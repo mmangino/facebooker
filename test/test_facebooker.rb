@@ -111,7 +111,7 @@ class TestFacebooker < Test::Unit::TestCase
   private
   def establish_session(session = @session)
     mock = flexmock(Net::HTTP).should_receive(:post_form).and_return(example_auth_token_xml).once.ordered(:posts)
-    mock = flexmock(Net::HTTP).should_receive(:post_form).and_return(example_get_session_xml).once.ordered(:posts)
+    mock.should_receive(:post_form).and_return(example_get_session_xml).once.ordered(:posts)
     session.secure!    
     mock
   end

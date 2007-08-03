@@ -19,7 +19,7 @@ module Facebooker
       end
       
       #
-      # Declares an attrbitute named ::symbol:: which can be set with either a list of instances of ::klass::
+      # Declares an attribute named ::symbol:: which can be set with either a list of instances of ::klass::
       # or a list of Hashes which will be used to populate a new instance of ::klass::.      
       def hash_settable_list_accessor(symbol, klass)
         attr_reader symbol
