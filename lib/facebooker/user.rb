@@ -60,6 +60,10 @@ module Facebooker
       publish(action)
     end
     
+    def albums
+      @albums ||= @session.post('facebook.photos.getAlbums', :uid => self.id)
+    end
+    
     private
     def publish(feed_story_or_action)
       @session.post(Facebooker::Feed::METHODS[feed_story_or_action.class.name.split(/::/).last], feed_story_or_action.to_params) == "1" ? true : false

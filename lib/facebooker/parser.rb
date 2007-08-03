@@ -77,7 +77,6 @@ module Facebooker
   class UserInfo < Parser#:nodoc:
     def self.process(data)
       response_element = element('users_getInfo_response', data)
-      hashinate(response_element)
       users = []
       response_element.elements.each('user') do |element|
         users << hashinate(element)
@@ -104,6 +103,19 @@ module Facebooker
     def self.process(data)
       response_element = element('notifications_get_response', data)
       hashinate(response_element)
+    end
+  end
+  
+  class GetAlbums < Parser#nodoc:
+    def self.process(data)
+      response_element = element('photos_getAlbums_response', data)
+      albums = []
+      response_element.elements.each('album') do |element|
+        album = hashinate(element)
+        album = Album.from_hash(album)
+        albums << album
+      end
+      albums
     end
   end
   
@@ -136,7 +148,8 @@ module Facebooker
       'facebook.users.getInfo' => UserInfo,
       'facebook.feed.publishStoryToUser' => PublishStoryToUser,
       'facebook.feed.publishActionOfUser' => PublishActionOfUser,
-      'facebook.notifications.get' => NotificationsGet
+      'facebook.notifications.get' => NotificationsGet,
+      'facebook.photos.getAlbums' => GetAlbums
     }
   end
 end

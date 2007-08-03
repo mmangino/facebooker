@@ -108,6 +108,13 @@ class TestFacebooker < Test::Unit::TestCase
       
   end
   
+  def test_should_get_albums_for_user
+    mock_http = establish_session
+    mock_http.should_receive(:post_form).and_return(example_albums_xml).once.ordered(:posts)
+    assert_equal('Summertime is Best', @session.user.albums.first.name)
+    assert_equal(4, @session.user.albums.size)
+  end
+  
   private
   def establish_session(session = @session)
     mock = flexmock(Net::HTTP).should_receive(:post_form).and_return(example_auth_token_xml).once.ordered(:posts)
@@ -360,6 +367,62 @@ class TestFacebooker < Test::Unit::TestCase
         </arg>
       </request_args>
     </error_response>    
+    XML
+  end
+  
+  def example_albums_xml
+    <<-XML
+    <?xml version="1.0" encoding="UTF-8"?>
+    <photos_getAlbums_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd" list="true">
+      <album>
+        <aid>97503428432802022</aid>
+        <cover_pid>97503428461115574</cover_pid>
+        <owner>22701786</owner>
+        <name>Summertime is Best</name>
+        <created>1184120648</created>
+        <modified>1185465771</modified>
+        <description>Happenings on or around Summer '07</description>
+        <location>Brooklyn, New York</location>
+        <link>http://www.facebook.com/album.php?aid=2011366&amp;id=22701786</link>
+        <size>49</size>
+      </album>
+      <album>
+        <aid>97503428432802301</aid>
+        <cover_pid>0</cover_pid>
+        <owner>22701786</owner>
+        <name>Facebook Exporter for iPhoto Photos</name>
+        <created>1185408168</created>
+        <modified>1185465762</modified>
+        <description/>
+        <location/>
+        <link>http://www.facebook.com/album.php?aid=2011645&amp;id=22701786</link>
+        <size>0</size>
+      </album>
+      <album>
+        <aid>97503428432797817</aid>
+        <cover_pid>97503428460977993</cover_pid>
+        <owner>22701786</owner>
+        <name>Bonofon's Recital</name>
+        <created>1165356279</created>
+        <modified>1165382364</modified>
+        <description>The whole Ewing fam flies out to flatland to watch the Bonofon's senior recital.  That boy sure can tinkle them ivories.</description>
+        <location>Grinnell College, Grinnell Iowa</location>
+        <link>http://www.facebook.com/album.php?aid=2007161&amp;id=22701786</link>
+        <size>14</size>
+      </album>
+      <album>
+        <aid>97503428432797059</aid>
+        <cover_pid>0</cover_pid>
+        <owner>22701786</owner>
+        <name>Articles of Interest</name>
+        <created>1162175229</created>
+        <modified>1162175229</modified>
+        <description/>
+        <location>Around the World</location>
+        <link>http://www.facebook.com/album.php?aid=2006403&amp;id=22701786</link>
+        <size>0</size>
+      </album>
+    </photos_getAlbums_response>
     XML
   end
   
