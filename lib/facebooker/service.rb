@@ -8,7 +8,8 @@ module Facebooker
       @api_key = api_key
     end
     
-    def post(params)
+   # TODO: support ssl 
+   def post(params)
       Parser.parse(params[:method], Net::HTTP.post_form(url, params))
     end
     
