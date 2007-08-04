@@ -99,6 +99,17 @@ module Facebooker
     end
   end  
   
+  class GetAppUsers < Parser#:nodoc:
+    def self.process(data)
+      response_element = element('friends_getAppUsers_response', data)
+      users = []
+      response_element.elements.each('uid') do |element|
+        users << element.children.first.to_s.strip
+      end
+      users
+    end
+  end
+  
   class NotificationsGet < Parser#:nodoc:
     def self.process(data)
       response_element = element('notifications_get_response', data)
@@ -149,6 +160,7 @@ module Facebooker
       'facebook.feed.publishStoryToUser' => PublishStoryToUser,
       'facebook.feed.publishActionOfUser' => PublishActionOfUser,
       'facebook.notifications.get' => NotificationsGet,
+      'facebook.friends.getAppUsers' => GetAppUsers,
       'facebook.photos.getAlbums' => GetAlbums
     }
   end

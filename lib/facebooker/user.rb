@@ -46,6 +46,12 @@ module Facebooker
         User.new(hash['uid'], @session, hash)
       end
     end
+
+    def friends_with_this_app
+      @friends_with_this_app ||= @session.post('facebook.friends.getAppUsers').map do |uid|
+        User.new(uid, @session)
+      end
+    end
     
     def notifications
       @notifications ||= Notifications.from_hash(@session.post('facebook.notifications.get'))

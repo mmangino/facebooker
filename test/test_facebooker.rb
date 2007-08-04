@@ -114,6 +114,13 @@ class TestFacebooker < Test::Unit::TestCase
     assert_equal('Summertime is Best', @session.user.albums.first.name)
     assert_equal(4, @session.user.albums.size)
   end
+ 
+  def test_can_find_friends_who_have_installed_app
+    mock_http = establish_session
+    mock_http.should_receive(:post_form).and_return(example_app_users_xml).once.ordered(:posts)
+    assert_equal(2, @session.user.friends_with_this_app.size)
+    assert_equal(['222333', '1240079'], @session.user.friends_with_this_app.map{|f| f.id})
+  end
   
   private
   def establish_session(session = @session)
@@ -367,6 +374,16 @@ class TestFacebooker < Test::Unit::TestCase
         </arg>
       </request_args>
     </error_response>    
+    XML
+  end
+
+  def example_app_users_xml
+    <<-XML
+          <?xml version="1.0" encoding="UTF-8"?>
+      <friends_getAppUsers_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd" list="true">
+        <uid>222333</uid>
+        <uid>1240079</uid>
+      </friends_getAppUsers_response> 
     XML
   end
   
