@@ -55,10 +55,7 @@ class TestFacebooker < Test::Unit::TestCase
   end
   
   def test_can_get_info_for_one_or_more_users
-    mock_http = establish_session
-    mock_http.should_receive(:post_form).and_return(example_friends_xml).once.ordered(:posts)
-    mock_http.should_receive(:post_form).and_return(example_user_info_xml).once.ordered(:posts)
-    friends = @session.user.friends!
+    friends = populate_session_friends
     friend = friends.detect{|f| f.id == '222333'}
     assert_equal('This field perpetuates the glorification of the ego.  Also, it has a character limit.',
                  friend.about_me)  
@@ -122,12 +119,33 @@ class TestFacebooker < Test::Unit::TestCase
     assert_equal(['222333', '1240079'], @session.user.friends_with_this_app.map{|f| f.id})
   end
   
+  def test_when_marshaling_a_session_object_only_enough_data_to_stay_authenticated_is_stored
+    populate_session_friends
+    assert_equal(2, @session.user.friends.size)
+    reloaded_session = Marshal.load(Marshal.dump(@session))
+    %w(@session_key @uid @expires @secret_from_session @auth_token).each do |iv_name|
+      assert_not_nil(reloaded_session.instance_variable_get(iv_name))
+    end
+    assert_nil(reloaded_session.user.instance_variable_get("@friends"))
+  end
+  
+  
+  
+  
   private
   def establish_session(session = @session)
     mock = flexmock(Net::HTTP).should_receive(:post_form).and_return(example_auth_token_xml).once.ordered(:posts)
     mock.should_receive(:post_form).and_return(example_get_session_xml).once.ordered(:posts)
     session.secure!    
     mock
+  end
+  
+  
+  def populate_session_friends
+    mock_http = establish_session
+    mock_http.should_receive(:post_form).and_return(example_friends_xml).once.ordered(:posts)
+    mock_http.should_receive(:post_form).and_return(example_user_info_xml).once.ordered(:posts)
+    @session.user.friends!    
   end
   
   def sample_args_to_post

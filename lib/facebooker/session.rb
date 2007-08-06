@@ -55,6 +55,15 @@ module Facebooker
       @user ||= User.new(uid, self)
     end
     
+    
+    def marshal_load(variables)
+      @session_key, @uid, @expires, @secret_from_session, @auth_token = variables
+    end
+    
+    def marshal_dump
+      [@session_key, @uid, @expires, @secret_from_session, @auth_token]
+    end
+    
     class Desktop < Session
       def login_url
         super + "&auth_token=#{auth_token}"
