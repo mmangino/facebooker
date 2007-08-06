@@ -123,7 +123,6 @@ module Facebooker
       albums = []
       response_element.elements.each('album') do |element|
         album = hashinate(element)
-        album = Album.from_hash(album)
         albums << album
       end
       albums

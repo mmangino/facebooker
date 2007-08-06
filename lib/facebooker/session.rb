@@ -55,6 +55,11 @@ module Facebooker
       @user ||= User.new(uid, self)
     end
     
+    def get_albums(album_ids)
+      @albums ||= post('facebook.photos.getAlbums', :aids => album_ids).map do |hash|
+        Album.from_hash(hash)
+      end
+    end
     
     def marshal_load(variables)
       @session_key, @uid, @expires, @secret_from_session, @auth_token = variables

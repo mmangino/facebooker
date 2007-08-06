@@ -67,7 +67,9 @@ module Facebooker
     end
     
     def albums
-      @albums ||= @session.post('facebook.photos.getAlbums', :uid => self.id)
+      @albums ||= @session.post('facebook.photos.getAlbums', :uid => self.id).map do |hash|
+        Album.from_hash(hash)
+      end
     end
     
     private
