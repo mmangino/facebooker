@@ -24,7 +24,7 @@ module Facebooker
     hash_settable_list_accessor :work_history, WorkInfo
 
     def initialize(id, session, attributes = {})
-      @id = id
+      @id = Integer(id)
       @session = session
       populate_from_hash!(attributes)
     end

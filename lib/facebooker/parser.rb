@@ -117,6 +117,13 @@ module Facebooker
     end
   end
   
+  class NotificationsSend < Parser#:nodoc:
+    def self.process(data)
+      response_element = element('notifications_send_response', data)
+      hashinate(response_element)
+    end
+  end
+  
   class GetAlbums < Parser#nodoc:
     def self.process(data)
       response_element = element('photos_getAlbums_response', data)
@@ -160,7 +167,8 @@ module Facebooker
       'facebook.feed.publishActionOfUser' => PublishActionOfUser,
       'facebook.notifications.get' => NotificationsGet,
       'facebook.friends.getAppUsers' => GetAppUsers,
-      'facebook.photos.getAlbums' => GetAlbums
+      'facebook.photos.getAlbums' => GetAlbums,
+      'facebook.notifications.send' => NotificationsSend
     }
   end
 end

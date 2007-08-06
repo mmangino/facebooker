@@ -42,12 +42,23 @@ module Facebooker
       @auth_token ||= post 'facebook.auth.createToken'
     end
     
-    #TODO: sucky name for this      
+    def infinite?
+      @expires == 0
+    end
+    
+    def expired?
+      @expires.nil? || (!infinite? && Time.at(@expires) <= Time.now)
+    end
+    
+    def secured?
+      !@session_key.nil? && !expired?
+    end
+    
     def secure!
       response = post 'facebook.auth.getSession', :auth_token => auth_token
       @session_key = response['session_key']
-      @uid = response['uid']
-      @expires = response['expires']
+      @uid = Integer(response['uid'])
+      @expires = Integer(response['expires'])
       @secret_from_session = response['secret']
     end    
     
@@ -61,11 +72,19 @@ module Facebooker
       end
     end
     
-    def marshal_load(variables)
+    def send_notification(user_ids, fbml, email_fbml = nil)
+      params = {:notification => fbml, :to_ids => user_ids.join(',')}
+      if email_fbml
+        params[:email] = email_fbml
+      end
+      post 'facebook.notifications.send', params
+    end
+    
+    def marshal_load(variables)#:nodoc:
       @session_key, @uid, @expires, @secret_from_session, @auth_token = variables
     end
     
-    def marshal_dump
+    def marshal_dump#:nodoc:
       [@session_key, @uid, @expires, @secret_from_session, @auth_token]
     end
     

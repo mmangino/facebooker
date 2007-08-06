@@ -45,18 +45,18 @@ class TestFacebooker < Test::Unit::TestCase
   def test_session_can_get_current_logged_in_user_id_and_will_cache
     establish_session
     flexmock(Net::HTTP).should_receive(:post_form).and_return(example_get_logged_in_user_xml)
-    assert_equal('8055', @session.user.id)
+    assert_equal(8055, @session.user.id)
   end
 
   def test_can_get_current_users_friends
     mock_http = establish_session
     mock_http.should_receive(:post_form).and_return(example_friends_xml).once.ordered(:posts)
-    assert_equal(['222333', '1240079'], @session.user.friends.map{|friend| friend.id})
+    assert_equal([222333, 1240079], @session.user.friends.map{|friend| friend.id})
   end
   
   def test_can_get_info_for_one_or_more_users
     friends = populate_session_friends
-    friend = friends.detect{|f| f.id == '222333'}
+    friend = friends.detect{|f| f.id == 222333}
     assert_equal('This field perpetuates the glorification of the ego.  Also, it has a character limit.',
                  friend.about_me)  
     assert_equal('Facebook Developers', friend.affiliations.first.name)
@@ -102,7 +102,17 @@ class TestFacebooker < Test::Unit::TestCase
     assert_equal("1", @session.user.notifications.messages.unread)  
     assert_equal("0", @session.user.notifications.pokes.unread)    
     assert_equal("1", @session.user.notifications.shares.unread)        
-      
+  end
+  
+  def test_can_send_notifications
+    mock_http = establish_session
+    mock_http.should_receive(:post_form).and_return(example_notifications_send_xml).once.ordered(:posts)
+    assert_nothing_raised {
+      user_ids = [123, 321]
+      notification_fbml = "O HAI!!!"
+      optional_email_fbml = "This would be in the email.  If this is not passed, facebook sends  no mailz!"
+      @session.send_notification(user_ids, notification_fbml, optional_email_fbml)
+    }
   end
   
   def test_should_get_albums_for_user
@@ -123,7 +133,7 @@ class TestFacebooker < Test::Unit::TestCase
     mock_http = establish_session
     mock_http.should_receive(:post_form).and_return(example_app_users_xml).once.ordered(:posts)
     assert_equal(2, @session.user.friends_with_this_app.size)
-    assert_equal(['222333', '1240079'], @session.user.friends_with_this_app.map{|f| f.id})
+    assert_equal([222333, 1240079], @session.user.friends_with_this_app.map{|f| f.id})
   end
   
   def test_when_marshaling_a_session_object_only_enough_data_to_stay_authenticated_is_stored
@@ -137,7 +147,20 @@ class TestFacebooker < Test::Unit::TestCase
   end
   
   
+  def test_sessions_can_be_infinite_or_can_expire
+    establish_session
+    assert(@session.expired?, "Session with expiry time #{@session.instance_variable_get('@expires')} occurred in the past and should be expired.")
+    @session.instance_variable_set("@expires", 0)
+    assert(@session.infinite?)
+    assert(!@session.expired?)
+  end
   
+  def test_session_can_tell_you_if_it_has_been_secured
+    mock = flexmock(Net::HTTP).should_receive(:post_form).and_return(example_auth_token_xml).once.ordered(:posts)
+    mock.should_receive(:post_form).and_return(example_get_session_xml.sub(/1173309298/, (Time.now + 60).to_i.to_s)).once.ordered(:posts)
+    @session.secure!    
+    assert(@session.secured?)
+  end
   
   private
   def establish_session(session = @session)
@@ -159,6 +182,12 @@ class TestFacebooker < Test::Unit::TestCase
     {:method=>"facebook.auth.createToken", :sig=>"18b3dc4f5258a63c0ad641eebd3e3930"}
   end  
   
+  def example_notifications_send_xml
+    <<-XML
+<?xml version="1.0" encoding="UTF-8"?>
+<notifications_send_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd">http://www.facebook.com/send_email.php?from=211031&id=52</notifications_send_response>
+    XML
+  end
   
   def example_notifications_get_xml
     <<-XML
