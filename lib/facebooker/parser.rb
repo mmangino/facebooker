@@ -19,6 +19,26 @@ module Facebooker
       )
     end
     
+    def self.array_of(response_element, element_name)
+      values_to_return = []
+      response_element.elements.each(element_name) do |element|
+        values_to_return << yield(element)
+      end
+      values_to_return
+    end
+    
+    def self.array_of_text_values(response_element, element_name)
+      array_of(response_element, element_name) do |element|
+        element.text_value
+      end
+    end
+
+    def self.array_of_hashes(response_element, element_name)
+      array_of(response_element, element_name) do |element|
+        hashinate(element)
+      end
+    end
+    
     def self.element(name, data)
       data = data.body rescue data # either data or an HTTP response
       doc = REXML::Document.new(data)
@@ -66,95 +86,67 @@ module Facebooker
 
   class GetSession < Parser#:nodoc:
     def self.process(data)      
-      response_element = element('auth_getSession_response', data)
-      hashinate(response_element)
+      hashinate(element('auth_getSession_response', data))
     end
   end
   
   class GetFriends < Parser#:nodoc:
     def self.process(data)
-      response_element = element('friends_get_response', data)
-      friend_uids = []
-      response_element.elements.each('uid') do |element|
-        friend_uids << element.text_value
-      end
-      friend_uids
+      array_of_text_values(element('friends_get_response', data), 'uid')
     end
   end
  
   class UserInfo < Parser#:nodoc:
     def self.process(data)
-      response_element = element('users_getInfo_response', data)
-      users = []
-      response_element.elements.each('user') do |element|
-        users << hashinate(element)
-      end
-      users
+      array_of_hashes(element('users_getInfo_response', data), 'user')
     end
   end
   
   class PublishStoryToUser < Parser#:nodoc:
     def self.process(data)
-      response_element = element('feed_publishStoryToUser_response', data)
-      response_element.text_value
+      element('feed_publishStoryToUser_response', data).text_value
     end
   end
   
   class PublishActionOfUser < Parser#:nodoc:
     def self.process(data)
-      response_element = element('feed_publishActionOfUser_response', data)
-      response_element.text_value
+      element('feed_publishActionOfUser_response', data).text_value
     end
   end  
   
   class GetAppUsers < Parser#:nodoc:
     def self.process(data)
-      response_element = element('friends_getAppUsers_response', data)
-      users = []
-      response_element.elements.each('uid') do |element|
-        users << element.text_value
-      end
-      users
+      array_of_text_values(element('friends_getAppUsers_response', data), 'uid')
     end
   end
   
   class NotificationsGet < Parser#:nodoc:
     def self.process(data)
-      response_element = element('notifications_get_response', data)
-      hashinate(response_element)
+      hashinate(element('notifications_get_response', data))
     end
   end
   
   class NotificationsSend < Parser#:nodoc:
     def self.process(data)
-      response_element = element('notifications_send_response', data)
-      response_element.text_value
+      element('notifications_send_response', data).text_value
     end
   end
   
   class GetAlbums < Parser#nodoc:
     def self.process(data)
-      response_element = element('photos_getAlbums_response', data)
-      albums = []
-      response_element.elements.each('album') do |element|
-        album = hashinate(element)
-        albums << album
-      end
-      albums
+      array_of_hashes(element('photos_getAlbums_response', data), 'album')
     end
   end
   
   class CreateAlbum < Parser#:nodoc:
     def self.process(data)
-      response_element = element('photos_createAlbum_response', data)
-      hashinate(response_element)
+      hashinate(element('photos_createAlbum_response', data))
     end
   end  
   
   class SendRequest < Parser#:nodoc:
     def self.process(data)
-      response_element = element('notifications_sendRequest_response', data)
-      response_element.text_value
+      element('notifications_sendRequest_response', data).text_value
     end
   end
   

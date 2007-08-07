@@ -3,5 +3,4 @@
 * Missing method calls (obvious)
 * Provide method for determining whether a session has been secured
 
-* Refactor parser.rb for duplication when dealing with lists.
 * Split test_facebooker.rb into multiple files
