@@ -1,3 +1,4 @@
+require 'facebooker'
 module Facebooker
   module Rails
     module Controller
