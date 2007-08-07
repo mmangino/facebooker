@@ -136,12 +136,19 @@ module Facebooker
     end
   end
   
-  class CreateAlbum < Parser#nodoc:
+  class CreateAlbum < Parser#:nodoc:
     def self.process(data)
       response_element = element('photos_createAlbum_response', data)
       hashinate(response_element)
     end
   end  
+  
+  class SendRequest < Parser#:nodoc:
+    def self.process(data)
+      response_element = element('notifications_sendRequest_response', data)
+      response_element.children.first.to_s.strip
+    end
+  end
   
   class Errors < Parser#:nodoc:
     EXCEPTIONS = {
@@ -176,7 +183,8 @@ module Facebooker
       'facebook.notifications.send' => NotificationsSend,
       'facebook.friends.getAppUsers' => GetAppUsers,
       'facebook.photos.getAlbums' => GetAlbums,
-      'facebook.photos.createAlbum' => CreateAlbum
+      'facebook.photos.createAlbum' => CreateAlbum,
+      'facebook.notifications.sendRequest' => SendRequest
     }
   end
 end

@@ -79,6 +79,14 @@ module Facebooker
       end
       post 'facebook.notifications.send', params
     end
+
+    def send_request(user_ids, request_type, content, image_url)
+      send_request_or_invitation(user_ids, request_type, content, image_url, false)      
+    end
+
+    def send_invitation(user_ids, invitation_type, content, image_url)
+      send_request_or_invitation(user_ids, invitation_type, content, image_url, true)
+    end
     
     def marshal_load(variables)#:nodoc:
       @session_key, @uid, @expires, @secret_from_session, @auth_token = variables
@@ -122,7 +130,7 @@ module Facebooker
     def uid
       @uid || (secure!; @uid)
     end
-    
+      
     def signature_for(params)
       raw_string = params.inject([]) do |collection, pair|
         collection << pair.join("=")
@@ -130,6 +138,10 @@ module Facebooker
       end.sort.join
       Digest::MD5.hexdigest([raw_string, secret_for_method(params[:method])].join)
     end
-    
+        
+    def send_request_or_invitation(user_ids, request_type, content, image_url, invitation)
+      params = {:to_ids => user_ids, :type => request_type, :content => content, :image => image_url, :invitation => invitation}
+      post 'facebook.notifications.sendRequest', params
+    end    
   end
 end

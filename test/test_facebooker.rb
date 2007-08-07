@@ -115,6 +115,18 @@ class TestFacebooker < Test::Unit::TestCase
     }
   end
   
+  
+  def test_can_send_invitation_or_request
+    mock_http = establish_session
+    mock_http.should_receive(:post_form).and_return(example_request_send_xml).twice.ordered(:posts)
+    assert_nothing_raised {
+      expected_url = 'http://www.facebook.com/send_req.php?from=211031&id=6'
+      content = 'uhuh. yes. thx'
+      assert_equal(expected_url, @session.send_invitation(user_ids = [123, 321], invitation_type = 'partay', content, image_url = 'http://farm1.static.flickr.com/72/173637866_78e981fa58.jpg?v=0'))
+      assert_equal(expected_url, @session.send_request(user_ids = [123, 321], invitation_type = 'werewolf game', content, image_url = 'http://farm1.static.flickr.com/72/173637866_78e981fa58.jpg?v=0'))
+    }
+  end
+  
   def test_should_get_albums_for_user
     mock_http = establish_session
     mock_http.should_receive(:post_form).and_return(example_user_albums_xml).once.ordered(:posts)
@@ -193,6 +205,13 @@ class TestFacebooker < Test::Unit::TestCase
 <notifications_send_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd">http://www.facebook.com/send_email.php?from=211031&id=52</notifications_send_response>
     XML
   end
+
+  def example_request_send_xml
+    <<-XML
+    <?xml version="1.0" encoding="UTF-8"?>
+    <notifications_sendRequest_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd">http://www.facebook.com/send_req.php?from=211031&id=6</notifications_sendRequest_response>    
+    XML
+  end  
   
   def example_notifications_get_xml
     <<-XML
