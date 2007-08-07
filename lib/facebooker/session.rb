@@ -15,10 +15,10 @@ module Facebooker
     class SessionExpired < Exception; end
     class CallOutOfOrder < Exception; end
     class IncorrectSignature     < Exception; end
+    class ConfigurationMissing < Exception; end
 
     API_SERVER_BASE_URL       = "api.facebook.com"
     API_PATH_REST             = "/restserver.php"
-
     WWW_SERVER_BASE_URL       = "www.facebook.com"
     WWW_PATH_LOGIN            = "/login.php"
     WWW_PATH_ADD              = "/add.php"
@@ -28,7 +28,15 @@ module Facebooker
       raise ArgumentError unless !api_key.nil? && !secret_key.nil?
       new(api_key, secret_key)
     end
-  
+    
+    def self.api_key
+      extract_key_from_environment(:api) || extract_key_from_configuration_file(:api) rescue report_inability_to_find_key(:api)
+    end
+    
+    def self.secret_key
+      extract_key_from_environment(:secret) || extract_key_from_configuration_file(:secret) rescue report_inability_to_find_key(:secret)
+    end
+    
     def login_url
       "http://www.facebook.com/login.php?api_key=#{@api_key}&v=1.0"
     end
@@ -132,7 +140,31 @@ module Facebooker
       service.post(params.merge(:sig => signature_for(params)))      
     end
     
+    def self.configuration_file_path
+      @configuration_file_path || File.expand_path("~/.facebookerrc")
+    end
+    
+    def self.configuration_file_path=(path)
+      @configuration_file_path = path
+    end
+    
     private
+    def self.extract_key_from_environment(key_name)
+      val = ENV["FACEBOOK_" + key_name.to_s.upcase + "_KEY"]
+    end
+    
+    def self.extract_key_from_configuration_file(key_name)
+      read_configuration_file[key_name]
+    end
+    
+    def self.report_inability_to_find_key(key_name)
+      raise ConfigurationMissing, "Could not find configuration information for #{key_name}"
+    end
+    
+    def self.read_configuration_file
+      eval(File.read(configuration_file_path))
+    end
+    
     def service
       @service ||= Service.new(API_SERVER_BASE_URL, API_PATH_REST, @api_key)      
     end
