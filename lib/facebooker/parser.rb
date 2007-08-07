@@ -3,6 +3,14 @@ require 'facebooker/session'
 module Facebooker
   class Parser
     
+    module REXMLElementExtensions
+      def text_value
+        self.children.first.to_s.strip
+      end
+    end
+    
+    ::REXML::Element.__send__(:include, REXMLElementExtensions)
+    
     def self.parse(method, data)
       Errors.process(data)
       parser = Parser::PARSERS[method]
@@ -22,7 +30,7 @@ module Facebooker
     
     def self.hash_or_value_for(element)
       if element.children.size == 1 && element.children.first.kind_of?(REXML::Text)
-        element.children.first.to_s.strip
+        element.text_value
       else
         hashinate(element)
       end
@@ -31,7 +39,7 @@ module Facebooker
     def self.hashinate(response_element)
       response_element.children.reject{|c| c.kind_of? REXML::Text}.inject({}) do |hash, child|
         hash[child.name] = if child.children.size == 1 && child.children.first.kind_of?(REXML::Text)
-          child.children.first.to_s.strip
+          child.text_value
         else
           if child.attributes['list'] == 'true'
             child.children.reject{|c| c.kind_of? REXML::Text}.map do |subchild| 
@@ -52,7 +60,7 @@ module Facebooker
   
   class CreateToken < Parser#:nodoc:
     def self.process(data)
-      element('auth_createToken_response', data).children.first.to_s.strip
+      element('auth_createToken_response', data).text_value
     end
   end
 
@@ -68,7 +76,7 @@ module Facebooker
       response_element = element('friends_get_response', data)
       friend_uids = []
       response_element.elements.each('uid') do |element|
-        friend_uids << element.children.first.to_s.strip
+        friend_uids << element.text_value
       end
       friend_uids
     end
@@ -88,14 +96,14 @@ module Facebooker
   class PublishStoryToUser < Parser#:nodoc:
     def self.process(data)
       response_element = element('feed_publishStoryToUser_response', data)
-      response_element.children.first.to_s.strip
+      response_element.text_value
     end
   end
   
   class PublishActionOfUser < Parser#:nodoc:
     def self.process(data)
       response_element = element('feed_publishActionOfUser_response', data)
-      response_element.children.first.to_s.strip
+      response_element.text_value
     end
   end  
   
@@ -104,7 +112,7 @@ module Facebooker
       response_element = element('friends_getAppUsers_response', data)
       users = []
       response_element.elements.each('uid') do |element|
-        users << element.children.first.to_s.strip
+        users << element.text_value
       end
       users
     end
@@ -120,7 +128,7 @@ module Facebooker
   class NotificationsSend < Parser#:nodoc:
     def self.process(data)
       response_element = element('notifications_send_response', data)
-      response_element.children.first.to_s.strip
+      response_element.text_value
     end
   end
   
@@ -146,7 +154,7 @@ module Facebooker
   class SendRequest < Parser#:nodoc:
     def self.process(data)
       response_element = element('notifications_sendRequest_response', data)
-      response_element.children.first.to_s.strip
+      response_element.text_value
     end
   end
   
