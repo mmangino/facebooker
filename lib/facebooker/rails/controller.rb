@@ -29,9 +29,6 @@ module Facebooker
         def ensure_authenticated_to_facebook(options = {})
           before_filter :set_facebook_session, options
         end
-        def ensure_application_added_on_facebook
-          raise "Not implemented yet"
-        end
       end
     end
   end
