@@ -74,6 +74,10 @@ module Facebooker
     def create_album(params)
       @album = Album.from_hash(@session.post('facebook.photos.createAlbum', params))
     end
+
+    def profile_fbml
+      @session.post('facebook.profile.getFBML', :uid => @id)  
+    end    
     
     private
     def publish(feed_story_or_action)

@@ -179,6 +179,12 @@ class TestFacebooker < Test::Unit::TestCase
     assert_equal "My Empty Album", @session.user.create_album(:name => "My Empty Album", :location => "Limboland").name
   end  
   
+  def test_can_get_app_profile_fbml_for_user
+    mock_http = establish_session
+    mock_http.should_receive(:post_form).and_return(example_get_fbml_xml).once.ordered(:posts)
+    assert_match(/My profile!/, @session.user.profile_fbml)
+  end
+  
   private
   def establish_session(session = @session)
     mock = flexmock(Net::HTTP).should_receive(:post_form).and_return(example_auth_token_xml).once.ordered(:posts)
@@ -198,6 +204,18 @@ class TestFacebooker < Test::Unit::TestCase
   def sample_args_to_post
     {:method=>"facebook.auth.createToken", :sig=>"18b3dc4f5258a63c0ad641eebd3e3930"}
   end  
+  
+  
+  def example_get_fbml_xml
+    <<-XML
+    <?xml version="1.0" encoding="UTF-8"?>
+    <profile_getFBML_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd">
+    &lt;fb:if-is-own-profile&gt;My profile!
+    &lt;fb:else&gt; Not my profile!&lt;/fb:else&gt;
+    &lt;/fb:if-is-own-profile&gt;
+    </profile_getFBML_response>    
+    XML
+  end
   
   def example_notifications_send_xml
     <<-XML
