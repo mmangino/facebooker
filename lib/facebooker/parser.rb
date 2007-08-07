@@ -156,6 +156,12 @@ module Facebooker
     end
   end
   
+  class ProfileFBMLSet < Parser#:nodoc:
+    def self.process(data)
+      element('profile_setFBML_response', data).text_value
+    end
+  end
+    
   class Errors < Parser#:nodoc:
     EXCEPTIONS = {
       1 	=> Facebooker::Session::UnknownError,
@@ -191,7 +197,8 @@ module Facebooker
       'facebook.photos.getAlbums' => GetAlbums,
       'facebook.photos.createAlbum' => CreateAlbum,
       'facebook.notifications.sendRequest' => SendRequest,
-      'facebook.profile.getFBML' => ProfileFBML
+      'facebook.profile.getFBML' => ProfileFBML,
+      'facebook.profile.setFBML' => ProfileFBMLSet
     }
   end
 end

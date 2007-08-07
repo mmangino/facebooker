@@ -1,5 +1,9 @@
 require 'digest/md5'
 module Facebooker
+  #
+  # Raised when trying to perform an operation on a user
+  # other than the logged in user (if that's unallowed)
+  class NonSessionUser < Exception;  end
   class Session
     class SessionExpired < Exception; end
     class UnknownError < Exception; end
@@ -106,6 +110,12 @@ module Facebooker
         secret
       end
       
+      def post(method, params = {})
+        if method == 'facebook.profile.getFBML' || method == 'facebook.profile.setFBML'
+          raise NonSessionUser.new("User #{@uid} is not the logged in user.") unless @uid == params[:uid]
+        end
+        super
+      end
       private
         def auth_request_methods
           ['facebook.auth.getSession', 'facebook.auth.createToken']

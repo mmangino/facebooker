@@ -185,6 +185,25 @@ class TestFacebooker < Test::Unit::TestCase
     assert_match(/My profile!/, @session.user.profile_fbml)
   end
   
+  def test_can_set_app_profile_fbml_for_user
+    mock_http = establish_session
+    mock_http.should_receive(:post_form).and_return(example_set_fbml_xml).once.ordered(:posts)
+    assert_nothing_raised {
+      @session.user.profile_fbml = 'aha!'
+    }
+  end
+  
+  def test_desktop_apps_cannot_request_to_get_or_set_profile_fbml_for_any_user_other_than_logged_in_user
+    mock_http = establish_session(@desktop_session)
+    mock_http.should_receive(:post_form).and_return(example_friends_xml).once.ordered(:posts)
+    assert_raises(Facebooker::NonSessionUser) {
+      @desktop_session.user.friends.first.profile_fbml
+    }
+    assert_raises(Facebooker::NonSessionUser) {
+      @desktop_session.user.friends.first.profile_fbml = "O rly"
+    }
+  end
+  
   private
   def establish_session(session = @session)
     mock = flexmock(Net::HTTP).should_receive(:post_form).and_return(example_auth_token_xml).once.ordered(:posts)
@@ -205,6 +224,12 @@ class TestFacebooker < Test::Unit::TestCase
     {:method=>"facebook.auth.createToken", :sig=>"18b3dc4f5258a63c0ad641eebd3e3930"}
   end  
   
+  def example_set_fbml_xml
+    <<-XML
+    <?xml version="1.0" encoding="UTF-8"?>
+      <profile_setFBML_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd">1</profile_setFBML_response>    
+    XML
+  end
   
   def example_get_fbml_xml
     <<-XML
