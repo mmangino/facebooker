@@ -120,7 +120,7 @@ module Facebooker
   class NotificationsSend < Parser#:nodoc:
     def self.process(data)
       response_element = element('notifications_send_response', data)
-      hashinate(response_element)
+      response_element.children.first.to_s.strip
     end
   end
   

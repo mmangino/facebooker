@@ -111,7 +111,7 @@ class TestFacebooker < Test::Unit::TestCase
       user_ids = [123, 321]
       notification_fbml = "O HAI!!!"
       optional_email_fbml = "This would be in the email.  If this is not passed, facebook sends  no mailz!"
-      @session.send_notification(user_ids, notification_fbml, optional_email_fbml)
+      assert_equal('http://www.facebook.com/send_email.php?from=211031&id=52', @session.send_notification(user_ids, notification_fbml, optional_email_fbml))
     }
   end
   
