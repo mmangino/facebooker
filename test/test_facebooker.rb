@@ -121,13 +121,6 @@ class TestFacebooker < Test::Unit::TestCase
     assert_equal('Summertime is Best', @session.user.albums.first.name)
     assert_equal(2, @session.user.albums.size)
   end
-  
-  
-  def test_should_get_albums_by_album_ids
-    mock_http = establish_session
-    mock_http.should_receive(:post_form).and_return(example_user_albums_xml).once.ordered(:posts)
-    assert_equal('Summertime is Best', @session.get_albums(:aids => [97503428432802022, 97503428432797817] ).first.name)
-  end
  
   def test_can_find_friends_who_have_installed_app
     mock_http = establish_session
@@ -161,6 +154,18 @@ class TestFacebooker < Test::Unit::TestCase
     @session.secure!    
     assert(@session.secured?)
   end
+  
+  def test_should_get_albums_by_album_ids
+    mock_http = establish_session
+    mock_http.should_receive(:post_form).and_return(example_user_albums_xml).once.ordered(:posts)
+    assert_equal('Summertime is Best', @session.get_albums(:aids => [97503428432802022, 97503428432797817] ).first.name)
+  end
+  
+  def test_should_create_album
+    mock_http = establish_session
+    mock_http.should_receive(:post_form).and_return(example_new_album_xml).once.ordered(:posts)
+    assert_equal "My Empty Album", @session.user.create_album(:name => "My Empty Album", :location => "Limboland").name
+  end  
   
   private
   def establish_session(session = @session)
@@ -472,5 +477,24 @@ class TestFacebooker < Test::Unit::TestCase
     </photos_getAlbums_response>
     XML
   end
+  
+  def example_new_album_xml
+    <<-XML
+    <?xml version="1.0" encoding="UTF-8"?>
+    <photos_createAlbum_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd">
+      <aid>34595963571485</aid>
+      <cover_pid>0</cover_pid>
+      <owner>8055</owner>
+      <name>My Empty Album</name>
+      <created>1132553109</created>
+      <modified>1132553363</modified>
+      <description>No I will not make out with you</description>
+      <location>York, PA</location>
+      <link>http://www.facebook.com/album.php?aid=2002205&id=8055</link>
+      <size>0</size>
+    </photos_createAlbum_response>
+    XML
+  end
+  
   
 end

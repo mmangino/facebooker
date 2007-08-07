@@ -136,6 +136,13 @@ module Facebooker
     end
   end
   
+  class CreateAlbum < Parser#nodoc:
+    def self.process(data)
+      response_element = element('photos_createAlbum_response', data)
+      hashinate(response_element)
+    end
+  end  
+  
   class Errors < Parser#:nodoc:
     EXCEPTIONS = {
       1 	=> Facebooker::Session::UnknownError,
@@ -166,9 +173,10 @@ module Facebooker
       'facebook.feed.publishStoryToUser' => PublishStoryToUser,
       'facebook.feed.publishActionOfUser' => PublishActionOfUser,
       'facebook.notifications.get' => NotificationsGet,
+      'facebook.notifications.send' => NotificationsSend,
       'facebook.friends.getAppUsers' => GetAppUsers,
       'facebook.photos.getAlbums' => GetAlbums,
-      'facebook.notifications.send' => NotificationsSend
+      'facebook.photos.createAlbum' => CreateAlbum
     }
   end
 end

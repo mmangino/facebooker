@@ -57,7 +57,6 @@ module Facebooker
       @notifications ||= Notifications.from_hash(@session.post('facebook.notifications.get'))
     end
     
-    
     def publish_story(story)
       publish(story)
     end
@@ -70,6 +69,10 @@ module Facebooker
       @albums ||= @session.post('facebook.photos.getAlbums', :uid => self.id).map do |hash|
         Album.from_hash(hash)
       end
+    end
+    
+    def create_album(params)
+      @album = Album.from_hash(@session.post('facebook.photos.createAlbum', params))
     end
     
     private

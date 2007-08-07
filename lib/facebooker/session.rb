@@ -103,7 +103,6 @@ module Facebooker
           ['facebook.auth.getSession', 'facebook.auth.createToken']
         end
     end
-    
 
     
     def post(method, params = {})
