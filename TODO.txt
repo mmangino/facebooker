@@ -1,6 +1,5 @@
 * Specify fields wanted when getting user info (defaults to all now)
 * Support missing parameters on methods---most notably authentication-related parameters such as next and canvas
 * Missing method calls (obvious)
-* Provide method for determining whether a session has been secured
 
 * Split test_facebooker.rb into multiple files
