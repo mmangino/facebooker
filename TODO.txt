@@ -1,6 +1,4 @@
 * Specify fields wanted when getting user info (defaults to all now)
 * Support missing parameters on methods---most notably authentication-related parameters such as next and canvas
 * Missing method calls (obvious)
-* In Rails, handle params being passed down from facebook for Web apps.  Make this non-rails-specific?
-* Figure out why session doesn't seem to be working on non-Desktop Session (Invalid API Key).  Experiment on a server.  That might be the issue.
 * Split test_facebooker.rb into multiple files
