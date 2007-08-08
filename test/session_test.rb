@@ -38,7 +38,48 @@ class SessionTest < Test::Unit::TestCase
     assert(session.secured?)
   end
   
+  # The Facebook API for this is hideous.  Oh well.
+  def test_can_ask_session_to_check_friendship_between_pairs_of_users
+    @session = Facebooker::Session.create(ENV['FACEBOOK_API_KEY'], ENV['FACEBOOK_SECRET_KEY'])
+    mock_http = establish_session
+    mock_http.should_receive(:post_form).and_return(example_check_friendship_xml).once.ordered(:posts)
+    assert_equal({[222332, 222333] => true, [1240077, 1240079] => false}, @session.check_friendship([[222332, 222333], [1240077, 1240079]]))    
+  end
+  
   def teardown
     Facebooker::Session.configuration_file_path = nil
   end
+  
+  private
+  def example_check_friendship_xml
+    <<-XML
+    <?xml version="1.0" encoding="UTF-8"?>
+    <friends_areFriends_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd" list="true">
+      <friend_info>
+        <uid1>222332</uid1>
+        <uid2>222333</uid2>
+        <are_friends>1</are_friends>
+      </friend_info>
+      <friend_info>
+        <uid1>1240077</uid1>
+        <uid2>1240079</uid2>
+        <are_friends>0</are_friends>
+      </friend_info>
+    </friends_areFriends_response>    
+    XML
+  end
+  
+  def example_check_friendship_with_unknown_result
+    <<-XML
+    <?xml version="1.0" encoding="UTF-8"?>
+    <friends_areFriends_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd" list="true">
+      <friend_info>
+        <uid1>1240077</uid1>
+        <uid2>1240079</uid2>
+        <are_friends xsi:nil="true"/>
+      </friend_info>
+    </friends_areFriends_response>    
+    XML
+  end
+  
 end

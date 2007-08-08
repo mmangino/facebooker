@@ -161,6 +161,26 @@ module Facebooker
       element('profile_setFBML_response', data).text_value
     end
   end
+  
+  class AreFriends < Parser#:nodoc:
+    def self.process(data)
+      array_of_hashes(element('friends_areFriends_response', data), 'friend_info').inject({}) do |memo, hash|
+        memo[[Integer(hash['uid1']), Integer(hash['uid2'])].sort] = are_friends?(hash['are_friends'])
+        memo
+      end
+    end
+    
+    private
+    def self.are_friends?(raw_value)
+      if raw_value == '1'
+        true
+      elsif raw_value == '0'
+        false
+      else
+        nil
+      end
+    end
+  end
     
   class Errors < Parser#:nodoc:
     EXCEPTIONS = {
@@ -198,7 +218,8 @@ module Facebooker
       'facebook.photos.createAlbum' => CreateAlbum,
       'facebook.notifications.sendRequest' => SendRequest,
       'facebook.profile.getFBML' => ProfileFBML,
-      'facebook.profile.setFBML' => ProfileFBMLSet
+      'facebook.profile.setFBML' => ProfileFBMLSet,
+      'facebook.friends.areFriends' => AreFriends
     }
   end
 end

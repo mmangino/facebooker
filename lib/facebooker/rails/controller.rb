@@ -11,7 +11,9 @@ module Facebooker
       end
       
       def set_facebook_session
-        session_already_secured? || secure_with_token! || secure_with_facebook_params! || create_new_facebook_session_and_redirect!
+        returning session_set = session_already_secured? || secure_with_token! || secure_with_facebook_params! || create_new_facebook_session_and_redirect! do
+          capture_facebook_friends_if_available! if session_set
+        end
       end
       
       def facebook_params
@@ -55,6 +57,14 @@ module Facebooker
         Facebooker::Session.create(Facebooker::Session.api_key, Facebooker::Session.secret_key)
       end
       
+      def capture_facebook_friends_if_available!
+        if friends = facebook_params['friends']
+          facebook_session.user.friends = friends.map do |friend_uid|
+            User.new(friend_uid, facebook_session)
+          end
+        end
+      end
+            
       def facebook_sig_params
         params.select{|key, value| key.to_s =~ /^fb_sig/}
       end
@@ -64,7 +74,7 @@ module Facebooker
       end
       
       def facebook_parameter_conversions
-        Hash.new do |hash, key| 
+        @facebook_parameter_conversions ||= Hash.new do |hash, key| 
           lambda{|value| value}
         end.merge(
           'time' => lambda{|value| Time.at(value.to_f)},

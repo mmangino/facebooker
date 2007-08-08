@@ -84,6 +84,22 @@ module Facebooker
       @user ||= User.new(uid, self)
     end
     
+    #
+    # Given an array like:
+    # [[userid, otheruserid], [yetanotherid, andanotherid]]
+    # returns a Hash indicating friendship of those pairs:
+    # {[userid, otheruserid] => true, [yetanotherid, andanotherid] => false}
+    # if one of the Hash values is nil, it means the facebook platform's answer is "I don't know"
+    def check_friendship(array_of_pairs_of_users)
+      uids1 = []
+      uids2 = []
+      array_of_pairs_of_users.each do |pair|
+        uids1 = pair.first
+        uids2 = pair.last
+      end
+      post('facebook.friends.areFriends', :uids1 => uids1, :uids2 => uids2)
+    end
+    
     def get_albums(album_ids)
       @albums ||= post('facebook.photos.getAlbums', :aids => album_ids).map do |hash|
         Album.from_hash(hash)

@@ -28,6 +28,12 @@ module Facebooker
       @session = session
       populate_from_hash!(attributes)
     end
+
+    # 
+    # Set the list of friends, given an array of User objects.  If the list has been retrieved previously, will not set
+    def friends=(list_of_friends)
+      @friends ||= list_of_friends
+    end
     
     ##
     # Retrieve friends
@@ -46,7 +52,11 @@ module Facebooker
         User.new(hash['uid'], @session, hash)
       end
     end
-
+    
+    def friends_with?(user_or_id)
+      friends.map{|f| f.to_i}.include?(user_or_id.to_i)  
+    end
+    
     def friends_with_this_app
       @friends_with_this_app ||= @session.post('facebook.friends.getAppUsers').map do |uid|
         User.new(uid, @session)
@@ -81,6 +91,11 @@ module Facebooker
     
     def profile_fbml=(markup)
       @session.post('facebook.profile.setFBML', :uid => @id, :markup => markup)      
+    end
+    
+    # Returns the user's id as an integer
+    def to_i
+      id
     end
     
     private
