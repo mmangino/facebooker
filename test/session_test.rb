@@ -46,6 +46,13 @@ class SessionTest < Test::Unit::TestCase
     assert_equal({[222332, 222333] => true, [1240077, 1240079] => false}, @session.check_friendship([[222332, 222333], [1240077, 1240079]]))    
   end
   
+  def test_facebook_can_claim_ignorance_as_to_friend_relationships
+    @session = Facebooker::Session.create(ENV['FACEBOOK_API_KEY'], ENV['FACEBOOK_SECRET_KEY'])
+    mock_http = establish_session
+    mock_http.should_receive(:post_form).and_return(example_check_friendship_with_unknown_result).once.ordered(:posts)  
+    assert_equal({[1240077, 1240079] => nil}, @session.check_friendship([[1240077, 1240079]]))  
+  end
+  
   def teardown
     Facebooker::Session.configuration_file_path = nil
   end
