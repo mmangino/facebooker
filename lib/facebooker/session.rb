@@ -16,14 +16,16 @@ module Facebooker
     class CallOutOfOrder < Exception; end
     class IncorrectSignature     < Exception; end
     class ConfigurationMissing < Exception; end
-
+  
     API_SERVER_BASE_URL       = "api.facebook.com"
     API_PATH_REST             = "/restserver.php"
     WWW_SERVER_BASE_URL       = "www.facebook.com"
     WWW_PATH_LOGIN            = "/login.php"
     WWW_PATH_ADD              = "/add.php"
     WWW_PATH_INSTALL          = "/install.php"
-        
+    
+    attr_writer :auth_token
+          
     def self.create(api_key, secret_key)
       raise ArgumentError unless !api_key.nil? && !secret_key.nil?
       new(api_key, secret_key)
@@ -68,11 +70,15 @@ module Facebooker
     
     def secure!
       response = post 'facebook.auth.getSession', :auth_token => auth_token
-      @session_key = response['session_key']
-      @uid = Integer(response['uid'])
-      @expires = Integer(response['expires'])
-      @secret_from_session = response['secret']
+      secure_with!(response['session_key'], response['uid'], response['expires'], response['secret'])
     end    
+    
+    def secure_with!(session_key, uid, expires, secret_from_session = nil)
+      @session_key = session_key
+      @uid = Integer(uid)
+      @expires = Integer(expires)
+      @secret_from_session = secret_from_session
+    end
     
     def user
       @user ||= User.new(uid, self)

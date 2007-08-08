@@ -27,4 +27,18 @@ class SessionTest < Test::Unit::TestCase
     }
   end
   
+  def test_configuration_file_path_can_be_set_explicitly
+    Facebooker::Session.configuration_file_path = '/tmp/foo'
+    assert_equal('/tmp/foo', Facebooker::Session.configuration_file_path)
+  end
+  
+  def test_session_can_be_secured_with_existing_values
+    session = Facebooker::Session.create(ENV['FACEBOOK_API_KEY'], ENV['FACEBOOK_SECRET_KEY'])
+    session.secure_with!("a session key", "123456", Time.now.to_i + 60)
+    assert(session.secured?)
+  end
+  
+  def teardown
+    Facebooker::Session.configuration_file_path = nil
+  end
 end
