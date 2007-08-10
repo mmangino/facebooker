@@ -34,7 +34,7 @@ class RailsIntegrationTest < Test::Unit::TestCase
   def test_facebook_params_are_parsed_into_a_separate_hash
     get :index, example_rails_params_including_fb
     facebook_params = @controller.facebook_params
-    assert_equal("Wed Aug 08 09:51:15 -0600 2007", facebook_params['time'].to_s)
+    assert_equal([8, 8], [facebook_params['time'].day, facebook_params['time'].mon])
   end
   
   def test_facebook_params_convert_in_canvas_to_boolean
@@ -49,7 +49,7 @@ class RailsIntegrationTest < Test::Unit::TestCase
     modified_params['fb_sig_expires'] = modified_params['fb_sig_time']
     setup # reset session and cached params
     get :index, modified_params
-    assert_equal("Wed Aug 08 09:51:15 -0600 2007", @controller.facebook_params['expires'].to_s)
+    assert_equal([8, 8], [facebook_params['time'].day, @controller.facebook_params['time'].mon])    
   end
   
   def test_facebook_params_convert_friend_list_to_parsed_array_of_friend_ids

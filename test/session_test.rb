@@ -5,7 +5,8 @@ class SessionTest < Test::Unit::TestCase
 
   def setup
     ENV['FACEBOOK_API_KEY'] = '1234567'
-    ENV['FACEBOOK_SECRET_KEY'] = '7654321'    
+    ENV['FACEBOOK_SECRET_KEY'] = '7654321'   
+    @session = Facebooker::Session.create('whatever', 'doesnotmatterintest')     
   end
 
   def test_can_get_api_and_secret_key_from_environment
@@ -51,6 +52,16 @@ class SessionTest < Test::Unit::TestCase
     mock_http = establish_session
     mock_http.should_receive(:post_form).and_return(example_check_friendship_with_unknown_result).once.ordered(:posts)  
     assert_equal({[1240077, 1240079] => nil}, @session.check_friendship([[1240077, 1240079]]))  
+  end
+  
+  def test_can_query_with_fql
+    expect_http_posts_with_responses(raise 'need example xml')    
+    fail "Need to implement this"
+  end
+  
+  def test_fql_queries_return_objects_whose_classes_depend_on_the_query_results
+    expect_http_posts_with_responses(raise 'need example xml')
+    fail 'Need to implement this'    
   end
   
   def teardown

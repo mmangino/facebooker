@@ -85,6 +85,13 @@ module Facebooker
     end
     
     #
+    # Returns a proxy object for handling calls to Facebook cached items
+    # such as images and FBML ref handles
+    def server_cache
+      Facebooker::ServerCache.new(self)
+    end
+    
+    #
     # Given an array like:
     # [[userid, otheruserid], [yetanotherid, andanotherid]]
     # returns a Hash indicating friendship of those pairs:

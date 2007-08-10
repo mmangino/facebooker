@@ -162,6 +162,18 @@ module Facebooker
     end
   end
   
+  class SetRefHandle < Parser#:nodoc:
+    def self.process(data)
+      element('fbml_setRefHandle_response', data).text_value
+    end
+  end
+  
+  class RefreshRefURL < Parser#:nodoc:
+    def self.process(data)
+      element('fbml_refreshRefUrl_response', data).text_value
+    end
+  end
+  
   class AreFriends < Parser#:nodoc:
     def self.process(data)
       array_of_hashes(element('friends_areFriends_response', data), 'friend_info').inject({}) do |memo, hash|
@@ -219,7 +231,9 @@ module Facebooker
       'facebook.notifications.sendRequest' => SendRequest,
       'facebook.profile.getFBML' => ProfileFBML,
       'facebook.profile.setFBML' => ProfileFBMLSet,
-      'facebook.friends.areFriends' => AreFriends
+      'facebook.friends.areFriends' => AreFriends,
+      'facebook.fbml.setRefHandle' => SetRefHandle,
+      'facebook.fbml.refreshRefUrl' => RefreshRefURL
     }
   end
 end
