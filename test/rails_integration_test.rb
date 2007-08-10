@@ -49,7 +49,7 @@ class RailsIntegrationTest < Test::Unit::TestCase
     modified_params['fb_sig_expires'] = modified_params['fb_sig_time']
     setup # reset session and cached params
     get :index, modified_params
-    assert_equal([8, 8], [facebook_params['time'].day, @controller.facebook_params['time'].mon])    
+    assert_equal([8, 8], [@controller.facebook_params['time'].day, @controller.facebook_params['time'].mon])    
   end
   
   def test_facebook_params_convert_friend_list_to_parsed_array_of_friend_ids
