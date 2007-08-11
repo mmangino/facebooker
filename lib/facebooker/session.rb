@@ -107,9 +107,15 @@ module Facebooker
       post('facebook.friends.areFriends', :uids1 => uids1, :uids2 => uids2)
     end
     
-    def get_albums(album_ids)
-      @albums ||= post('facebook.photos.getAlbums', :aids => album_ids).map do |hash|
+    def get_albums(aids)
+      @albums = post('facebook.photos.getAlbums', :aids => aids).map do |hash|        
         Album.from_hash(hash)
+      end
+    end
+    
+    def get_tags(pids)
+      @tags = post('facebook.photos.getTags', :pids => pids).map do |hash|
+        Tag.from_hash(hash)
       end
     end
     

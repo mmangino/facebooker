@@ -126,14 +126,7 @@ class TestFacebooker < Test::Unit::TestCase
       assert_equal(expected_url, @session.send_request(user_ids = [123, 321], invitation_type = 'werewolf game', content, image_url = 'http://farm1.static.flickr.com/72/173637866_78e981fa58.jpg?v=0'))
     }
   end
-  
-  def test_should_get_albums_for_user
-    mock_http = establish_session
-    mock_http.should_receive(:post_form).and_return(example_user_albums_xml).once.ordered(:posts)
-    assert_equal('Summertime is Best', @session.user.albums.first.name)
-    assert_equal(2, @session.user.albums.size)
-  end
- 
+
   def test_can_find_friends_who_have_installed_app
     mock_http = establish_session
     mock_http.should_receive(:post_form).and_return(example_app_users_xml).once.ordered(:posts)
@@ -149,8 +142,7 @@ class TestFacebooker < Test::Unit::TestCase
       assert_not_nil(reloaded_session.instance_variable_get(iv_name))
     end
     assert_nil(reloaded_session.user.instance_variable_get("@friends"))
-  end
-  
+  end 
   
   def test_sessions_can_be_infinite_or_can_expire
     establish_session
@@ -167,17 +159,36 @@ class TestFacebooker < Test::Unit::TestCase
     assert(@session.secured?)
   end
   
-  def test_should_get_albums_by_album_ids
+  def test_can_get_albums_for_user
+    mock_http = establish_session
+    mock_http.should_receive(:post_form).and_return(example_user_albums_xml).once.ordered(:posts)
+    assert_equal('Summertime is Best', @session.user.albums.first.name)
+    assert_equal(2, @session.user.albums.size)
+  end
+  
+  def test_can_get_albums_by_album_ids
     mock_http = establish_session
     mock_http.should_receive(:post_form).and_return(example_user_albums_xml).once.ordered(:posts)
     assert_equal('Summertime is Best', @session.get_albums(:aids => [97503428432802022, 97503428432797817] ).first.name)
   end
   
-  def test_should_create_album
+  def test_can_create_album
     mock_http = establish_session
     mock_http.should_receive(:post_form).and_return(example_new_album_xml).once.ordered(:posts)
     assert_equal "My Empty Album", @session.user.create_album(:name => "My Empty Album", :location => "Limboland").name
   end  
+
+  def test_can_get_photo_tags
+    mock_http = establish_session
+    mock_http.should_receive(:post_form).and_return(example_photo_tags_xml).once.ordered(:posts)
+    assert_instance_of Facebooker::Tag, @session.get_tags(:pids => [97503428461115571] ).first
+  end
+  
+  def test_can_get_coordinates_for_photo_tags
+    mock_http = establish_session
+    mock_http.should_receive(:post_form).and_return(example_photo_tags_xml).once.ordered(:posts)
+    assert_equal "65.4248", @session.get_tags(:pids => [97503428461115571] ).first.xcoord
+  end
   
   def test_can_get_app_profile_fbml_for_user
     mock_http = establish_session
@@ -528,5 +539,18 @@ class TestFacebooker < Test::Unit::TestCase
     XML
   end
   
+  def example_photo_tags_xml
+    <<-XML
+    <?xml version="1.0" encoding="UTF-8"?>
+    <photos_getTags_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd" list="true">
+      <photo_tag>
+        <pid>97503428461115571</pid>
+        <subject>570070524</subject>
+        <xcoord>65.4248</xcoord>
+        <ycoord>16.8627</ycoord>
+      </photo_tag>
+    </photos_getTags_response>
+    XML
+  end
   
 end

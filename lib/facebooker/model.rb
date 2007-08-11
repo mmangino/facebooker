@@ -9,7 +9,7 @@ module Facebooker
       end
       
       #
-      # Declares an attrbitute named ::symbol:: which can be set with either an instance of ::klass::
+      # Declares an attribute named ::symbol:: which can be set with either an instance of ::klass::
       # or a Hash which will be used to populate a new instance of ::klass::.
       def hash_settable_accessor(symbol, klass)
         attr_reader symbol
