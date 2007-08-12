@@ -143,6 +143,12 @@ module Facebooker
       element('photos_addTag_response', data)
     end
   end
+
+  class GetPhotos < Parser#nodoc:
+    def self.process(data)
+      array_of_hashes(element('photos_get_response', data), 'photo')
+    end
+  end
   
   class GetAlbums < Parser#nodoc:
     def self.process(data)
@@ -244,6 +250,7 @@ module Facebooker
       'facebook.profile.setFBML' => ProfileFBMLSet,
       'facebook.fbml.setRefHandle' => SetRefHandle,
       'facebook.fbml.refreshRefUrl' => RefreshRefURL,
+      'facebook.photos.get' => GetPhotos,
       'facebook.photos.getAlbums' => GetAlbums,
       'facebook.photos.createAlbum' => CreateAlbum,
       'facebook.photos.getTags' => GetTags,

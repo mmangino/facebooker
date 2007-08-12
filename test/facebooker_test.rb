@@ -115,7 +115,6 @@ class TestFacebooker < Test::Unit::TestCase
     }
   end
   
-  
   def test_can_send_invitation_or_request
     mock_http = establish_session
     mock_http.should_receive(:post_form).and_return(example_request_send_xml).twice.ordered(:posts)
@@ -159,6 +158,26 @@ class TestFacebooker < Test::Unit::TestCase
     assert(@session.secured?)
   end
   
+  def test_can_get_photos_by_pids    
+    mock_http = establish_session
+    mock_http.should_receive(:post_form).and_return(example_get_photo_xml).once.ordered(:posts)
+    photos = @session.get_photos([97503428461115590, 97503428461115573])    
+    assert_equal 2, photos.size
+    assert_equal "Rooftop barbecues make me act funny", photos.first.caption
+  end
+  
+  def test_can_get_photos_by_subject_and_album
+    mock_http = establish_session
+    mock_http.should_receive(:post_form).and_return(example_get_photo_xml).once.ordered(:posts)
+    photos = @session.get_photos(nil, 22701786, 97503428432802022 )    
+    assert_equal '97503428432802022', photos.first.aid
+  end
+  
+  def test_getting_photos_requires_arguments
+    mock_http = establish_session
+    assert_raise(ArgumentError) { @session.get_photos() }
+  end
+  
   def test_can_get_albums_for_user
     mock_http = establish_session
     mock_http.should_receive(:post_form).and_return(example_user_albums_xml).once.ordered(:posts)
@@ -179,27 +198,29 @@ class TestFacebooker < Test::Unit::TestCase
     mock_http.should_receive(:post_form).and_return(example_new_album_xml).once.ordered(:posts)
     assert_equal "My Empty Album", @session.user.create_album(:name => "My Empty Album", :location => "Limboland").name
   end  
-
+  
   def test_can_get_photo_tags
     mock_http = establish_session
     mock_http.should_receive(:post_form).and_return(example_photo_tags_xml).once.ordered(:posts)
     assert_instance_of Facebooker::Tag, @session.get_tags(:pids => 97503428461115571 ).first
   end
   
+  # TODO: how to test that tags were created properly? Response doesn't contain much
   def test_can_tag_a_user_in_a_photo
     mock_http = establish_session
     mock_http.should_receive(:post_form).and_return(example_add_tag_xml).once.ordered(:posts)
-    @session.add_tags(97503428461115571, {:uid => 1234567890, :x => 30.0, :y => 62.5} )
+    @session.add_tags(97503428461115571, {:uid => 1234567890, :x => 30.0, :y => 62.5})
+    flunk
   end
   
   def test_can_add_multiple_tags_to_photos
-    
   end
   
   def test_can_get_coordinates_for_photo_tags
     mock_http = establish_session
     mock_http.should_receive(:post_form).and_return(example_photo_tags_xml).once.ordered(:posts)
-    assert_equal "65.4248", @session.get_tags(:pids => [97503428461115571] ).first.xcoord
+    tag = @session.get_tags([97503428461115571]).first
+    assert_equal ['65.4248', '16.8627'], tag.coordinates
   end
   
   def test_can_get_app_profile_fbml_for_user
@@ -571,4 +592,35 @@ class TestFacebooker < Test::Unit::TestCase
     <photos_addTag_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd">1</photos_addTag_response>
     XML
   end
+  
+  def example_get_photo_xml
+    <<-XML
+    <?xml version="1.0" encoding="UTF-8"?>
+    <photos_get_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd" list="true">
+      <photo>
+        <pid>97503428461115590</pid>
+        <aid>97503428432802022</aid>
+        <owner>22701786</owner>
+        <src>http://photos-c.ak.facebook.com/photos-ak-sf2p/v77/74/112/22701786/s22701786_30324934_7816.jpg</src>
+        <src_big>http://photos-c.ak.facebook.com/photos-ak-sf2p/v77/74/112/22701786/n22701786_30324934_7816.jpg</src_big>
+        <src_small>http://photos-c.ak.facebook.com/photos-ak-sf2p/v77/74/112/22701786/t22701786_30324934_7816.jpg</src_small>
+        <link>http://www.facebook.com/photo.php?pid=30324934&amp;id=22701786</link>
+        <caption>Rooftop barbecues make me act funny</caption>
+        <created>1184120987</created>
+      </photo>
+      <photo>
+        <pid>97503428461115573</pid>
+        <aid>97503428432802022</aid>
+        <owner>22701786</owner>
+        <src>http://photos-b.ak.facebook.com/photos-ak-sf2p/v77/74/112/22701786/s22701786_30324917_4555.jpg</src>
+        <src_big>http://photos-b.ak.facebook.com/photos-ak-sf2p/v77/74/112/22701786/n22701786_30324917_4555.jpg</src_big>
+        <src_small>http://photos-b.ak.facebook.com/photos-ak-sf2p/v77/74/112/22701786/t22701786_30324917_4555.jpg</src_small>
+        <link>http://www.facebook.com/photo.php?pid=30324917&amp;id=22701786</link>
+        <caption/>
+        <created>1184120654</created>
+      </photo>
+    </photos_get_response>
+    XML
+  end
+  
 end

@@ -107,6 +107,15 @@ module Facebooker
       post('facebook.friends.areFriends', :uids1 => uids1, :uids2 => uids2)
     end
     
+    def get_photos(pids = nil, subj_id = nil,  aid = nil)
+      if [subj_id, pids, aid].all? {|arg| arg.nil?}
+        raise ArgumentError, "Can't get a photo without a picture, album or subject ID" 
+      end
+      @photos = post('facebook.photos.get', :subj_id => subj_id, :pids => pids, :aid => aid ).map do |hash|
+        Photo.from_hash(hash)
+      end
+    end
+    
     def get_albums(aids)
       @albums = post('facebook.photos.getAlbums', :aids => aids).map do |hash|        
         Album.from_hash(hash)
