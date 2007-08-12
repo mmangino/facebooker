@@ -119,6 +119,10 @@ module Facebooker
       end
     end
     
+    def add_tags(pid, tags_hash)
+      @tags = post('facebook.photos.addTag', :pid => pid, :tags => tags_hash.to_json)
+    end
+    
     def send_notification(user_ids, fbml, email_fbml = nil)
       params = {:notification => fbml, :to_ids => user_ids.join(',')}
       if email_fbml

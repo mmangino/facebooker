@@ -138,6 +138,12 @@ module Facebooker
     end
   end
   
+  class AddTags < Parser#nodoc:
+    def self.process(data)
+      element('photos_addTag_response', data)
+    end
+  end
+  
   class GetAlbums < Parser#nodoc:
     def self.process(data)
       array_of_hashes(element('photos_getAlbums_response', data), 'album')
@@ -225,22 +231,23 @@ module Facebooker
     PARSERS = {
       'facebook.auth.createToken' => CreateToken,
       'facebook.auth.getSession' => GetSession,
-      'facebook.friends.get' => GetFriends,
       'facebook.users.getInfo' => UserInfo,
+      'facebook.friends.get' => GetFriends,
+      'facebook.friends.areFriends' => AreFriends,
+      'facebook.friends.getAppUsers' => GetAppUsers,
       'facebook.feed.publishStoryToUser' => PublishStoryToUser,
       'facebook.feed.publishActionOfUser' => PublishActionOfUser,
       'facebook.notifications.get' => NotificationsGet,
       'facebook.notifications.send' => NotificationsSend,
-      'facebook.friends.getAppUsers' => GetAppUsers,
-      'facebook.photos.getAlbums' => GetAlbums,
-      'facebook.photos.createAlbum' => CreateAlbum,
       'facebook.notifications.sendRequest' => SendRequest,
       'facebook.profile.getFBML' => ProfileFBML,
       'facebook.profile.setFBML' => ProfileFBMLSet,
-      'facebook.friends.areFriends' => AreFriends,
       'facebook.fbml.setRefHandle' => SetRefHandle,
       'facebook.fbml.refreshRefUrl' => RefreshRefURL,
-      'facebook.photos.getTags' => GetTags
+      'facebook.photos.getAlbums' => GetAlbums,
+      'facebook.photos.createAlbum' => CreateAlbum,
+      'facebook.photos.getTags' => GetTags,
+      'facebook.photos.addTag' => AddTags
     }
   end
 end

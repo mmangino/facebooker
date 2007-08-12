@@ -110,7 +110,7 @@ class TestFacebooker < Test::Unit::TestCase
     assert_nothing_raised {
       user_ids = [123, 321]
       notification_fbml = "O HAI!!!"
-      optional_email_fbml = "This would be in the email.  If this is not passed, facebook sends  no mailz!"
+      optional_email_fbml = "This would be in the email.  If this is not passed, facebook sends no mailz!"
       assert_equal('http://www.facebook.com/send_email.php?from=211031&id=52', @session.send_notification(user_ids, notification_fbml, optional_email_fbml))
     }
   end
@@ -169,7 +169,9 @@ class TestFacebooker < Test::Unit::TestCase
   def test_can_get_albums_by_album_ids
     mock_http = establish_session
     mock_http.should_receive(:post_form).and_return(example_user_albums_xml).once.ordered(:posts)
-    assert_equal('Summertime is Best', @session.get_albums(:aids => [97503428432802022, 97503428432797817] ).first.name)
+    albums = @session.get_albums([97503428432802022, 97503428432797817] )
+    assert_equal('Summertime is Best', albums[0].name)
+    assert_equal('Bonofon\'s Recital', albums[1].name)
   end
   
   def test_can_create_album
@@ -181,7 +183,17 @@ class TestFacebooker < Test::Unit::TestCase
   def test_can_get_photo_tags
     mock_http = establish_session
     mock_http.should_receive(:post_form).and_return(example_photo_tags_xml).once.ordered(:posts)
-    assert_instance_of Facebooker::Tag, @session.get_tags(:pids => [97503428461115571] ).first
+    assert_instance_of Facebooker::Tag, @session.get_tags(:pids => 97503428461115571 ).first
+  end
+  
+  def test_can_tag_a_user_in_a_photo
+    mock_http = establish_session
+    mock_http.should_receive(:post_form).and_return(example_add_tag_xml).once.ordered(:posts)
+    @session.add_tags(97503428461115571, {:uid => 1234567890, :x => 30.0, :y => 62.5} )
+  end
+  
+  def test_can_add_multiple_tags_to_photos
+    
   end
   
   def test_can_get_coordinates_for_photo_tags
@@ -553,4 +565,10 @@ class TestFacebooker < Test::Unit::TestCase
     XML
   end
   
+  def example_add_tag_xml
+    <<-XML
+    <?xml version="1.0" encoding="UTF-8"?>
+    <photos_addTag_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd">1</photos_addTag_response>
+    XML
+  end
 end
