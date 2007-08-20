@@ -206,6 +206,14 @@ module Facebooker
     end
   end
   
+  class EventMembersGet < Parser#:nodoc:
+    def self.process(data)
+      root = element('events_getMembers_response', data)
+      first_child = root.children.reject{|c| c.kind_of?(REXML::Text)}.first
+      [first_child, array_of_hashes(root, first_child.name)]
+    end
+  end
+  
   class GroupsGet < Parser#:nodoc:
     def self.process(data)
       array_of_hashes(element('groups_get_response', data), 'group')
@@ -277,8 +285,8 @@ module Facebooker
       'facebook.photos.getTags' => GetTags,
       'facebook.photos.addTag' => AddTags,
       'facebook.events.get' => EventsGet,
-      'facebook.groups.get' => GroupsGet
-      
+      'facebook.groups.get' => GroupsGet,
+      'facebook.events.getMembers' => EventMembersGet
     }
   end
 end

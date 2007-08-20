@@ -115,6 +115,13 @@ module Facebooker
       end
     end
     
+    def event_members(eid)
+      @members ||= post('facebook.events.getMembers', :eid => eid).map do |attendee_hash|
+        Event::Attendance.from_hash(attendee_hash)
+      end
+    end
+    
+    
     #
     # Returns a proxy object for handling calls to Facebook cached items
     # such as images and FBML ref handles

@@ -59,10 +59,7 @@ class SessionTest < Test::Unit::TestCase
   def test_can_query_with_fql
     @session = Facebooker::Session.create(ENV['FACEBOOK_API_KEY'], ENV['FACEBOOK_SECRET_KEY'])
     expect_http_posts_with_responses(example_fql_for_multiple_photos_xml)    
-    response = @session.fql_query('SELECT src, caption, 1+2*3/4, caption, 10*(20 + 1) FROM photo
-    WHERE pid IN (SELECT pid FROM photo_tag WHERE subject= 22701786) AND
-          pid IN (SELECT pid FROM photo_tag WHERE subject= 22701786) AND
-          caption')
+    response = @session.fql_query('Lets be frank. We are not testing the query here')
     assert_kind_of(Facebooker::Photo, response.first)      
   end
   
@@ -78,6 +75,12 @@ class SessionTest < Test::Unit::TestCase
     assert_equal('attending', response.first.rsvp_status)
   end
   
+  def test_can_query_for_event_members
+    expect_http_posts_with_responses(example_event_members_xml)
+    event_attendences = @session.event_members(69)
+    assert_equal 'Attendance', event_attendences.first.class
+    assert_equal '222332', event_attendances.first.uid
+  end
   
   def test_can_query_for_events
     expect_http_posts_with_responses(example_events_get_xml)    
@@ -259,5 +262,24 @@ class SessionTest < Test::Unit::TestCase
     XML
   end
   
+  def example_event_members_xml
+    <<-XML
+    <?xml version="1.0" encoding="UTF-8"?>
+    <events_getMembers_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd" list="true">
+      <attending list="true">
+        <uid>222332</uid>
+        <uid>222333</uid>
+      </attending>
+      <unsure list="true">
+        <uid>1240077</uid>
+      </unsure>
+      <declined list="true"/>
+      <not_replied list="true">
+        <uid>222335</uid>
+        <uid>222336</uid>
+      </not_replied>
+    </events_getMembers_response>
+    XML
+  end
   
 end
