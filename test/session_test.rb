@@ -64,7 +64,11 @@ class SessionTest < Test::Unit::TestCase
     WHERE pid IN (SELECT pid FROM photo_tag WHERE subject= 22701786) AND
           pid IN (SELECT pid FROM photo_tag WHERE subject= 22701786) AND
           caption')
-          
+    assert_kind_of(Facebooker::Photo, response.first)      
+  end
+  
+  def test_fql_can_return_anonymous_field_values
+    fail("Man I hate the facebook API")
   end
   
   def test_can_fql_query_for_users_and_pictures
@@ -136,23 +140,17 @@ class SessionTest < Test::Unit::TestCase
       <photo>
         <src>http://photos-c.ak.facebook.com/photos-ak-sf2p/v108/212/118/22700225/s22700225_30345986_2713.jpg</src>
         <caption>Nottttt. get ready for some museumz</caption>
-        <anon>2.5</anon>
         <caption>Nottttt. get ready for some museumz</caption>
-        <anon>210</anon>
       </photo>
       <photo>
         <src>http://photos-c.ak.facebook.com/photos-ak-sf2p/v77/74/112/22701786/s22701786_30324934_7816.jpg</src>
         <caption>Rooftop barbecues make me act funny</caption>
-        <anon>2.5</anon>
         <caption>Rooftop barbecues make me act funny</caption>
-        <anon>210</anon>
       </photo>
       <photo>
         <src>http://photos-c.ak.facebook.com/photos-ak-sctm/v96/154/56/22700188/s22700188_30321538_17.jpg</src>
         <caption>An epic shot of Patrick getting ready for a run to second.</caption>
-        <anon>2.5</anon>
         <caption>An epic shot of Patrick getting ready for a run to second.</caption>
-        <anon>210</anon>
       </photo>
     </fql_query_response>
     XML

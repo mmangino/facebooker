@@ -90,6 +90,8 @@ module Facebooker
           user.session = self
           user.populate_from_hash!(hash)
           user
+        when 'photo'
+          Photo.from_hash(hash)
         end
         #TODO add a method to parser for going through the list and creating proper elements?
         #User.from_hash(hash)
