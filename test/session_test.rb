@@ -9,6 +9,9 @@ class SessionTest < Test::Unit::TestCase
     @session = Facebooker::Session.create('whatever', 'doesnotmatterintest')     
   end
 
+  def teardown
+    flexmock_close
+  end
   def test_can_get_api_and_secret_key_from_environment
     assert_equal('1234567', Facebooker::Session.api_key)
     assert_equal('7654321', Facebooker::Session.secret_key)    
@@ -56,8 +59,7 @@ class SessionTest < Test::Unit::TestCase
   
   def test_can_query_with_fql
     @session = Facebooker::Session.create(ENV['FACEBOOK_API_KEY'], ENV['FACEBOOK_SECRET_KEY'])
-    mock_http = establish_session
-    expect_http_posts_with_responses('example_fql_for_multiple_photos xml')    
+    expect_http_posts_with_responses(example_fql_for_multiple_photos_xml)    
     response = @session.fql_query('SELECT src, caption, 1+2*3/4, caption, 10*(20 + 1) FROM photo
     WHERE pid IN (SELECT pid FROM photo_tag WHERE subject= 22701786) AND
           pid IN (SELECT pid FROM photo_tag WHERE subject= 22701786) AND
@@ -70,9 +72,9 @@ class SessionTest < Test::Unit::TestCase
     mock_http = establish_session
     mock_http.should_receive(:post_form).and_return(example_fql_for_multiple_users_and_pics).once.ordered(:posts)  
     response = @session.fql_query('SELECT name, pic FROM user WHERE uid=211031 OR uid=4801660')
-    assert_equal Array, response.class
-    assert_equal 'User', response[0].class.to_s
-    assert_equal "Ari Steinberg", response[0].name
+    assert_kind_of Array, response
+    assert_kind_of Facebooker::User, response.first
+    assert_equal "Ari Steinberg", response.firsts.name
   end
   
   def test_fql_queries_return_objects_whose_classes_depend_on_the_query_results
@@ -132,7 +134,7 @@ class SessionTest < Test::Unit::TestCase
     XML
   end
   
-  def example_fql_for_multiple_photos
+  def example_fql_for_multiple_photos_xml
     <<-XML
     <?xml version="1.0" encoding="UTF-8"?>
     <fql_query_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" list="true">

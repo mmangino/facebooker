@@ -182,7 +182,14 @@ module Facebooker
   
   class FqlQuery < Parser#nodoc
     def self.process(data)
-      array_of_hashes(element('fql_query_response', data), 'user')
+      root = element('fql_query_response', data)
+      first_child = root.children.reject{|c| c.kind_of?(REXML::Text)}.first
+      #FIXME: The following is dreadful
+      [first_child.name, case first_child.name
+      when 'user'
+       array_of_hashes(root, 'user')
+      when 'photo'
+      end]
     end
   end
   

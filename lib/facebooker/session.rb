@@ -82,7 +82,15 @@ module Facebooker
     
     def fql_query(query, format = 'XML')
       response = post('facebook.fql.query', :query => query, :format => format)
+      type = response.shift
       response.map do |hash|
+        raise "This is a mess.  Not only do we have a lot of duplication, but we need to deal with Users who don't have UIDs.  Lame."
+        case type
+        when 'user'
+          user = User.new(hash['uid'], self)
+          user.populate_from_hash!(hash)
+          user
+        end
         #TODO add a method to parser for going through the list and creating proper elements?
         #User.from_hash(hash)
         #Photo.from_hash(has)
