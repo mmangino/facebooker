@@ -8,7 +8,7 @@ Gardener.configure do
     spec.version           = Gem::Version.new(Facebooker::VERSION::STRING)
     spec.summary           = "Pure, idiomatic Ruby wrapper for the Facebook REST API."
     spec.email             = 'chad@infoether.com'
-    spec.author            = 'Chad Fowler'
+    spec.author            = ['Chad Fowler', 'Patrick Ewing']
     spec.extra_rdoc_files  = %w(COPYING)
     spec.rdoc_options      = ['--title', "Gardener",
                               '--main',  'README',

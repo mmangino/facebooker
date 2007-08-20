@@ -6,7 +6,7 @@ module Facebooker
       include Model
       attr_accessor :eid, :uid, :rsvp_status
       def event
-        @event ||= session.post('facebook.events.get', :eids => [eid])
+        @event ||= Event.from_hash(session.post('facebook.events.get', :eids => [eid]).first)
       end
     end
     

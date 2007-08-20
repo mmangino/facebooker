@@ -43,5 +43,12 @@ class TestFacebooker < Test::Unit::TestCase
     assert_equal("111, 555", t.list_of_complex_things.map{|ct| ct.weight.to_s}.sort.join(', '))
   end
   
+  def test_if_you_try_to_use_a_models_session_without_initializing_it_first_you_get_a_descriptive_error
+    t = Thing.new
+    assert_raises(Facebooker::Model::UnboundSessionException) {
+      t.session
+    }
+  end
+  
 end
 

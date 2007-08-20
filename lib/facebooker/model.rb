@@ -3,7 +3,7 @@ module Facebooker
     class UnboundSessionException < Exception; end
     def self.included(includer)
       includer.extend ClassMethods
-      includer.__send__(:attr_accessor, :session)
+      includer.__send__(:attr_writer, :session)
       includer.__send__(:attr_reader, :anonymous_fields)
     end
     module ClassMethods
