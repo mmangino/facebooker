@@ -59,12 +59,12 @@ module Facebooker
     def self.hashinate(response_element)
       response_element.children.reject{|c| c.kind_of? REXML::Text}.inject({}) do |hash, child|
         hash[child.name] = if child.children.size == 1 && child.children.first.kind_of?(REXML::Text)
-          child.text_value
+          anonymous_field_from(child, hash) || child.text_value
         else
           if child.attributes['list'] == 'true'
             child.children.reject{|c| c.kind_of? REXML::Text}.map do |subchild| 
                 hash_or_value_for(subchild)
-            end            
+            end     
           else
             child.children.reject{|c| c.kind_of? REXML::Text}.inject({}) do |subhash, subchild|
               subhash[subchild.name] = hash_or_value_for(subchild)
@@ -74,6 +74,12 @@ module Facebooker
         end
         hash
       end      
+    end
+    
+    def self.anonymous_field_from(child, hash)
+      if child.name == 'anon'
+        (hash[child.name] || []) << child.text_value
+      end
     end
     
   end  

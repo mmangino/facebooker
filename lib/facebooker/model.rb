@@ -4,6 +4,7 @@ module Facebooker
     def self.included(includer)
       includer.extend ClassMethods
       includer.__send__(:attr_accessor, :session)
+      includer.__send__(:attr_reader, :anonymous_fields)
     end
     module ClassMethods
       def from_hash(hash)
@@ -38,6 +39,12 @@ module Facebooker
     
     def session
       @session || (raise UnboundSessionException, "Must bind this object to a Facebook session before querying")
+    end
+    
+    # 
+    # This gets populated from FQL queries.
+    def anon=(value)
+      @anonymous_fields = value
     end
     
     def initialize(hash = {})

@@ -63,8 +63,14 @@ class SessionTest < Test::Unit::TestCase
     assert_kind_of(Facebooker::Photo, response.first)      
   end
   
-  def test_fql_can_return_anonymous_field_values
-    fail("Man I hate the facebook API")
+  def test_anonymous_fql_results_get_put_in_a_positioned_array_on_the_model
+    @session = Facebooker::Session.create(ENV['FACEBOOK_API_KEY'], ENV['FACEBOOK_SECRET_KEY'])
+    expect_http_posts_with_responses(example_fql_for_multiple_photos_with_anon_xml)    
+    response = @session.fql_query('Lets be frank. We are not testing the query here')
+    assert_kind_of(Facebooker::Photo, response.first)
+    response.each do |photo|
+      assert_equal(['first', 'second'], photo.anonymous_fields)
+    end
   end
   
   def test_can_fql_query_for_event_members
@@ -268,6 +274,35 @@ class SessionTest < Test::Unit::TestCase
         <src>http://photos-c.ak.facebook.com/photos-ak-sctm/v96/154/56/22700188/s22700188_30321538_17.jpg</src>
         <caption>An epic shot of Patrick getting ready for a run to second.</caption>
         <caption>An epic shot of Patrick getting ready for a run to second.</caption>
+      </photo>
+    </fql_query_response>
+    XML
+  end
+  
+  def example_fql_for_multiple_photos_with_anon_xml
+    <<-XML
+    <?xml version="1.0" encoding="UTF-8"?>
+    <fql_query_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" list="true">
+      <photo>
+        <src>http://photos-c.ak.facebook.com/photos-ak-sf2p/v108/212/118/22700225/s22700225_30345986_2713.jpg</src>
+        <caption>Nottttt. get ready for some museumz</caption>
+        <caption>Nottttt. get ready for some museumz</caption>
+        <anon>first</anon>
+        <anon>second</anon>
+      </photo>
+      <photo>
+        <src>http://photos-c.ak.facebook.com/photos-ak-sf2p/v77/74/112/22701786/s22701786_30324934_7816.jpg</src>
+        <caption>Rooftop barbecues make me act funny</caption>
+        <caption>Rooftop barbecues make me act funny</caption>
+        <anon>first</anon>
+        <anon>second</anon>
+      </photo>
+      <photo>
+        <src>http://photos-c.ak.facebook.com/photos-ak-sctm/v96/154/56/22700188/s22700188_30321538_17.jpg</src>
+        <caption>An epic shot of Patrick getting ready for a run to second.</caption>
+        <caption>An epic shot of Patrick getting ready for a run to second.</caption>
+        <anon>first</anon>
+        <anon>second</anon>
       </photo>
     </fql_query_response>
     XML
