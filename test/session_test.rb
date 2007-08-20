@@ -102,6 +102,7 @@ class SessionTest < Test::Unit::TestCase
     group_memberships = example_group.memberships
     assert_equal('officers', group_memberships.last.position)
     assert_equal(123, group_memberships.last.gid)
+    assert_equal(1240078, example_group.members.last.id)
   end
   
   def test_can_fql_query_for_users_and_pictures
