@@ -206,6 +206,19 @@ module Facebooker
     end
   end
   
+  class GroupGetMembers < Parser#:nodoc:
+    def self.process(data)
+      root = element('groups_getMembers_response', data)
+      result = ['members', 'admins', 'officers', 'not_replied'].map do |position|
+        array_of(root, position) {|element| element}.map do |element|
+          array_of_text_values(element, 'uid').map do |uid|
+            {:position => position}.merge(:uid => uid)
+          end
+        end
+      end.flatten      
+    end
+  end
+  
   class EventMembersGet < Parser#:nodoc:
     def self.process(data)
       root = element('events_getMembers_response', data)
@@ -291,7 +304,8 @@ module Facebooker
       'facebook.photos.addTag' => AddTags,
       'facebook.events.get' => EventsGet,
       'facebook.groups.get' => GroupsGet,
-      'facebook.events.getMembers' => EventMembersGet
+      'facebook.events.getMembers' => EventMembersGet,
+      'facebook.groups.getMembers' => GroupGetMembers
     }
   end
 end

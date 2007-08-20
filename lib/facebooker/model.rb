@@ -7,7 +7,9 @@ module Facebooker
     end
     module ClassMethods
       def from_hash(hash)
-        new(hash)
+        instance = new(hash)
+        yield instance if block_given?
+        instance
       end
       
       #

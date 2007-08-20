@@ -74,7 +74,9 @@ module Facebooker
     def groups(gids = [])
       args = gids.empty? ? {} : {:gids => gids}
       @groups ||= session.post('facebook.groups.get', args).map do |hash|
-        Group.from_hash(hash)
+        group = Group.from_hash(hash)
+        group.session = session
+        group
       end
     end
     

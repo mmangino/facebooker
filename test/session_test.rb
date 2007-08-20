@@ -96,6 +96,14 @@ class SessionTest < Test::Unit::TestCase
     assert_equal 'Donald Knuth Is My Homeboy', groups.first.name
   end
   
+  def test_can_query_for_group_memberships
+    expect_http_posts_with_responses(example_group_members_xml)
+    example_group = Facebooker::Group.new({:gid => 123, :session => @session})
+    group_memberships = example_group.memberships
+    assert_equal('officers', group_memberships.last.position)
+    assert_equal(123, group_memberships.last.gid)
+  end
+  
   def test_can_fql_query_for_users_and_pictures
     @session = Facebooker::Session.create(ENV['FACEBOOK_API_KEY'], ENV['FACEBOOK_SECRET_KEY'])
     mock_http = establish_session
@@ -261,6 +269,28 @@ class SessionTest < Test::Unit::TestCase
         <caption>An epic shot of Patrick getting ready for a run to second.</caption>
       </photo>
     </fql_query_response>
+    XML
+  end
+  
+  def example_group_members_xml
+    <<-XML
+    <?xml version="1.0" encoding="UTF-8"?>
+    <groups_getMembers_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd" list="true">
+      <members list="true">
+        <uid>1240077</uid>
+        <uid>1240078</uid>
+        <uid>222332</uid>
+        <uid>222333</uid>
+      </members>
+      <admins list="true">
+        <uid>1240077</uid>
+        <uid>222333</uid>
+      </admins>
+      <officers list="true">
+        <uid>1240078</uid>
+      </officers>
+      <not_replied list="true"/>
+    </groups_getMembers_response>    
     XML
   end
   
