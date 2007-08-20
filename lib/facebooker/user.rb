@@ -36,6 +36,7 @@ module Facebooker
       end      
     end
 
+
     # 
     # Set the list of friends, given an array of User objects.  If the list has been retrieved previously, will not set
     def friends=(list_of_friends)
@@ -55,8 +56,8 @@ module Facebooker
     # Subsequent calls will be retrieved from memory.
     # TODO: allow optional forced refresh
     def friends!
-      @friends ||= @session.post('facebook.users.getInfo', :fields => FIELDS.join(','), :uids => friends.map{|f| f.id}.join(',')).map do |hash|
-        User.new(hash['uid'], @session, hash)
+      @friends ||= session.post('facebook.users.getInfo', :fields => FIELDS.join(','), :uids => friends.map{|f| f.id}.join(',')).map do |hash|
+        User.new(hash['uid'], session, hash)
       end
     end
     
@@ -65,13 +66,13 @@ module Facebooker
     end
     
     def friends_with_this_app
-      @friends_with_this_app ||= @session.post('facebook.friends.getAppUsers').map do |uid|
-        User.new(uid, @session)
+      @friends_with_this_app ||= session.post('facebook.friends.getAppUsers').map do |uid|
+        User.new(uid, session)
       end
     end
     
     def notifications
-      @notifications ||= Notifications.from_hash(@session.post('facebook.notifications.get'))
+      @notifications ||= Notifications.from_hash(session.post('facebook.notifications.get'))
     end
     
     def publish_story(story)
@@ -83,21 +84,21 @@ module Facebooker
     end
     
     def albums
-      @albums ||= @session.post('facebook.photos.getAlbums', :uid => self.id).map do |hash|
+      @albums ||= session.post('facebook.photos.getAlbums', :uid => self.id).map do |hash|
         Album.from_hash(hash)
       end
     end
     
     def create_album(params)
-      @album = Album.from_hash(@session.post('facebook.photos.createAlbum', params))
+      @album = Album.from_hash(session.post('facebook.photos.createAlbum', params))
     end
 
     def profile_fbml
-      @session.post('facebook.profile.getFBML', :uid => @id)  
+      session.post('facebook.profile.getFBML', :uid => @id)  
     end    
     
     def profile_fbml=(markup)
-      @session.post('facebook.profile.setFBML', :uid => @id, :markup => markup)      
+      session.post('facebook.profile.setFBML', :uid => @id, :markup => markup)      
     end
     
     # Returns the user's id as an integer
@@ -107,7 +108,7 @@ module Facebooker
     
     private
     def publish(feed_story_or_action)
-      @session.post(Facebooker::Feed::METHODS[feed_story_or_action.class.name.split(/::/).last], feed_story_or_action.to_params) == "1" ? true : false
+      session.post(Facebooker::Feed::METHODS[feed_story_or_action.class.name.split(/::/).last], feed_story_or_action.to_params) == "1" ? true : false
     end
     
   end  

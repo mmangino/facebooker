@@ -74,7 +74,8 @@ class SessionTest < Test::Unit::TestCase
     @session = Facebooker::Session.create(ENV['FACEBOOK_API_KEY'], ENV['FACEBOOK_SECRET_KEY'])
     expect_http_posts_with_responses(example_fql_query_event_members_xml)
     response = @session.fql_query("DOES NOT REALLY MATTER FOR TEST")
-    assert_kind_of(Facebooker::Event, response.first)
+    assert_kind_of(Facebooker::Event::Attendance, response.first)
+    assert_equal('attending', response.first.rsvp_status)
   end
   
   
@@ -136,12 +137,16 @@ class SessionTest < Test::Unit::TestCase
     <?xml version="1.0" encoding="UTF-8"?>
     <fql_query_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" list="true">
       <event_member>
+        <uid>517961878</uid>
         <eid>2454827764</eid>
+        <rsvp_status>attending</rsvp_status>
       </event_member>
       <event_member>
+        <uid>744961110</uid>
         <eid>2454827764</eid>
+        <rsvp_status>declined</rsvp_status>
       </event_member>
-    </fql_query_response>    
+    </fql_query_response>
     XML
   end
   def example_check_friendship_xml

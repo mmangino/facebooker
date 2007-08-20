@@ -1,7 +1,9 @@
 module Facebooker
   module Model
+    class UnboundSessionException < Exception; end
     def self.included(includer)
       includer.extend ClassMethods
+      includer.__send__(:attr_accessor, :session)
     end
     module ClassMethods
       def from_hash(hash)
@@ -30,6 +32,10 @@ module Facebooker
         end
       end
       
+    end
+    
+    def session
+      @session || (raise UnboundSessionException, "Must bind this object to a Facebook session before querying")
     end
     
     def initialize(hash = {})
