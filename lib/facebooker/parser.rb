@@ -180,6 +180,12 @@ module Facebooker
     end
   end
   
+  class FqlQuery < Parser#nodoc
+    def self.process(data)
+      array_of_hashes(element('fql_query_response', data), 'user')
+    end
+  end
+  
   class SetRefHandle < Parser#:nodoc:
     def self.process(data)
       element('fbml_setRefHandle_response', data).text_value
@@ -250,6 +256,7 @@ module Facebooker
       'facebook.profile.setFBML' => ProfileFBMLSet,
       'facebook.fbml.setRefHandle' => SetRefHandle,
       'facebook.fbml.refreshRefUrl' => RefreshRefURL,
+      'facebook.fql.query' => FqlQuery,
       'facebook.photos.get' => GetPhotos,
       'facebook.photos.getAlbums' => GetAlbums,
       'facebook.photos.createAlbum' => CreateAlbum,

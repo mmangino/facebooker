@@ -80,6 +80,16 @@ module Facebooker
       @secret_from_session = secret_from_session
     end
     
+    def fql_query(query, format = 'XML')
+      response = post('facebook.fql.query', :query => query, :format => format)
+      response.map do |hash|
+        #TODO add a method to parser for going through the list and creating proper elements?
+        #User.from_hash(hash)
+        #Photo.from_hash(has)
+        #Affilliation.from_hash(hash) etc.
+      end        
+    end
+    
     def user
       @user ||= User.new(uid, self)
     end

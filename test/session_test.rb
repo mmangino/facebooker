@@ -55,8 +55,24 @@ class SessionTest < Test::Unit::TestCase
   end
   
   def test_can_query_with_fql
-    expect_http_posts_with_responses(raise 'need example xml')    
-    fail "Need to implement this"
+    @session = Facebooker::Session.create(ENV['FACEBOOK_API_KEY'], ENV['FACEBOOK_SECRET_KEY'])
+    mock_http = establish_session
+    expect_http_posts_with_responses('example_fql_for_multiple_photos xml')    
+    response = @session.fql_query('SELECT src, caption, 1+2*3/4, caption, 10*(20 + 1) FROM photo
+    WHERE pid IN (SELECT pid FROM photo_tag WHERE subject= 22701786) AND
+          pid IN (SELECT pid FROM photo_tag WHERE subject= 22701786) AND
+          caption')
+          
+  end
+  
+  def test_can_fql_query_for_users_and_pictures
+    @session = Facebooker::Session.create(ENV['FACEBOOK_API_KEY'], ENV['FACEBOOK_SECRET_KEY'])
+    mock_http = establish_session
+    mock_http.should_receive(:post_form).and_return(example_fql_for_multiple_users_and_pics).once.ordered(:posts)  
+    response = @session.fql_query('SELECT name, pic FROM user WHERE uid=211031 OR uid=4801660')
+    assert_equal Array, response.class
+    assert_equal 'User', response[0].class.to_s
+    assert_equal "Ari Steinberg", response[0].name
   end
   
   def test_fql_queries_return_objects_whose_classes_depend_on_the_query_results
@@ -99,5 +115,51 @@ class SessionTest < Test::Unit::TestCase
     </friends_areFriends_response>    
     XML
   end
+  
+  def example_fql_for_multiple_users_and_pics
+    <<-XML
+    <?xml version="1.0" encoding="UTF-8"?>
+    <fql_query_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" list="true">
+      <user>
+        <name>Ari Steinberg</name>
+        <pic>http://profile.ak.facebook.com/profile2/1805/47/s211031_26434.jpg</pic>
+      </user>
+      <user>
+        <name>Ruchi Sanghvi</name>
+        <pic>http://profile.ak.facebook.com/v52/870/125/s4801660_2498.jpg</pic>
+      </user>
+    </fql_query_response>
+    XML
+  end
+  
+  def example_fql_for_multiple_photos
+    <<-XML
+    <?xml version="1.0" encoding="UTF-8"?>
+    <fql_query_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" list="true">
+      <photo>
+        <src>http://photos-c.ak.facebook.com/photos-ak-sf2p/v108/212/118/22700225/s22700225_30345986_2713.jpg</src>
+        <caption>Nottttt. get ready for some museumz</caption>
+        <anon>2.5</anon>
+        <caption>Nottttt. get ready for some museumz</caption>
+        <anon>210</anon>
+      </photo>
+      <photo>
+        <src>http://photos-c.ak.facebook.com/photos-ak-sf2p/v77/74/112/22701786/s22701786_30324934_7816.jpg</src>
+        <caption>Rooftop barbecues make me act funny</caption>
+        <anon>2.5</anon>
+        <caption>Rooftop barbecues make me act funny</caption>
+        <anon>210</anon>
+      </photo>
+      <photo>
+        <src>http://photos-c.ak.facebook.com/photos-ak-sctm/v96/154/56/22700188/s22700188_30321538_17.jpg</src>
+        <caption>An epic shot of Patrick getting ready for a run to second.</caption>
+        <anon>2.5</anon>
+        <caption>An epic shot of Patrick getting ready for a run to second.</caption>
+        <anon>210</anon>
+      </photo>
+    </fql_query_response>
+    XML
+  end
+  
   
 end
