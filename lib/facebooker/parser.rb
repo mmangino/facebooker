@@ -210,7 +210,7 @@ module Facebooker
     def self.process(data)
       root = element('events_getMembers_response', data)
       first_child = root.children.reject{|c| c.kind_of?(REXML::Text)}.first
-      [first_child, array_of_hashes(root, first_child.name)]
+      array_of_hashes(root, first_child.name)
     end
   end
   
