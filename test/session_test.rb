@@ -78,7 +78,6 @@ class SessionTest < Test::Unit::TestCase
   def test_can_query_for_event_members
     expect_http_posts_with_responses(example_event_members_xml)
     event_attendances = @session.event_members(69)
-    raise event_attendances.inspect
     assert_equal Facebooker::Event::Attendance, event_attendances.first.class
     assert_equal 5, event_attendances.size
   end

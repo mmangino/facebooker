@@ -208,19 +208,10 @@ module Facebooker
   
   class EventMembersGet < Parser#:nodoc:
     def self.process(data)
-      members = []
       root = element('events_getMembers_response', data)
-      first_child = root.children.reject{|c| c.kind_of?(REXML::Text)}.first
-      
-      root.children.to_a.each do |child|
-        status = {:rsvp_status => child.name}
-        child.each do |grandchild|
-          grandhash = hashinate(grandchild)
-          grandhash.merge!(status)
-          members << grandhash
-        end
+      root.children.reject{|c| c.kind_of?(REXML::Text)}.map do |child|
+        hashinate(child).merge({:rsvp_status => child.name})
       end
-      
     end
   end
   
