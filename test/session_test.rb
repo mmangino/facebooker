@@ -79,6 +79,8 @@ class SessionTest < Test::Unit::TestCase
     expect_http_posts_with_responses(example_event_members_xml)
     event_attendances = @session.event_members(69)
     assert_equal Facebooker::Event::Attendance, event_attendances.first.class
+    assert_equal 'attending', event_attendances.first.rsvp_status
+    assert_equal(["1240077", "222332", "222333", "222335", "222336"], event_attendances.map{|ea| ea.uid}.sort)
     assert_equal 5, event_attendances.size
   end
   

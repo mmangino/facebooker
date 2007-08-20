@@ -209,9 +209,13 @@ module Facebooker
   class EventMembersGet < Parser#:nodoc:
     def self.process(data)
       root = element('events_getMembers_response', data)
-      root.children.reject{|c| c.kind_of?(REXML::Text)}.map do |child|
-        hashinate(child).merge({:rsvp_status => child.name})
-      end
+      result = ['attending', 'declined', 'unsure', 'not_replied'].map do |rsvp_status|
+        array_of(root, rsvp_status) {|element| element}.map do |element|
+          array_of_text_values(element, 'uid').map do |uid|
+            {:rsvp_status => rsvp_status}.merge(:uid => uid)
+          end
+        end
+      end.flatten
     end
   end
   
