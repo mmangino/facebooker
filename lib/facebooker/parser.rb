@@ -187,8 +187,9 @@ module Facebooker
       #FIXME: The following is dreadful
       [first_child.name, case first_child.name
       when 'user'
-       array_of_hashes(root, 'user')
+        array_of_hashes(root, 'user')
       when 'photo'
+        array_of_hashes(root, 'photo')
       end]
     end
   end

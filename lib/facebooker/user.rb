@@ -12,7 +12,7 @@ module Facebooker
       attr_accessor :message, :time
     end
     FIELDS = [:status, :political, :pic_small, :name, :quotes, :is_app_user, :tv, :profile_update_time, :meeting_sex, :hs_info, :timezone, :relationship_status, :hometown_location, :about_me, :wall_count, :significant_other_id, :pic_big, :music, :uid, :work_history, :sex, :religion, :notes_count, :activities, :pic_square, :movies, :has_added_app, :education_history, :birthday, :first_name, :meeting_for, :last_name, :interests, :current_location, :pic, :books, :affiliations]
-    attr_accessor :id
+    attr_accessor :id, :session
     attr_accessor *FIELDS
     attr_reader :affiliations
     hash_settable_accessor :current_location, Location
@@ -23,10 +23,17 @@ module Facebooker
     hash_settable_list_accessor :education_history, EducationInfo
     hash_settable_list_accessor :work_history, WorkInfo
 
-    def initialize(id, session, attributes = {})
-      @id = Integer(id)
-      @session = session
-      populate_from_hash!(attributes)
+    # Can pass in these two forms:
+    # id, session, (optional) attribute_hash
+    # attribute_hash
+    def initialize(*args)
+      if (args.first.kind_of?(String) || args.first.kind_of?(Integer)) && args[1].kind_of?(Session)
+        @id = Integer(args.shift)
+        @session = args.shift
+      end
+      if args.last.kind_of?(Hash)
+        populate_from_hash!(args.pop)
+      end      
     end
 
     # 

@@ -74,12 +74,7 @@ class SessionTest < Test::Unit::TestCase
     response = @session.fql_query('SELECT name, pic FROM user WHERE uid=211031 OR uid=4801660')
     assert_kind_of Array, response
     assert_kind_of Facebooker::User, response.first
-    assert_equal "Ari Steinberg", response.firsts.name
-  end
-  
-  def test_fql_queries_return_objects_whose_classes_depend_on_the_query_results
-    expect_http_posts_with_responses(raise 'need example xml')
-    fail 'Need to implement this'    
+    assert_equal "Ari Steinberg", response.first.name
   end
   
   def teardown
