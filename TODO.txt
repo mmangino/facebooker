@@ -1,6 +1,5 @@
 * Specify fields wanted when getting user info (defaults to all now)
 * Support missing parameters on methods---most notably authentication-related parameters such as next and canvas
-* Missing method calls (obvious)
-* Split test_facebooker.rb into multiple files
-
-* Experiment with including an anonymous module which holds the facebook environment: include facebook_environment(session)
+* Finish FQL Querying
+* Refactor FQL Querying
+* Transform incoming data into appropriate classes (Integers, Dates, etc.)
