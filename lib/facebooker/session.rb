@@ -93,15 +93,24 @@ module Facebooker
         when 'photo'
           Photo.from_hash(hash)
         end
-        #TODO add a method to parser for going through the list and creating proper elements?
-        #User.from_hash(hash)
-        #Photo.from_hash(has)
-        #Affilliation.from_hash(hash) etc.
       end        
     end
     
     def user
       @user ||= User.new(uid, self)
+    end
+    
+    #
+    # This one has so many parameters, a Hash seemed cleaner than a long param list.  Options can be:
+    # :uid => Filter by events associated with a user with this uid
+    # :eids => Filter by this list of event ids. This is a comma-separated list of eids.
+    # :start_time => Filter with this UTC as lower bound. A missing or zero parameter indicates no lower bound. (Time or Integer)
+    # :end_time => Filter with this UTC as upper bound. A missing or zero parameter indicates no upper bound. (Time or Integer)
+    # :rsvp_status => Filter by this RSVP status.
+    def events(options = {})
+      @events ||= post('facebook.events.get', options).map do |hash|
+        Event.from_hash(hash)
+      end
     end
     
     #

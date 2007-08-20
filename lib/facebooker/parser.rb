@@ -184,13 +184,7 @@ module Facebooker
     def self.process(data)
       root = element('fql_query_response', data)
       first_child = root.children.reject{|c| c.kind_of?(REXML::Text)}.first
-      #FIXME: The following is dreadful
-      [first_child.name, case first_child.name
-      when 'user'
-        array_of_hashes(root, 'user')
-      when 'photo'
-        array_of_hashes(root, 'photo')
-      end]
+      [first_child.name, array_of_hashes(root, first_child.name)]
     end
   end
   
@@ -203,6 +197,12 @@ module Facebooker
   class RefreshRefURL < Parser#:nodoc:
     def self.process(data)
       element('fbml_refreshRefUrl_response', data).text_value
+    end
+  end
+  
+  class EventsGet < Parser#:nodoc:
+    def self.process(data)
+      array_of_hashes(element('events_get_response', data), 'event')
     end
   end
   
@@ -269,7 +269,9 @@ module Facebooker
       'facebook.photos.getAlbums' => GetAlbums,
       'facebook.photos.createAlbum' => CreateAlbum,
       'facebook.photos.getTags' => GetTags,
-      'facebook.photos.addTag' => AddTags
+      'facebook.photos.addTag' => AddTags,
+      'facebook.events.get' => EventsGet
+      
     }
   end
 end
