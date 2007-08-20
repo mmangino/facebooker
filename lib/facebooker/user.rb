@@ -71,6 +71,13 @@ module Facebooker
       end
     end
     
+    def groups(gids = [])
+      args = gids.empty? ? {} : {:gids => gids}
+      @groups ||= session.post('facebook.groups.get', args).map do |hash|
+        Group.from_hash(hash)
+      end
+    end
+    
     def notifications
       @notifications ||= Notifications.from_hash(session.post('facebook.notifications.get'))
     end

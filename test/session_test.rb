@@ -85,6 +85,12 @@ class SessionTest < Test::Unit::TestCase
     assert_equal 'Technology Tasting', events.first.name
   end
   
+  def test_can_query_for_groups
+    expect_http_posts_with_responses(example_groups_get_xml)    
+    groups = @session.user.groups
+    assert_equal 'Donald Knuth Is My Homeboy', groups.first.name
+  end
+  
   def test_can_fql_query_for_users_and_pictures
     @session = Facebooker::Session.create(ENV['FACEBOOK_API_KEY'], ENV['FACEBOOK_SECRET_KEY'])
     mock_http = establish_session
@@ -100,6 +106,40 @@ class SessionTest < Test::Unit::TestCase
   end
   
   private
+  
+  def example_groups_get_xml
+    <<-XML
+    <?xml version="1.0" encoding="UTF-8"?>
+    <groups_get_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd" list="true">
+      <group>
+        <gid>2206609142</gid>
+        <name>Donald Knuth Is My Homeboy</name>
+        <nid>0</nid>
+        <description>Donald Ervin Knuth (born January 10, 1938) is a renowned computer scientist and professor emeritus at Stanford University.
+
+    Knuth is best known as the author of the multi-volume The Art of Computer Programming, one of the most highly respected references in the computer science field. He practically created the field of rigorous analysis of algorithms, and made many seminal contributions to several branches of theoretical computer science. He is also the creator of the TeX typesetting system and of the METAFONT font design system, and pioneered the concept of literate programming.
+
+    That's how he ROLLS, y0.</description>
+        <group_type>Just for Fun</group_type>
+        <group_subtype>Fan Clubs</group_subtype>
+        <recent_news/>
+        <pic>http://photos-142.facebook.com/ip006/object/543/95/s2206609142_32530.jpg</pic>
+        <pic_big>http://photos-142.facebook.com/ip006/object/543/95/n2206609142_32530.jpg</pic_big>
+        <pic_small>http://photos-142.facebook.com/ip006/object/543/95/t2206609142_32530.jpg</pic_small>
+        <creator>1240077</creator>
+        <update_time>1156543965</update_time>
+        <office/>
+        <website/>
+        <venue>
+          <street/>
+          <city/>
+          <state>CA</state>
+          <country>United States</country>
+        </venue>
+      </group>
+    </groups_get_response>    
+    XML
+  end
   
   def example_events_get_xml
     <<-XML

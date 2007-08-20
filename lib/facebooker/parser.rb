@@ -206,6 +206,12 @@ module Facebooker
     end
   end
   
+  class GroupsGet < Parser#:nodoc:
+    def self.process(data)
+      array_of_hashes(element('groups_get_response', data), 'group')
+    end
+  end
+  
   class AreFriends < Parser#:nodoc:
     def self.process(data)
       array_of_hashes(element('friends_areFriends_response', data), 'friend_info').inject({}) do |memo, hash|
@@ -270,7 +276,8 @@ module Facebooker
       'facebook.photos.createAlbum' => CreateAlbum,
       'facebook.photos.getTags' => GetTags,
       'facebook.photos.addTag' => AddTags,
-      'facebook.events.get' => EventsGet
+      'facebook.events.get' => EventsGet,
+      'facebook.groups.get' => GroupsGet
       
     }
   end
