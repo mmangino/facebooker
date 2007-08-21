@@ -209,7 +209,7 @@ class TestFacebooker < Test::Unit::TestCase
   def test_can_tag_a_user_in_a_photo
     mock_http = establish_session
     mock_http.should_receive(:post_form).and_return(example_add_tag_xml).once.ordered(:posts)
-    assert_equal example_add_tag_xml, @session.add_tags(97503428461115571, {:uid => 1234567890, :x => 30.0, :y => 62.5})
+    assert !@session.add_tags(pid = 97503428461115571, x= 30.0, y = 62.5, tag_uid = 1234567890).nil?
   end
   
   def test_can_add_multiple_tags_to_photos

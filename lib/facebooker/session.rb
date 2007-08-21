@@ -166,8 +166,11 @@ module Facebooker
       end
     end
     
-    def add_tags(pid, tags_hash)
-      @tags = post('facebook.photos.addTag', :pid => pid, :tags => tags_hash.to_json)
+    def add_tags(pid, x, y, tag_uid = nil, tag_text = nil )
+      if [tag_uid, tag_text].all? {|arg| arg.nil?}
+        raise ArgumentError, "Must enter a name or string for this tag"        
+      end
+      @tags = post('facebook.photos.addTag', :pid => pid, :tag_uid => tag_uid, :tag_text => tag_text, :x => x, :y => y )
     end
     
     def send_notification(user_ids, fbml, email_fbml = nil)
