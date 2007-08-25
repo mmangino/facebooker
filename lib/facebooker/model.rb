@@ -1,4 +1,8 @@
 module Facebooker
+  ##
+  # helper methods primarily supporting the management of Ruby objects which are populatable via Hashes.  
+  # Since most Facebook API calls accept and return hashes of data (as XML), the Model module allows us to
+  # directly populate a model's attributes given a Hash with matching key names.
   module Model
     class UnboundSessionException < Exception; end
     def self.included(includer)
@@ -7,6 +11,9 @@ module Facebooker
       includer.__send__(:attr_reader, :anonymous_fields)
     end
     module ClassMethods
+      ##
+      # Instantiate a new instance of the class into which we are included and populate that instance's
+      # attributes given the provided Hash.  Key names in the Hash should map to attribute names on the model.
       def from_hash(hash)
         instance = new(hash)
         yield instance if block_given?
@@ -37,6 +44,9 @@ module Facebooker
       
     end
     
+    ##
+    # Centralized, error-checked place for a model to get the session to which it is bound.
+    # Any Facebook API queries require a Session instance.
     def session
       @session || (raise UnboundSessionException, "Must bind this object to a Facebook session before querying")
     end
@@ -49,7 +59,10 @@ module Facebooker
     
     def initialize(hash = {})
       populate_from_hash!(hash)
-    end    
+    end
+    
+    ##
+    # Set model's attributes via Hash.  Keys should map directly to the model's attribute names.
     def populate_from_hash!(hash)
       unless hash.empty?
         hash.each do |key, value|

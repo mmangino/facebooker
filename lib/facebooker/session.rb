@@ -184,15 +184,23 @@ module Facebooker
     def send_request(user_ids, request_type, content, image_url)
       send_request_or_invitation(user_ids, request_type, content, image_url, false)      
     end
-
+    
+    ##
+    # Send an invitatino to a list of users
+    # +user_ids+ - An Array of facebook IDs to which to send this invitation.
+    # +invitation_type+ - 
+    # +content+ - Text of the invitation
+    # +image_url+ - String URL to image to associate with this invitation.
     def send_invitation(user_ids, invitation_type, content, image_url)
       send_request_or_invitation(user_ids, invitation_type, content, image_url, true)
     end
     
+    # Only serialize the bare minimum to recreate the session.
     def marshal_load(variables)#:nodoc:
       @session_key, @uid, @expires, @secret_from_session, @auth_token = variables
     end
     
+    # Only serialize the bare minimum to recreate the session.    
     def marshal_dump#:nodoc:
       [@session_key, @uid, @expires, @secret_from_session, @auth_token]
     end
@@ -238,41 +246,41 @@ module Facebooker
     end
     
     private
-    def self.extract_key_from_environment(key_name)
-      val = ENV["FACEBOOK_" + key_name.to_s.upcase + "_KEY"]
-    end
+      def self.extract_key_from_environment(key_name)
+        val = ENV["FACEBOOK_" + key_name.to_s.upcase + "_KEY"]
+      end
     
-    def self.extract_key_from_configuration_file(key_name)
-      read_configuration_file[key_name]
-    end
+      def self.extract_key_from_configuration_file(key_name)
+        read_configuration_file[key_name]
+      end
     
-    def self.report_inability_to_find_key(key_name)
-      raise ConfigurationMissing, "Could not find configuration information for #{key_name}"
-    end
+      def self.report_inability_to_find_key(key_name)
+        raise ConfigurationMissing, "Could not find configuration information for #{key_name}"
+      end
     
-    def self.read_configuration_file
-      eval(File.read(configuration_file_path))
-    end
+      def self.read_configuration_file
+        eval(File.read(configuration_file_path))
+      end
     
-    def service
-      @service ||= Service.new(API_SERVER_BASE_URL, API_PATH_REST, @api_key)      
-    end
+      def service
+        @service ||= Service.new(API_SERVER_BASE_URL, API_PATH_REST, @api_key)      
+      end
     
-    def uid
-      @uid || (secure!; @uid)
-    end
+      def uid
+        @uid || (secure!; @uid)
+      end
       
-    def signature_for(params)
-      raw_string = params.inject([]) do |collection, pair|
-        collection << pair.join("=")
-        collection
-      end.sort.join
-      Digest::MD5.hexdigest([raw_string, secret_for_method(params[:method])].join)
-    end
+      def signature_for(params)
+        raw_string = params.inject([]) do |collection, pair|
+          collection << pair.join("=")
+          collection
+        end.sort.join
+        Digest::MD5.hexdigest([raw_string, secret_for_method(params[:method])].join)
+      end
         
-    def send_request_or_invitation(user_ids, request_type, content, image_url, invitation)
-      params = {:to_ids => user_ids, :type => request_type, :content => content, :image => image_url, :invitation => invitation}
-      post 'facebook.notifications.sendRequest', params
-    end    
+      def send_request_or_invitation(user_ids, request_type, content, image_url, invitation)
+        params = {:to_ids => user_ids, :type => request_type, :content => content, :image => image_url, :invitation => invitation}
+        post 'facebook.notifications.sendRequest', params
+      end    
   end
 end
