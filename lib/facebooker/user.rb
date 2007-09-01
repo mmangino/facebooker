@@ -54,9 +54,9 @@ module Facebooker
     ###
     # Retrieve friends with user info populated
     # Subsequent calls will be retrieved from memory.
-    # TODO: allow optional forced refresh
-    def friends!
-      @friends ||= session.post('facebook.users.getInfo', :fields => FIELDS.join(','), :uids => friends.map{|f| f.id}.join(',')).map do |hash|
+    # Optional: list of fields to retrieve as symbols
+    def friends!(*fields)
+      @friends ||= session.post('facebook.users.getInfo', :fields => FIELDS.reject{|field_name| !fields.empty? && !fields.include?(field_name)}.join(','), :uids => friends.map{|f| f.id}.join(',')).map do |hash|  
         User.new(hash['uid'], session, hash)
       end
     end

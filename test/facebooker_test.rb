@@ -70,6 +70,13 @@ class TestFacebooker < Test::Unit::TestCase
     assert_equal('I rule', friend.status.message)
   end
 
+  def test_can_get_specific_info_for_one_or_more_users
+    friends = populate_session_friends_with_limited_fields
+    friend = friends.detect{|f| f.id == 222333}
+    assert_equal('I rule', friend.status.message)
+    assert_equal(nil, friend.hometown_location)
+  end
+
   def test_session_can_expire_on_server_and_client_handles_appropriately
     mock_http = establish_session
     mock_http.should_receive(:post_form).and_return(example_session_expired_error_response).once.ordered(:posts)
@@ -256,6 +263,13 @@ class TestFacebooker < Test::Unit::TestCase
     @session.user.friends!    
   end
   
+  def populate_session_friends_with_limited_fields
+    mock_http = establish_session
+    mock_http.should_receive(:post_form).and_return(example_friends_xml).once.ordered(:posts)
+    mock_http.should_receive(:post_form).and_return(example_limited_user_info_xml).once.ordered(:posts)
+    @session.user.friends!(:affiliations, :status, :meeting_for)    
+  end
+  
   def sample_args_to_post
     {:method=>"facebook.auth.createToken", :sig=>"18b3dc4f5258a63c0ad641eebd3e3930"}
   end  
@@ -437,6 +451,38 @@ class TestFacebooker < Test::Unit::TestCase
     </users_getInfo_response>    
     XML
   end
+
+  def example_limited_user_info_xml
+    <<-XML
+    <?xml version="1.0" encoding="UTF-8"?>
+    <users_getInfo_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd" list="true">
+      <user>
+        <uid>222333</uid>
+        <affiliations list="true">
+          <affiliation>
+            <nid>50453093</nid>
+            <name>Facebook Developers</name>
+            <type>work</type>
+            <status/>
+            <year/>
+          </affiliation>
+        </affiliations> 
+         <meeting_for list="true">
+           <seeking>Friendship</seeking>
+         </meeting_for>
+         <status>
+           <message>I rule</message>
+           <time>0</time>
+         </status>
+       </user>
+       <user>
+         <uid>1240079</uid>
+         <activities>Party.</activities>       
+       </user>
+    </users_getInfo_response>    
+    XML
+  end
+
   
   def example_friends_xml
     <<-XML
