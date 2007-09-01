@@ -49,7 +49,7 @@ module Facebooker
       
       def create_new_facebook_session_and_redirect!
         session[:facebook_session] = new_facebook_session
-        redirect_to session[:facebook_session].login_url
+        redirect_to session[:facebook_session].login_url unless @installation_required
         false
       end
       
@@ -79,9 +79,41 @@ module Facebooker
         end.merge(
           'time' => lambda{|value| Time.at(value.to_f)},
           'in_canvas' => lambda{|value| !blank?(value)},
+          'added' => lambda{|value| !blank?(value)},
           'expires' => lambda{|value| blank?(value) ? nil : Time.at(value.to_f)},
           'friends' => lambda{|value| value.split(/,/)}
         )
+      end
+      
+      def redirect_to(url)
+        if request_is_from_a_facebook_canvas?
+          render :text => fbml_redirect_tag(url)
+        else
+          super
+        end
+      end
+      
+      def fbml_redirect_tag(url)
+        "<fb:redirect url=\"#{url}\" />"
+      end
+      
+      def request_is_from_a_facebook_canvas?
+        facebook_params['in_canvas']
+      end
+      
+      def application_is_installed?
+        facebook_params['added']
+      end
+      
+      def ensure_authenticated_to_facebook
+        set_facebook_session
+      end
+      
+      def ensure_application_is_installed_by_facebook_user
+        @installation_required = true
+        returning ensure_authenticated_to_facebook && application_is_installed? do |authenticated_and_installed|
+          redirect_to session[:facebook_session].install_url unless authenticated_and_installed
+        end
       end
       
       module ClassMethods
@@ -90,7 +122,11 @@ module Facebooker
         # Facebook before executing actions.  Accepts the same optional options hash which
         # before_filter and after_filter accept.
         def ensure_authenticated_to_facebook(options = {})
-          before_filter :set_facebook_session, options
+          before_filter :ensure_authenticated_to_facebook, options
+        end
+        
+        def ensure_application_is_installed_by_facebook_user(options = {})
+          before_filter :ensure_application_is_installed_by_facebook_user, options
         end
       end
     end

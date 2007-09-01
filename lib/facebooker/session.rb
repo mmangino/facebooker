@@ -39,10 +39,29 @@ module Facebooker
       extract_key_from_environment(:secret) || extract_key_from_configuration_file(:secret) rescue report_inability_to_find_key(:secret)
     end
     
-    def login_url
-      "http://www.facebook.com/login.php?api_key=#{@api_key}&v=1.0"
+    def login_url(options={})
+      options = default_login_url_options.merge(options)
+      "http://www.facebook.com/login.php?api_key=#{@api_key}&v=1.0#{login_url_optional_parameters(options)}"
+    end
+
+    def install_url
+      "http://www.facebook.com/install.php?api_key=#{@api_key}&v=1.0"
+    end
+
+    def login_url_optional_parameters(options)
+      # It is important that unused options are omitted as stuff like &canvas=false will still display the canvas. 
+      optional_parameters = []
+      optional_parameters << "&next=#{CGI.escape(options[:next])}" if options[:next]
+      optional_parameters << "&skipcookie=true" if options[:skip_cookie]
+      optional_parameters << "&hide_checkbox=true" if options[:hide_checkbox]
+      optional_parameters << "&canvas=true" if options[:canvas]
+      optional_parameters.join
     end
   
+    def default_login_url_options
+      {}
+    end
+    
     def initialize(api_key, secret_key)
       @api_key = api_key
       @secret_key = secret_key
@@ -282,5 +301,11 @@ module Facebooker
         params = {:to_ids => user_ids, :type => request_type, :content => content, :image => image_url, :invitation => invitation}
         post 'facebook.notifications.sendRequest', params
       end    
+  end
+  
+  class CanvasSession < Session
+    def default_login_url_options
+      {:canvas => true}
+    end
   end
 end

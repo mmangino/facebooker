@@ -351,3 +351,15 @@ class SessionTest < Test::Unit::TestCase
   end
   
 end
+
+class CanvasSessionTest < Test::Unit::TestCase
+  def setup
+    ENV['FACEBOOK_API_KEY'] = '1234567'
+    ENV['FACEBOOK_SECRET_KEY'] = '7654321'   
+  end
+   
+  def test_login_url_will_display_callback_url_in_canvas
+    session = Facebooker::CanvasSession.create(ENV['FACEBOOK_API_KEY'], ENV['FACEBOOK_SECRET_KEY'])
+    assert_equal("http://www.facebook.com/login.php?api_key=1234567&v=1.0&canvas=true", session.login_url)
+  end
+end
