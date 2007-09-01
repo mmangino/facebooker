@@ -16,6 +16,12 @@ module Facebooker
     class CallOutOfOrder < Exception; end
     class IncorrectSignature     < Exception; end
     class ConfigurationMissing < Exception; end
+    class FQLParseError < Exception; end
+    class FQLFieldDoesNotExist < Exception; end
+    class FQLTableDoesNotExist < Exception; end
+    class FQLStatementNotIndexable < Exception; end
+    class FQLFunctionDoesNotExist < Exception; end
+    class FQLWrongNumberArgumentsPassedToFunction < Exception; end
   
     API_SERVER_BASE_URL       = "api.facebook.com"
     API_PATH_REST             = "/restserver.php"

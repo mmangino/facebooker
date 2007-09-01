@@ -274,7 +274,13 @@ module Facebooker
       101 => Facebooker::Session::InvalidAPIKey,
       102 => Facebooker::Session::SessionExpired,
       103 => Facebooker::Session::CallOutOfOrder,
-      104 => Facebooker::Session::IncorrectSignature
+      104 => Facebooker::Session::IncorrectSignature,
+      601 => Facebooker::Session::FQLParseError,
+      602 => Facebooker::Session::FQLFieldDoesNotExist,
+      603 => Facebooker::Session::FQLTableDoesNotExist,
+      604 => Facebooker::Session::FQLStatementNotIndexable,
+      605 => Facebooker::Session::FQLFunctionDoesNotExist,
+      606 => Facebooker::Session::FQLWrongNumberArgumentsPassedToFunction
     }
     def self.process(data)
       response_element = element('error_response', data) rescue nil
