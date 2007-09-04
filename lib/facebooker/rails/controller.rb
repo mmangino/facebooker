@@ -86,7 +86,7 @@ module Facebooker
       end
       
       def redirect_to(url)
-        if request_is_from_a_facebook_canvas?
+        if request_is_for_a_facebook_canvas?
           render :text => fbml_redirect_tag(url)
         else
           super
@@ -97,7 +97,7 @@ module Facebooker
         "<fb:redirect url=\"#{url}\" />"
       end
       
-      def request_is_from_a_facebook_canvas?
+      def request_is_for_a_facebook_canvas?
         facebook_params['in_canvas']
       end
       

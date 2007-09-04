@@ -138,7 +138,7 @@ class RailsIntegrationTest < Test::Unit::TestCase
     assert_equal(111, friends.size)    
   end
   
-  def test_redirect_to_renders_fbml_redirect_tag_if_request_is_from_a_facebook_canvas
+  def test_redirect_to_renders_fbml_redirect_tag_if_request_is_for_a_facebook_canvas
     get :index, example_rails_params_including_fb_for_user_not_logged_into_application
     assert_response :success
     assert_equal("<fb:redirect url=\"http://www.facebook.com/login.php?api_key=1234567&v=1.0\" />", @response.body)
