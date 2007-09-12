@@ -222,12 +222,12 @@ module Facebooker
     
     # Only serialize the bare minimum to recreate the session.
     def marshal_load(variables)#:nodoc:
-      @session_key, @uid, @expires, @secret_from_session, @auth_token = variables
+      @session_key, @uid, @expires, @secret_from_session, @auth_token, @api_key, @secret_key = variables
     end
     
     # Only serialize the bare minimum to recreate the session.    
     def marshal_dump#:nodoc:
-      [@session_key, @uid, @expires, @secret_from_session, @auth_token]
+      [@session_key, @uid, @expires, @secret_from_session, @auth_token, @api_key, @secret_key]
     end
     
     class Desktop < Session
@@ -251,7 +251,6 @@ module Facebooker
           ['facebook.auth.getSession', 'facebook.auth.createToken']
         end
     end
-
     
     def post(method, params = {})
       params[:method] = method

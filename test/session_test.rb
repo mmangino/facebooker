@@ -31,6 +31,18 @@ class SessionTest < Test::Unit::TestCase
     }
   end
   
+  def test_marshal_stores_api_key
+    data = Marshal.dump(@session)
+    loaded_session = Marshal.load(data)
+    assert_equal 'whatever', loaded_session.instance_variable_get("@api_key")
+  end
+  
+  def test_marshal_stores_secret_key
+    data = Marshal.dump(@session)
+    loaded_session = Marshal.load(data)
+    assert_equal 'doesnotmatterintest', loaded_session.instance_variable_get("@secret_key")    
+  end
+  
   def test_configuration_file_path_can_be_set_explicitly
     Facebooker::Session.configuration_file_path = '/tmp/foo'
     assert_equal('/tmp/foo', Facebooker::Session.configuration_file_path)

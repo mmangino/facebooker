@@ -138,6 +138,11 @@ class RailsIntegrationTest < Test::Unit::TestCase
     assert_equal(111, friends.size)    
   end
   
+  def test_fbml_redirect_tag_handles_hash_parameters_correctly
+    get :index, example_rails_params_including_fb
+    assert_equal "<fb:redirect url=\"http://test.host/require_auth\" />", @controller.send(:fbml_redirect_tag, :action => :index)
+  end
+  
   def test_redirect_to_renders_fbml_redirect_tag_if_request_is_for_a_facebook_canvas
     get :index, example_rails_params_including_fb_for_user_not_logged_into_application
     assert_response :success

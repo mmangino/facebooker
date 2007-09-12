@@ -94,7 +94,7 @@ module Facebooker
       end
       
       def fbml_redirect_tag(url)
-        "<fb:redirect url=\"#{url}\" />"
+        "<fb:redirect url=\"#{url_for(url)}\" />"
       end
       
       def request_is_for_a_facebook_canvas?
