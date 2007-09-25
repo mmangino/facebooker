@@ -54,6 +54,11 @@ class TestFacebooker < Test::Unit::TestCase
     assert_equal([222333, 1240079], @session.user.friends.map{|friend| friend.id})
   end
   
+  def test_can_get_info_for_instance_of_user
+    populate_user_info
+    @session.user.first_name = "Dave"
+  end
+  
   def test_can_get_info_for_one_or_more_users
     friends = populate_session_friends
     friend = friends.detect{|f| f.id == 222333}
@@ -255,6 +260,11 @@ class TestFacebooker < Test::Unit::TestCase
   end
   
   private
+  def populate_user_info
+    mock_http = establish_session
+    mock_http.should_receive(:post_form).and_return(example_user_info_xml).once
+    @session.user.populate
+  end
   
   def populate_session_friends
     mock_http = establish_session

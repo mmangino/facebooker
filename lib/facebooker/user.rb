@@ -61,6 +61,11 @@ module Facebooker
       end
     end
     
+    def populate
+      results = session.post('facebook.users.getInfo', :fields => FIELDS.join(','), :uids => id)
+      populate_from_hash!(results.first)
+    end
+    
     def friends_with?(user_or_id)
       friends.map{|f| f.to_i}.include?(user_or_id.to_i)  
     end
