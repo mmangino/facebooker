@@ -23,8 +23,8 @@ module Facebooker
         1.upto(4) do |num|
           image_attribute = "image_#{num}"
           image_link_attribute = image_attribute + "_link"
-          self.__send__(image_attribute) ? image_hash[image_attribute] = send.__send__(image_attribute) : nil
-          self.__send__(image_link_attribute) ? image_hash[image_link_attribute] = send.__send__(image_link_attribute) : nil    
+          self.__send__(image_attribute) ? image_hash[image_attribute] = self.__send__(image_attribute) : nil
+          self.__send__(image_link_attribute) ? image_hash[image_link_attribute] = self.__send__(image_link_attribute) : nil    
         end
         image_hash
       end
