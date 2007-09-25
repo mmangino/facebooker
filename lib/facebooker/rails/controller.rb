@@ -112,8 +112,12 @@ module Facebooker
       def ensure_application_is_installed_by_facebook_user
         @installation_required = true
         returning ensure_authenticated_to_facebook && application_is_installed? do |authenticated_and_installed|
-          redirect_to session[:facebook_session].install_url unless authenticated_and_installed
+           application_is_not_installed_by_facebook_user unless authenticated_and_installed
         end
+      end
+      
+      def application_is_not_installed_by_facebook_user
+        redirect_to session[:facebook_session].install_url
       end
       
       module ClassMethods
