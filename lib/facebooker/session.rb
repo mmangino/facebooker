@@ -1,4 +1,6 @@
 require 'digest/md5'
+require 'cgi'
+
 module Facebooker
   #
   # Raised when trying to perform an operation on a user
@@ -50,8 +52,14 @@ module Facebooker
       "http://www.facebook.com/login.php?api_key=#{@api_key}&v=1.0#{login_url_optional_parameters(options)}"
     end
 
-    def install_url
-      "http://www.facebook.com/install.php?api_key=#{@api_key}&v=1.0"
+    def install_url(options={})
+      "http://www.facebook.com/install.php?api_key=#{@api_key}&v=1.0#{install_url_optional_parameters(options)}"
+    end
+
+    def install_url_optional_parameters(options)
+      optional_parameters = []
+      optional_parameters << "&next=#{CGI.escape(options[:next])}" if options[:next]
+      optional_parameters.join
     end
 
     def login_url_optional_parameters(options)

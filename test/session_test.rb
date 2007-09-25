@@ -12,6 +12,12 @@ class SessionTest < Test::Unit::TestCase
   def teardown
     flexmock_close
   end
+  
+  def test_install_url_escapes_optional_next_parameter
+    session = Facebooker::CanvasSession.create(ENV['FACEBOOK_API_KEY'], ENV['FACEBOOK_SECRET_KEY'])
+    assert_equal("http://www.facebook.com/install.php?api_key=1234567&v=1.0&next=next_url%3Fa%3D1%26b%3D2", session.install_url(:next => "next_url?a=1&b=2"))
+  end
+  
   def test_can_get_api_and_secret_key_from_environment
     assert_equal('1234567', Facebooker::Session.api_key)
     assert_equal('7654321', Facebooker::Session.secret_key)    
