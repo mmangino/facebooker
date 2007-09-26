@@ -1,4 +1,6 @@
 require File.dirname(__FILE__) + '/test_helper.rb'
+require 'rubygems'
+require 'flexmock/test_unit'
 
 class TestFacebooker < Test::Unit::TestCase
   
@@ -14,6 +16,10 @@ class TestFacebooker < Test::Unit::TestCase
     hash_settable_list_accessor :list_of_complex_things, ComplexThing
   end
 
+  class PopulatingThing
+    include Facebooker::Model
+    populating_attr_accessor :first_name
+  end
   
   def test_can_instantiate_an_object_with_a_hash
     h = {:name => "Blob", :job => "Monster"}
@@ -50,5 +56,24 @@ class TestFacebooker < Test::Unit::TestCase
     }
   end
   
+  def test_populating_reader_will_call_populate_if_model_was_not_previously_populated
+    t = PopulatingThing.new
+    flexmock(t).should_receive(:populate).once
+    t.first_name
+  end
+  
+  def test_populating_reader_will_not_call_populate_if_model_was_previously_populated
+    t = PopulatingThing.new
+    flexmock(t).should_receive(:populated?).and_return(true)
+    flexmock(t).should_receive(:populate).never
+    t.first_name
+  end
+  
+  def test_attempting_to_access_a_populating_reader_will_raise_an_exception_if_populate_was_not_defined
+    t = PopulatingThing.new
+    assert_raises(NotImplementedError) {
+      t.first_name
+    }
+  end
 end
 

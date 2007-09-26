@@ -5,6 +5,7 @@ module Facebooker
   # directly populate a model's attributes given a Hash with matching key names.
   module Model
     class UnboundSessionException < Exception; end
+    class SubclassResponsibilityException < Exception; end
     def self.included(includer)
       includer.extend ClassMethods
       includer.__send__(:attr_writer, :session)
@@ -18,6 +19,24 @@ module Facebooker
         instance = new(hash)
         yield instance if block_given?
         instance
+      end
+      
+      ##
+      # Create a standard attr_writer and a populating_attr_reader      
+      def populating_attr_accessor(*symbols)
+        attr_writer *symbols
+        populating_attr_reader *symbols
+      end
+
+      ## 
+      # Create a reader that will attempt to populate the model if it has not already been populated
+      def populating_attr_reader(*symbols)
+        symbols.each do |symbol|
+          define_method(symbol) do
+            populate unless populated?
+            instance_variable_get("@#{symbol}")
+          end
+        end
       end
       
       #
@@ -60,6 +79,14 @@ module Facebooker
     def initialize(hash = {})
       populate_from_hash!(hash)
     end
+
+    def populate
+      raise NotImplementedError, "#{self.class} included me and should have overriden me"
+    end
+
+    def populated?
+      !@populated.nil?
+    end
     
     ##
     # Set model's attributes via Hash.  Keys should map directly to the model's attribute names.
@@ -68,6 +95,7 @@ module Facebooker
         hash.each do |key, value|
           self.__send__("#{key}=", value)
         end
+        @populated = true
       end      
     end    
   end
