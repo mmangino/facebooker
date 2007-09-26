@@ -5,7 +5,6 @@ module Facebooker
   # directly populate a model's attributes given a Hash with matching key names.
   module Model
     class UnboundSessionException < Exception; end
-    class SubclassResponsibilityException < Exception; end
     def self.included(includer)
       includer.extend ClassMethods
       includer.__send__(:attr_writer, :session)
@@ -39,14 +38,28 @@ module Facebooker
         end
       end
       
+      def populating_hash_settable_accessor(symbol, klass)
+        populating_attr_reader symbol
+        hash_settable_writer(symbol, klass)
+      end
+        
+      def populating_hash_settable_list_accessor(symbol, klass)
+        populating_attr_reader symbol
+        hash_settable_list_writer(symbol, klass)
+      end
+      
       #
       # Declares an attribute named ::symbol:: which can be set with either an instance of ::klass::
       # or a Hash which will be used to populate a new instance of ::klass::.
       def hash_settable_accessor(symbol, klass)
         attr_reader symbol
+        hash_settable_writer(symbol, klass)
+      end
+      
+      def hash_settable_writer(symbol, klass)
         define_method("#{symbol}=") do |value|
           instance_variable_set("@#{symbol}", value.kind_of?(Hash) ? klass.from_hash(value) : value)
-        end
+        end        
       end
       
       #
@@ -54,13 +67,16 @@ module Facebooker
       # or a list of Hashes which will be used to populate a new instance of ::klass::.      
       def hash_settable_list_accessor(symbol, klass)
         attr_reader symbol
+        hash_settable_list_writer(symbol, klass)
+      end
+      
+      def hash_settable_list_writer(symbol, klass)
         define_method("#{symbol}=") do |list|
           instance_variable_set("@#{symbol}", list.map do |item|
             item.kind_of?(Hash) ? klass.from_hash(item) : item
           end)
         end
-      end
-      
+      end      
     end
     
     ##

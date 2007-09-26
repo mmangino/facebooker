@@ -15,13 +15,13 @@ module Facebooker
     attr_accessor :id, :session
     populating_attr_accessor *FIELDS
     attr_reader :affiliations
-    hash_settable_accessor :current_location, Location
-    hash_settable_accessor :hometown_location, Location
-    hash_settable_accessor :hs_info, EducationInfo::HighschoolInfo
-    hash_settable_accessor :status, Status
-    hash_settable_list_accessor :affiliations, Affiliation
-    hash_settable_list_accessor :education_history, EducationInfo
-    hash_settable_list_accessor :work_history, WorkInfo
+    populating_hash_settable_accessor :current_location, Location
+    populating_hash_settable_accessor :hometown_location, Location
+    populating_hash_settable_accessor :hs_info, EducationInfo::HighschoolInfo
+    populating_hash_settable_accessor :status, Status
+    populating_hash_settable_list_accessor :affiliations, Affiliation
+    populating_hash_settable_list_accessor :education_history, EducationInfo
+    populating_hash_settable_list_accessor :work_history, WorkInfo
 
     # Can pass in these two forms:
     # id, session, (optional) attribute_hash
