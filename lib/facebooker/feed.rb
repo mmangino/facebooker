@@ -1,23 +1,15 @@
 module Facebooker
   module Feed
-    METHODS = {'Action' => 'facebook.feed.publishActionOfUser', 'Story' => 'facebook.feed.publishStoryToUser'}
-    ##
-    # Representation of a story to be published into a user's news feed.
-    class Story
-      attr_accessor :title, :body
+    METHODS = {'Action' => 'facebook.feed.publishActionOfUser', 'Story' => 'facebook.feed.publishStoryToUser',
+               'TemplatizedAction' => 'facebook.feed.publishTemplatizedAction' }
+
+    class ActionBase
       1.upto(4) do |num|
         attr_accessor "image_#{num}"
         attr_accessor "image_#{num}_link"
       end
-      
-      ##
-      # Converts Story to a Hash of its attributes for use as parameters to Facebook REST API calls
-      def to_params
-        raise "Must set title before converting" if self.title.nil?
-        {:title => title, :body => body}.merge image_params
-      end
-      
-      private
+
+      protected
       def image_params
         image_hash = {}
         1.upto(4) do |num|
@@ -28,7 +20,33 @@ module Facebooker
         end
         image_hash
       end
-      
+    end
+
+    ##
+    # Representation of a templatized action to be published into a user's news feed
+    class TemplatizedAction < ActionBase
+     attr_accessor :actor_id, :title_template, :title_data, :body_template, :body_data, :body_general, :target_ids
+
+      def to_params
+       raise "Must set actor_id and title_template before converting" if (self.actor_id.nil? || self.title_template.nil?)
+       { :actor_id => actor_id, :title_template => title_template, :title_data => title_data,
+         :body_template => body_template, :body_data => body_data, :body_general => body_general,
+         :target_ids => target_ids }.merge image_params
+      end
+    end
+
+    ##
+    # Representation of a story to be published into a user's news feed.
+    class Story < ActionBase
+      attr_accessor :title, :body
+
+      ##
+      # Converts Story to a Hash of its attributes for use as parameters to Facebook REST API calls
+      def to_params
+        raise "Must set title before converting" if self.title.nil?
+        {:title => title, :body => body}.merge image_params
+      end
+
     end
     Action = Story.dup
     def Action.name

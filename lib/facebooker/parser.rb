@@ -118,6 +118,12 @@ module Facebooker
     def self.process(data)
       element('feed_publishActionOfUser_response', data).text_value
     end
+  end
+    
+  class PublishTemplatizedAction < Parser#:nodoc:
+    def self.process(data)
+      element('feed_publishTemplatizedAction_response', data).children[1].text_value
+    end
   end  
   
   class GetAppUsers < Parser#:nodoc:
@@ -275,6 +281,13 @@ module Facebooker
       102 => Facebooker::Session::SessionExpired,
       103 => Facebooker::Session::CallOutOfOrder,
       104 => Facebooker::Session::IncorrectSignature,
+      330 => Facebooker::Session::FeedMarkupInvalid,
+      360 => Facebooker::Session::FeedTitleDataInvalid,
+      361 => Facebooker::Session::FeedTitleTemplateInvalid,
+      362 => Facebooker::Session::FeedBodyDataInvalid,
+      363 => Facebooker::Session::FeedBodyTemplateInvalid,
+      364 => Facebooker::Session::FeedPhotosNotRetrieved,
+      366 => Facebooker::Session::FeedTargetIdsInvalid,
       601 => Facebooker::Session::FQLParseError,
       602 => Facebooker::Session::FQLFieldDoesNotExist,
       603 => Facebooker::Session::FQLTableDoesNotExist,
@@ -301,6 +314,7 @@ module Facebooker
       'facebook.friends.getAppUsers' => GetAppUsers,
       'facebook.feed.publishStoryToUser' => PublishStoryToUser,
       'facebook.feed.publishActionOfUser' => PublishActionOfUser,
+      'facebook.feed.publishTemplatizedAction' => PublishTemplatizedAction,
       'facebook.notifications.get' => NotificationsGet,
       'facebook.notifications.send' => NotificationsSend,
       'facebook.notifications.sendRequest' => SendRequest,

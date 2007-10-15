@@ -108,6 +108,17 @@ class TestFacebooker < Test::Unit::TestCase
     }
   end
   
+  def test_can_publish_templatized_action_to_users_feed
+     mock_http = establish_session
+     mock_http.should_receive(:post_form).and_return(example_publish_templatized_action_xml).once.ordered(:posts)
+     assert_nothing_raised {
+       action = Facebooker::Feed::TemplatizedAction.new
+       action.actor_id = '12345'
+       action.title_template = "{actor} did something"
+       assert(@session.user.publish_templatized_action(action))
+     }
+   end
+  
   def test_can_get_notifications_for_logged_in_user
     mock_http = establish_session
     mock_http.should_receive(:post_form).and_return(example_notifications_get_xml).once.ordered(:posts)
@@ -357,6 +368,15 @@ class TestFacebooker < Test::Unit::TestCase
     XML
   end
     
+  def example_publish_templatized_action_xml
+    <<-XML
+    <?xml version="1.0" encoding="UTF-8"?>
+    <feed_publishTemplatizedAction_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd" list="true">
+      <feed_publishTemplatizedAction_response_elt>1</feed_publishTemplatizedAction_response_elt>
+    </feed_publishTemplatizedAction_response>
+    XML
+  end
+  
   def example_user_info_xml
     <<-XML
     <?xml version="1.0" encoding="UTF-8"?>

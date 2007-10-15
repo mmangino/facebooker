@@ -17,6 +17,13 @@ module Facebooker
     class SessionExpired < Exception; end
     class CallOutOfOrder < Exception; end
     class IncorrectSignature     < Exception; end
+    class FeedMarkupInvalid < Exception; end
+    class FeedTitleDataInvalid < Exception; end
+    class FeedTitleTemplateInvalid < Exception; end
+    class FeedBodyDataInvalid < Exception; end
+    class FeedBodyTemplateInvalid < Exception; end
+    class FeedPhotosNotRetrieved < Exception; end
+    class FeedTargetIdsInvalid < Exception; end
     class ConfigurationMissing < Exception; end
     class FQLParseError < Exception; end
     class FQLFieldDoesNotExist < Exception; end

@@ -96,6 +96,10 @@ module Facebooker
     def publish_action(action)
       publish(action)
     end
+
+    def publish_templatized_action(action)
+      publish(action)
+    end
     
     def albums
       @albums ||= session.post('facebook.photos.getAlbums', :uid => self.id).map do |hash|
