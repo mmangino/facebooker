@@ -17,6 +17,15 @@ module Facebooker
     class SessionExpired < Exception; end
     class CallOutOfOrder < Exception; end
     class IncorrectSignature     < Exception; end
+    class TooManyUserCalls < Exception; end
+    class TooManyUserActionCalls < Exception; end
+    class InvalidFeedTitleLink < Exception; end
+    class InvalidFeedTitleLength < Exception; end
+    class InvalidFeedTitleName < Exception; end
+    class BlankFeedTitle < Exception; end
+    class FeedBodyLengthTooLong < Exception; end
+    class InvalidFeedPhotoSource < Exception; end
+    class InvalidFeedPhotoLink < Exception; end    
     class FeedMarkupInvalid < Exception; end
     class FeedTitleDataInvalid < Exception; end
     class FeedTitleTemplateInvalid < Exception; end
