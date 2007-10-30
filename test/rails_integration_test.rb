@@ -3,6 +3,9 @@ begin
   require 'action_controller'
   require 'action_controller/test_process'
   require 'facebooker/rails/controller'
+  require 'facebooker/rails/helpers'
+  require 'facebooker/rails/facebook_form_builder'
+  require 'mocha'
   ActionController::Routing::Routes.draw do |map|
     map.connect 'require_auth/:action', :controller => "controller_which_requires_facebook_authentication"
     map.connect 'require_install/:action', :controller => "controller_which_requires_application_installation"
@@ -159,6 +162,144 @@ class RailsIntegrationTest < Test::Unit::TestCase
   end
 end
 
+class RailsHelperTest < Test::Unit::TestCase
+  class HelperClass
+    include ActionView::Helpers::TextHelper
+    include ActionView::Helpers::CaptureHelper
+    include ActionView::Helpers::TagHelper
+    include Facebooker::Rails::Helpers
+    attr_accessor :flash
+    def initialize
+      @flash={}
+    end
+    #used for stubbing out the form builder
+    def url_for(arg)
+      arg
+    end
+    def fields_for(*args)
+      ""
+    end
+  end 
+
+  # used for capturing the contents of some of the helper tests
+  # this duplicates the rails template system  
+  attr_accessor :_erbout
+  
+  def setup
+    @_erbout = ""
+    @h = HelperClass.new
+    ENV['FACEBOOKER_STATIC_HOST']='127.0.0.1:3000'
+  end
+  
+  def test_profile_pic
+    assert_equal "<fb:profile uid=\"1234\" />",@h.profile_pic("1234")
+  end
+  
+  def test_name
+    assert_equal "<fb:name uid=\"1234\" />",@h.name("1234")
+  end
+  
+  def test_facebook_image_tag
+    @h.expects(:image_path).with("test.jpg").returns("/test.jpg")
+    assert_equal "<img src=\"http://127.0.0.1:3000/test.jpg\" />",@h.facebook_image_tag("test.jpg")
+  end
+  
+  def test_fb_req_choice
+    assert_equal "<fb:req_choice label=\"label\" url=\"url\" />", @h.fb_req_choice("label","url")
+  end
+  def test_multi_friend_selector
+    assert_equal "<fb:multi-friend-selector actiontext=\"This is a message\" max=\"20\" showborder=\"false\" />",@h.multi_friend_selector("This is a message")
+  end
+  def test_facebook_messages_notice
+    @h.flash[:notice]="A message"
+    assert_equal "<fb:message>A message</fb:message>",@h.facebook_messages
+  end
+  def test_facebook_messages_error
+    @h.flash[:error]="An error"
+    assert_equal "<fb:error>An error</fb:error>",@h.facebook_messages
+  end
+  def test_wall_post
+    assert_equal "<fb:wallpost uid=\"1234\">A wall post</fb:wallpost>",@h.wall_post("1234","A wall post")
+  end
+  
+  def test_wall
+    @h.expects(:capture).returns("wall content")
+    @h.wall do 
+    end
+    assert_equal "<fb:wall>wall content</fb:wall>",_erbout
+  end
+  
+  def test_multi_friend_request
+    @h.expects(:capture).returns("body")
+    @h.expects(:multi_friend_selector).returns("friend selector")
+    assert_equal "<fb:request_form action=\"action\" content=\"body\" invite=\"true\" method=\"post\" type=\"invite\">friend selector</fb:request_form>",
+      (@h.multi_friend_request("invite","ignored","action") {})
+  end
+  
+  def test_facebook_form_for
+    form_body=@h.facebook_form_for(:model,:url=>"action") do
+    end
+    assert_equal "<fb:editor action=\"action\"></fb:editor>",form_body
+  end
+  
+end
+class TestModel
+  attr_accessor :name,:facebook_id
+end
+
+class RailsFacebookFormbuilderTest < Test::Unit::TestCase
+  class TestTemplate
+    include ActionView::Helpers::TextHelper
+    include ActionView::Helpers::CaptureHelper
+    include ActionView::Helpers::TagHelper
+    include Facebooker::Rails::Helpers
+    attr_accessor :_erbout
+    def initialize
+      @_erbout=""
+    end
+  end
+  def setup
+    @_erbout = ""
+    @test_model = TestModel.new
+    @test_model.name="Mike"
+    @template = TestTemplate.new
+    @proc = Proc.new {}
+    @form_builder = Facebooker::Rails::FacebookFormBuilder.new(:test_model,@test_model,@template,{},@proc)
+    def @form_builder._erbout
+      ""
+    end
+    
+  end
+  
+  def test_text_field
+    assert_equal "<fb:editor-text id=\"testmodel_name\" label=\"Name\" name=\"testmodel[name]\" value=\"Mike\"></fb:editor-text>",
+        @form_builder.text_field(:name)
+  end
+  def test_text_area
+    assert_equal "<fb:editor-textarea id=\"testmodel_name\" label=\"Name\" name=\"testmodel[name]\">Mike</fb:editor-textarea>",
+        @form_builder.text_area(:name)    
+  end
+  
+  def test_buttons
+    @form_builder.expects(:create_button).with(:first)
+    @form_builder.expects(:create_button).with(:second)
+    assert_equal "<fb:editor-buttonset></fb:editor-buttonset>",
+        @form_builder.buttons(:first,:second)    
+  end
+  
+  def test_create_button
+    assert_equal "<fb:editor-button value=\"first\"></fb:editor-button>",@form_builder.create_button(:first)
+  end
+  
+  def test_custom
+    @template.expects(:password_field).returns("password_field")
+    assert_equal "<fb:editor-custom label=\"Name\"></fb:editor-custom>",@form_builder.password_field(:name)
+  end
+  
+  def test_multi_friend_input
+    assert_equal "<fb:editor-custom label=\"Friends\"></fb:editor-custom>",@form_builder.multi_friend_input
+  end
+end
 rescue LoadError
   $stderr.puts "Couldn't find action controller.  That's OK.  We'll skip it."
 end

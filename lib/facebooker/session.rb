@@ -63,6 +63,14 @@ module Facebooker
       extract_key_from_environment(:secret) || extract_key_from_configuration_file(:secret) rescue report_inability_to_find_key(:secret)
     end
     
+    def self.current
+      @current_session
+    end
+    
+    def self.current=(session)
+      @current_session=session
+    end
+    
     def login_url(options={})
       options = default_login_url_options.merge(options)
       "http://www.facebook.com/login.php?api_key=#{@api_key}&v=1.0#{login_url_optional_parameters(options)}"
@@ -253,6 +261,18 @@ module Facebooker
     def marshal_dump#:nodoc:
       [@session_key, @uid, @expires, @secret_from_session, @auth_token, @api_key, @secret_key]
     end
+    
+    # Only serialize the bare minimum to recreate the session.    
+    def to_yaml( opts = {} )
+      YAML::quick_emit( self.object_id, opts ) do |out|
+        out.map(taguri) do |map|
+          %w(session_key uid expires secret_from_session auth_token api_key secret_key).each do |field|
+            map.add( field, self.instance_variable_get("@#{field}") )
+          end
+        end
+      end
+    end
+    
     
     class Desktop < Session
       def login_url

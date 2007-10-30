@@ -17,7 +17,7 @@ module Facebooker
       end
       
       def facebook_params
-        @facebook_params ||= facebook_sig_params.inject({}) do |new_hash, pair| 
+        @facebook_params ||= facebook_sig_params.inject(HashWithIndifferentAccess.new) do |new_hash, pair| 
                                  new_key_name = pair.first.to_s.sub(/^fb_sig_/, '')
                                  new_hash[new_key_name] = facebook_parameter_conversions[new_key_name].call(pair.last)
                                  new_hash
