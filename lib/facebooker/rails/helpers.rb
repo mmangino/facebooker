@@ -37,7 +37,7 @@ module Facebooker
       end
       
       def profile_pic(user,options={})
-        tag "fb:profile",options.merge(:uid=>user)
+        tag "fb:profile-pic",options.merge(:uid=>user)
       end
       
       def wall(&proc)
