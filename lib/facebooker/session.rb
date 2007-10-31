@@ -254,25 +254,36 @@ module Facebooker
     
     # Only serialize the bare minimum to recreate the session.
     def marshal_load(variables)#:nodoc:
-      @session_key, @uid, @expires, @secret_from_session, @auth_token, @api_key, @secret_key = variables
+      fields_to_serialize.each_with_index{|field, index| instance_variable_set_value(field, variables[index])}
     end
     
     # Only serialize the bare minimum to recreate the session.    
     def marshal_dump#:nodoc:
-      [@session_key, @uid, @expires, @secret_from_session, @auth_token, @api_key, @secret_key]
+      fields_to_serialize.map{|field| instance_variable_value(field)}
     end
     
-    # Only serialize the bare minimum to recreate the session.    
+    # Only serialize the bare minimum to recreate the session. 
     def to_yaml( opts = {} )
-      YAML::quick_emit( self.object_id, opts ) do |out|
+      YAML::quick_emit(self.object_id, opts) do |out|
         out.map(taguri) do |map|
-          %w(session_key uid expires secret_from_session auth_token api_key secret_key).each do |field|
-            map.add( field, self.instance_variable_get("@#{field}") )
+          fields_to_serialize.each do |field|
+            map.add(field, instance_variable_value(field))
           end
         end
       end
     end
     
+    def instance_variable_set_value(field, value)
+      self.instance_variable_set("@#{field}", value)
+    end
+    
+    def instance_variable_value(field)
+      self.instance_variable_get("@#{field}")
+    end
+    
+    def fields_to_serialize
+      %w(session_key uid expires secret_from_session auth_token api_key secret_key)
+    end
     
     class Desktop < Session
       def login_url
