@@ -4,6 +4,7 @@ module Facebooker
     module Controller
       def self.included(controller)
         controller.extend(ClassMethods)
+        controller.before_filter :set_fbml_format
       end
       
       def facebook_session
@@ -118,6 +119,10 @@ module Facebooker
       
       def application_is_not_installed_by_facebook_user
         redirect_to session[:facebook_session].install_url
+      end
+      
+      def set_fbml_format
+        params[:format]="fbml" if facebook_params['in_canvas']
       end
       
       module ClassMethods

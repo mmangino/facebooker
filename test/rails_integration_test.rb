@@ -192,7 +192,7 @@ class RailsHelperTest < Test::Unit::TestCase
   end
   
   def test_profile_pic
-    assert_equal "<fb:profile uid=\"1234\" />",@h.profile_pic("1234")
+    assert_equal "<fb:profile-pic uid=\"1234\" />",@h.profile_pic("1234")
   end
   
   def test_name

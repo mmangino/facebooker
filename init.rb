@@ -3,7 +3,10 @@ require 'facebooker/rails/facebook_url_rewriting'
 module ::ActionController
   class Base
     include Facebooker::Rails::UrlRewriter
-#   include Facebooker::Rails::Controller
+    def self.inherited(subclass)
+      super
+      subclass.send(:include,Facebooker::Rails::Controller)      
+    end
   end
   class AbstractRequest                         
     def relative_url_root                       
