@@ -1,7 +1,7 @@
 module Facebooker
   module Rails
     module Helpers
-      def multi_friend_request(type,message,url,&block)
+      def fb_multi_friend_request(type,message,url,&block)
         content = capture(&block)  	
         concat(content_tag("fb:request_form", 
                             multi_friend_selector(message),
@@ -10,7 +10,7 @@ module Facebooker
               block.binding)
       end
 
-      def multi_friend_selector(message)
+      def fb_multi_friend_selector(message)
         tag("fb:multi-friend-selector",:showborder=>false,:actiontext=>message,:max=>20)
       end
 
@@ -74,12 +74,12 @@ module Facebooker
         tag "img",:src=>"http://#{ENV['FACEBOOKER_STATIC_HOST']}#{image_path(name)}"
       end
       
-      def wall(&proc)
+      def fb_wall(&proc)
         content = capture(&proc)  	
         concat(content_tag("fb:wall",content,{}),proc.binding)
       end
       
-      def wall_post(user,message)
+      def fb_wall_post(user,message)
         content_tag("fb:wallpost",message,:uid=>user)
       end
       

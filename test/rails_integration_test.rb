@@ -228,19 +228,22 @@ class RailsHelperTest < Test::Unit::TestCase
   def test_fb_req_choice
     assert_equal "<fb:req_choice label=\"label\" url=\"url\" />", @h.fb_req_choice("label","url")
   end
-  def test_multi_friend_selector
-    assert_equal "<fb:multi-friend-selector actiontext=\"This is a message\" max=\"20\" showborder=\"false\" />",@h.multi_friend_selector("This is a message")
+  
+  def test_fb_multi_friend_selector
+    assert_equal "<fb:multi-friend-selector actiontext=\"This is a message\" max=\"20\" showborder=\"false\" />", @h.fb_multi_friend_selector("This is a message")
   end
+  
   def test_facebook_messages_notice
     @h.flash[:notice]="A message"
     assert_equal "<fb:message>A message</fb:message>",@h.facebook_messages
   end
+  
   def test_facebook_messages_error
     @h.flash[:error]="An error"
     assert_equal "<fb:error>An error</fb:error>",@h.facebook_messages
   end
-  def test_wall_post
-    assert_equal "<fb:wallpost uid=\"1234\">A wall post</fb:wallpost>",@h.wall_post("1234","A wall post")
+  def test_fb_wall_post
+    assert_equal "<fb:wallpost uid=\"1234\">A wall post</fb:wallpost>",@h.fb_wall_post("1234","A wall post")
   end
   
   def test_fb_pronoun
@@ -260,18 +263,18 @@ class RailsHelperTest < Test::Unit::TestCase
     assert_raises(ArgumentError) {@h.fb_pronoun(1234, :posessive => true)}
   end
   
-  def test_wall
+  def test_fb_wall
     @h.expects(:capture).returns("wall content")
-    @h.wall do 
+    @h.fb_wall do 
     end
     assert_equal "<fb:wall>wall content</fb:wall>",_erbout
   end
   
-  def test_multi_friend_request
+  def test_fb_multi_friend_request
     @h.expects(:capture).returns("body")
     @h.expects(:multi_friend_selector).returns("friend selector")
     assert_equal "<fb:request_form action=\"action\" content=\"body\" invite=\"true\" method=\"post\" type=\"invite\">friend selector</fb:request_form>",
-      (@h.multi_friend_request("invite","ignored","action") {})
+      (@h.fb_multi_friend_request("invite","ignored","action") {})
   end
   
   def test_facebook_form_for
