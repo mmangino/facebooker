@@ -54,13 +54,24 @@ module Facebooker
       FB_PRONOUN_OPTION_KEYS_TO_TRANSFORM = {:use_you => :useyou, :use_they => :usethey}
       FB_PRONOUN_VALID_OPTION_KEYS = [:useyou, :possssive, :reflexive, :objective, 
                                       :usethey, :capitalize]
+
+      
+      def fb_profile_pic(user, options={})
+        validate_fb_profile_pic_size(options)
+        options.merge!(:uid => cast_to_facebook_id(user))
+        tag("fb:profile-pic", options)
+      end
+      
+      def validate_fb_profile_pic_size(options)
+        if options.has_key?(:size) && !VALID_FB_PROFILE_PIC_SIZES.include?(options[:size].to_sym)
+          raise(ArgumentError, "Unkown value for size: #{options[:size]}")
+        end
+      end
+      
+      VALID_FB_PROFILE_PIC_SIZES = [:thumb, :small, :normal, :square]
             
       def facebook_image_tag(name,options={})
         tag "img",:src=>"http://#{ENV['FACEBOOKER_STATIC_HOST']}#{image_path(name)}"
-      end
-      
-      def profile_pic(user,options={})
-        tag "fb:profile-pic",options.merge(:uid=>user)
       end
       
       def wall(&proc)

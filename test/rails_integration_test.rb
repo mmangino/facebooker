@@ -191,8 +191,16 @@ class RailsHelperTest < Test::Unit::TestCase
     ENV['FACEBOOKER_STATIC_HOST']='127.0.0.1:3000'
   end
   
-  def test_profile_pic
-    assert_equal "<fb:profile-pic uid=\"1234\" />",@h.profile_pic("1234")
+  def test_fb_profile_pic
+    assert_equal "<fb:profile-pic uid=\"1234\" />", @h.fb_profile_pic("1234")
+  end
+
+  def test_fb_profile_pic_with_valid_size
+    assert_equal "<fb:profile-pic size=\"small\" uid=\"1234\" />", @h.fb_profile_pic("1234", :size => :small)
+  end
+
+  def test_fb_profile_pic_with_invalid_size
+    assert_raises(ArgumentError) {@h.fb_profile_pic("1234", :size => :medium)}
   end
   
   def test_fb_name
