@@ -195,8 +195,21 @@ class RailsHelperTest < Test::Unit::TestCase
     assert_equal "<fb:profile-pic uid=\"1234\" />",@h.profile_pic("1234")
   end
   
-  def test_name
-    assert_equal "<fb:name uid=\"1234\" />",@h.name("1234")
+  def test_fb_name
+    assert_equal "<fb:name uid=\"1234\" />",@h.fb_name("1234")
+  end
+  
+  def test_fb_name_with_transformed_key
+    assert_equal "<fb:name uid=\"1234\" useyou=\"true\" />", @h.fb_name(1234, :use_you => true)
+  end
+  
+  def test_fb_name_with_user_responding_to_facebook_id
+    user = flexmock("user", :facebook_id => "5678")
+    assert_equal "<fb:name uid=\"5678\" />", @h.fb_name(user)
+  end
+  
+  def test_fb_name_with_invalid_key
+    assert_raises(ArgumentError) {@h.fb_name(1234, :linkd => false)}
   end
   
   def test_facebook_image_tag

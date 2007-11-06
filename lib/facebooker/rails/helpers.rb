@@ -28,10 +28,22 @@ module Facebooker
         concat("</fb:editor>",proc.binding)
       end
       
-      def name(user,options={})
-        tag "fb:name",options.merge({:uid=>user})
+      def fb_name(user, options={})
+        options.transform_keys!(FB_NAME_OPTION_KEYS_TO_TRANSFORM)
+        options.assert_valid_keys(FB_NAME_VALID_OPTION_KEYS)
+        options.merge!(:uid => cast_to_facebook_id(user))
+        tag("fb:name", options)
       end
-      
+
+      FB_NAME_OPTION_KEYS_TO_TRANSFORM = {:first_name_only => :firstnameonly, 
+                                          :last_name_only => :lastnameonly,
+                                          :show_network => :shownetwork,
+                                          :use_you => :useyou,
+                                          :if_cant_see => :ifcantsee,
+                                          :subject_id => :subjectid}
+      FB_NAME_VALID_OPTION_KEYS = [:firstnameonly, :linked, :lastnameonly, :possessive, :reflexive, 
+                                   :shownetwork, :useyou, :ifcantsee, :capitalize, :subjectid]
+            
       def fb_pronoun(user, options={})
         options.transform_keys!(FB_PRONOUN_OPTION_KEYS_TO_TRANSFORM)
         options.assert_valid_keys(FB_PRONOUN_VALID_OPTION_KEYS)
@@ -40,7 +52,8 @@ module Facebooker
       end
       
       FB_PRONOUN_OPTION_KEYS_TO_TRANSFORM = {:use_you => :useyou, :use_they => :usethey}
-      FB_PRONOUN_VALID_OPTION_KEYS = [:useyou, :possssive, :reflexive, :objective, :usethey, :capitalize]
+      FB_PRONOUN_VALID_OPTION_KEYS = [:useyou, :possssive, :reflexive, :objective, 
+                                      :usethey, :capitalize]
             
       def facebook_image_tag(name,options={})
         tag "img",:src=>"http://#{ENV['FACEBOOKER_STATIC_HOST']}#{image_path(name)}"
