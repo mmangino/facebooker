@@ -33,9 +33,20 @@ module Facebooker
       end
       
       def fb_pronoun(user, options={})
-        tag("fb:pronoun", {:uid => user}.merge(options))
+        options.transform_keys!(fb_pronoun_option_keys_to_transform)
+        options.assert_valid_keys(fb_pronoun_valid_option_keys)
+        options.merge!(:uid => cast_to_facebook_id(user))
+        tag("fb:pronoun", options)
       end
       
+      def fb_pronoun_option_keys_to_transform
+        return :use_you => :useyou, :use_they => :usethey
+      end
+      
+      def fb_pronoun_valid_option_keys
+        [:useyou, :possssive, :reflexive, :objective, :usethey, :capitalize]
+      end
+            
       def facebook_image_tag(name,options={})
         tag "img",:src=>"http://#{ENV['FACEBOOKER_STATIC_HOST']}#{image_path(name)}"
       end
@@ -63,6 +74,30 @@ module Facebooker
         end
         message
       end
+      
+      def cast_to_facebook_id(object)
+        if object.respond_to?(:facebook_id)
+          object.facebook_id
+        else
+          object
+        end
+      end
     end
+  end
+end
+
+class Hash
+  def transform_keys!(transformation_hash)
+    transformation_hash.each_pair{|key, value| transform_key!(key, value)}
+  end
+  
+  def transform_key!(old_key, new_key)
+    swapkey!(new_key, old_key)
+  end
+  
+  ### This method is lifted from Ruby Facets core
+  def swapkey!( newkey, oldkey )
+    self[newkey] = self.delete(oldkey) if self.has_key?(oldkey)
+    self
   end
 end

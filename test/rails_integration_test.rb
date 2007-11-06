@@ -226,6 +226,19 @@ class RailsHelperTest < Test::Unit::TestCase
     assert_equal "<fb:pronoun uid=\"1234\" />", @h.fb_pronoun(1234)
   end
   
+  def test_fb_pronoun_with_transformed_key
+    assert_equal "<fb:pronoun uid=\"1234\" usethey=\"true\" />", @h.fb_pronoun(1234, :use_they => true)
+  end
+  
+  def test_fb_pronoun_with_user_responding_to_facebook_id
+    user = flexmock("user", :facebook_id => "5678")
+    assert_equal "<fb:pronoun uid=\"5678\" />", @h.fb_pronoun(user)
+  end
+  
+  def test_fb_pronoun_with_invalid_key
+    assert_raises(ArgumentError) {@h.fb_pronoun(1234, :posessive => true)}
+  end
+  
   def test_wall
     @h.expects(:capture).returns("wall content")
     @h.wall do 
