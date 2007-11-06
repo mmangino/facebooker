@@ -32,6 +32,10 @@ module Facebooker
         tag "fb:name",options.merge({:uid=>user})
       end
       
+      def fb_pronoun(user, options={})
+        tag("fb:pronoun", {:uid => user}.merge(options))
+      end
+      
       def facebook_image_tag(name,options={})
         tag "img",:src=>"http://#{ENV['FACEBOOKER_STATIC_HOST']}#{image_path(name)}"
       end

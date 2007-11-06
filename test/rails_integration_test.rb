@@ -222,6 +222,10 @@ class RailsHelperTest < Test::Unit::TestCase
     assert_equal "<fb:wallpost uid=\"1234\">A wall post</fb:wallpost>",@h.wall_post("1234","A wall post")
   end
   
+  def test_fb_pronoun
+    assert_equal "<fb:pronoun uid=\"1234\" />", @h.fb_pronoun(1234)
+  end
+  
   def test_wall
     @h.expects(:capture).returns("wall content")
     @h.wall do 
