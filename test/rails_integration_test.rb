@@ -171,6 +171,8 @@ class RailsHelperTest < Test::Unit::TestCase
     attr_accessor :flash
     def initialize
       @flash={}
+      @template = self
+      @content_for_test_param="Test Param"
     end
     #used for stubbing out the form builder
     def url_for(arg)
@@ -179,6 +181,7 @@ class RailsHelperTest < Test::Unit::TestCase
     def fields_for(*args)
       ""
     end
+    
   end 
 
   # used for capturing the contents of some of the helper tests
@@ -226,7 +229,7 @@ class RailsHelperTest < Test::Unit::TestCase
   end
   
   def test_fb_req_choice
-    assert_equal "<fb:req_choice label=\"label\" url=\"url\" />", @h.fb_req_choice("label","url")
+    assert_equal "<fb:req-choice label=\"label\" url=\"url\" />", @h.fb_req_choice("label","url")
   end
   
   def test_fb_multi_friend_selector
@@ -272,15 +275,30 @@ class RailsHelperTest < Test::Unit::TestCase
   
   def test_fb_multi_friend_request
     @h.expects(:capture).returns("body")
-    @h.expects(:multi_friend_selector).returns("friend selector")
-    assert_equal "<fb:request_form action=\"action\" content=\"body\" invite=\"true\" method=\"post\" type=\"invite\">friend selector</fb:request_form>",
+    @h.expects(:fb_multi_friend_selector).returns("friend selector")
+    assert_equal "<fb:request-form action=\"action\" content=\"body\" invite=\"true\" method=\"post\" type=\"invite\">friend selector</fb:request-form>",
       (@h.fb_multi_friend_request("invite","ignored","action") {})
+  end
+  
+  def test_fb_request_form
+    @h.expects(:capture).returns("body")
+    assert_equal "<fb:request-form action=\"action\" content=\"Test Param\" invite=\"true\" method=\"post\" type=\"invite\">body</fb:request-form>",
+      (@h.fb_request_form("invite","test_param","action") {})
+    
   end
   
   def test_facebook_form_for
     form_body=@h.facebook_form_for(:model,:url=>"action") do
     end
     assert_equal "<fb:editor action=\"action\"></fb:editor>",form_body
+  end
+  
+  def test_fb_friend_selector
+    assert_equal("<fb:friend-selector />",@h.fb_friend_selector)
+  end
+  
+  def test_fb_request_form_submit
+    assert_equal("<fb:request-form-submit />",@h.fb_request_form_submit)  
   end
   
 end

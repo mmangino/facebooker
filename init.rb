@@ -5,7 +5,7 @@ module ::ActionController
     include Facebooker::Rails::UrlRewriter
     def self.inherited(subclass)
       super
-      subclass.send(:include,Facebooker::Rails::Controller)      
+      subclass.send(:include,Facebooker::Rails::Controller) if subclass.to_s == "ApplicationController"
     end
   end
   class AbstractRequest                         
