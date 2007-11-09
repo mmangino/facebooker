@@ -59,6 +59,11 @@ module Facebooker
       def fb_friend_selector(options={})
         tag("fb:friend-selector",options)
       end
+      
+      # Render an <fb:multi-friend-input> element
+      def fb_multi_friend_input(options={})
+        tag "fb:multi-friend-input",options
+      end
 
       # Render an <fb:multi-friend-selector> with the passed in welcome message
       def fb_multi_friend_selector(message,&block)
