@@ -27,4 +27,4 @@ module ::ActionController
     end
   end
 end
-require 'facbooker/rails/facebook_session_handling'
+require 'facebooker/rails/facebook_session_handling'
