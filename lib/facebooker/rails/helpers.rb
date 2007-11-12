@@ -178,6 +178,15 @@ module Facebooker
       end
       alias_method :fb_wallpost, :fb_wall_post
       
+      
+      def fb_error(message, text=nil)
+        if text.blank?
+          tag("fb:error", :message => message)
+        else
+          content_tag("fb:error", content_tag("fb:message", message) + text)
+        end
+      end
+      
       # Render flash values as <fb:message> and <fb:error> tags
       #
       # values in flash[:notice] will be rendered as an <fb:message>
