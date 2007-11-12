@@ -187,6 +187,14 @@ module Facebooker
         end
       end
       
+      def fb_success(message, text=nil)
+        if text.blank?
+          tag("fb:success", :message => message)
+        else
+          content_tag("fb:success", content_tag("fb:message", message) + text)
+        end
+      end
+      
       # Render flash values as <fb:message> and <fb:error> tags
       #
       # values in flash[:notice] will be rendered as an <fb:message>
