@@ -5,6 +5,7 @@ begin
   require 'facebooker/rails/controller'
   require 'facebooker/rails/helpers'
   require 'facebooker/rails/facebook_form_builder'
+  require File.dirname(__FILE__)+'/../init'
   require 'mocha'
   ActionController::Routing::Routes.draw do |map|
     map.connect 'require_auth/:action', :controller => "controller_which_requires_facebook_authentication"
@@ -19,12 +20,19 @@ begin
     def index
       render :text => 'score!'
     end
+    def link_test
+      options = {}
+      options[:canvas] = true if params[:canvas] == "true"
+      options[:canvas] = false if params[:canvas] == "false"
+      render :text=>url_for(options)
+    end
+    
   end
   class ControllerWhichRequiresApplicationInstallation < NoisyController
     ensure_application_is_installed_by_facebook_user
     def index
       render :text => 'installed!'
-    end
+    end    
   end
 
 class RailsIntegrationTestForApplicationInstallation < Test::Unit::TestCase
@@ -62,6 +70,7 @@ end
   
 class RailsIntegrationTest < Test::Unit::TestCase
   def setup
+    ENV['FACEBOOKER_RELATIVE_URL_ROOT'] ='root'
     ENV['FACEBOOK_API_KEY'] = '1234567'
     ENV['FACEBOOK_SECRET_KEY'] = '7654321'
     @controller = ControllerWhichRequiresFacebookAuthentication.new
@@ -143,13 +152,28 @@ class RailsIntegrationTest < Test::Unit::TestCase
   
   def test_fbml_redirect_tag_handles_hash_parameters_correctly
     get :index, example_rails_params_including_fb
-    assert_equal "<fb:redirect url=\"http://test.host/require_auth\" />", @controller.send(:fbml_redirect_tag, :action => :index)
+    assert_equal "<fb:redirect url=\"http://apps.facebook.com/root/require_auth\" />", @controller.send(:fbml_redirect_tag, :action => :index)
   end
   
   def test_redirect_to_renders_fbml_redirect_tag_if_request_is_for_a_facebook_canvas
     get :index, example_rails_params_including_fb_for_user_not_logged_into_application
     assert_response :success
     assert_equal("<fb:redirect url=\"http://www.facebook.com/login.php?api_key=1234567&v=1.0\" />", @response.body)
+  end
+  
+  def test_url_for_links_to_canvas_if_canvas_is_true_and_not_in_canvas
+    get :link_test,example_rails_params_including_fb.merge(:fb_sig_in_canvas=>0,:canvas=>true)
+    assert_match /apps.facebook.com/,@response.body
+  end
+  
+  def test_url_for_links_to_callback_if_canvas_is_false_and_in_canvas
+    get :link_test,example_rails_params_including_fb.merge(:fb_sig_in_canvas=>0,:canvas=>false)
+    assert_match /test.host/,@response.body
+  end
+  
+  def test_url_for_links_to_canvas_if_canvas_is_not_set
+    get :link_test,example_rails_params_including_fb
+    assert_match /apps.facebook.com/,@response.body
   end
   
   private

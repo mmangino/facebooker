@@ -1,4 +1,5 @@
 require 'facebooker/rails/controller'
+require 'ruby-debug'
 module ::ActionController
   class Base
     def self.inherited_with_facebooker(subclass)
@@ -20,11 +21,27 @@ module ::ActionController
     end                                         
   end                                           
   class UrlRewriter
-    alias :rewrite_url_aliased_by_facebooker :rewrite_url
-    def rewrite_url(options)
-      options[:host] = "apps.facebook.com" if !options.has_key?(:host) && @request.request_parameters['fb_sig_in_canvas'] == "1"
-      rewrite_url_aliased_by_facebooker(options)
+    
+    def link_to_canvas?(params)
+      #yes, we do really want to see if it is false. nil means use the default action
+      canvas = params.delete(:canvas)
+      return false  if canvas == false 
+      canvas || params[:fb_sig_in_canvas] == "1"
     end
+    
+    def rewrite_url_with_facebooker(*args)
+      if args.first.is_a?(Hash)
+        options=args.first
+      else
+        options = args.last
+      end
+      if !options.has_key?(:host) && link_to_canvas?(@request.request_parameters)
+        options[:host] = "apps.facebook.com"
+      end
+      rewrite_url_without_facebooker(*args)
+    end
+    
+    alias_method_chain :rewrite_url, :facebooker
   end
 end
 require 'facebooker/rails/facebook_session_handling'
