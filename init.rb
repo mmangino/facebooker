@@ -35,7 +35,9 @@ module ::ActionController
       else
         options = args.last
       end
+      options[:skip_relative_url_root] ||= true
       if !options.has_key?(:host) && link_to_canvas?(@request.request_parameters)
+        options[:skip_relative_url_root] = false
         options[:host] = "apps.facebook.com"
       end
       rewrite_url_without_facebooker(*args)

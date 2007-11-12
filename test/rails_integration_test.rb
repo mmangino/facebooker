@@ -166,9 +166,19 @@ class RailsIntegrationTest < Test::Unit::TestCase
     assert_match /apps.facebook.com/,@response.body
   end
   
+  def test_includes_relative_url_root_when_linked_to_canvas
+    get :link_test,example_rails_params_including_fb.merge(:fb_sig_in_canvas=>0,:canvas=>true)
+    assert_match /root/,@response.body
+  end
+
   def test_url_for_links_to_callback_if_canvas_is_false_and_in_canvas
     get :link_test,example_rails_params_including_fb.merge(:fb_sig_in_canvas=>0,:canvas=>false)
     assert_match /test.host/,@response.body
+  end
+
+  def test_url_for_doesnt_include_url_root_when_not_linked_to_canvas
+    get :link_test,example_rails_params_including_fb.merge(:fb_sig_in_canvas=>0,:canvas=>false)
+    assert !@response.body.match(/root/)
   end
   
   def test_url_for_links_to_canvas_if_canvas_is_not_set
