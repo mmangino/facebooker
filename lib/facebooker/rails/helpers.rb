@@ -203,10 +203,10 @@ module Facebooker
       def facebook_messages
         message=""
         unless flash[:notice].blank?
-          message += content_tag("fb:message",flash[:notice])
+          message += fb_success(flash[:notice])
         end
         unless flash[:error].blank?
-          message += content_tag("fb:error",flash[:error])
+          message += fb_error(flash[:error])
         end
         message
       end

@@ -238,12 +238,12 @@ class RailsHelperTest < Test::Unit::TestCase
   
   def test_facebook_messages_notice
     @h.flash[:notice]="A message"
-    assert_equal "<fb:message>A message</fb:message>",@h.facebook_messages
+    assert_equal "<fb:success message=\"A message\" />",@h.facebook_messages
   end
   
   def test_facebook_messages_error
     @h.flash[:error]="An error"
-    assert_equal "<fb:error>An error</fb:error>",@h.facebook_messages
+    assert_equal "<fb:error message=\"An error\" />",@h.facebook_messages
   end
   def test_fb_wall_post
     assert_equal "<fb:wallpost uid=\"1234\">A wall post</fb:wallpost>",@h.fb_wall_post("1234","A wall post")
