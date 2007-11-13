@@ -134,7 +134,7 @@ module Facebooker
       end
       
       FB_PRONOUN_OPTION_KEYS_TO_TRANSFORM = {:use_you => :useyou, :use_they => :usethey}
-      FB_PRONOUN_VALID_OPTION_KEYS = [:useyou, :possssive, :reflexive, :objective, 
+      FB_PRONOUN_VALID_OPTION_KEYS = [:useyou, :possessive, :reflexive, :objective, 
                                       :usethey, :capitalize]
 
       
