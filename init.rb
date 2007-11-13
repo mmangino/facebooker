@@ -26,7 +26,7 @@ module ::ActionController
       #yes, we do really want to see if it is false. nil means use the default action
       canvas = params.delete(:canvas)
       return false  if canvas == false 
-      canvas || params[:fb_sig_in_canvas] == "1"
+      canvas || params["fb_sig_in_canvas"] == "1" ||  params[:fb_sig_in_canvas] == "1"
     end
     
     def rewrite_url_with_facebooker(*args)
