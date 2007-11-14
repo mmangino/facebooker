@@ -257,6 +257,22 @@ class RailsHelperTest < Test::Unit::TestCase
     assert_raises(ArgumentError) {@h.fb_name(1234, :linkd => false)}
   end
   
+  def test_fb_tabs
+    assert_equal "<fb:tabs></fb:tabs>", @h.fb_tabs{}
+  end
+  
+  def test_fb_tab_item
+    assert_equal "<fb:tab-item href=\"http://www.google.com\" title=\"Google\" />", @h.fb_tab_item("Google", "http://www.google.com")
+  end
+  
+  def test_fb_tab_item_raises_exception_for_invalid_option
+    assert_raises(ArgumentError) {@h.fb_tab_item("Google", "http://www.google.com", :alignn => :right)}
+  end
+
+  def test_fb_tab_item_raises_exception_for_invalid_align_value
+    assert_raises(ArgumentError) {@h.fb_tab_item("Google", "http://www.google.com", :align => :rightt)}
+  end
+  
   def test_facebook_image_tag
     @h.expects(:image_path).with("test.jpg").returns("/test.jpg")
     assert_equal "<img src=\"http://127.0.0.1:3000/test.jpg\" />",@h.facebook_image_tag("test.jpg")

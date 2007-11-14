@@ -160,6 +160,29 @@ module Facebooker
       end
       
       
+      def fb_tabs(&block)
+        content = capture(&block)  	
+        concat(content_tag("fb:tabs", content), block.binding)
+      end
+      
+      def fb_tab_item(title, url, options={})
+        options.assert_valid_keys(FB_TAB_ITEM_VALID_OPTION_KEYS)
+        options.merge!(:title => title, :href => url)  	
+        validate_fb_tab_item_align_value(options)
+        tag("fb:tab-item", options)
+      end
+
+      FB_TAB_ITEM_VALID_OPTION_KEYS = [:align, :selected]
+
+      def validate_fb_tab_item_align_value(options)
+        if options.has_key?(:align) && !VALID_FB_TAB_ITEM_ALIGN_VALUES.include?(options[:align].to_sym)
+          raise(ArgumentError, "Unkown value for size: #{options[:align]}")
+        end
+      end
+
+      VALID_FB_TAB_ITEM_ALIGN_VALUES = [:left, :right]
+      
+      
       # Create a Facebook wall. It can contain fb_wall_posts
       #
       # For Example:
