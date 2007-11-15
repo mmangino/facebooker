@@ -37,7 +37,7 @@ class CGI
       end
 
       def session_key_should_be_set_with_facebook_session_key?
-        request_parameters[session_key].blank? && request_parameters[facebook_session_key].not.blank?
+        request_parameters[session_key].blank? && !request_parameters[facebook_session_key].blank?
       end
 
       def session_key
