@@ -150,7 +150,23 @@ module Facebooker
       end
       
       
-      VALID_FB_PROFILE_PIC_SIZES = [:thumb, :small, :normal, :square]
+      def fb_photo(photo, options={})
+        options.assert_valid_keys(FB_PHOTO_VALID_OPTION_KEYS)
+        options.merge!(:pid => cast_to_photo_id(photo))
+        validate_fb_photo_size(options)
+        validate_fb_photo_align_value(options)
+        tag("fb:photo", options)
+      end
+
+      FB_PHOTO_VALID_OPTION_KEYS = [:uid, :size, :align]
+
+      def cast_to_photo_id(object)
+        object.respond_to?(:photo_id) ? object.photo_id : object
+      end
+      
+      VALID_FB_SHARED_PHOTO_SIZES = [:thumb, :small, :normal, :square]
+      VALID_FB_PHOTO_SIZES = VALID_FB_SHARED_PHOTO_SIZES      
+      VALID_FB_PROFILE_PIC_SIZES = VALID_FB_SHARED_PHOTO_SIZES
       
       # Deprecated
       #
@@ -176,11 +192,19 @@ module Facebooker
 
       def validate_fb_tab_item_align_value(options)
         if options.has_key?(:align) && !VALID_FB_TAB_ITEM_ALIGN_VALUES.include?(options[:align].to_sym)
-          raise(ArgumentError, "Unkown value for size: #{options[:align]}")
+          raise(ArgumentError, "Unkown value for align: #{options[:align]}")
         end
       end
-
-      VALID_FB_TAB_ITEM_ALIGN_VALUES = [:left, :right]
+      
+      def validate_fb_photo_align_value(options)
+        if options.has_key?(:align) && !VALID_FB_PHOTO_ALIGN_VALUES.include?(options[:align].to_sym)
+          raise(ArgumentError, "Unkown value for align: #{options[:align]}")
+        end
+      end
+      
+      VALID_FB_SHARED_ALIGN_VALUES = [:left, :right]
+      VALID_FB_PHOTO_ALIGN_VALUES = VALID_FB_SHARED_ALIGN_VALUES
+      VALID_FB_TAB_ITEM_ALIGN_VALUES = VALID_FB_SHARED_ALIGN_VALUES
       
       
       # Create a Facebook wall. It can contain fb_wall_posts
@@ -254,7 +278,12 @@ module Facebooker
           raise(ArgumentError, "Unkown value for size: #{options[:size]}")
         end
       end
-      
+
+      def validate_fb_photo_size(options)
+        if options.has_key?(:size) && !VALID_FB_PHOTO_SIZES.include?(options[:size].to_sym)
+          raise(ArgumentError, "Unkown value for size: #{options[:size]}")
+        end
+      end      
     end
   end
 end

@@ -237,9 +237,38 @@ class RailsHelperTest < Test::Unit::TestCase
   end
 
   def test_fb_profile_pic_with_invalid_size
-    assert_raises(ArgumentError) {@h.fb_profile_pic("1234", :size => :medium)}
+    assert_raises(ArgumentError) {@h.fb_profile_pic("1234", :size => :mediumm)}
+  end
+
+  def test_fb_photo
+    assert_equal "<fb:photo pid=\"1234\" />",@h.fb_photo("1234")
+  end
+
+  def test_fb_photo_with_object_responding_to_photo_id
+    photo = flexmock("photo", :photo_id => "5678")
+    assert_equal "<fb:photo pid=\"5678\" />", @h.fb_photo(photo)
+  end
+
+  def test_fb_photo_with_invalid_size
+    assert_raises(ArgumentError) {@h.fb_photo("1234", :size => :medium)}
   end
   
+  def test_fb_photo_with_invalid_size_value
+    assert_raises(ArgumentError) {@h.fb_photo("1234", :size => :mediumm)}
+  end
+  
+  def test_fb_photo_with_invalid_align_value
+    assert_raises(ArgumentError) {@h.fb_photo("1234", :align => :rightt)}
+  end
+
+  def test_fb_photo_with_valid_align_value
+    assert_equal "<fb:photo align=\"right\" pid=\"1234\" />",@h.fb_photo("1234", :align => :right)
+  end
+
+  def test_fb_name_with_invalid_key
+    assert_raises(ArgumentError) {@h.fb_name(1234, :sizee => false)}
+  end
+
   def test_fb_name
     assert_equal "<fb:name uid=\"1234\" />",@h.fb_name("1234")
   end
