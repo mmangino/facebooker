@@ -56,16 +56,19 @@ module Facebooker
     # Subsequent calls will be retrieved from memory.
     # Optional: list of fields to retrieve as symbols
     def friends!(*fields)
-      @friends ||= session.post('facebook.users.getInfo', :fields => FIELDS.reject{|field_name| !fields.empty? && !fields.include?(field_name)}.join(','), :uids => friends.map{|f| f.id}.join(',')).map do |hash|  
+      @friends ||= session.post('facebook.users.getInfo', :fields => collect(fields), :uids => friends.map{|f| f.id}.join(',')).map do |hash|  
         User.new(hash['uid'], session, hash)
       end
     end
     
-    def populate
-      results = session.post('facebook.users.getInfo', :fields => FIELDS.join(','), :uids => id)
+    ###
+    # Retrieve profile data for logged in user
+    # Optional: list of fields to retrieve as symbols
+    def populate(*fields)
+      results = session.post('facebook.users.getInfo', :fields => collect(fields), :uids => id)
       populate_from_hash!(results.first)
     end
-    
+        
     def friends_with?(user_or_id)
       friends.map{|f| f.to_i}.include?(user_or_id.to_i)  
     end
@@ -127,6 +130,10 @@ module Facebooker
     private
     def publish(feed_story_or_action)
       session.post(Facebooker::Feed::METHODS[feed_story_or_action.class.name.split(/::/).last], feed_story_or_action.to_params) == "1" ? true : false
+    end
+    
+    def collect(fields)
+      FIELDS.reject{|field_name| !fields.empty? && !fields.include?(field_name)}.join(',')
     end
     
   end  

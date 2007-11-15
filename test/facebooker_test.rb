@@ -276,6 +276,12 @@ class TestFacebooker < Test::Unit::TestCase
     mock_http.should_receive(:post_form).and_return(example_user_info_xml).once
     @session.user.populate
   end
+
+  def populate_user_info_with_limited_fields
+    mock_http = establish_session
+    mock_http.should_receive(:post_form).and_return(example_limited_user_info_xml).once.ordered(:posts)
+    @session.user.populate(:affiliations, :status, :meeting_for)
+  end
   
   def populate_session_friends
     mock_http = establish_session
