@@ -22,8 +22,8 @@ begin
     end
     def link_test
       options = {}
-      options[:canvas] = true if params[:canvas] == "true"
-      options[:canvas] = false if params[:canvas] == "false"
+      options[:canvas] = true if params[:canvas] == true
+      options[:canvas] = false if params[:canvas] == false
       render :text=>url_for(options)
     end
     
