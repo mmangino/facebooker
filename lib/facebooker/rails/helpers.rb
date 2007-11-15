@@ -234,6 +234,11 @@ module Facebooker
         message
       end
       
+      # Renders an action using the <fb:action> tag
+      def fb_action(name, url)
+        "<fb:action href=\"#{url_for(url)}\">#{name}</fb:action>"
+      end
+           
       protected
       
       def cast_to_facebook_id(object)

@@ -367,6 +367,10 @@ class RailsHelperTest < Test::Unit::TestCase
     assert_equal("<fb:request-form-submit />",@h.fb_request_form_submit)  
   end
   
+  def test_fb_action
+    assert_equal "<fb:action href=\"/growingpets/rub\">Rub my pet</fb:action>", @h.fb_action("Rub my pet", "/growingpets/rub")  
+  end
+  
 end
 class TestModel
   attr_accessor :name,:facebook_id
