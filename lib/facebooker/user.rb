@@ -127,6 +127,10 @@ module Facebooker
       id
     end
     
+    def to_s
+      id.to_s
+    end
+    
     private
     def publish(feed_story_or_action)
       session.post(Facebooker::Feed::METHODS[feed_story_or_action.class.name.split(/::/).last], feed_story_or_action.to_params) == "1" ? true : false

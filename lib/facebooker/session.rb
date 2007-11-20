@@ -50,7 +50,9 @@ module Facebooker
     
     attr_writer :auth_token
           
-    def self.create(api_key, secret_key)
+    def self.create(api_key=nil, secret_key=nil)
+      api_key ||= self.api_key
+      secret_key ||= self.secret_key
       raise ArgumentError unless !api_key.nil? && !secret_key.nil?
       new(api_key, secret_key)
     end
