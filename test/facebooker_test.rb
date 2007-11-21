@@ -416,6 +416,7 @@ class TestFacebooker < Test::Unit::TestCase
               <concentration>Applied Mathematics</concentration>
               <concentration>Computer Science</concentration>
             </concentrations>
+            <degree>Masters</degree>
           </education_info>
         </education_history>
         <first_name>Dave</first_name>
