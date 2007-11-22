@@ -400,6 +400,21 @@ class RailsHelperTest < Test::Unit::TestCase
     assert_equal "<fb:action href=\"/growingpets/rub\">Rub my pet</fb:action>", @h.fb_action("Rub my pet", "/growingpets/rub")  
   end
   
+  def test_fb_help
+    assert_equal "<fb:help href=\"http://www.facebook.com/apps/application.php?id=6236036681\">Help</fb:help>", @h.fb_help("Help", "http://www.facebook.com/apps/application.php?id=6236036681")      
+  end
+  
+  def test_fb_create_button
+    assert_equal "<fb:create-button href=\"/growingpets/invite\">Invite Friends</fb:create-button>", @h.fb_create_button('Invite Friends', '/growingpets/invite')
+  end
+  
+  def test_fb_dashboard
+    @h.expects(:capture).returns("dashboard content")
+    @h.fb_dashboard do 
+    end
+    assert_equal "<fb:dashboard>dashboard content</fb:dashboard>", _erbout
+  end
+  
 end
 class TestModel
   attr_accessor :name,:facebook_id

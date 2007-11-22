@@ -258,11 +258,37 @@ module Facebooker
         message
       end
       
+      # Create a dashboard. It can contain fb_action, fb_help, and fb_create_button
+      #
+      # For Example:
+      #   <% fb_dashboard do %>
+      #     <%= APP_NAME %>
+      #     <%= fb_action 'My Matches', search_path %>
+      #     <%= fb_help 'Feedback', "http://www.facebook.com/apps/application.php?id=6236036681" %>
+      #     <%= fb_create_button 'Invite Friends', main_path %>
+      #   <% end %>
+      def fb_dashboard(&proc)
+        content = capture(&proc)  	
+        concat(content_tag("fb:dashboard",content,{}),proc.binding)
+      end
+
       # Renders an action using the <fb:action> tag
       def fb_action(name, url)
         "<fb:action href=\"#{url_for(url)}\">#{name}</fb:action>"
       end
            
+      # Render a <fb:help> tag
+      # For use inside <fb:dashboard>
+      def fb_help(name, url)
+        "<fb:help href=\"#{url_for(url)}\">#{name}</fb:help>"
+      end
+
+      # Render a <fb:create-button> tag
+      # For use inside <fb:dashboard>
+			def fb_create_button(name, url)
+			 	"<fb:create-button href=\"#{url_for(url)}\">#{name}</fb:create-button>"
+			end
+      
       protected
       
       def cast_to_facebook_id(object)
