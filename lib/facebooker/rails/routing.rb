@@ -3,7 +3,7 @@ module Facebooker
     module Routing
       module MapperExtensions
 
-        # Generates pseudo-resource routes. Since everything is a POST, routes can't be indentified
+        # Generates pseudo-resource routes. Since everything is a POST, routes can't be identified
         # using HTTP verbs. Therefore, the action is appended to the beginning of each named route,
         # except for index.
         #
