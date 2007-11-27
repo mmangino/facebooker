@@ -137,6 +137,27 @@ module Facebooker
       FB_PRONOUN_VALID_OPTION_KEYS = [:useyou, :possessive, :reflexive, :objective, 
                                       :usethey, :capitalize]
 
+
+      def fb_ref(options)
+        options.assert_valid_keys(FB_REF_VALID_OPTION_KEYS)
+        validate_fb_ref_has_either_url_or_handle(options)
+        validate_fb_ref_does_not_have_both_url_and_handle(options)
+        tag("fb:ref", options)
+      end
+      
+      def validate_fb_ref_has_either_url_or_handle(options)
+        unless options.has_key?(:url) || options.has_key?(:handle)
+          raise ArgumentError, "fb_ref requires :url or :handle"
+        end
+      end
+      
+      def validate_fb_ref_does_not_have_both_url_and_handle(options)
+        if options.has_key?(:url) && options.has_key?(:handle)
+          raise ArgumentError, "fb_ref may not have both :url and :handle"
+        end
+      end
+      
+      FB_REF_VALID_OPTION_KEYS = [:url, :handle]
       
       # Render an <fb:profile-pic> for the specified user.
       #

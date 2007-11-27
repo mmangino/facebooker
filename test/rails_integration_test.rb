@@ -315,6 +315,22 @@ class RailsHelperTest < Test::Unit::TestCase
     assert_equal "<fb:multi-friend-selector actiontext=\"This is a message\" max=\"20\" showborder=\"false\" />", @h.fb_multi_friend_selector("This is a message")
   end
   
+  def test_fb_ref_with_url
+    assert_equal "<fb:ref url=\"A URL\" />", @h.fb_ref(:url => "A URL")
+  end
+  
+  def test_fb_ref_with_handle
+    assert_equal "<fb:ref handle=\"A Handle\" />", @h.fb_ref(:handle => "A Handle")
+  end
+  
+  def test_fb_ref_with_invalid_attribute
+    assert_raises(ArgumentError) {@h.fb_ref(:handlee => "A HANLDE")}
+  end
+  
+  def test_fb_ref_with_handle_and_url
+    assert_raises(ArgumentError) {@h.fb_ref(:url => "URL", :handle => "HANDLE")}
+  end  
+  
   def test_facebook_messages_notice
     @h.flash[:notice]="A message"
     assert_equal "<fb:success message=\"A message\" />",@h.facebook_messages
