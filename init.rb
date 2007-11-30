@@ -2,6 +2,7 @@ require 'facebooker/rails/controller'
 require 'facebooker/rails/facebook_url_rewriting'
 require 'facebooker/rails/facebook_session_handling'
 require 'facebooker/rails/routing'
+require 'facebooker/rails/'
 
 module ::ActionController
   class Base
@@ -19,3 +20,4 @@ module ::ActionController
 end
 
 ActionController::Routing::RouteSet::Mapper.send :include, Facebooker::Rails::Routing::MapperExtensions
+ActionController::TestCase.send :include, Facebooker::Rails::TestHelpers::Functional
