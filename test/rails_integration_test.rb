@@ -390,6 +390,14 @@ class RailsHelperTest < Test::Unit::TestCase
     assert_equal "<fb:error><fb:message>Errors have occurred!!</fb:message>Label can't be blank!!</fb:error>", @h.fb_error("Errors have occurred!!", "Label can't be blank!!")
   end
 
+  def test_fb_explanation_with_only_message
+    assert_equal "<fb:explanation message=\"This is an explanation\" />", @h.fb_explanation("This is an explanation")
+  end
+
+  def test_fb_explanation_with_message_and_text
+    assert_equal "<fb:explanation><fb:message>This is an explanation</fb:message>You have a match</fb:explanation>", @h.fb_explanation("This is an explanation", "You have a match")
+  end
+
   def test_fb_success_with_only_message
     assert_equal "<fb:success message=\"Woot!!\" />", @h.fb_success("Woot!!")
   end

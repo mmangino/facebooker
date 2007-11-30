@@ -246,21 +246,16 @@ module Facebooker
       end
       alias_method :fb_wallpost, :fb_wall_post
       
-      
       def fb_error(message, text=nil)
-        if text.blank?
-          tag("fb:error", :message => message)
-        else
-          content_tag("fb:error", content_tag("fb:message", message) + text)
-        end
+        fb_status_msg("error", message, text)
       end
       
+      def fb_explanation(message, text=nil)
+        fb_status_msg("explanation", message, text)
+      end
+
       def fb_success(message, text=nil)
-        if text.blank?
-          tag("fb:success", :message => message)
-        else
-          content_tag("fb:success", content_tag("fb:message", message) + text)
-        end
+        fb_status_msg("success", message, text)
       end
       
       # Render flash values as <fb:message> and <fb:error> tags
@@ -329,6 +324,16 @@ module Facebooker
       def validate_fb_photo_size(options)
         if options.has_key?(:size) && !VALID_FB_PHOTO_SIZES.include?(options[:size].to_sym)
           raise(ArgumentError, "Unkown value for size: #{options[:size]}")
+        end
+      end
+      
+      private
+      
+      def fb_status_msg(type, message, text)
+        if text.blank?
+          tag("fb:#{type}", :message => message)
+        else
+          content_tag("fb:#{type}", content_tag("fb:message", message) + text)
         end
       end      
     end
