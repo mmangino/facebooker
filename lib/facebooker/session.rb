@@ -49,6 +49,7 @@ module Facebooker
     WWW_PATH_INSTALL          = "/install.php"
     
     attr_writer :auth_token
+    attr_reader :session_key
           
     def self.create(api_key=nil, secret_key=nil)
       api_key ||= self.api_key
