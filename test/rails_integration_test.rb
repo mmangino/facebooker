@@ -497,6 +497,6 @@ class RailsFacebookFormbuilderTest < Test::Unit::TestCase
     assert_equal "<fb:editor-custom label=\"Friends\"></fb:editor-custom>",@form_builder.multi_friend_input
   end
 end
-rescue LoadError
-  $stderr.puts "Couldn't find action controller.  That's OK.  We'll skip it."
+# rescue LoadError
+#   $stderr.puts "Couldn't find action controller.  That's OK.  We'll skip it."
 end

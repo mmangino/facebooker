@@ -8,7 +8,7 @@ module Facebooker
         # except for index.
         #
         # Example: 
-        #   facebook_resources :profiles
+        #   map.facebook_resources :profiles
         #
         # Generates the following routes:
         #
