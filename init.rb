@@ -2,6 +2,7 @@ require 'facebooker/rails/controller'
 require 'facebooker/rails/facebook_url_rewriting'
 require 'facebooker/rails/facebook_session_handling'
 require 'facebooker/rails/facebook_asset_path'
+require 'facebooker/rails/facebook_request_fix'
 require 'facebooker/rails/routing'
 
 module ::ActionController

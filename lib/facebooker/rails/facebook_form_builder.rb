@@ -36,6 +36,13 @@ module Facebooker
         options[:label] || field.to_s.humanize
       end
       
+      def text(string,options={})
+        @template.content_tag "fb:editor-custom", :label=>label_for("",options) do
+          string
+        end        
+      end
+      
+      
       def text_field(method, options = {})
         options[:label] ||= label_for(method,options)
         add_default_name_and_id(options,method)

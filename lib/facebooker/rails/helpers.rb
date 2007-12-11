@@ -96,13 +96,31 @@ module Facebooker
      #     <fb:editor-button label="Save Poke"
      #    </fb:editor-buttonset>
      #  </fb:editor>
-     def facebook_form_for(object_name, *args, &proc)
-        raise ArgumentError, "Missing block" unless block_given?
-        options = args.last.is_a?(Hash) ? args.pop : {}
+     def facebook_form_for( record_or_name_or_array,*args, &proc)
+
+       raise ArgumentError, "Missing block" unless block_given?
+       options = args.last.is_a?(Hash) ? args.pop : {}
+
+       case record_or_name_or_array
+       when String, Symbol
+         object_name = record_or_name_or_array
+       when Array
+         object = record_or_name_or_array.last
+         object_name = ActionController::RecordIdentifier.singular_class_name(object)
+         apply_form_for_options!(record_or_name_or_array, options)
+         args.unshift object
+       else
+         object = record_or_name_or_array
+         object_name = ActionController::RecordIdentifier.singular_class_name(object)
+         apply_form_for_options!([object], options)
+         args.unshift object
+       end
+        method = (options[:html]||{})[:method]
         options[:builder] ||= Facebooker::Rails::FacebookFormBuilder
 
         concat(tag("fb:editor",{:action=>url_for(options.delete(:url) || {})},true) , proc.binding)
-        fields_for(object_name, *(args << options), &proc)
+        concat(tag(:input,{:type=>"hidden",:name=>:_method, :value=>method},false), proc.binding) unless method.blank?
+        fields_for( object_name,*(args << options), &proc)
         concat("</fb:editor>",proc.binding)
       end
       
