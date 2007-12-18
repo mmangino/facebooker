@@ -3,7 +3,7 @@ module Facebooker
     class FacebookFormBuilder < ActionView::Helpers::FormBuilder
       
       
-      second_param = %w(hidden_field password_field file_field check_box date_select datetime_select time_select)
+      second_param = %w(password_field file_field check_box date_select datetime_select time_select)
       third_param = %w(radio_button country_select select time_zone_select)
       fifth_param = %w(collection_select)
       
