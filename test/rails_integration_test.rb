@@ -152,7 +152,7 @@ class RailsIntegrationTest < Test::Unit::TestCase
   
   def test_fbml_redirect_tag_handles_hash_parameters_correctly
     get :index, example_rails_params_including_fb
-    assert_equal "<fb:redirect url=\"http://apps.facebook.com/root/require_auth\" />", @controller.send(:fbml_redirect_tag, :action => :index)
+    assert_equal "<fb:redirect url=\"http://apps.facebook.com/root/require_auth\" />", @controller.send(:fbml_redirect_tag, :action => :index,:canvas=>true)
   end
   
   def test_redirect_to_renders_fbml_redirect_tag_if_request_is_for_a_facebook_canvas
@@ -312,7 +312,7 @@ class RailsHelperTest < Test::Unit::TestCase
   end
   
   def test_fb_multi_friend_selector
-    assert_equal "<fb:multi-friend-selector actiontext=\"This is a message\" max=\"20\" showborder=\"false\" />", @h.fb_multi_friend_selector("This is a message")
+    assert_equal "<fb:multi-friend-selector actiontext=\"This is a message\" max=\"20\" />", @h.fb_multi_friend_selector("This is a message")
   end
   
   def test_fb_ref_with_url

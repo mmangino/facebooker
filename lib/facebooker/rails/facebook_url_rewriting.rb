@@ -11,13 +11,14 @@ module ::ActionController
     def link_to_canvas?(params, options)
       option_override = options[:canvas]
       return false if option_override == false # important to check for false. nil should use default behavior
-      option_override || params["fb_sig_in_canvas"] == "1" ||  params[:fb_sig_in_canvas] == "1"
+      option_override || @request.parameters["fb_sig_in_canvas"] == "1" ||  @request.parameters[:fb_sig_in_canvas] == "1" 
     end
   
     def rewrite_url_with_facebooker(*args)
       options = args.first.is_a?(Hash) ? args.first : args.last
-      options[:skip_relative_url_root] ||= !link_to_canvas?(@request.request_parameters, options)
-      if link_to_canvas?(@request.request_parameters, options) && !options.has_key?(:host)
+      is_link_to_canvas=link_to_canvas?(@request.request_parameters, options)
+      options[:skip_relative_url_root] ||= !is_link_to_canvas
+      if is_link_to_canvas && !options.has_key?(:host)
         options[:host] = "apps.facebook.com"
       end 
       options.delete(:canvas)
