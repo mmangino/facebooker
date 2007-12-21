@@ -136,6 +136,18 @@ class TestFacebooker < Test::Unit::TestCase
       optional_email_fbml = "This would be in the email.  If this is not passed, facebook sends no mailz!"
       assert_equal('http://www.facebook.com/send_email.php?from=211031&id=52', @session.send_notification(user_ids, notification_fbml, optional_email_fbml))
     }
+  end   
+
+  def test_can_send_emails
+    mock_http = establish_session
+    mock_http.should_receive(:post_form).and_return(example_notifications_send_email_xml).once.ordered(:posts)
+    assert_nothing_raised {
+      user_ids = [123, 321]
+      text = "Hi I am the text part of the email."
+      fbml = "Hi I am the fbml version of the <b>email</a>"   
+      subject = "Somethign you should really pay attention to."
+      assert_equal('123,321', @session.send_email(user_ids, subject,text,fbml ))
+    }
   end
   
   def test_can_send_invitation_or_request
@@ -324,7 +336,14 @@ class TestFacebooker < Test::Unit::TestCase
 <?xml version="1.0" encoding="UTF-8"?>
 <notifications_send_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd">http://www.facebook.com/send_email.php?from=211031&id=52</notifications_send_response>
     XML
-  end
+  end     
+  
+	  def example_notifications_send_email_xml
+	    <<-XML
+	    <?xml version="1.0" encoding="UTF-8"?>
+	<notifications_sendEmail_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd">123,321</notifications_sendEmail_response>
+	    XML
+	  end
 
   def example_request_send_xml
     <<-XML

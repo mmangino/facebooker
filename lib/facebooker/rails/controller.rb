@@ -18,11 +18,7 @@ module Facebooker
       end
       
       def facebook_params
-        @facebook_params ||= facebook_sig_params.inject(HashWithIndifferentAccess.new) do |new_hash, pair| 
-                                 new_key_name = pair.first.to_s.sub(/^fb_sig_/, '')
-                                 new_hash[new_key_name] = facebook_parameter_conversions[new_key_name].call(pair.last)
-                                 new_hash
-                             end
+        @facebook_params ||= verified_facebook_params
       end      
       
       private
@@ -66,12 +62,33 @@ module Facebooker
         end
       end
             
-      def facebook_sig_params
-        params.select{|key, value| key.to_s =~ /^fb_sig/}
-      end
-      
       def blank?(value)
         (value == '0' || value.nil? || value == '')        
+      end
+
+      def verified_facebook_params
+        facebook_sig_params = params.inject({}) do |collection, pair|
+          collection[pair.first.sub(/^fb_sig_/, '')] = pair.last if pair.first[0,7] == 'fb_sig_'
+          collection
+        end
+        verify_signature(facebook_sig_params,params['fb_sig'])
+
+        facebook_sig_params.inject(HashWithIndifferentAccess.new) do |collection, pair| 
+          collection[pair.first] = facebook_parameter_conversions[pair.first].call(pair.last)
+          collection
+        end
+      end
+      
+      def earliest_valid_session
+        48.hours.ago
+      end
+      
+      def verify_signature(facebook_sig_params,expected_signature)
+        raw_string = facebook_sig_params.map{ |*args| args.join('=') }.sort.join
+        actual_sig = Digest::MD5.hexdigest([raw_string, Facebooker::Session.secret_key].join)
+        raise Facebooker::Session::IncorrectSignature if actual_sig != expected_signature
+        raise Facebooker::Session::SignatureTooOld if Time.at(facebook_sig_params['time'].to_f) < earliest_valid_session
+        true
       end
       
       def facebook_parameter_conversions

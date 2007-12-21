@@ -17,6 +17,7 @@ module Facebooker
     class SessionExpired < Exception; end
     class CallOutOfOrder < Exception; end
     class IncorrectSignature     < Exception; end
+    class SignatureTooOld     < Exception; end
     class TooManyUserCalls < Exception; end
     class TooManyUserActionCalls < Exception; end
     class InvalidFeedTitleLink < Exception; end
@@ -239,7 +240,13 @@ module Facebooker
         params[:email] = email_fbml
       end
       post 'facebook.notifications.send', params
-    end
+    end 
+
+		  def send_email(user_ids, subject, text, fbml = nil) 			
+			  user_ids = Array(user_ids)
+	      params = {:fbml => fbml, :recipients => user_ids.join(','), :text => text, :subject => subject} 
+	      post 'facebook.notifications.sendEmail', params
+	    end
 
     def send_request(user_ids, request_type, content, image_url)
       send_request_or_invitation(user_ids, request_type, content, image_url, false)      

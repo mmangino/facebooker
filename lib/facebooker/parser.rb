@@ -142,6 +142,12 @@ module Facebooker
     def self.process(data)
       element('notifications_send_response', data).text_value
     end
+  end 
+
+  class NotificationsSendEmail < Parser#:nodoc:
+    def self.process(data)  
+      element('notifications_sendEmail_response', data).text_value
+    end
   end
 
   class GetTags < Parser#nodoc:
@@ -340,7 +346,9 @@ module Facebooker
       'facebook.events.get' => EventsGet,
       'facebook.groups.get' => GroupsGet,
       'facebook.events.getMembers' => EventMembersGet,
-      'facebook.groups.getMembers' => GroupGetMembers
+      'facebook.groups.getMembers' => GroupGetMembers,
+      'facebook.notifications.sendEmail' => NotificationsSendEmail
+      
     }
   end
 end
