@@ -345,6 +345,9 @@ module Facebooker
         concat(content_tag("fb:else",content),proc.binding)
       end
       
+      def fb_about_url
+        "http://www.facebook.com/apps/application.php?api_key=#{ENV["FACEBOOK_API_KEY"]}"
+      end
       
       protected
       

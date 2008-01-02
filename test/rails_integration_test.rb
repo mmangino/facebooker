@@ -386,6 +386,11 @@ class RailsHelperTest < Test::Unit::TestCase
     assert_equal "<fb:else></fb:else>", @h.fb_else{}    
   end
   
+  def test_fb_about_url
+    ENV["FACEBOOK_API_KEY"]="1234"
+    assert_equal "http://www.facebook.com/apps/application.php?api_key=1234", @h.fb_about_url
+  end
+  
   def test_fb_ref_with_url
     assert_equal "<fb:ref url=\"A URL\" />", @h.fb_ref(:url => "A URL")
   end
