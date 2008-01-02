@@ -328,6 +328,19 @@ module Facebooker
 			  tag "fb:comments",options.merge(:xid=>xid,:canpost=>canpost.to_s,:candelete=>candelete.to_s,:numposts=>numposts)
 			end
       
+      def fb_if_is_app_user(user,options={},&proc)
+        content = capture(&proc) 
+        concat(content_tag("fb:if-is-app-user",content,options.merge(:uid=>cast_to_facebook_id(user))),proc.binding)
+      end
+      
+      def fb_if_is_user(user,&proc)
+        content = capture(&proc) 
+        user = [user] unless user.is_a? Array
+        user_list=user.map{|u| cast_to_facebook_id(u)}.join(",")
+        concat(content_tag("fb:if-is-user",content,{:uid=>user_list}),proc.binding)
+      end
+      
+      
       protected
       
       def cast_to_facebook_id(object)

@@ -371,6 +371,16 @@ class RailsHelperTest < Test::Unit::TestCase
     assert_equal "<fb:comments candelete=\"false\" canpost=\"true\" numposts=\"7\" showform=\"true\" xid=\"a:1\" />", @h.fb_comments("a:1",true,false,7,:showform=>true)
   end
 
+  def test_fb_if_is_user_with_single_object
+    user = flexmock("user", :facebook_id => "5678")
+    assert_equal "<fb:if-is-user uid=\"5678\"></fb:if-is-user>", @h.fb_if_is_user(user){}    
+  end
+  
+  def test_fb_if_is_user_with_array
+    user1 = flexmock("user", :facebook_id => "5678")
+    user2 = flexmock("user", :facebook_id => "1234")
+    assert_equal "<fb:if-is-user uid=\"5678,1234\"></fb:if-is-user>", @h.fb_if_is_user([user1,user2]){}
+  end
   
   def test_fb_ref_with_url
     assert_equal "<fb:ref url=\"A URL\" />", @h.fb_ref(:url => "A URL")
