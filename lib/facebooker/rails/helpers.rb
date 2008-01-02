@@ -66,8 +66,8 @@ module Facebooker
       end
 
       # Render an <fb:multi-friend-selector> with the passed in welcome message
-      def fb_multi_friend_selector(message,&block)
-        tag("fb:multi-friend-selector",:showborder=>false,:actiontext=>message,:max=>20)
+      def fb_multi_friend_selector(message,options={},&block)
+        tag("fb:multi-friend-selector",options.merge(:showborder=>false,:actiontext=>message,:max=>20))
       end
 
       # Render a button in a request using the <fb:req-choice> tag
@@ -259,10 +259,10 @@ module Facebooker
       end
       
       # Render an <fb:wallpost> tag
-      def fb_wall_post(user,message)
-        content_tag("fb:wallpost",message,:uid=>user)
+      def fb_wallpost(user,message)
+        content_tag("fb:wallpost",message,:uid=>cast_to_facebook_id(user))
       end
-      alias_method :fb_wallpost, :fb_wall_post
+      alias_method :fb_wall_post, :fb_wallpost
       
       def fb_error(message, text=nil)
         fb_status_msg("error", message, text)
@@ -321,6 +321,11 @@ module Facebooker
       # For use inside <fb:dashboard>
 			def fb_create_button(name, url)
 			 	"<fb:create-button href=\"#{url_for(url)}\">#{name}</fb:create-button>"
+			end
+			
+			# Create a comment area
+			def fb_comments(xid,canpost=true,candelete=false,numposts=5,options={})
+			  tag "fb:comments",options.merge(:xid=>xid,:canpost=>canpost.to_s,:candelete=>candelete.to_s,:numposts=>numposts)
 			end
       
       protected
