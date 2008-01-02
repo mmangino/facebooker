@@ -117,8 +117,25 @@ class TestFacebooker < Test::Unit::TestCase
        action.title_template = "{actor} did something"
        assert(@session.user.publish_templatized_action(action))
      }
-   end
-  
+  end
+  def test_can_publish_templatized_action_to_users_feed_with_params_as_string
+    json_data="{\"move\": \"punch\"}"
+    action = Facebooker::Feed::TemplatizedAction.new
+    action.actor_id = '12345'
+    action.title_template = "{actor} did something "
+    action.title_data=json_data
+    assert_equal action.to_params[:title_data],json_data
+  end
+  def test_can_publish_templatized_action_to_users_feed_with_params_as_hash
+    json_data="{\"move\": \"punch\"}"
+    hash={:move=>"punch"}
+    hash.expects(:to_json).returns(json_data)
+    action = Facebooker::Feed::TemplatizedAction.new
+    action.actor_id = '12345'
+    action.title_template = "{actor} did something "
+    action.title_data=hash
+    assert_equal action.to_params[:title_data],json_data
+  end
   def test_can_get_notifications_for_logged_in_user
     mock_http = establish_session
     mock_http.should_receive(:post_form).and_return(example_notifications_get_xml).once.ordered(:posts)

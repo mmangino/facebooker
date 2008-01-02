@@ -29,9 +29,14 @@ module Facebooker
 
       def to_params
        raise "Must set actor_id and title_template before converting" if (self.actor_id.nil? || self.title_template.nil?)
-       { :actor_id => actor_id, :title_template => title_template, :title_data => title_data,
-         :body_template => body_template, :body_data => body_data, :body_general => body_general,
+       { :actor_id => actor_id, :title_template => title_template, :title_data => convert_json(title_data),
+         :body_template => body_template, :body_data => convert_json(body_data), :body_general => body_general,
          :target_ids => target_ids }.merge image_params
+      end
+      
+      def convert_json(hash_or_string)
+        
+        (hash_or_string.is_a?(Hash) and hash_or_string.respond_to?(:to_json)) ? hash_or_string.to_json : hash_or_string
       end
     end
 
