@@ -12,7 +12,7 @@ module Facebooker
       end
       
       def set_facebook_session
-        returning session_set = session_already_secured? || secure_with_token! || secure_with_facebook_params! || create_new_facebook_session_and_redirect! do
+        returning session_set = session_already_secured? || secure_with_token! || secure_with_facebook_params!  do
           capture_facebook_friends_if_available! if session_set
         end
       end
@@ -124,7 +124,7 @@ module Facebooker
       end
       
       def ensure_authenticated_to_facebook
-        set_facebook_session
+        set_facebook_session || create_new_facebook_session_and_redirect!
       end
       
       def ensure_application_is_installed_by_facebook_user
