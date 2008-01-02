@@ -340,6 +340,11 @@ module Facebooker
         concat(content_tag("fb:if-is-user",content,{:uid=>user_list}),proc.binding)
       end
       
+      def fb_else
+        content = capture(&proc) 
+        concat(content_tag("fb:else",content),proc.binding)
+      end
+      
       
       protected
       

@@ -382,6 +382,10 @@ class RailsHelperTest < Test::Unit::TestCase
     assert_equal "<fb:if-is-user uid=\"5678,1234\"></fb:if-is-user>", @h.fb_if_is_user([user1,user2]){}
   end
   
+  def test_fb_else
+    assert_equal "<fb:else></fb:else>", @h.fb_else{}    
+  end
+  
   def test_fb_ref_with_url
     assert_equal "<fb:ref url=\"A URL\" />", @h.fb_ref(:url => "A URL")
   end
