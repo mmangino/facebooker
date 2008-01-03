@@ -118,10 +118,23 @@ module Facebooker
       session.post('facebook.profile.getFBML', :uid => @id)  
     end    
     
+    #
+    # Set the profile FBML for this user
+    #
+    # This does not set profile actions, that should be done with profile_action=
     def profile_fbml=(markup)
       session.post('facebook.profile.setFBML', :uid => @id, :markup => markup)      
     end
     
+    #
+    # Set the mobile profile FBML
+    def mobile_fbml=(markup)
+      session.post('facebook.profile.setFBML', :uid => @id, :mobile_fbml => markup)      
+    end
+
+    def profile_action=(markup)
+      session.post('facebook.profile.setFBML', :uid => @id, :profile_action => markup)      
+    end
     # Returns the user's id as an integer
     def to_i
       id
