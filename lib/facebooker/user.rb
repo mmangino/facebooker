@@ -144,6 +144,14 @@ module Facebooker
       id.to_s
     end
     
+    def self.cast_to_facebook_id(object)
+      if object.respond_to?(:facebook_id)
+        object.facebook_id
+      else
+        object
+      end
+    end
+    
     private
     def publish(feed_story_or_action)
       session.post(Facebooker::Feed::METHODS[feed_story_or_action.class.name.split(/::/).last], feed_story_or_action.to_params) == "1" ? true : false
@@ -152,6 +160,7 @@ module Facebooker
     def collect(fields)
       FIELDS.reject{|field_name| !fields.empty? && !fields.include?(field_name)}.join(',')
     end
+    
     
   end  
 end

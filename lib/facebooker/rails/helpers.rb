@@ -352,11 +352,7 @@ module Facebooker
       protected
       
       def cast_to_facebook_id(object)
-        if object.respond_to?(:facebook_id)
-          object.facebook_id
-        else
-          object
-        end
+        Facebooker::User.cast_to_facebook_id(object)
       end
       
       def validate_fb_profile_pic_size(options)
