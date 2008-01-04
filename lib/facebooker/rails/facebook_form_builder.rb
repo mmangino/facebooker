@@ -37,9 +37,7 @@ module Facebooker
       end
       
       def text(string,options={})
-        @template.content_tag "fb:editor-custom", :label=>label_for("",options) do
-          string
-        end        
+        @template.content_tag "fb:editor-custom",string, :label=>label_for("",options)
       end
       
       
@@ -55,6 +53,25 @@ module Facebooker
         options[:label] ||= label_for(method,options)
         add_default_name_and_id(options,method)
         @template.content_tag("fb:editor-textarea",value_before_type_cast(object,method),options)        
+      end
+      
+      #
+      # Build a text input area that uses typeahed
+      # options are like collection_select
+      def collection_typeahead(method,collection,value_method,text_method,options={})
+        build_shell(method,options) do
+          collection_typeahead_internal(method,collection,value_method,text_method,options)
+        end
+      end
+      
+      def collection_typeahead_internal(method,collection,value_method,text_method,options={})
+        option_values = collection.map do |item|
+          value=item.send(value_method)
+          text=item.send(text_method)
+          @template.content_tag "fb:typeahead-option",text,:value=>value
+        end.join
+        add_default_name_and_id(options,method)
+        @template.content_tag("fb:typeahead-input",option_values,options)        
       end
       
       def value_before_type_cast(object,method)
@@ -73,11 +90,11 @@ module Facebooker
       end
       
       def buttons(*names)
-        @template.content_tag "fb:editor-buttonset" do
-          names.map do |name|
-            create_button(name)
-          end.join
-        end
+        buttons=names.map do |name|
+          create_button(name)
+        end.join
+        
+        @template.content_tag "fb:editor-buttonset",buttons
       end
       
       def create_button(name)

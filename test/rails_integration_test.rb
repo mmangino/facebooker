@@ -553,11 +553,23 @@ class RailsFacebookFormbuilderTest < Test::Unit::TestCase
         @form_builder.text_area(:name)    
   end
   
+  def test_collection_typeahead
+    flexmock(@form_builder) do |fb|
+      fb.should_receive(:collection_typeahead_internal).with(:name,["ABC"],:size,:to_s,{})
+    end
+    @form_builder.collection_typeahead(:name,["ABC"],:size,:to_s)        
+  end
+  
+  def test_collection_typeahead_internal
+    assert_equal "<fb:typeahead-input id=\"testmodel_name\" name=\"testmodel[name]\"><fb:typeahead-option value=\"3\">ABC</fb:typeahead-option></fb:typeahead-input>",
+      @form_builder.collection_typeahead_internal(:name,["ABC"],:size,:to_s)        
+  end
+  
   def test_buttons
-    @form_builder.expects(:create_button).with(:first)
-    @form_builder.expects(:create_button).with(:second)
-    assert_equal "<fb:editor-buttonset></fb:editor-buttonset>",
-        @form_builder.buttons(:first,:second)    
+    @form_builder.expects(:create_button).with(:first).returns("first")
+    @form_builder.expects(:create_button).with(:second).returns("second")
+    @template.expects(:content_tag).with("fb:editor-buttonset","firstsecond")
+    @form_builder.buttons(:first,:second)    
   end
   
   def test_create_button
@@ -567,6 +579,10 @@ class RailsFacebookFormbuilderTest < Test::Unit::TestCase
   def test_custom
     @template.expects(:password_field).returns("password_field")
     assert_equal "<fb:editor-custom label=\"Name\"></fb:editor-custom>",@form_builder.password_field(:name)
+  end
+  
+  def test_text
+    assert_equal "<fb:editor-custom label=\"custom\">Mike</fb:editor-custom>",@form_builder.text("Mike",:label=>"custom")
   end
   
   def test_multi_friend_input
