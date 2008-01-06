@@ -117,8 +117,16 @@ module Facebooker
        end
         method = (options[:html]||{})[:method]
         options[:builder] ||= Facebooker::Rails::FacebookFormBuilder
+        editor_options={}
+        
+        action=options.delete(:url)
+        editor_options[:action]= action unless action.blank?
+        width=options.delete(:width)
+        editor_options[:width]=width unless width.blank?
+        width=options.delete(:labelwidth)
+        editor_options[:labelwidth]=width unless width.blank?
 
-        concat(tag("fb:editor",{:action=>url_for(options.delete(:url) || {})},true) , proc.binding)
+        concat(tag("fb:editor",editor_options,true) , proc.binding)
         concat(tag(:input,{:type=>"hidden",:name=>:_method, :value=>method},false), proc.binding) unless method.blank?
         fields_for( object_name,*(args << options), &proc)
         concat("</fb:editor>",proc.binding)
