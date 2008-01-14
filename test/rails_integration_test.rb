@@ -228,7 +228,7 @@ class RailsSignatureTest < Test::Unit::TestCase
   
   def test_should_raise_on_bad_sig
     begin
-      get :fb_params_test,example_rails_params_including_fb(:fb_sig=>'incorrect')
+      get :fb_params_test,example_rails_params_including_fb("fb_sig"=>'incorrect')
       fail "No IncorrectSignature raised"
     rescue Facebooker::Session::IncorrectSignature=>e
     end
@@ -561,7 +561,7 @@ class RailsFacebookFormbuilderTest < Test::Unit::TestCase
   end
   
   def test_collection_typeahead_internal
-    assert_equal "<fb:typeahead-input id=\"testmodel_name\" name=\"testmodel[name]\"><fb:typeahead-option value=\"3\">ABC</fb:typeahead-option></fb:typeahead-input>",
+    assert_equal "<fb:typeahead-input id=\"testmodel_name\" name=\"testmodel[name]\" value=\"Mike\"><fb:typeahead-option value=\"3\">ABC</fb:typeahead-option></fb:typeahead-input>",
       @form_builder.collection_typeahead_internal(:name,["ABC"],:size,:to_s)        
   end
   

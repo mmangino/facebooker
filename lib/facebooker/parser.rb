@@ -217,6 +217,11 @@ module Facebooker
       element('fbml_refreshRefUrl_response', data).text_value
     end
   end
+  class RefreshImgSrc < Parser#:nodoc:
+    def self.process(data)
+      element('fbml_refreshImgSrc_response', data).text_value
+    end
+  end
   
   class EventsGet < Parser#:nodoc:
     def self.process(data)
@@ -337,6 +342,7 @@ module Facebooker
       'facebook.profile.setFBML' => ProfileFBMLSet,
       'facebook.fbml.setRefHandle' => SetRefHandle,
       'facebook.fbml.refreshRefUrl' => RefreshRefURL,
+      'facebook.fbml.refreshImgSrc' => RefreshImgSrc,
       'facebook.fql.query' => FqlQuery,
       'facebook.photos.get' => GetPhotos,
       'facebook.photos.getAlbums' => GetAlbums,

@@ -24,7 +24,7 @@ module ::ActionController
       options.delete(:canvas)
       rewrite_url_without_facebooker(*args)
     end
-  
+    
     alias_method_chain :rewrite_url, :facebooker
   end
 end

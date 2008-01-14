@@ -27,7 +27,10 @@ module Facebooker
     # id, session, (optional) attribute_hash
     # attribute_hash
     def initialize(*args)
-      if (args.first.kind_of?(String) || args.first.kind_of?(Integer)) && args[1].kind_of?(Session)
+      if (args.first.kind_of?(String) || args.first.kind_of?(Integer)) && args.size==1
+        @id=Integer(args.shift)
+        @session = Session.current
+      elsif (args.first.kind_of?(String) || args.first.kind_of?(Integer)) && args[1].kind_of?(Session)
         @id = Integer(args.shift)
         @session = args.shift
       end
@@ -123,18 +126,27 @@ module Facebooker
     #
     # This does not set profile actions, that should be done with profile_action=
     def profile_fbml=(markup)
-      session.post('facebook.profile.setFBML', :uid => @id, :markup => markup)      
+      set_profile_fbml(markup, nil, nil)
     end
     
     #
     # Set the mobile profile FBML
     def mobile_fbml=(markup)
-      session.post('facebook.profile.setFBML', :uid => @id, :mobile_fbml => markup)      
+      set_profile_fbml(nil, markup, nil)
     end
 
     def profile_action=(markup)
-      session.post('facebook.profile.setFBML', :uid => @id, :profile_action => markup)      
+      set_profile_fbml(nil, nil, markup)
     end
+    
+    def set_profile_fbml(profile_fbml, mobile_fbml, profile_action_fbml)
+    parameters = {:uid => @id}
+    parameters[:markup] = profile_fbml if profile_fbml
+    parameters[:profile_action] = profile_action_fbml if profile_action_fbml
+    parameters[:mobile_fbml] = mobile_fbml if mobile_fbml
+    session.post('facebook.profile.setFBML', parameters)
+    end
+
     # Returns the user's id as an integer
     def to_i
       id

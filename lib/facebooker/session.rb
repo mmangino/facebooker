@@ -5,42 +5,42 @@ module Facebooker
   #
   # Raised when trying to perform an operation on a user
   # other than the logged in user (if that's unallowed)
-  class NonSessionUser < Exception;  end
+  class NonSessionUser < StandardError;  end
   class Session
-    class SessionExpired < Exception; end
-    class UnknownError < Exception; end
-    class ServiceUnavailable < Exception; end
-    class MaxRequestsDepleted < Exception; end
-    class HostNotAllowed < Exception; end
-    class MissingOrInvalidParameter < Exception; end
-    class InvalidAPIKey < Exception; end
-    class SessionExpired < Exception; end
-    class CallOutOfOrder < Exception; end
-    class IncorrectSignature     < Exception; end
-    class SignatureTooOld     < Exception; end
-    class TooManyUserCalls < Exception; end
-    class TooManyUserActionCalls < Exception; end
-    class InvalidFeedTitleLink < Exception; end
-    class InvalidFeedTitleLength < Exception; end
-    class InvalidFeedTitleName < Exception; end
-    class BlankFeedTitle < Exception; end
-    class FeedBodyLengthTooLong < Exception; end
-    class InvalidFeedPhotoSource < Exception; end
-    class InvalidFeedPhotoLink < Exception; end    
-    class FeedMarkupInvalid < Exception; end
-    class FeedTitleDataInvalid < Exception; end
-    class FeedTitleTemplateInvalid < Exception; end
-    class FeedBodyDataInvalid < Exception; end
-    class FeedBodyTemplateInvalid < Exception; end
-    class FeedPhotosNotRetrieved < Exception; end
-    class FeedTargetIdsInvalid < Exception; end
-    class ConfigurationMissing < Exception; end
-    class FQLParseError < Exception; end
-    class FQLFieldDoesNotExist < Exception; end
-    class FQLTableDoesNotExist < Exception; end
-    class FQLStatementNotIndexable < Exception; end
-    class FQLFunctionDoesNotExist < Exception; end
-    class FQLWrongNumberArgumentsPassedToFunction < Exception; end
+    class SessionExpired < StandardError; end
+    class UnknownError < StandardError; end
+    class ServiceUnavailable < StandardError; end
+    class MaxRequestsDepleted < StandardError; end
+    class HostNotAllowed < StandardError; end
+    class MissingOrInvalidParameter < StandardError; end
+    class InvalidAPIKey < StandardError; end
+    class SessionExpired < StandardError; end
+    class CallOutOfOrder < StandardError; end
+    class IncorrectSignature     < StandardError; end
+    class SignatureTooOld     < StandardError; end
+    class TooManyUserCalls < StandardError; end
+    class TooManyUserActionCalls < StandardError; end
+    class InvalidFeedTitleLink < StandardError; end
+    class InvalidFeedTitleLength < StandardError; end
+    class InvalidFeedTitleName < StandardError; end
+    class BlankFeedTitle < StandardError; end
+    class FeedBodyLengthTooLong < StandardError; end
+    class InvalidFeedPhotoSource < StandardError; end
+    class InvalidFeedPhotoLink < StandardError; end    
+    class FeedMarkupInvalid < StandardError; end
+    class FeedTitleDataInvalid < StandardError; end
+    class FeedTitleTemplateInvalid < StandardError; end
+    class FeedBodyDataInvalid < StandardError; end
+    class FeedBodyTemplateInvalid < StandardError; end
+    class FeedPhotosNotRetrieved < StandardError; end
+    class FeedTargetIdsInvalid < StandardError; end
+    class ConfigurationMissing < StandardError; end
+    class FQLParseError < StandardError; end
+    class FQLFieldDoesNotExist < StandardError; end
+    class FQLTableDoesNotExist < StandardError; end
+    class FQLStatementNotIndexable < StandardError; end
+    class FQLFunctionDoesNotExist < StandardError; end
+    class FQLWrongNumberArgumentsPassedToFunction < StandardError; end
   
     API_SERVER_BASE_URL       = "api.facebook.com"
     API_PATH_REST             = "/restserver.php"
@@ -56,7 +56,9 @@ module Facebooker
       api_key ||= self.api_key
       secret_key ||= self.secret_key
       raise ArgumentError unless !api_key.nil? && !secret_key.nil?
-      new(api_key, secret_key)
+      new_session = new(api_key, secret_key)
+      self.current ||= new_session
+      new_session
     end
     
     def self.api_key

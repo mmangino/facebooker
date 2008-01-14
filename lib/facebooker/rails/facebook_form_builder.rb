@@ -71,6 +71,7 @@ module Facebooker
           @template.content_tag "fb:typeahead-option",text,:value=>value
         end.join
         add_default_name_and_id(options,method)
+        options["value"] ||= value_before_type_cast(object,method)
         @template.content_tag("fb:typeahead-input",option_values,options)        
       end
       
@@ -88,7 +89,7 @@ module Facebooker
           @template.content_tag("fb:multi-friend-input","",options)
         end
       end
-      
+
       def buttons(*names)
         buttons=names.map do |name|
           create_button(name)

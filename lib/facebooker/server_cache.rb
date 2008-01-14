@@ -16,5 +16,9 @@ module Facebooker
     def refresh_ref_url(url)
       (@session.post 'facebook.fbml.refreshRefUrl', :url => url) == '1'
     end
+    
+    def refresh_img_src(url)
+      (@session.post 'facebook.fbml.refreshImgSrc', :url => url) == '1'
+    end
   end
 end

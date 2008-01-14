@@ -69,6 +69,10 @@ module Facebooker
       def fb_multi_friend_selector(message,options={},&block)
         tag("fb:multi-friend-selector",options.merge(:showborder=>false,:actiontext=>message,:max=>20))
       end
+      # Render an <fb:multi-friend-selector> with the passed in welcome message
+      def fb_multi_friend_selector_condensed(options={},&block)
+        tag("fb:multi-friend-selector",options.merge(:condensed=>true))
+      end
 
       # Render a button in a request using the <fb:req-choice> tag
       #

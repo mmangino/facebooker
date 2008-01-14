@@ -116,7 +116,7 @@ module Facebooker
       end
       
       def request_is_for_a_facebook_canvas?
-        facebook_params['in_canvas']
+        !params['fb_sig_in_canvas'].blank?
       end
       
       def application_is_installed?
@@ -139,7 +139,7 @@ module Facebooker
       end
       
       def set_fbml_format
-        params[:format]="fbml" if facebook_params['in_canvas']
+        params[:format]="fbml" if request_is_for_a_facebook_canvas?
       end
       
       module ClassMethods
