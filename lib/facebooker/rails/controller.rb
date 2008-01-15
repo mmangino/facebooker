@@ -13,7 +13,10 @@ module Facebooker
       
       def set_facebook_session
         returning session_set = session_already_secured? || secure_with_token! || secure_with_facebook_params!  do
-          capture_facebook_friends_if_available! if session_set
+          if session_set
+            capture_facebook_friends_if_available! 
+            Session.current = facebook_session
+          end
         end
       end
       

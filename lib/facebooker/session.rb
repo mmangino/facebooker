@@ -56,9 +56,7 @@ module Facebooker
       api_key ||= self.api_key
       secret_key ||= self.secret_key
       raise ArgumentError unless !api_key.nil? && !secret_key.nil?
-      new_session = new(api_key, secret_key)
-      self.current ||= new_session
-      new_session
+      new(api_key, secret_key)
     end
     
     def self.api_key
