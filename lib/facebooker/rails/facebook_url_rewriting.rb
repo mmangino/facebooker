@@ -1,7 +1,7 @@
 module ::ActionController
   class AbstractRequest                         
     def relative_url_root                       
-      "/#{ENV['FACEBOOKER_RELATIVE_URL_ROOT']||ENV['FACEBOOK_CANVAS_PATH']}" 
+      "/#{ENV['FACEBOOKER_RELATIVE_URL_ROOT']||ENV['FACEBOOK_CANVAS_PATH']}" if parameters['fb_sig']
     end                                         
   end
   

@@ -8,14 +8,18 @@ begin
   require 'facebooker/rails/facebook_form_builder'
   require File.dirname(__FILE__)+'/../init'
   require 'mocha'
+  
   ActionController::Routing::Routes.draw do |map|
     map.connect 'require_auth/:action', :controller => "controller_which_requires_facebook_authentication"
     map.connect 'require_install/:action', :controller => "controller_which_requires_application_installation"
+    map.connect ':controller/:action/:id', :controller => "plain_old_rails_controller"
   end  
+  
   class NoisyController < ActionController::Base
     include Facebooker::Rails::Controller
     def rescue_action(e) raise e end
   end
+  
   class ControllerWhichRequiresFacebookAuthentication < NoisyController
     ensure_authenticated_to_facebook
     def index
@@ -39,7 +43,39 @@ begin
       render :text => 'installed!'
     end    
   end
+  
+  class PlainOldRailsController < ActionController::Base
+    def link_test
+      options = {}
+      options[:canvas] = true if params[:canvas] == true
+      options[:canvas] = false if params[:canvas] == false
+      render :text => url_for(options)
+    end
+  end
+  
+  class RailsIntegrationTestForNonFacebookControllers < Test::Unit::TestCase
+    def setup
+      ENV['FACEBOOKER_RELATIVE_URL_ROOT'] ='facebook_app_name'
+      ENV['FACEBOOK_API_KEY'] = '1234567'
+      ENV['FACEBOOK_SECRET_KEY'] = '7654321'
+      @controller = PlainOldRailsController.new
+      @request    = ActionController::TestRequest.new
+      @response   = ActionController::TestResponse.new        
+    end
 
+    def test_url_for_links_to_callback_if_canvas_is_false_and_in_canvas
+      get :link_test, example_rails_params
+      assert_match /test.host/,@response.body
+    end
+    
+    private
+    def example_rails_params
+      { "action"=>"index", "controller"=>"plain_old_rails_controller" }    
+    end
+  
+  end
+  
+  
 class RailsIntegrationTestForApplicationInstallation < Test::Unit::TestCase
   def setup
     ENV['FACEBOOK_API_KEY'] = '1234567'
