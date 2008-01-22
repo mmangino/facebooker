@@ -551,6 +551,11 @@ class RailsHelperTest < Test::Unit::TestCase
     assert_equal "<fb:dashboard>dashboard content</fb:dashboard>", _erbout
   end
   
+  def test_fb_dialog
+    
+    
+  end
+  
 end
 class TestModel
   attr_accessor :name,:facebook_id
@@ -619,6 +624,10 @@ class RailsFacebookFormbuilderTest < Test::Unit::TestCase
   
   def test_text
     assert_equal "<fb:editor-custom label=\"custom\">Mike</fb:editor-custom>",@form_builder.text("Mike",:label=>"custom")
+  end
+  
+  def test_checkbox
+    assert_equal "<fb:editor-custom label=\"custom\">Mike</fb:editor-custom>",@form_builder.text("Mike",:label=>"custom")    
   end
   
   def test_multi_friend_input

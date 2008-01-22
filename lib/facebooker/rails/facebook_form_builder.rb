@@ -2,28 +2,14 @@ module Facebooker
   module Rails
     class FacebookFormBuilder < ActionView::Helpers::FormBuilder
       
-      
-      second_param = %w(password_field file_field check_box date_select datetime_select time_select)
-      third_param = %w(radio_button country_select select time_zone_select)
-      fifth_param = %w(collection_select)
-      
-      def self.create_with_offset(name,offset)
-        define_method name do |field,*args|
-          options = args[offset] || {}
-          build_shell(field,options) do
-            super
-          end
-        end    
-      end
-
-      second_param.each do |name|
-        create_with_offset(name,0)
-      end
-      third_param.each do |name|
-        create_with_offset(name,1)
-      end
-      fifth_param.each do |name|
-        create_with_offset(name,3)
+      dynamic_helpers = %w(hidden_field password_field file_field check_box date_select datetime_select time_select
+                           radio_button country_select select time_zone_select collection_select)
+      dynamic_helpers.each do |name|
+        define_method name do |field, *args|
+          options = args.last.is_a?(Hash) ? args.dup.pop : {}
+          label_option = name.to_s.match(/hidden/) ? nil : {:label => label_for(field, options)}
+          @template.content_tag "fb:editor-custom", *[super(field, *args), label_option].compact
+        end
       end
       
       def build_shell(field,options)
