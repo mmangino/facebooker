@@ -35,6 +35,10 @@ begin
       render :text=>url_for(options)
     end
     
+    def image_test
+      render :inline=>"<%=image_tag 'image.png'%>"
+    end
+    
     def fb_params_test
       render :text=>facebook_params['user']
     end
@@ -103,6 +107,7 @@ begin
       get :link_test, example_rails_params
       assert_match /test.host/,@response.body
     end
+    
     def test_named_route_doesnt_include_canvas_path_when_not_in_canvas
       get :named_route_test, example_rails_params
       assert_equal "http://test.host/comments",@response.body
@@ -170,6 +175,7 @@ class RailsIntegrationTest < Test::Unit::TestCase
     ENV['FACEBOOKER_RELATIVE_URL_ROOT'] ='root'
     ENV['FACEBOOK_API_KEY'] = '1234567'
     ENV['FACEBOOK_SECRET_KEY'] = '7654321'
+    ActionController::Base.asset_host="http://root.example.com"
     @controller = ControllerWhichRequiresFacebookAuthentication.new
     @request    = ActionController::TestRequest.new
     @response   = ActionController::TestResponse.new    
@@ -285,6 +291,10 @@ class RailsIntegrationTest < Test::Unit::TestCase
     assert_match /apps.facebook.com/,@response.body
   end
   
+  def test_image_tag
+    get :image_test, example_rails_params_including_fb
+    assert_equal "<img alt=\"Image\" src=\"http://root.example.com/images/image.png\" />",@response.body
+  end
   
   
   private
@@ -341,6 +351,7 @@ class RailsHelperTest < Test::Unit::TestCase
     include ActionView::Helpers::TextHelper
     include ActionView::Helpers::CaptureHelper
     include ActionView::Helpers::TagHelper
+    include ActionView::Helpers::AssetTagHelper
     include Facebooker::Rails::Helpers
     attr_accessor :flash
     def initialize
@@ -363,9 +374,14 @@ class RailsHelperTest < Test::Unit::TestCase
   attr_accessor :_erbout
   
   def setup
+    ENV['FACEBOOK_CANVAS_PATH'] ='facebook'
+    ENV['FACEBOOK_API_KEY'] = '1234567'
+    ENV['FACEBOOK_SECRET_KEY'] = '7654321'
+    
     @_erbout = ""
     @h = HelperClass.new
-    ENV['FACEBOOKER_STATIC_HOST']='127.0.0.1:3000'
+    #use an asset path where the canvas path equals the hostname to make sure we handle that case right
+    ActionController::Base.asset_host='http://facebook.host.com'
   end
   
   def test_fb_profile_pic
@@ -412,7 +428,7 @@ class RailsHelperTest < Test::Unit::TestCase
   def test_fb_name
     assert_equal "<fb:name uid=\"1234\" />",@h.fb_name("1234")
   end
-  
+    
   def test_fb_name_with_transformed_key
     assert_equal "<fb:name uid=\"1234\" useyou=\"true\" />", @h.fb_name(1234, :use_you => true)
   end
@@ -441,12 +457,7 @@ class RailsHelperTest < Test::Unit::TestCase
   def test_fb_tab_item_raises_exception_for_invalid_align_value
     assert_raises(ArgumentError) {@h.fb_tab_item("Google", "http://www.google.com", :align => :rightt)}
   end
-  
-  def test_facebook_image_tag
-    @h.expects(:image_path).with("test.jpg").returns("/test.jpg")
-    assert_equal "<img src=\"http://127.0.0.1:3000/test.jpg\" />",@h.facebook_image_tag("test.jpg")
-  end
-  
+    
   def test_fb_req_choice
     assert_equal "<fb:req-choice label=\"label\" url=\"url\" />", @h.fb_req_choice("label","url")
   end
