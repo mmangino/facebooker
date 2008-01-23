@@ -1,6 +1,16 @@
 module Facebooker
   module Rails
     module Routing
+      module RouteSetExtensions
+        def self.included(base)
+          base.alias_method_chain :extract_request_environment, :facebooker
+        end
+
+        def extract_request_environment_with_facebooker(request)
+          env = extract_request_environment_without_facebooker(request)
+          env.merge :canvas => (request.parameters[:fb_sig_in_canvas]=="1")
+        end
+      end
       module MapperExtensions
 
         # Generates pseudo-resource routes. Since everything is a POST, routes can't be identified
