@@ -1,3 +1,4 @@
+require 'net/http_multipart_post'
 require 'facebooker/rails/controller'
 require 'facebooker/rails/facebook_url_rewriting'
 require 'facebooker/rails/facebook_session_handling'

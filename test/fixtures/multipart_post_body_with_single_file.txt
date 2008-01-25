@@ -1,0 +1,38 @@
+--MichaelNiessnerIsSuperDuperAwesome
+Content-Disposition: form-data; name="aid"
+
+940915667462717
+--MichaelNiessnerIsSuperDuperAwesome
+Content-Disposition: form-data; name="api_key"
+
+77a52842357422fadd912a2600e6e53c
+--MichaelNiessnerIsSuperDuperAwesome
+Content-Disposition: form-data; name="call_id"
+
+1172623588.023010
+--MichaelNiessnerIsSuperDuperAwesome
+Content-Disposition: form-data; name="caption"
+
+Under the sunset
+--MichaelNiessnerIsSuperDuperAwesome
+Content-Disposition: form-data; name="method"
+
+facebook.photos.upload
+--MichaelNiessnerIsSuperDuperAwesome
+Content-Disposition: form-data; name="session_key"
+
+489727d0ab2efc6e8003018c-i2LLkn8BDb2s.
+--MichaelNiessnerIsSuperDuperAwesome
+Content-Disposition: form-data; name="sig"
+
+dfa724b8a5cd97d9df4baf2b60d3484c
+--MichaelNiessnerIsSuperDuperAwesome
+Content-Disposition: form-data; name="v"
+
+1.0
+--MichaelNiessnerIsSuperDuperAwesome
+Content-Disposition: form-data; name="file"; filename="somefilename.jpg"
+Content-Type: image/jpg
+
+[Raw file data here]
+--MichaelNiessnerIsSuperDuperAwesome--
