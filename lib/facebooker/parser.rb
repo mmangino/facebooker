@@ -180,6 +180,12 @@ module Facebooker
     end
   end  
   
+  class UploadPhoto < Parser#:nodoc:
+    def self.process(data)
+      hashinate(element('photos_upload_response', data))
+    end
+  end
+  
   class SendRequest < Parser#:nodoc:
     def self.process(data)
       element('notifications_sendRequest_response', data).text_value
@@ -292,6 +298,10 @@ module Facebooker
       102 => Facebooker::Session::SessionExpired,
       103 => Facebooker::Session::CallOutOfOrder,
       104 => Facebooker::Session::IncorrectSignature,
+      120 => Facebooker::Session::InvalidAlbumId,
+      321 => Facebooker::Session::AlbumIsFull,
+      324 => Facebooker::Session::MissingOrInvalidImageFile,
+      325 => Facebooker::Session::TooManyUnapprovedPhotosPending,
       340 => Facebooker::Session::TooManyUserCalls,
       341 => Facebooker::Session::TooManyUserActionCalls,
       342 => Facebooker::Session::InvalidFeedTitleLink,
@@ -349,6 +359,7 @@ module Facebooker
       'facebook.photos.createAlbum' => CreateAlbum,
       'facebook.photos.getTags' => GetTags,
       'facebook.photos.addTag' => AddTags,
+      'facebook.photos.upload' => UploadPhoto,
       'facebook.events.get' => EventsGet,
       'facebook.groups.get' => GroupsGet,
       'facebook.events.getMembers' => EventMembersGet,

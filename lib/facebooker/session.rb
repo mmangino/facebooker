@@ -41,6 +41,10 @@ module Facebooker
     class FQLStatementNotIndexable < StandardError; end
     class FQLFunctionDoesNotExist < StandardError; end
     class FQLWrongNumberArgumentsPassedToFunction < StandardError; end
+    class InvalidAlbumId < StandardError; end
+    class AlbumIsFull < StandardError; end
+    class MissingOrInvalidImageFile < StandardError; end
+    class TooManyUnapprovedPhotosPending < StandardError; end
   
     API_SERVER_BASE_URL       = "api.facebook.com"
     API_PATH_REST             = "/restserver.php"
@@ -318,13 +322,17 @@ module Facebooker
     end
     
     def post(method, params = {})
-      params[:method] = method
-      params[:api_key] = @api_key
-      params[:call_id] = Time.now.to_f.to_s unless method == 'facebook.auth.getSession'
-      params[:v] = "1.0"
+      add_facebook_params(params, method)
       @session_key && params[:session_key] ||= @session_key
       service.post(params.merge(:sig => signature_for(params)))      
     end
+    
+    def post_file(method, params = {})
+      add_facebook_params(params, method)
+      @session_key && params[:session_key] ||= @session_key
+      service.post_file(params.merge(:sig => signature_for(params.reject{|key, value| key.nil?})))
+    end
+    
     
     def self.configuration_file_path
       @configuration_file_path || File.expand_path("~/.facebookerrc")
@@ -335,6 +343,13 @@ module Facebooker
     end
     
     private
+      def add_facebook_params(hash, method)
+        hash[:method] = method
+        hash[:api_key] = @api_key
+        hash[:call_id] = Time.now.to_f.to_s unless method == 'facebook.auth.getSession'
+        hash[:v] = "1.0"
+      end
+    
       def self.extract_key_from_environment(key_name)
         val = ENV["FACEBOOK_" + key_name.to_s.upcase + "_KEY"]
       end

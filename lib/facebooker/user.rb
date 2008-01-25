@@ -116,6 +116,10 @@ module Facebooker
     def create_album(params)
       @album = Album.from_hash(session.post('facebook.photos.createAlbum', params))
     end
+    
+    def upload_photo(multipart_post_file)
+      Photo.from_hash(session.post_file('facebook.photos.upload', {nil => multipart_post_file}))
+    end
 
     def profile_fbml
       session.post('facebook.profile.getFBML', :uid => @id)  

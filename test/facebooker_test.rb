@@ -31,6 +31,12 @@ class TestFacebooker < Test::Unit::TestCase
     assert_equal("http://www.facebook.com/login.php?api_key=#{@api_key}&v=1.0&auth_token=3e4a22bb2f5ed75114b0fc9995ea85f1", @desktop_session.login_url)
   end
 
+  def test_serivce_post_file_delegates_to_post_multipart_form
+    flexmock(@service).should_receive(:url).and_return('url')
+    flexmock(Net::HTTP).expects(:post_multipart_form).with('url', {:method => 'facebook.auth.createToken'}).returns(example_auth_token_xml)
+    @service.post_file(:method => 'facebook.auth.createToken')
+  end
+
   def test_desktop_session_be_secured_and_activated_after_receiving_auth_token_and_logging_in
     establish_session
     assert_equal("5f34e11bfb97c762e439e6a5-8055", @session.instance_variable_get("@session_key"))
@@ -249,6 +255,13 @@ class TestFacebooker < Test::Unit::TestCase
     mock_http = establish_session
     mock_http.should_receive(:post_form).and_return(example_new_album_xml).once.ordered(:posts)
     assert_equal "My Empty Album", @session.user.create_album(:name => "My Empty Album", :location => "Limboland").name
+  end  
+  
+  def test_can_upload_photo
+    mock_http = establish_session
+    mock_http.should_receive(:post_multipart_form).and_return(example_upload_photo_xml).once.ordered(:posts)
+    f = Net::HTTP::MultipartPostFile.new("image.jpg", "image/jpeg", "RAW DATA")
+    assert_equal "Under the sunset", @session.user.upload_photo(f).caption
   end  
   
   def test_can_get_photo_tags
@@ -669,6 +682,22 @@ class TestFacebooker < Test::Unit::TestCase
         <size>14</size>
       </album>
     </photos_getAlbums_response>
+    XML
+  end
+  
+  def example_upload_photo_xml
+    <<-XML
+    <?xml version="1.0" encoding="UTF-8"?>
+    <photos_upload_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd">
+      <pid>940915697041656</pid>
+      <aid>940915667462717</aid>
+      <owner>219074</owner>
+      <src>http://ip002.facebook.com/v67/161/72/219074/s219074_31637752_5455.jpg</src>
+      <src_big>http://ip002.facebook.com/v67/161/72/219074/n219074_31637752_5455.jpg</src_big>
+      <src_small>http://ip002.facebook.com/v67/161/72/219074/t219074_31637752_5455.jpg</src_small>
+      <link>http://www.facebook.com/photo.php?pid=31637752&id=219074</link>
+      <caption>Under the sunset</caption>
+    </photos_upload_response>
     XML
   end
   
