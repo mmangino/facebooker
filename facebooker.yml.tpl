@@ -15,7 +15,7 @@ development:
 test:
   api_key: 
   secret_key: 
-	canvas_page_name: 
+  canvas_page_name: 
   tunnel:
     public_host_username: 
     public_host: 
@@ -25,7 +25,7 @@ test:
 production:
   api_key: 
   secret_key: 
-	canvas_page_name: 
+  canvas_page_name: 
   tunnel:
     public_host_username: 
     public_host: 
