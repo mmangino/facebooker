@@ -7,9 +7,10 @@ require File.dirname(__FILE__)+'/../lib/facebooker/rails/test_helpers'
 
 $: << File.join(File.dirname(__FILE__), '..', 'lib')
 require 'facebooker'
+
 class Test::Unit::TestCase
   include Facebooker::Rails::TestHelpers
-  
+    
   private
   
   def expect_http_posts_with_responses(*responses_xml)

@@ -35,3 +35,14 @@ ActionController::Base::optimise_named_routes = false
 # pull :canvas=> into env in routing to allow for conditions
 ActionController::Routing::RouteSet.send :include,  Facebooker::Rails::Routing::RouteSetExtensions
 ActionController::Routing::RouteSet::Mapper.send :include, Facebooker::Rails::Routing::MapperExtensions
+
+facebook_config = File.dirname(__FILE__) + '/../../../config/facebooker.yml'
+
+if File.exists?(facebook_config)
+  FACEBOOKER = YAML.load_file(facebook_config)[RAILS_ENV] 
+  ENV['FACEBOOKER_RELATIVE_URL_ROOT'] = FACEBOOKER['canvas_page_name']
+  ENV['FACEBOOK_API_KEY'] = FACEBOOKER['api_key']
+  ENV['FACEBOOK_SECRET_KEY'] = FACEBOOKER['secret_key']
+else
+  puts "Facebook configuration not loaded. Run rake facebooker:setup or ignore if this is a test."
+end

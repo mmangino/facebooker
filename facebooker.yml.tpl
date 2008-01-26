@@ -1,0 +1,33 @@
+# The api key, secret key, and canvas page name are required to get started
+# Tunnel configuration is only needed if you are going to use the facebooker:tunnel Rake tasks
+
+development:
+  api_key: 
+  secret_key: 
+  canvas_page_name: # just the name, not the url
+  tunnel:
+    # Your callback url in Facebook should be set to http://public_host:public_port
+    public_host_username: 
+    public_host: 
+    public_port: 4007
+    local_port: 3000
+
+test:
+  api_key: 
+  secret_key: 
+	canvas_page_name: 
+  tunnel:
+    public_host_username: 
+    public_host: 
+    public_port: 4007
+    local_port: 3000
+
+production:
+  api_key: 
+  secret_key: 
+	canvas_page_name: 
+  tunnel:
+    public_host_username: 
+    public_host: 
+    public_port: 4007
+    local_port: 3000
