@@ -43,6 +43,4 @@ if File.exists?(facebook_config)
   ENV['FACEBOOKER_RELATIVE_URL_ROOT'] = FACEBOOKER['canvas_page_name']
   ENV['FACEBOOK_API_KEY'] = FACEBOOKER['api_key']
   ENV['FACEBOOK_SECRET_KEY'] = FACEBOOKER['secret_key']
-else
-  puts "Facebook configuration not loaded. Run rake facebooker:setup or ignore if this is a test."
 end
