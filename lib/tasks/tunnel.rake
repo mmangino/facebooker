@@ -3,9 +3,10 @@ namespace :facebooker do
   # http://www.BuildingWebApps.com
   # http://www.LearningRails.com
   namespace :tunnel do 
-    desc "Create a reverse tunnel from a public server to a private \
-    development server." 
+    desc "Create a reverse tunnel from a public server to a private development server." 
     task :start => :environment do  
+      facebook_config = File.dirname(__FILE__) + '/../../../../../config/facebooker.yml'
+      FACEBOOKER = YAML.load_file(facebook_config)[RAILS_ENV]
       public_host_username = FACEBOOKER['tunnel']['public_host_username'] 
       public_host = FACEBOOKER['tunnel']['public_host'] 
       public_port = FACEBOOKER['tunnel']['public_port'] 
@@ -18,6 +19,8 @@ namespace :facebooker do
     # Adapted from Evan Weaver's article: http://blog.evanweaver.com/articles/2007/07/13/developing-a-facebook-app-locally/ 
      desc "Check if reverse tunnel is running"
      task :status => :environment do
+       facebook_config = File.dirname(__FILE__) + '/../../../../../config/facebooker.yml'
+       FACEBOOKER = YAML.load_file(facebook_config)[RAILS_ENV]
        public_host_username = FACEBOOKER['tunnel']['public_host_username'] 
        public_host = FACEBOOKER['tunnel']['public_host'] 
        public_port = FACEBOOKER['tunnel']['public_port'] 
