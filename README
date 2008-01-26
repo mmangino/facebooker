@@ -25,12 +25,7 @@ Facebooker can be installed as a Rails plugin by:
 
   script/plugin install http://facebooker.rubyforge.org/svn/trunk/facebooker/
 
-Once the plugin is installed, you will need to define several values in each environment. 
-
-  ActionController::Base.asset_host = "http://your_ip:3000"
-  ENV['FACEBOOKER_RELATIVE_URL_ROOT'] = 'canvas_path'
-  ENV['FACEBOOK_API_KEY'] = 'api_key'
-  ENV['FACEBOOK_SECRET_KEY'] = 'secret_key'
+Once the plugin is installed, you will need to configure your Facebook app in config/facebooker.yml. 
 
 Your application users will need to have added the application in facebook to access all of facebooker's features. You enforce this by adding
 
