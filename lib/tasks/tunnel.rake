@@ -1,37 +1,33 @@
 namespace :facebooker do
-  # Tunnel tasks courtesy of Christopher Haupt
-  # http://www.BuildingWebApps.com
-  # http://www.LearningRails.com
+  
   namespace :tunnel do 
+    # Courtesy of Christopher Haupt
+    # http://www.BuildingWebApps.com
+    # http://www.LearningRails.com
     desc "Create a reverse tunnel from a public server to a private development server." 
-    task :start => :environment do  
-      facebook_config = File.dirname(__FILE__) + '/../../../../../config/facebooker.yml'
-      FACEBOOKER = YAML.load_file(facebook_config)[RAILS_ENV]
-      public_host_username = FACEBOOKER['tunnel']['public_host_username'] 
-      public_host = FACEBOOKER['tunnel']['public_host'] 
-      public_port = FACEBOOKER['tunnel']['public_port'] 
-      local_port = FACEBOOKER['tunnel']['local_port'] 
-    
-      puts "Starting tunnel #{public_host}:#{public_port} to 0.0.0.0:#{local_port}" 
-      exec "ssh -nNT -g -R *:#{public_port}:0.0.0.0:#{local_port} #{public_host_username}@#{public_host} > /dev/null 2>&1 &" 
+    task :start => [ :environment, :config ] do  
+      puts "Starting tunnel #{@public_host}:#{@public_port} to 0.0.0.0:#{@local_port}" 
+      exec "ssh -nNT -g -R *:#{@public_port}:0.0.0.0:#{@local_port} #{@public_host_username}@#{@public_host} > /dev/null 2>&1 &" 
     end 
     
-    # Adapted from Evan Weaver's article: http://blog.evanweaver.com/articles/2007/07/13/developing-a-facebook-app-locally/ 
-     desc "Check if reverse tunnel is running"
-     task :status => :environment do
-       facebook_config = File.dirname(__FILE__) + '/../../../../../config/facebooker.yml'
-       FACEBOOKER = YAML.load_file(facebook_config)[RAILS_ENV]
-       public_host_username = FACEBOOKER['tunnel']['public_host_username'] 
-       public_host = FACEBOOKER['tunnel']['public_host'] 
-       public_port = FACEBOOKER['tunnel']['public_port'] 
-
-       if `ssh #{public_host} -l #{public_host_username} netstat -an | 
-           egrep "tcp.*:#{public_port}.*LISTEN" | wc`.to_i > 0
-         puts "Seems ok"
-       else
-         puts "Down"
-       end
+    # Adapted from Evan Weaver: http://blog.evanweaver.com/articles/2007/07/13/developing-a-facebook-app-locally/ 
+    desc "Check if reverse tunnel is running"
+    task :status => [ :environment, :config ] do
+     if `ssh #{@public_host} -l #{@public_host_username} netstat -an | 
+         egrep "tcp.*:#{@public_port}.*LISTEN" | wc`.to_i > 0
+       puts "Seems ok"
+     else
+       puts "Down"
      end
-    
+    end
+
+    task :config => :environment do
+     facebook_config = File.dirname(__FILE__) + '/../../../../../config/facebooker.yml'
+     FACEBOOKER = YAML.load_file(facebook_config)[RAILS_ENV]
+     @public_host_username = FACEBOOKER['tunnel']['public_host_username'] 
+     @public_host = FACEBOOKER['tunnel']['public_host'] 
+     @public_port = FACEBOOKER['tunnel']['public_port'] 
+     @local_port = FACEBOOKER['tunnel']['local_port'] 
+    end
   end
 end
