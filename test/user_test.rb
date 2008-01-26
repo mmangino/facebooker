@@ -43,7 +43,50 @@ class UserTest < Test::Unit::TestCase
     @user.set_profile_fbml("profile","mobile","action")
   end
   
+  def test_can_get_profile_photos
+    @user.expects(:profile_photos)
+    @user.profile_photos
+  end
+  
+  def test_get_profile_photos
+    @user = Facebooker::User.new(548871286, @session)
+    expect_http_posts_with_responses(example_profile_photos_get_xml)    
+    photos = @user.profile_photos
+    assert_equal "2357384227378429949", photos.first.aid
+  end
+  
   def test_to_s
     assert_equal("1234",@user.to_s)
+  end
+  
+  private
+  def example_profile_photos_get_xml
+    "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+    <photos_get_response xmlns=\"http://api.facebook.com/1.0/\"
+      xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"
+      xsi:schemaLocation=\"http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd\" list=\"true\">
+       <photo>
+         <pid>34585991612804</pid>
+         <aid>2357384227378429949</aid>
+         <owner>1240077</owner>
+         <src>http://ip002.facebook.com/v11/135/18/8055/s1240077_30043524_2020.jpg</src>
+         <src_big>http://ip002.facebook.com/v11/135/18/8055/n1240077_30043524_2020.jpg</src_big>
+         <src_small>http://ip002.facebook.com/v11/135/18/8055/t1240077_30043524_2020.jpg</src_small>
+         <link>http://www.facebook.com/photo.php?pid=30043524&id=8055</link>
+         <caption>From The Deathmatch (Trailer) (1999)</caption>
+         <created>1132553361</created>
+       </photo>
+       <photo>
+         <pid>34585991612805</pid>
+         <aid>2357384227378429949</aid>
+         <owner>1240077</owner>
+         <src>http://ip002.facebook.com/v11/135/18/8055/s1240077_30043525_2184.jpg</src>
+         <src_big>http://ip002.facebook.com/v11/135/18/8055/n1240077_30043525_2184.jpg</src_big>
+         <src_small>http://ip002.facebook.com/v11/135/18/8055/t1240077_30043525_2184.jpg</src_small>
+         <link>http://www.facebook.com/photo.php?pid=30043525&id=8055</link>
+         <caption>Mexico City, back cover of the CYHS Student Underground 1999.</caption>
+         <created>1132553362</created>
+       </photo>
+    </photos_get_response>"
   end
 end

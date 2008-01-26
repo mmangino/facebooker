@@ -117,6 +117,10 @@ module Facebooker
       @album = Album.from_hash(session.post('facebook.photos.createAlbum', params))
     end
     
+    def profile_photos
+      session.get_photos(nil, nil, profile_pic_album_id)
+    end
+    
     def upload_photo(multipart_post_file)
       Photo.from_hash(session.post_file('facebook.photos.upload', {nil => multipart_post_file}))
     end
@@ -177,6 +181,13 @@ module Facebooker
       FIELDS.reject{|field_name| !fields.empty? && !fields.include?(field_name)}.join(',')
     end
     
+    def profile_pic_album_id
+      merge_aid(-3, @id)
+    end
+    
+    def merge_aid(aid, uid)
+      (uid << 32) + (aid & 0xFFFFFFFF)
+    end
     
   end  
 end
