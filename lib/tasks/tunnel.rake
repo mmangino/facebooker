@@ -4,8 +4,14 @@ namespace :facebooker do
     # Courtesy of Christopher Haupt
     # http://www.BuildingWebApps.com
     # http://www.LearningRails.com
-    desc "Create a reverse tunnel from a public server to a private development server." 
+    desc "Create a reverse ssh tunnel from a public server to a private development server." 
     task :start => [ :environment, :config ] do  
+      puts "Starting tunnel #{@public_host}:#{@public_port} to 0.0.0.0:#{@local_port}" 
+      exec "ssh -nNT -g -R *:#{@public_port}:0.0.0.0:#{@local_port} #{@public_host_username}@#{@public_host}" 
+    end 
+
+    desc "Create a reverse ssh tunnel in the background. Requires ssh keys to be setup." 
+    task :background_start => [ :environment, :config ] do  
       puts "Starting tunnel #{@public_host}:#{@public_port} to 0.0.0.0:#{@local_port}" 
       exec "ssh -nNT -g -R *:#{@public_port}:0.0.0.0:#{@local_port} #{@public_host_username}@#{@public_host} > /dev/null 2>&1 &" 
     end 
