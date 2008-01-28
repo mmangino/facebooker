@@ -24,18 +24,19 @@ module Facebooker
 
     ##
     # Representation of a templatized action to be published into a user's news feed
+    # Deprecation Notice: +actor_id+ will be removed by Facebook sometime in February 2008
     class TemplatizedAction < ActionBase
-     attr_accessor :actor_id, :title_template, :title_data, :body_template, :body_data, :body_general, :target_ids
+     attr_accessor :actor_id, :page_actor_id, :title_template, :title_data, :body_template, :body_data, :body_general, :target_ids
 
       def to_params
-       raise "Must set actor_id and title_template before converting" if (self.actor_id.nil? || self.title_template.nil?)
-       { :actor_id => actor_id, :title_template => title_template, :title_data => convert_json(title_data),
+       raise "Must set title_template" if self.title_template.nil?
+       { :actor_id => actor_id, :page_actor_id => page_actor_id, 
+         :title_template => title_template, :title_data => convert_json(title_data),
          :body_template => body_template, :body_data => convert_json(body_data), :body_general => body_general,
          :target_ids => target_ids }.merge image_params
       end
       
-      def convert_json(hash_or_string)
-        
+      def convert_json(hash_or_string)    
         (hash_or_string.is_a?(Hash) and hash_or_string.respond_to?(:to_json)) ? hash_or_string.to_json : hash_or_string
       end
     end
@@ -49,7 +50,7 @@ module Facebooker
       # Converts Story to a Hash of its attributes for use as parameters to Facebook REST API calls
       def to_params
         raise "Must set title before converting" if self.title.nil?
-        {:title => title, :body => body}.merge image_params
+        { :title => title, :body => body }.merge image_params
       end
 
     end
