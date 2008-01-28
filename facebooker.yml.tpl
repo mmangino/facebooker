@@ -6,6 +6,7 @@ development:
   api_key: 
   secret_key: 
   canvas_page_name:
+  callback_url:
   tunnel:
     public_host_username: 
     public_host: 
@@ -16,6 +17,7 @@ test:
   api_key: 
   secret_key: 
   canvas_page_name: 
+  callback_url:
   tunnel:
     public_host_username: 
     public_host: 
@@ -26,6 +28,7 @@ production:
   api_key: 
   secret_key: 
   canvas_page_name: 
+  callback_url:  
   tunnel:
     public_host_username: 
     public_host: 
