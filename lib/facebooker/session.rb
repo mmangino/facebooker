@@ -246,11 +246,11 @@ module Facebooker
       post 'facebook.notifications.send', params
     end 
 
-		  def send_email(user_ids, subject, text, fbml = nil) 			
-			  user_ids = Array(user_ids)
-	      params = {:fbml => fbml, :recipients => user_ids.map{ |id| User.cast_to_facebook_id(id)}.join(','), :text => text, :subject => subject} 
-	      post 'facebook.notifications.sendEmail', params
-	    end
+	  def send_email(user_ids, subject, text, fbml = nil) 			
+		  user_ids = Array(user_ids)
+      params = {:fbml => fbml, :recipients => user_ids.map{ |id| User.cast_to_facebook_id(id)}.join(','), :text => text, :subject => subject} 
+      post 'facebook.notifications.sendEmail', params
+    end
 
     def send_request(user_ids, request_type, content, image_url)
       send_request_or_invitation(user_ids.map{ |id| User.cast_to_facebook_id(id)}, request_type, content, image_url, false)      
