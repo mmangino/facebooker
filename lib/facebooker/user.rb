@@ -129,7 +129,7 @@ module Facebooker
       session.post('facebook.profile.getFBML', :uid => @id)  
     end    
     
-    #
+    ##
     # Set the profile FBML for this user
     #
     # This does not set profile actions, that should be done with profile_action=
@@ -137,7 +137,7 @@ module Facebooker
       set_profile_fbml(markup, nil, nil)
     end
     
-    #
+    ##
     # Set the mobile profile FBML
     def mobile_fbml=(markup)
       set_profile_fbml(nil, markup, nil)
@@ -148,13 +148,20 @@ module Facebooker
     end
     
     def set_profile_fbml(profile_fbml, mobile_fbml, profile_action_fbml)
-    parameters = {:uid => @id}
-    parameters[:markup] = profile_fbml if profile_fbml
-    parameters[:profile_action] = profile_action_fbml if profile_action_fbml
-    parameters[:mobile_fbml] = mobile_fbml if mobile_fbml
-    session.post('facebook.profile.setFBML', parameters)
+      parameters = {:uid => @id}
+      parameters[:markup] = profile_fbml if profile_fbml
+      parameters[:profile_action] = profile_action_fbml if profile_action_fbml
+      parameters[:mobile_fbml] = mobile_fbml if mobile_fbml
+      session.post('facebook.profile.setFBML', parameters)
     end
-
+    
+    ##
+    # Convenience method to send email to the current user
+    def send_email(subject, text=nil, fbml=nil)
+      session.send_email([@id], subject, text, fbml)
+    end
+    
+    ##
     # Returns the user's id as an integer
     def to_i
       id

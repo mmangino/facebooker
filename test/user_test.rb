@@ -55,6 +55,14 @@ class UserTest < Test::Unit::TestCase
     assert_equal "2357384227378429949", photos.first.aid
   end
   
+  def test_can_send_email
+    @user.expects(:send_email).with("subject", "body text")
+    @user.send_email("subject", "body text")
+    
+    @user.expects(:send_email).with("subject", nil, "body fbml")
+    @user.send_email("subject", nil, "body fbml")
+  end
+  
   def test_to_s
     assert_equal("1234",@user.to_s)
   end
@@ -89,4 +97,5 @@ class UserTest < Test::Unit::TestCase
        </photo>
     </photos_get_response>"
   end
+  
 end

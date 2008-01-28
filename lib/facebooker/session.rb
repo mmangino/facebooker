@@ -246,6 +246,8 @@ module Facebooker
       post 'facebook.notifications.send', params
     end 
 
+    ##
+    # Send email to as many as 100 users at a time
 	  def send_email(user_ids, subject, text, fbml = nil) 			
 		  user_ids = Array(user_ids)
       params = {:fbml => fbml, :recipients => user_ids.map{ |id| User.cast_to_facebook_id(id)}.join(','), :text => text, :subject => subject} 
