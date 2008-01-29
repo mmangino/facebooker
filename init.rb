@@ -31,7 +31,12 @@ class ActionController::Routing::Route
   alias_method_chain :recognition_conditions, :facebooker
 end
 # We turn off route optimization to make named routes use our code for figuring out if they should go to the session
-ActionController::Base::optimise_named_routes = false
+# If this fails, it means we're on rails 1.2, we can ignore it
+begin
+  ActionController::Base::optimise_named_routes = false 
+rescue NoMethodError=>e
+  nil
+end
 # pull :canvas=> into env in routing to allow for conditions
 ActionController::Routing::RouteSet.send :include,  Facebooker::Rails::Routing::RouteSetExtensions
 ActionController::Routing::RouteSet::Mapper.send :include, Facebooker::Rails::Routing::MapperExtensions
