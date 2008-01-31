@@ -149,7 +149,7 @@ module Facebooker
     
     def set_profile_fbml(profile_fbml, mobile_fbml, profile_action_fbml)
       parameters = {:uid => @id}
-      parameters[:markup] = profile_fbml if profile_fbml
+      parameters[:profile] = profile_fbml if profile_fbml
       parameters[:profile_action] = profile_action_fbml if profile_action_fbml
       parameters[:mobile_fbml] = mobile_fbml if mobile_fbml
       session.post('facebook.profile.setFBML', parameters)
