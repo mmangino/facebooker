@@ -5,13 +5,21 @@ module Facebooker
       def self.included(controller)
         controller.extend(ClassMethods)
         controller.before_filter :set_fbml_format
+        controller.helper_attr :facebook_session_parameters
+        
       end
       
       def facebook_session
         @facebook_session
       end
       
+      def facebook_session_parameters
+        {:fb_sig_session_key=>params[:fb_sig_session_key]}
+      end
+      
+      
       def set_facebook_session
+        
         returning session_set = session_already_secured? || secure_with_token! || secure_with_facebook_params!  do
           if session_set
             capture_facebook_friends_if_available! 
@@ -40,6 +48,8 @@ module Facebooker
       end
       
       def secure_with_facebook_params!
+        return unless request_is_for_a_facebook_canvas?
+        
         if ['user', 'session_key'].all? {|element| facebook_params[element]}
           @facebook_session = new_facebook_session
           @facebook_session.secure_with!(facebook_params['session_key'], facebook_params['user'], facebook_params['expires'])
@@ -58,6 +68,7 @@ module Facebooker
       end
       
       def capture_facebook_friends_if_available!
+        return unless request_is_for_a_facebook_canvas?
         if friends = facebook_params['friends']
           facebook_session.user.friends = friends.map do |friend_uid|
             User.new(friend_uid, facebook_session)

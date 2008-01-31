@@ -4,7 +4,7 @@ module ActionController
 
     def initialize(cgi, session_options = {})
       initialize_aliased_by_facebooker(cgi, session_options)
-      @cgi.instance_variable_set("@request_params", request_parameters)
+      @cgi.instance_variable_set("@request_params", request_parameters.merge(query_parameters))
     end
     
     DEFAULT_SESSION_OPTIONS[:cookie_only] = false

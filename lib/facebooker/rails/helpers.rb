@@ -32,6 +32,17 @@ module Facebooker
       end
       
       # Create a submit button for an <fb:request-form>
+      # If the request is for an individual user you can optionally
+      # Provide the user and a label for the request button.      
+      # For example
+			#   <% content_for("invite_user") do %>
+			#     This gets sent in the invite. <%= fb_req_choice("Come join us!","new_invite_path") %>
+			#   <% end %>
+			#   <% fb_request_form("Invite","invite_user","create_invite_path") do %>
+			#     Invite <%= fb_name(@facebook_user.friends.first.id)%> to the party<br />
+			#     <%= fb_request_form_submit(@facebook_user.friends.first.id, "Invite %n") %>
+			#   <% end %>   
+			# TODO: uid and label are options on this tag.                                   
       def fb_request_form_submit
         tag "fb:request-form-submit"
       end
@@ -55,28 +66,37 @@ module Facebooker
       end
       
       # Render an <fb:friend-selector> element
+      # <em>See:</em> http://wiki.developers.facebook.com/index.php/Fb:friend-selector for options
       #
       def fb_friend_selector(options={})
         tag("fb:friend-selector",options)
       end
       
       # Render an <fb:multi-friend-input> element
+      # <em> See: </em> http://wiki.developers.facebook.com/index.php/Fb:multi-friend-input for options
       def fb_multi_friend_input(options={})
         tag "fb:multi-friend-input",options
       end
 
       # Render an <fb:multi-friend-selector> with the passed in welcome message
+      # Full version shows all profile pics for friends.  
+      # <em> See: </em> http://wiki.developers.facebook.com/index.php/Fb:multi-friend-selector for options 
+      # <em> Note: </em> I don't think the block is used here.
       def fb_multi_friend_selector(message,options={},&block)
         tag("fb:multi-friend-selector",options.merge(:showborder=>false,:actiontext=>message,:max=>20))
       end
-      # Render an <fb:multi-friend-selector> with the passed in welcome message
+
+      # Render a condensed <fb:multi-friend-selector> with the passed in welcome message 
+      # Condensed version show checkboxes for each friend.
+      # <em> See: </em> http://wiki.developers.facebook.com/index.php/Fb:multi-friend-selector_%28condensed%29 for options
+      # <em> Note: </em> I don't think the block is used here.
       def fb_multi_friend_selector_condensed(options={},&block)
         tag("fb:multi-friend-selector",options.merge(:condensed=>true))
       end
 
       # Render a button in a request using the <fb:req-choice> tag
-      #
-      # This should be used inside the block of an fb_multi_friend_request of a
+      # url must be an absolute url
+      # This should be used inside the block of an fb_multi_friend_request  
       def fb_req_choice(label,url)
         tag "fb:req-choice",:label=>label,:url=>url
       end
@@ -137,6 +157,9 @@ module Facebooker
       end
       
       # Render an fb:name tag for the given user
+      # This renders the name of the user specified.  You can use this tag as both subject and object of 
+      # a sentence.  <em> See </em> http://wiki.developers.facebook.com/index.php/Fb:name for full description.  
+      # Use this tag on FBML pages instead of retrieving the user's info and rendering the name explicitly.
       #
       def fb_name(user, options={})
         options.transform_keys!(FB_NAME_OPTION_KEYS_TO_TRANSFORM)
@@ -155,6 +178,8 @@ module Facebooker
                                    :shownetwork, :useyou, :ifcantsee, :capitalize, :subjectid]
             
       # Render an <fb:pronoun> tag for the specified user
+      # Options give flexibility for placing in any part of a sentence.
+      # <em> See </em> http://wiki.developers.facebook.com/index.php/Fb:pronoun for complete list of options.
       #      
       def fb_pronoun(user, options={})
         options.transform_keys!(FB_PRONOUN_OPTION_KEYS_TO_TRANSFORM)
@@ -167,7 +192,11 @@ module Facebooker
       FB_PRONOUN_VALID_OPTION_KEYS = [:useyou, :possessive, :reflexive, :objective, 
                                       :usethey, :capitalize]
 
-
+      # Render an fb:ref tag.  
+      # Options must contain either url or handle.
+      # * <em> url </em> The URL from which to fetch the FBML. You may need to call fbml.refreshRefUrl to refresh cache
+      # * <em> handle </em> The string previously set by fbml.setRefHandle that identifies the FBML 
+      # <em> See </em> http://wiki.developers.facebook.com/index.php/Fb:ref for complete description 
       def fb_ref(options)
         options.assert_valid_keys(FB_REF_VALID_OPTION_KEYS)
         validate_fb_ref_has_either_url_or_handle(options)
@@ -200,7 +229,9 @@ module Facebooker
         tag("fb:profile-pic", options)
       end
       
-      
+      # Render an fb:photo tag.
+      # photo is either a Facebooker::Photo or an id of a Facebook photo or an object that responds to photo_id.
+      # <em> See: </em> http://wiki.developers.facebook.com/index.php/Fb:photo for complete list of options.
       def fb_photo(photo, options={})
         options.assert_valid_keys(FB_PHOTO_VALID_OPTION_KEYS)
         options.merge!(:pid => cast_to_photo_id(photo))
@@ -226,12 +257,21 @@ module Facebooker
         tag "img",:src=>"http://#{ENV['FACEBOOKER_STATIC_HOST']}#{image_path(name)}"
       end
       
-      
+      # Render an fb:tabs tag containing some number of fb:tab_item tags.
+      # Example:
+      # <% fb_tabs do %>  
+	 		 #  	   <%= fb_tab_item("Home", "home") %>  
+	 		 # 			 <%= fb_tab_item("Office", "office") %>  
+	 		 # <% end %>        
       def fb_tabs(&block)
         content = capture(&block)  	
         concat(content_tag("fb:tabs", content), block.binding)
       end
       
+      # Render an fb:tab_item tag. 
+      # Use this in conjunction with fb_tabs 
+      # Options can contains :selected => true to indicate that a tab is the current tab.
+      # <em> See: </em> http://wiki.developers.facebook.com/index.php/Fb:tab-item for complete list of options
       def fb_tab_item(title, url, options={})
         options.assert_valid_keys(FB_TAB_ITEM_VALID_OPTION_KEYS)
         options.merge!(:title => title, :href => url)  	
@@ -271,19 +311,29 @@ module Facebooker
       end
       
       # Render an <fb:wallpost> tag
+      # TODO:  Optionally takes a time parameter t = int The current time, which is displayed in epoch seconds.
       def fb_wallpost(user,message)
         content_tag("fb:wallpost",message,:uid=>cast_to_facebook_id(user))
       end
       alias_method :fb_wall_post, :fb_wallpost
       
+      # Render an <fb:error> tag
+      # If message and text are present then this will render fb:error and fb:message tag
+      # TODO: Optionally takes a decoration tag with value of 'no_padding' or 'shorten'
       def fb_error(message, text=nil)
         fb_status_msg("error", message, text)
       end
       
+      # Render an <fb:explanation> tag
+      # If message and text are present then this will render fb:error and fb:message tag
+      # TODO: Optionally takes a decoration tag with value of 'no_padding' or 'shorten'
       def fb_explanation(message, text=nil)
         fb_status_msg("explanation", message, text)
       end
 
+      # Render an <fb:success> tag
+      # If message and text are present then this will render fb:error and fb:message tag
+      # TODO: Optionally takes a decoration tag with value of 'no_padding' or 'shorten'
       def fb_success(message, text=nil)
         fb_status_msg("success", message, text)
       end
@@ -292,7 +342,8 @@ module Facebooker
       #
       # values in flash[:notice] will be rendered as an <fb:message>
       #
-      # values in flash[:error] will be rednered as an <fb:error>
+      # values in flash[:error] will be rendered as an <fb:error>   
+      # TODO: Allow flash[:info] to render fb_explanation
       def facebook_messages
         message=""
         unless flash[:notice].blank?
@@ -336,15 +387,38 @@ module Facebooker
 			end
 			
 			# Create a comment area
+			# All the data for this content area is stored on the facebook servers.
+			# <em>See:</em> http://wiki.developers.facebook.com/index.php/Fb:comments for full details 
+			# TODO: Comments can optionally take an fb:title tag. 
 			def fb_comments(xid,canpost=true,candelete=false,numposts=5,options={})
 			  tag "fb:comments",options.merge(:xid=>xid,:canpost=>canpost.to_s,:candelete=>candelete.to_s,:numposts=>numposts)
 			end
       
+      # Render if-is-app-user tag
+      # This tag renders the enclosing content only if the user specified has accepted the terms of service for the application. Use fb_if_user_has_added_app to determine wether the user has added the app.
+      # Example: 
+      # <% fb_if_is_app_user(@facebook_user) do %>
+      # 			  Hey you are an app user!
+      # 			<% fb_else do %>
+      # 			  Hey you aren't an app user.  <%= link_to("Add App and see the other side.", :action => "added_app") %>
+      # 			<% end %>
+      #<% end %>       
       def fb_if_is_app_user(user,options={},&proc)
         content = capture(&proc) 
         concat(content_tag("fb:if-is-app-user",content,options.merge(:uid=>cast_to_facebook_id(user))),proc.binding)
       end
       
+      # Render fb:if-is-user tag
+      # This tag only renders enclosing content if the user is one of those specified
+      # user can be a single user or an Array of users
+      # Example:
+      # <% fb_if_is_user(@check_user) do %>
+      # 			     <%= fb_name(@facebook_user) %> are one of the users. <%= link_to("Check the other side", :action => "friend") %>
+      # 			<% fb_else do %>
+      # 			  <%= fb_name(@facebook_user) %>  are not one of the users  <%= fb_name(@check_user) %>
+      # 			    <%= link_to("Check the other side", :action => "you") %>
+      # 			<% end %>
+      # <% end %>             
       def fb_if_is_user(user,&proc)
         content = capture(&proc) 
         user = [user] unless user.is_a? Array
@@ -352,6 +426,8 @@ module Facebooker
         concat(content_tag("fb:if-is-user",content,{:uid=>user_list}),proc.binding)
       end
       
+      # Render fb:else tag
+      # Must be used within if block such as fb_if_is_user or fb_if_is_app_user . See example in fb_if_is_app_user
       def fb_else
         content = capture(&proc) 
         concat(content_tag("fb:else",content),proc.binding)

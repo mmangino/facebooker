@@ -143,7 +143,7 @@ class RailsIntegrationTestForApplicationInstallation < Test::Unit::TestCase
     @controller = ControllerWhichRequiresApplicationInstallation.new
     @request    = ActionController::TestRequest.new
     @response   = ActionController::TestResponse.new
-    @controller.expects(:verify_signature).returns(true)
+    @controller.stubs(:verify_signature).returns(true)
   end
   
   def test_if_controller_requires_application_installation_unauthenticated_requests_will_redirect_to_install_page
@@ -179,7 +179,7 @@ class RailsIntegrationTest < Test::Unit::TestCase
     @controller = ControllerWhichRequiresFacebookAuthentication.new
     @request    = ActionController::TestRequest.new
     @response   = ActionController::TestResponse.new    
-    @controller.expects(:verify_signature).returns(true)
+    @controller.stubs(:verify_signature).returns(true)
     
   end
 
