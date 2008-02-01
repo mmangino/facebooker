@@ -6,6 +6,8 @@ require 'pp'
 require File.dirname(__FILE__)+'/../lib/facebooker/rails/test_helpers'
 
 $: << File.join(File.dirname(__FILE__), '..', 'lib')
+
+RAILS_ROOT=File.join(File.dirname(__FILE__),'..','..')
 require 'facebooker'
 
 class Test::Unit::TestCase

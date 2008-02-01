@@ -1,5 +1,4 @@
 require File.dirname(__FILE__) + '/test_helper.rb'
-
 class TestFacebooker < Test::Unit::TestCase
 
   def setup

@@ -41,7 +41,7 @@ end
 ActionController::Routing::RouteSet.send :include,  Facebooker::Rails::Routing::RouteSetExtensions
 ActionController::Routing::RouteSet::Mapper.send :include, Facebooker::Rails::Routing::MapperExtensions
 
-facebook_config = File.dirname(__FILE__) + '/../../../config/facebooker.yml'
+facebook_config = "#{RAILS_ROOT}/config/facebooker.yml"
 
 if File.exist?(facebook_config)
   FACEBOOKER = YAML.load_file(facebook_config)[RAILS_ENV] 
