@@ -95,7 +95,7 @@ begin
   
   class RailsIntegrationTestForNonFacebookControllers < Test::Unit::TestCase
     def setup
-      ENV['FACEBOOKER_RELATIVE_URL_ROOT'] ='facebook_app_name'
+      ENV['FACEBOOK_CANVAS_PATH'] ='facebook_app_name'
       ENV['FACEBOOK_API_KEY'] = '1234567'
       ENV['FACEBOOK_SECRET_KEY'] = '7654321'
       @controller = PlainOldRailsController.new
@@ -172,7 +172,7 @@ end
   
 class RailsIntegrationTest < Test::Unit::TestCase
   def setup
-    ENV['FACEBOOKER_RELATIVE_URL_ROOT'] ='root'
+    ENV['FACEBOOK_CANVAS_PATH'] ='root'
     ENV['FACEBOOK_API_KEY'] = '1234567'
     ENV['FACEBOOK_SECRET_KEY'] = '7654321'
     ActionController::Base.asset_host="http://root.example.com"

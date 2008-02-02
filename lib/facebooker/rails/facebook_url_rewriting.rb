@@ -1,7 +1,7 @@
 module ::ActionController
   class AbstractRequest                         
-    def relative_url_root                       
-      "/#{ENV['FACEBOOKER_RELATIVE_URL_ROOT']||ENV['FACEBOOK_CANVAS_PATH']}"
+    def relative_url_root
+      Facebooker.path_prefix
     end                                         
   end
   
@@ -17,12 +17,13 @@ module ::ActionController
     def rewrite_url_with_facebooker(*args)
       options = args.first.is_a?(Hash) ? args.first : args.last
       is_link_to_canvas=link_to_canvas?(@request.request_parameters, options)
-      options[:skip_relative_url_root] ||= !is_link_to_canvas
       if is_link_to_canvas && !options.has_key?(:host)
         options[:host] = "apps.facebook.com"
       end 
       options.delete(:canvas)
-      rewrite_url_without_facebooker(*args)
+      Facebooker.request_for_canvas(is_link_to_canvas) do
+        rewrite_url_without_facebooker(*args)
+      end
     end
     
     alias_method_chain :rewrite_url, :facebooker

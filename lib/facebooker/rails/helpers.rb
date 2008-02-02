@@ -395,17 +395,33 @@ module Facebooker
 			end
       
       # Render if-is-app-user tag
-      # This tag renders the enclosing content only if the user specified has accepted the terms of service for the application. Use fb_if_user_has_added_app to determine wether the user has added the app.
+      # This tag renders the enclosing content only if the user specified has accepted the terms of service for the application. 
+      # Use fb_if_user_has_added_app to determine wether the user has added the app.
       # Example: 
       # <% fb_if_is_app_user(@facebook_user) do %>
-      # 			  Hey you are an app user!
+      # 			  Thanks for accepting our terms of service!
       # 			<% fb_else do %>
-      # 			  Hey you aren't an app user.  <%= link_to("Add App and see the other side.", :action => "added_app") %>
+      # 			  Hey you haven't agreed to our terms.  <%= link_to("Please accept our terms of service.", :action => "terms_of_service") %>
       # 			<% end %>
       #<% end %>       
       def fb_if_is_app_user(user,options={},&proc)
         content = capture(&proc) 
         concat(content_tag("fb:if-is-app-user",content,options.merge(:uid=>cast_to_facebook_id(user))),proc.binding)
+      end
+
+      # Render if-user-has-added-app tag
+      # This tag renders the enclosing content only if the user specified has installed the application 
+      #
+      # Example: 
+      # <% fb_if_user_has_added_app(@facebook_user) do %>
+      # 			  Hey you are an app user!
+      # 			<% fb_else do %>
+      # 			  Hey you aren't an app user.  <%= link_to("Add App and see the other side.", :action => "added_app") %>
+      # 			<% end %>
+      #<% end %>       
+      def fb_if_user_has_added_app(user,options={},&proc)
+        content = capture(&proc) 
+        concat(content_tag("fb:if-user-has-added-app",content,options.merge(:uid=>cast_to_facebook_id(user))),proc.binding)
       end
       
       # Render fb:if-is-user tag
@@ -436,6 +452,7 @@ module Facebooker
       def fb_about_url
         "http://www.facebook.com/apps/application.php?api_key=#{ENV["FACEBOOK_API_KEY"]}"
       end
+      
       
       protected
       
