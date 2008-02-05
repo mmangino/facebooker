@@ -30,23 +30,24 @@ module Facebooker
                   {:action=>url,:method=>"post",:invite=>true,:type=>type,:content=>message}),
               block.binding)
       end
-      
-      # Create a submit button for an <fb:request-form>
-      # If the request is for an individual user you can optionally
-      # Provide the user and a label for the request button.      
-      # For example
+
+			# Create a submit button for an <fb:request-form>
+			# If the request is for an individual user you can optionally
+			# Provide the user and a label for the request button.
+			# For example
 			#   <% content_for("invite_user") do %>
-			#     This gets sent in the invite. <%= fb_req_choice("Come join us!","new_invite_path") %>
+			#     This gets sent in the invite. <%= fb_req_choice("Come join us!",new_invite_path) %>
 			#   <% end %>
-			#   <% fb_request_form("Invite","invite_user","create_invite_path") do %>
-			#     Invite <%= fb_name(@facebook_user.friends.first.id)%> to the party<br />
-			#     <%= fb_request_form_submit(@facebook_user.friends.first.id, "Invite %n") %>
-			#   <% end %>   
-			# TODO: uid and label are options on this tag.                                   
-      def fb_request_form_submit
-        tag "fb:request-form-submit"
-      end
-      
+			#   <% fb_request_form("Invite","invite_user",create_invite_path) do %>
+			#     Invite <%= fb_name(@facebook_user.friends.first.id)%> to the party <br />
+			#     <%= fb_request_form_submit(@facebook_user.friends.first.id,"Invite %n") %>
+			#   <% end %>
+			# <em>See:</em> http://wiki.developers.facebook.com/index.php/Fb:request-form-submit for options
+			def fb_request_form_submit(options={})
+			   tag("fb:request-form-submit",options)
+			end                                              
+
+
       # Create an fb:request-form with an fb_multi_friend_selector inside
       # 
       # The content of the block are used as the message on the form,

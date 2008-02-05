@@ -596,7 +596,19 @@ class RailsHelperTest < Test::Unit::TestCase
   
   def test_fb_request_form_submit
     assert_equal("<fb:request-form-submit />",@h.fb_request_form_submit)  
-  end
+  end   
+
+	def test_fb_request_form_submit_with_uid
+	    assert_equal("<fb:request-form-submit uid=\"123456789\" />",@h.fb_request_form_submit({:uid => "123456789"}))
+	  end
+
+	  def test_fb_request_form_submit_with_label
+	     assert_equal("<fb:request-form-submit label=\"Send Invite to Joel\" />",@h.fb_request_form_submit({:label => "Send Invite to Joel"}))
+	  end
+
+	  def test_fb_request_form_submit_with_uid_and_label
+	     assert_equal("<fb:request-form-submit label=\"Send Invite to Joel\" uid=\"123456789\" />",@h.fb_request_form_submit({:uid =>"123456789", :label => "Send Invite to Joel"}))
+	   end
   
   def test_fb_action
     assert_equal "<fb:action href=\"/growingpets/rub\">Rub my pet</fb:action>", @h.fb_action("Rub my pet", "/growingpets/rub")  
