@@ -254,20 +254,6 @@ module Facebooker
       post 'facebook.notifications.sendEmail', params
     end
 
-    def send_request(user_ids, request_type, content, image_url)
-      send_request_or_invitation(user_ids.map{ |id| User.cast_to_facebook_id(id)}, request_type, content, image_url, false)      
-    end
-    
-    ##
-    # Send an invitatino to a list of users
-    # +user_ids+ - An Array of facebook IDs to which to send this invitation.
-    # +invitation_type+ - 
-    # +content+ - Text of the invitation
-    # +image_url+ - String URL to image to associate with this invitation.
-    def send_invitation(user_ids, invitation_type, content, image_url)
-      send_request_or_invitation(user_ids, invitation_type, content, image_url, true)
-    end
-    
     # Only serialize the bare minimum to recreate the session.
     def marshal_load(variables)#:nodoc:
       fields_to_serialize.each_with_index{|field, index| instance_variable_set_value(field, variables[index])}
@@ -382,12 +368,7 @@ module Facebooker
           collection
         end.sort.join
         Digest::MD5.hexdigest([raw_string, secret_for_method(params[:method])].join)
-      end
-        
-      def send_request_or_invitation(user_ids, request_type, content, image_url, invitation)
-        params = {:to_ids => user_ids, :type => request_type, :content => content, :image => image_url, :invitation => invitation}
-        post 'facebook.notifications.sendRequest', params
-      end    
+      end        
   end
   
   class CanvasSession < Session
