@@ -223,9 +223,22 @@ module Facebooker
       element('fbml_refreshRefUrl_response', data).text_value
     end
   end
+  
   class RefreshImgSrc < Parser#:nodoc:
     def self.process(data)
       element('fbml_refreshImgSrc_response', data).text_value
+    end
+  end
+  
+  class SetCookie < Parser#:nodoc:
+    def self.process(data)
+      element('data_setCookie_response', data).text_value
+    end
+  end
+  
+  class GetCookies < Parser#:nodoc:
+    def self.process(data)
+      array_of_hashes(element('data_getCookie_response', data), 'cookies')
     end
   end
   
@@ -353,6 +366,8 @@ module Facebooker
       'facebook.fbml.setRefHandle' => SetRefHandle,
       'facebook.fbml.refreshRefUrl' => RefreshRefURL,
       'facebook.fbml.refreshImgSrc' => RefreshImgSrc,
+      'facebook.data.setCookie' => SetCookie,
+      'facebook.data.getCookies' => GetCookies,
       'facebook.fql.query' => FqlQuery,
       'facebook.photos.get' => GetPhotos,
       'facebook.photos.getAlbums' => GetAlbums,

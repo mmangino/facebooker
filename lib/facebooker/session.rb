@@ -194,6 +194,12 @@ module Facebooker
       Facebooker::ServerCache.new(self)
     end
     
+    ##
+    # Returns a proxy object for handling calls to Facebook cookies
+    def cookies
+      Facebooker::Cookies.new(self)
+    end
+    
     #
     # Given an array like:
     # [[userid, otheruserid], [yetanotherid, andanotherid]]
