@@ -369,6 +369,18 @@ module Facebooker
         content = capture(&proc)  	
         concat(content_tag("fb:dashboard",content,{}),proc.binding)
       end
+      
+      # Content for the wide profile box goes in this tag
+      def fb_wide(&proc)
+        content = capture(&proc)
+        concat(content_tag("fb:wide", content, {}), proc.binding)
+      end
+
+      # Content for the narrow profile box goes in this tag
+      def fb_narrow(&proc)
+        content = capture(&proc)
+        concat(content_tag("fb:narrow", content, {}), proc.binding)
+      end
 
       # Renders an action using the <fb:action> tag
       def fb_action(name, url)

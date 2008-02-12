@@ -607,16 +607,16 @@ class RailsHelperTest < Test::Unit::TestCase
   end   
 
 	def test_fb_request_form_submit_with_uid
-	    assert_equal("<fb:request-form-submit uid=\"123456789\" />",@h.fb_request_form_submit({:uid => "123456789"}))
-	  end
+    assert_equal("<fb:request-form-submit uid=\"123456789\" />",@h.fb_request_form_submit({:uid => "123456789"}))
+  end
 
-	  def test_fb_request_form_submit_with_label
-	     assert_equal("<fb:request-form-submit label=\"Send Invite to Joel\" />",@h.fb_request_form_submit({:label => "Send Invite to Joel"}))
-	  end
+  def test_fb_request_form_submit_with_label
+    assert_equal("<fb:request-form-submit label=\"Send Invite to Joel\" />",@h.fb_request_form_submit({:label => "Send Invite to Joel"}))
+  end
 
-	  def test_fb_request_form_submit_with_uid_and_label
-	     assert_equal("<fb:request-form-submit label=\"Send Invite to Joel\" uid=\"123456789\" />",@h.fb_request_form_submit({:uid =>"123456789", :label => "Send Invite to Joel"}))
-	   end
+  def test_fb_request_form_submit_with_uid_and_label
+    assert_equal("<fb:request-form-submit label=\"Send Invite to Joel\" uid=\"123456789\" />",@h.fb_request_form_submit({:uid =>"123456789", :label => "Send Invite to Joel"}))
+  end
   
   def test_fb_action
     assert_equal "<fb:action href=\"/growingpets/rub\">Rub my pet</fb:action>", @h.fb_action("Rub my pet", "/growingpets/rub")  
@@ -637,6 +637,19 @@ class RailsHelperTest < Test::Unit::TestCase
     assert_equal "<fb:dashboard>dashboard content</fb:dashboard>", _erbout
   end
   
+  def test_fb_wide
+    @h.expects(:capture).returns("wide profile content")
+    @h.fb_wide do
+    end
+    assert_equal "<fb:wide>wide profile content</fb:wide>", _erbout
+  end
+  
+  def test_fb_narrow
+    @h.expects(:capture).returns("narrow profile content")
+    @h.fb_narrow do
+    end
+    assert_equal "<fb:narrow>narrow profile content</fb:narrow>", _erbout
+  end  
 end
 class TestModel
   attr_accessor :name,:facebook_id
