@@ -473,6 +473,10 @@ class RailsHelperTest < Test::Unit::TestCase
     assert_equal "<fb:comments candelete=\"false\" canpost=\"true\" numposts=\"7\" showform=\"true\" xid=\"a:1\" />", @h.fb_comments("a:1",true,false,7,:showform=>true)
   end
   
+  def test_fb_title
+    assert_equal "<fb:title>This is the canvas page window title</fb:title>", @h.fb_title("This is the canvas page window title")
+  end
+  
   def test_fb_google_analytics
     assert_equal "<fb:google-analytics uacct=\"UA-9999999-99\" />", @h.fb_google_analytics("UA-9999999-99")
   end

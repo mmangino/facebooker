@@ -394,6 +394,15 @@ module Facebooker
 			def fb_comments(xid,canpost=true,candelete=false,numposts=5,options={})
 			  tag "fb:comments",options.merge(:xid=>xid,:canpost=>canpost.to_s,:candelete=>candelete.to_s,:numposts=>numposts)
 			end
+			
+			# Adds a title to the title bar
+			#
+			# Facebook | App Name | This is the canvas page window title
+			#
+      # +title+: This is the canvas page window 
+			def fb_title(title)
+			 "<fb:title>#{title}</fb:title>"
+			end
       
       # Create a Google Analytics tag
       # 
