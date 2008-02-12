@@ -472,6 +472,10 @@ class RailsHelperTest < Test::Unit::TestCase
   def test_fb_comments
     assert_equal "<fb:comments candelete=\"false\" canpost=\"true\" numposts=\"7\" showform=\"true\" xid=\"a:1\" />", @h.fb_comments("a:1",true,false,7,:showform=>true)
   end
+  
+  def test_fb_google_analytics
+    assert_equal "<fb:google-analytics uacct=\"UA-9999999-99\" />", @h.fb_google_analytics("UA-9999999-99")
+  end
 
   def test_fb_if_is_user_with_single_object
     user = flexmock("user", :facebook_id => "5678")

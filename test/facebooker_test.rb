@@ -31,8 +31,12 @@ class TestFacebooker < Test::Unit::TestCase
   end
 
   def test_serivce_post_file_delegates_to_post_multipart_form
-    flexmock(@service).should_receive(:url).and_return('url')
-    flexmock(Net::HTTP).expects(:post_multipart_form).with('url', {:method => 'facebook.auth.createToken'}).returns(example_auth_token_xml)
+    # flexmock(@service).should_receive(:url).and_return('url')
+    # flexmock(Net::HTTP).expects(:post_multipart_form).with('url', {:method => 'facebook.auth.createToken'}).returns(example_auth_token_xml)
+    
+    res = mock(:content_type => 'text/html', :code => '200', :body => '<html><body>my blog</body></html>')
+    Net::HTTP.stubs(:get_response).once.with(uri).returns res
+    
     @service.post_file(:method => 'facebook.auth.createToken')
   end
 

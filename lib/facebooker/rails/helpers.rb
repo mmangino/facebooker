@@ -395,6 +395,13 @@ module Facebooker
 			  tag "fb:comments",options.merge(:xid=>xid,:canpost=>canpost.to_s,:candelete=>candelete.to_s,:numposts=>numposts)
 			end
       
+      # Create a Google Analytics tag
+      # 
+      # +uacct+: Your Urchin/Google Analytics account ID.
+      def fb_google_analytics(uacct, options={})
+        tag "fb:google-analytics", options.merge(:uacct => uacct)
+      end
+      
       # Render if-is-app-user tag
       # This tag renders the enclosing content only if the user specified has accepted the terms of service for the application. 
       # Use fb_if_user_has_added_app to determine wether the user has added the app.
