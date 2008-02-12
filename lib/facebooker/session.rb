@@ -194,10 +194,10 @@ module Facebooker
       Facebooker::ServerCache.new(self)
     end
     
-    ##
-    # Returns a proxy object for handling calls to Facebook cookies
-    def cookies
-      Facebooker::Cookies.new(self)
+    #
+    # Returns a proxy object for handling calls to the Facebook Data API
+    def data
+      Facebooker::Data.new(self)
     end
     
     #

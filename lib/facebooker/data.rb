@@ -1,5 +1,5 @@
 module Facebooker
-  class Cookies
+  class Data
     def initialize(session)
       @session = session
     end

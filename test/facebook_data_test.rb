@@ -1,24 +1,24 @@
 require File.dirname(__FILE__) + '/test_helper.rb'
 
-class FacebookCookiesTest < Test::Unit::TestCase
+class FacebookDataTest < Test::Unit::TestCase
   def setup
     @session = Facebooker::Session.create('apikey', 'secretkey')
   end
   
   def test_can_ask_facebook_to_set_a_cookies
     expect_http_posts_with_responses(example_set_cookie_xml)
-    assert(@session.cookies.set_cookie(12345, 'name', 'value'))
+    assert(@session.data.set_cookie(12345, 'name', 'value'))
   end
     
   def test_can_ask_facebook_to_get_cookies
     expect_http_posts_with_responses(example_get_cookies_xml)
-    assert(@session.cookies.get_cookies(12345))
+    assert(@session.data.get_cookies(12345))
   end
   
   def test_can_get_cookies_for_user
     mock_http = establish_session
     mock_http.should_receive(:post_form).and_return(example_get_cookies_xml).once.ordered(:posts)
-    cookies = @session.cookies.get_cookies(508508326)    
+    cookies = @session.data.get_cookies(508508326)    
     assert_equal 'Foo', cookies.first.name
     assert_equal 'Bar', cookies.first.value
   end
