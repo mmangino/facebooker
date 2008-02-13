@@ -1,3 +1,4 @@
+
 require 'facebooker/affiliation'
 require 'facebooker/album'
 require 'facebooker/education_info'
@@ -19,7 +20,7 @@ require 'facebooker/work_info'
 require 'facebooker/event'
 require 'facebooker/group'
 module Facebooker
-  
+  VERSION="0.9.5"
   class << self
     def path_prefix
       @path_prefix

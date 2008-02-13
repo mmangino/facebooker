@@ -1,17 +1,38 @@
-require File.dirname(__FILE__) + '/vendor/gardener/lib/gardener'
-$: << File.dirname(__FILE__) + '/lib'
-require 'facebooker'
+# -*- ruby -*-
 
-Gardener.configure do
-  gem_spec do |spec|
-    spec.name              = 'facebooker'
-    spec.version           = Gem::Version.new(Facebooker::VERSION::STRING)
-    spec.summary           = "Pure, idiomatic Ruby wrapper for the Facebook REST API."
-    spec.email             = 'chad@infoether.com'
-    spec.author            = ['Chad Fowler', 'Patrick Ewing']
-    spec.extra_rdoc_files  = %w(COPYING)
-    spec.rdoc_options      = ['--title', "Gardener",
-                              '--main',  'README',
-                              '--line-numbers', '--inline-source']
-  end
+require 'rubygems'
+require 'hoe'
+$: << File.dirname(__FILE__) + '/lib'
+require './lib/facebooker.rb'
+
+Hoe.new('facebooker', Facebooker::VERSION) do |p|
+  p.rubyforge_name = 'facebooker'
+  p.author = ['Chad Fowler', 'Patrick Ewing','Mike Mangino','Shane Vitarana']
+  p.email = 'mmangino@elevatedrails.com'
+  p.summary = 'Pure, idiomatic Ruby wrapper for the Facebook REST API.'
+  p.description = p.paragraphs_of('README.txt', 2..5).join("\n\n")
+  p.url = p.paragraphs_of('README.txt', 0).first.split(/\n/)[1..-1]
+  p.changes = p.paragraphs_of('History.txt', 0..1).join("\n\n")
+  p.remote_rdoc_dir = '' # Release to root
 end
+
+# vim: syntax=Ruby
+# 
+# 
+# require File.dirname(__FILE__) + '/vendor/gardener/lib/gardener'
+# 
+# require 'facebooker'
+# 
+# Gardener.configure do
+#   gem_spec do |spec|
+#     spec.name              = 'facebooker'
+#     spec.version           = Gem::Version.new(Facebooker::VERSION::STRING)
+#     spec.summary           = "Pure, idiomatic Ruby wrapper for the Facebook REST API."
+#     spec.email             = 'chad@infoether.com'
+#     spec.author            = ['Chad Fowler', 'Patrick Ewing','Mike Mangino','Shane Vitarana']
+#     spec.extra_rdoc_files  = %w(COPYING)
+#     spec.rdoc_options      = ['--title', "Gardener",
+#                               '--main',  'README',
+#                               '--line-numbers', '--inline-source']
+#   end
+# end
