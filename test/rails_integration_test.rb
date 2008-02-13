@@ -636,6 +636,9 @@ class RailsHelperTest < Test::Unit::TestCase
     end
     assert_equal "<fb:dashboard>dashboard content</fb:dashboard>", _erbout
   end
+  def test_fb_dashboard_non_block
+    assert_equal "<fb:dashboard></fb:dashboard>", @h.fb_dashboard
+  end
   
   def test_fb_wide
     @h.expects(:capture).returns("wide profile content")

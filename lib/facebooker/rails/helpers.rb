@@ -366,8 +366,12 @@ module Facebooker
       #     <%= fb_create_button 'Invite Friends', main_path %>
       #   <% end %>
       def fb_dashboard(&proc)
-        content = capture(&proc)  	
-        concat(content_tag("fb:dashboard",content,{}),proc.binding)
+        if block_given?
+          content = capture(&proc)  	
+          concat(content_tag("fb:dashboard",content,{}),proc.binding)
+        else
+          content_tag("fb:dashboard",content,{})
+        end
       end
       
       # Content for the wide profile box goes in this tag
