@@ -162,6 +162,12 @@ module Facebooker
     end
     
     ##
+    # Convenience method to set cookie for the current user
+    def set_cookie(name, value, expires, path)
+      session.data.set_cookie(@id, name, value, expires=nil, path=nil)
+    end
+    
+    ##
     # Returns the user's id as an integer
     def to_i
       id
