@@ -26,12 +26,14 @@ module Facebooker
   # dev_mode  bool   Indicates whether developer mode is enabled (1) or disabled (0). Only developers can install applications in developer mode. (default value is 1)  
   # preload_fql string   A preloaded FQL query.
   class ApplicationProperties
-    attr_accessor :application_name, :callback_url, :post_install_url, :edit_url, :dashboard_url,
-                  :uninstall_url, :ip_list, :email, :description, :use_iframe, :desktop, :is_mobile,
-                  :default_fbml, :default_column, :message_url, :message_action, :about_url,
-                  :private_install, :installable, :privacy_url, :help_url, :see_all_url, :tos_url,
-                  :dev_mode, :preload_fql
+    FIELDS = [ :application_name, :callback_url, :post_install_url, :edit_url, :dashboard_url,
+               :uninstall_url, :ip_list, :email, :description, :use_iframe, :desktop, :is_mobile,
+               :default_fbml, :default_column, :message_url, :message_action, :about_url,
+               :private_install, :installable, :privacy_url, :help_url, :see_all_url, :tos_url,
+               :dev_mode, :preload_fql ]
     
+    attr_accessor *FIELDS
+     
     class << self
       def from_array_of_hashes(array_of_hashes)
         new(array_of_hashes)

@@ -20,8 +20,7 @@ class FacebookAdminTest < Test::Unit::TestCase
   def test_can_get_properties
     mock_http = establish_session
     mock_http.should_receive(:post_form).and_return(example_get_properties_xml).once.ordered(:posts)
-    properties = [ :application_name, :dev_mode ]
-    p = @session.admin.get_app_properties(properties)
+    p = @session.admin.get_app_properties(:application_name, :dev_mode)
     assert_equal 'Trunc', p.application_name
     assert_equal 0, p.dev_mode
   end

@@ -12,9 +12,8 @@ module Facebooker
     end
     
     # ** BETA ***
-    def get_app_properties(properties)
-      properties = properties.to_json if properties.respond_to?(:to_json)      
-      json = @session.post('facebook.admin.getAppProperties', :properties => properties)
+    def get_app_properties(*properties)
+      json = @session.post('facebook.admin.getAppProperties', :properties => properties.to_json)
       array_of_hashes = JSON.parse(json)
       @properties = ApplicationProperties.from_array_of_hashes(array_of_hashes)
     end    
