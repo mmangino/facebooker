@@ -1,3 +1,4 @@
+require 'json'
 
 require 'facebooker/affiliation'
 require 'facebooker/album'
@@ -12,6 +13,8 @@ require 'facebooker/cookie'
 require 'facebooker/service'
 require 'facebooker/server_cache'
 require 'facebooker/data'
+require 'facebooker/admin'
+require 'facebooker/applicationproperties'
 require 'facebooker/session'
 require 'facebooker/tag'
 require 'facebooker/user'

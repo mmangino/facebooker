@@ -200,6 +200,10 @@ module Facebooker
       Facebooker::Data.new(self)
     end
     
+    def admin
+      Facebooker::Admin.new(self)
+    end
+    
     #
     # Given an array like:
     # [[userid, otheruserid], [yetanotherid, andanotherid]]

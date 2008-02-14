@@ -1,3 +1,8 @@
+=== x.x.x / 2008-xx-xx
+
+* Added support for data.getCookies and data.setCookies [shane]
+* Added support for admin.getAppProperties and admin.setAppProperties [shane]
+
 === 0.9.5 / 2008-02-13
 
 * Next release of documentation

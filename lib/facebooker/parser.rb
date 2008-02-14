@@ -124,7 +124,19 @@ module Facebooker
     def self.process(data)
       element('feed_publishTemplatizedAction_response', data).children[1].text_value
     end
+  end
+  
+  class SetAppProperties < Parser#:nodoc:
+    def self.process(data)
+      element('data_setAppProperties_response', data).text_value
+    end
   end  
+  
+  class GetAppProperties < Parser#:nodoc:
+    def self.process(data)
+      element('admin_getAppProperties_response', data).text_value
+    end
+  end
   
   class GetAppUsers < Parser#:nodoc:
     def self.process(data)
@@ -368,6 +380,8 @@ module Facebooker
       'facebook.fbml.refreshImgSrc' => RefreshImgSrc,
       'facebook.data.setCookie' => SetCookie,
       'facebook.data.getCookies' => GetCookies,
+      'facebook.admin.setAppProperties' => SetAppProperties,
+      'facebook.admin.getAppProperties' => GetAppProperties,
       'facebook.fql.query' => FqlQuery,
       'facebook.photos.get' => GetPhotos,
       'facebook.photos.getAlbums' => GetAlbums,
