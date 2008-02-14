@@ -1,7 +1,8 @@
 === x.x.x / 2008-xx-xx
 
-* Added support for data.getCookies and data.setCookies [shane]
-* Added support for admin.getAppProperties and admin.setAppProperties [shane]
+* Added data.get_cookies and data.set_cookie [shane]
+* Added admin.get_app_properties and admin.set_app_properties [shane]
+* Added admin.get_allocation [shane]
 
 === 0.9.5 / 2008-02-13
 

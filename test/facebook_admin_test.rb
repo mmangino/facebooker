@@ -25,6 +25,13 @@ class FacebookAdminTest < Test::Unit::TestCase
     assert_equal 0, p.dev_mode
   end
 
+  def test_can_get_allocation
+    mock_http = establish_session
+    mock_http.should_receive(:post_form).and_return(example_get_allocation_xml).once.ordered(:posts)
+    alloc = @session.admin.get_allocation(:notifications_per_day)
+    assert_equal 40, alloc
+  end
+
   private
   def example_set_properties_xml
     <<-XML
@@ -45,4 +52,17 @@ class FacebookAdminTest < Test::Unit::TestCase
     </admin_getAppProperties_response>
     XML
   end
+  
+  def example_get_allocation_xml
+    <<-XML
+    <?xml version="1.0" encoding="UTF-8"?>
+    <admin_getAllocation_response
+      xmlns="http://api.facebook.com/1.0/"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://api.facebook.com/1.0/http://api.facebook.com/1.0/facebook.xsd">
+        40
+    </admin_getAllocation_response>
+    XML
+  end
+    
 end

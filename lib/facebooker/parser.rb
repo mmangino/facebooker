@@ -138,6 +138,12 @@ module Facebooker
     end
   end
   
+  class GetAllocation < Parser#:nodoc:
+    def self.process(data)
+      element('admin_getAllocation_response', data).text_value
+    end
+  end
+  
   class GetAppUsers < Parser#:nodoc:
     def self.process(data)
       array_of_text_values(element('friends_getAppUsers_response', data), 'uid')
@@ -382,6 +388,7 @@ module Facebooker
       'facebook.data.getCookies' => GetCookies,
       'facebook.admin.setAppProperties' => SetAppProperties,
       'facebook.admin.getAppProperties' => GetAppProperties,
+      'facebook.admin.getAllocation' => GetAllocation,
       'facebook.fql.query' => FqlQuery,
       'facebook.photos.get' => GetPhotos,
       'facebook.photos.getAlbums' => GetAlbums,

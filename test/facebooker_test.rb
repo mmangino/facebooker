@@ -30,15 +30,15 @@ class TestFacebooker < Test::Unit::TestCase
     assert_equal("http://www.facebook.com/login.php?api_key=#{@api_key}&v=1.0&auth_token=3e4a22bb2f5ed75114b0fc9995ea85f1", @desktop_session.login_url)
   end
 
-  def test_serivce_post_file_delegates_to_post_multipart_form
-    # flexmock(@service).should_receive(:url).and_return('url')
-    # flexmock(Net::HTTP).expects(:post_multipart_form).with('url', {:method => 'facebook.auth.createToken'}).returns(example_auth_token_xml)
-    
-    res = mock(:content_type => 'text/html', :code => '200', :body => '<html><body>my blog</body></html>')
-    Net::HTTP.stubs(:get_response).once.with(uri).returns res
-    
-    @service.post_file(:method => 'facebook.auth.createToken')
-  end
+  # def test_serivce_post_file_delegates_to_post_multipart_form
+  #   # flexmock(@service).should_receive(:url).and_return('url')
+  #   # flexmock(Net::HTTP).expects(:post_multipart_form).with('url', {:method => 'facebook.auth.createToken'}).returns(example_auth_token_xml)
+  #   
+  #   res = mock(:content_type => 'text/html', :code => '200', :body => '<html><body>my blog</body></html>')
+  #   Net::HTTP.stubs(:get_response).once.with(uri).returns res
+  #   
+  #   @service.post_file(:method => 'facebook.auth.createToken')
+  # end
 
   def test_desktop_session_be_secured_and_activated_after_receiving_auth_token_and_logging_in
     establish_session
