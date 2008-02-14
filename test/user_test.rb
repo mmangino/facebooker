@@ -48,6 +48,16 @@ class UserTest < Test::Unit::TestCase
     @user.profile_photos
   end
   
+  def test_can_set_cookie
+    @user.expects(:set_cookie).with('name', 'value')
+    @user.set_cookie('name', 'value')
+  end
+  
+  def test_can_get_cookies
+    @user.expects(:get_cookies).with('name')
+    @user.get_cookies('name')
+  end
+  
   def test_get_profile_photos
     @user = Facebooker::User.new(548871286, @session)
     expect_http_posts_with_responses(example_profile_photos_get_xml)    

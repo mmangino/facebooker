@@ -163,8 +163,14 @@ module Facebooker
     
     ##
     # Convenience method to set cookie for the current user
-    def set_cookie(name, value, expires, path)
-      session.data.set_cookie(@id, name, value, expires=nil, path=nil)
+    def set_cookie(name, value, expires=nil, path=nil)
+      session.data.set_cookie(@id, name, value, expires, path)
+    end
+    
+    ##
+    # Convenience method to get cookies for the current user
+    def get_cookies(name=nil)
+      session.data.get_cookies(@id, name)
     end
     
     ##
