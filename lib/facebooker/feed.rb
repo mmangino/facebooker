@@ -24,15 +24,17 @@ module Facebooker
 
     ##
     # Representation of a templatized action to be published into a user's news feed
-    # Deprecation Notice: +actor_id+ will be removed by Facebook sometime in February 2008
     class TemplatizedAction < ActionBase
-     attr_accessor :actor_id, :page_actor_id, :title_template, :title_data, :body_template, :body_data, :body_general, :target_ids
+     attr_accessor :page_actor_id, :title_template, :title_data, :body_template, :body_data, :body_general, :target_ids
 
       def to_params
        raise "Must set title_template" if self.title_template.nil?
-       { :actor_id => actor_id, :page_actor_id => page_actor_id, 
-         :title_template => title_template, :title_data => convert_json(title_data),
-         :body_template => body_template, :body_data => convert_json(body_data), :body_general => body_general,
+       { :page_actor_id => page_actor_id, 
+         :title_template => title_template, 
+         :title_data => convert_json(title_data),
+         :body_template => body_template, 
+         :body_data => convert_json(body_data), 
+         :body_general => body_general,
          :target_ids => target_ids }.merge image_params
       end
       

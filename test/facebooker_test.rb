@@ -122,7 +122,6 @@ class TestFacebooker < Test::Unit::TestCase
      mock_http.should_receive(:post_form).and_return(example_publish_templatized_action_xml).once.ordered(:posts)
      assert_nothing_raised {
        action = Facebooker::Feed::TemplatizedAction.new
-       action.actor_id = '12345'
        action.title_template = "{actor} did something"
        assert(@session.user.publish_templatized_action(action))
      }
