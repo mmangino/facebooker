@@ -10,8 +10,10 @@ facebooker.yml.tpl
 init.rb
 install.rb
 lib/facebooker.rb
+lib/facebooker/admin.rb
 lib/facebooker/affiliation.rb
 lib/facebooker/album.rb
+lib/facebooker/applicationproperties.rb
 lib/facebooker/cookie.rb
 lib/facebooker/data.rb
 lib/facebooker/education_info.rb
@@ -45,6 +47,7 @@ lib/tasks/facebooker.rake
 lib/tasks/tunnel.rake
 setup.rb
 test/event_test.rb
+test/facebook_admin_test.rb
 test/facebook_cache_test.rb
 test/facebook_data_test.rb
 test/facebooker_test.rb
@@ -57,4 +60,3 @@ test/rails_integration_test.rb
 test/session_test.rb
 test/test_helper.rb
 test/user_test.rb
-
