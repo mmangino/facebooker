@@ -18,6 +18,22 @@ Hoe.new('facebooker', Facebooker::VERSION::STRING) do |p|
   p.test_globs = 'test/*.rb'
   p.extra_deps << ['json', '>= 1.0.0'] 
 end
+
+require 'rcov/rcovtask'
+
+namespace :test do 
+  namespace :coverage do
+    desc "Delete aggregate coverage data."
+    task(:clean) { rm_f "coverage.data" }
+  end
+  desc 'Aggregate code coverage for unit, functional and integration tests'
+  Rcov::RcovTask.new(:coverage) do |t|
+    t.libs << "test"
+    t.test_files = FileList["test/*.rb"]
+    t.output_dir = "coverage/"
+    t.verbose = true
+  end
+end
 # vim: syntax=Ruby
 # 
 # 

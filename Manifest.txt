@@ -32,6 +32,7 @@ lib/facebooker/rails/facebook_request_fix.rb
 lib/facebooker/rails/facebook_session_handling.rb
 lib/facebooker/rails/facebook_url_rewriting.rb
 lib/facebooker/rails/helpers.rb
+lib/facebooker/rails/publisher.rb
 lib/facebooker/rails/routing.rb
 lib/facebooker/rails/test_helpers.rb
 lib/facebooker/rails/utilities.rb
