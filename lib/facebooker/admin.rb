@@ -14,8 +14,8 @@ module Facebooker
     # ** BETA ***
     def get_app_properties(*properties)
       json = @session.post('facebook.admin.getAppProperties', :properties => properties.to_json)
-      array_of_hashes = JSON.parse(json)
-      @properties = ApplicationProperties.from_array_of_hashes(array_of_hashes)
+      hash = JSON.parse(CGI.unescapeHTML(json))
+      @properties = ApplicationProperties.from_hash(hash)
     end
   
     # Integration points include :notifications_per_day
