@@ -1,5 +1,5 @@
 require 'facebooker/model'
-require 'facebooker/affiliation'
+require 'facebooker/models/affiliation'
 require 'facebooker/work_info'
 
 module Facebooker
