@@ -135,16 +135,15 @@ module Facebooker
           @from = @recipients.first
         end
         raise InvalidSender.new("Sender must be a Facebooker::User") unless from.is_a?(Facebooker::User)
-        recipients = recipients.map {|r| Facebooker::User.cast_to_facebook_id(r)} unless recipients.blank?
         case _body
         when Facebooker::Feed::TemplatizedAction,Facebooker::Feed::Action
           from.publish_action(_body)
         when Facebooker::Feed::Story
           @recipients.each {|r| r.publish_story(_body)}
         when Notification
-          from.session.send_notification(recipients,_body.fbml)
+          from.session.send_notification(@recipients,_body.fbml)
         when Email
-          from.session.send_email(recipients, 
+          from.session.send_email(@recipients, 
                                              _body.title, 
                                              _body.text, 
                                              _body.fbml)
@@ -152,7 +151,7 @@ module Facebooker
           raise UnspecifiedBodyType.new("You must specify a valid send_as")
         end
       end
-  
+
   
       class <<self
         def method_missing(name,*args)
