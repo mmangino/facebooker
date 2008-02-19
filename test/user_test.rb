@@ -39,7 +39,7 @@ class UserTest < Test::Unit::TestCase
   end
   
   def test_can_call_set_profile_fbml
-    @session.expects(:post).with('facebook.profile.setFBML', :uid=>1234,:profile=>"profile",:profile_action=>"action",:mobile_fbml=>"mobile")
+    @session.expects(:post).with('facebook.profile.setFBML', :uid=>1234,:profile=>"profile",:profile_action=>"action",:mobile_profile=>"mobile")
     @user.set_profile_fbml("profile","mobile","action")
   end
   
