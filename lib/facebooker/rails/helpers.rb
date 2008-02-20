@@ -44,7 +44,7 @@ module Facebooker
 			#   <% end %>
 			# <em>See:</em> http://wiki.developers.facebook.com/index.php/Fb:request-form-submit for options
 			def fb_request_form_submit(options={})
-			   tag("fb:request-form-submit",options)
+			   tag("fb:request-form-submit",stringify_vals(options))
 			end                                              
 
 
@@ -70,13 +70,13 @@ module Facebooker
       # <em>See:</em> http://wiki.developers.facebook.com/index.php/Fb:friend-selector for options
       #
       def fb_friend_selector(options={})
-        tag("fb:friend-selector",options)
+        tag("fb:friend-selector",stringify_vals(options))
       end
       
       # Render an <fb:multi-friend-input> element
       # <em> See: </em> http://wiki.developers.facebook.com/index.php/Fb:multi-friend-input for options
       def fb_multi_friend_input(options={})
-        tag "fb:multi-friend-input",options
+        tag "fb:multi-friend-input",stringify_vals(options)
       end
 
       # Render an <fb:multi-friend-selector> with the passed in welcome message
@@ -84,7 +84,7 @@ module Facebooker
       # <em> See: </em> http://wiki.developers.facebook.com/index.php/Fb:multi-friend-selector for options 
       # <em> Note: </em> I don't think the block is used here.
       def fb_multi_friend_selector(message,options={},&block)
-        tag("fb:multi-friend-selector",options.merge(:showborder=>false,:actiontext=>message,:max=>20))
+        tag("fb:multi-friend-selector",stringify_vals(options.merge(:showborder=>false,:actiontext=>message,:max=>20)))
       end
 
       # Render a condensed <fb:multi-friend-selector> with the passed in welcome message 
@@ -92,7 +92,7 @@ module Facebooker
       # <em> See: </em> http://wiki.developers.facebook.com/index.php/Fb:multi-friend-selector_%28condensed%29 for options
       # <em> Note: </em> I don't think the block is used here.
       def fb_multi_friend_selector_condensed(options={},&block)
-        tag("fb:multi-friend-selector",options.merge(:condensed=>true))
+        tag("fb:multi-friend-selector",stringify_vals(options.merge(:condensed=>true)))
       end
 
       # Render a button in a request using the <fb:req-choice> tag
@@ -166,7 +166,7 @@ module Facebooker
         options.transform_keys!(FB_NAME_OPTION_KEYS_TO_TRANSFORM)
         options.assert_valid_keys(FB_NAME_VALID_OPTION_KEYS)
         options.merge!(:uid => cast_to_facebook_id(user))
-        tag("fb:name", options)
+        tag("fb:name", stringify_vals(options))
       end
 
       FB_NAME_OPTION_KEYS_TO_TRANSFORM = {:first_name_only => :firstnameonly, 
@@ -186,7 +186,7 @@ module Facebooker
         options.transform_keys!(FB_PRONOUN_OPTION_KEYS_TO_TRANSFORM)
         options.assert_valid_keys(FB_PRONOUN_VALID_OPTION_KEYS)
         options.merge!(:uid => cast_to_facebook_id(user))
-        tag("fb:pronoun", options)
+        tag("fb:pronoun", stringify_vals(options))
       end
       
       FB_PRONOUN_OPTION_KEYS_TO_TRANSFORM = {:use_you => :useyou, :use_they => :usethey}
@@ -202,7 +202,7 @@ module Facebooker
         options.assert_valid_keys(FB_REF_VALID_OPTION_KEYS)
         validate_fb_ref_has_either_url_or_handle(options)
         validate_fb_ref_does_not_have_both_url_and_handle(options)
-        tag("fb:ref", options)
+        tag("fb:ref", stringify_vals(options))
       end
       
       def validate_fb_ref_has_either_url_or_handle(options)
@@ -227,7 +227,7 @@ module Facebooker
       def fb_profile_pic(user, options={})
         validate_fb_profile_pic_size(options)
         options.merge!(:uid => cast_to_facebook_id(user))
-        tag("fb:profile-pic", options)
+        tag("fb:profile-pic", stringify_vals(options))
       end
       
       # Render an fb:photo tag.
@@ -238,7 +238,7 @@ module Facebooker
         options.merge!(:pid => cast_to_photo_id(photo))
         validate_fb_photo_size(options)
         validate_fb_photo_align_value(options)
-        tag("fb:photo", options)
+        tag("fb:photo", stringify_vals(options))
       end
 
       FB_PHOTO_VALID_OPTION_KEYS = [:uid, :size, :align]
@@ -251,12 +251,6 @@ module Facebooker
       VALID_FB_PHOTO_SIZES = VALID_FB_SHARED_PHOTO_SIZES      
       VALID_FB_PROFILE_PIC_SIZES = VALID_FB_SHARED_PHOTO_SIZES
       
-      # Deprecated
-      #
-      # set ActionController::Base.asset_host and use the regular image_tag method.      
-      def facebook_image_tag(name,options={})
-        tag "img",:src=>"http://#{ENV['FACEBOOKER_STATIC_HOST']}#{image_path(name)}"
-      end
       
       # Render an fb:tabs tag containing some number of fb:tab_item tags.
       # Example:
@@ -277,7 +271,7 @@ module Facebooker
         options.assert_valid_keys(FB_TAB_ITEM_VALID_OPTION_KEYS)
         options.merge!(:title => title, :href => url)  	
         validate_fb_tab_item_align_value(options)
-        tag("fb:tab-item", options)
+        tag("fb:tab-item", stringify_vals(options))
       end
 
       FB_TAB_ITEM_VALID_OPTION_KEYS = [:align, :selected]
@@ -408,7 +402,7 @@ module Facebooker
 			# <em>See:</em> http://wiki.developers.facebook.com/index.php/Fb:comments for full details 
 			# TODO: Comments can optionally take an fb:title tag. 
 			def fb_comments(xid,canpost=true,candelete=false,numposts=5,options={})
-			  tag "fb:comments",options.merge(:xid=>xid,:canpost=>canpost.to_s,:candelete=>candelete.to_s,:numposts=>numposts)
+			  tag "fb:comments",stringify_vals(options.merge(:xid=>xid,:canpost=>canpost.to_s,:candelete=>candelete.to_s,:numposts=>numposts))
 			end
 			
 			# Adds a title to the title bar
@@ -424,7 +418,7 @@ module Facebooker
       # 
       # +uacct+: Your Urchin/Google Analytics account ID.
       def fb_google_analytics(uacct, options={})
-        tag "fb:google-analytics", options.merge(:uacct => uacct)
+        tag "fb:google-analytics", stringify_vals(options.merge(:uacct => uacct))
       end
       
       # Render if-is-app-user tag
@@ -439,7 +433,7 @@ module Facebooker
       #<% end %>       
       def fb_if_is_app_user(user,options={},&proc)
         content = capture(&proc) 
-        concat(content_tag("fb:if-is-app-user",content,options.merge(:uid=>cast_to_facebook_id(user))),proc.binding)
+        concat(content_tag("fb:if-is-app-user",content,stringify_vals(options.merge(:uid=>cast_to_facebook_id(user)))),proc.binding)
       end
 
       # Render if-user-has-added-app tag
@@ -454,7 +448,7 @@ module Facebooker
       #<% end %>       
       def fb_if_user_has_added_app(user,options={},&proc)
         content = capture(&proc) 
-        concat(content_tag("fb:if-user-has-added-app",content,options.merge(:uid=>cast_to_facebook_id(user))),proc.binding)
+        concat(content_tag("fb:if-user-has-added-app",content,stringify_vals(options.merge(:uid=>cast_to_facebook_id(user)))),proc.binding)
       end
       
       # Render fb:if-is-user tag
@@ -482,8 +476,17 @@ module Facebooker
         concat(content_tag("fb:else",content),proc.binding)
       end
       
+      #
+      # Return the URL for the about page of the application
       def fb_about_url
         "http://www.facebook.com/apps/application.php?api_key=#{ENV["FACEBOOK_API_KEY"]}"
+      end
+      
+      #
+      # Embed a discussion board named xid on the current page
+      # 
+      def fb_board(xid,options={})
+        tag("fb:board",stringify_vals(options.merge(:xid=>xid)))
       end
       
       
@@ -506,6 +509,13 @@ module Facebooker
       end
       
       private
+      def stringify_vals(hash)
+        result={}
+        hash.each do |key,value|
+          result[key]=value.to_s
+        end
+        result
+      end
       
       def fb_status_msg(type, message, text)
         if text.blank?
@@ -522,6 +532,7 @@ class Hash
   def transform_keys!(transformation_hash)
     transformation_hash.each_pair{|key, value| transform_key!(key, value)}
   end
+  
   
   def transform_key!(old_key, new_key)
     swapkey!(new_key, old_key)

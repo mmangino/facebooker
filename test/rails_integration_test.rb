@@ -463,10 +463,10 @@ class RailsHelperTest < Test::Unit::TestCase
   end
   
   def test_fb_multi_friend_selector
-    assert_equal "<fb:multi-friend-selector actiontext=\"This is a message\" max=\"20\" />", @h.fb_multi_friend_selector("This is a message")
+    assert_equal "<fb:multi-friend-selector actiontext=\"This is a message\" max=\"20\" showborder=\"false\" />", @h.fb_multi_friend_selector("This is a message")
   end
   def test_fb_multi_friend_selector_with_options
-    assert_equal "<fb:multi-friend-selector actiontext=\"This is a message\" exclude_ids=\"1,2\" max=\"20\" />", @h.fb_multi_friend_selector("This is a message",:exclude_ids=>"1,2")
+    assert_equal "<fb:multi-friend-selector actiontext=\"This is a message\" exclude_ids=\"1,2\" max=\"20\" showborder=\"false\" />", @h.fb_multi_friend_selector("This is a message",:exclude_ids=>"1,2")
   end
 
   def test_fb_comments
@@ -628,6 +628,12 @@ class RailsHelperTest < Test::Unit::TestCase
   
   def test_fb_create_button
     assert_equal "<fb:create-button href=\"/growingpets/invite\">Invite Friends</fb:create-button>", @h.fb_create_button('Invite Friends', '/growingpets/invite')
+  end
+  def test_fb_comments
+    assert_equal "<fb:comments candelete=\"false\" canpost=\"true\" numposts=\"4\" optional=\"false\" xid=\"xxx\" />", @h.fb_comments("xxx",true,false,4,:optional=>false) 
+  end
+  def test_fb_board
+    assert_equal "<fb:board optional=\"false\" xid=\"xxx\" />", @h.fb_board("xxx",:optional => false) 
   end
   
   def test_fb_dashboard
