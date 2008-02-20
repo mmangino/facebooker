@@ -8,6 +8,17 @@ module Facebooker
         attr_accessor "image_#{num}"
         attr_accessor "image_#{num}_link"
       end
+      
+      def add_image(image,link=nil)
+        1.upto(4) do |num|
+          if send("image_#{num}").blank?
+            send("image_#{num}=",image)
+            send("image_#{num}_link=",link) unless link.nil?
+            return num
+          end
+        end        
+      end
+      
 
       protected
       def image_params
