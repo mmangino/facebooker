@@ -8,8 +8,25 @@ require 'facebooker/rails/controller'
 require 'facebooker/rails/helpers'
 require 'facebooker/rails/publisher'
 
+module SymbolHelper
+  def symbol_helper_loaded
+    true
+  end
+end
+
+module ModuleHelper
+  def module_helper_loaded
+    true
+  end
+end
+ 
+::RAILS_DEFAULT_LOGGER = Logger.new(STDOUT)
 
 class TestPublisher < Facebooker::Rails::Publisher
+  
+  helper :symbol
+  helper ModuleHelper
+  
   def action(f)
     send_as :action
     from f
@@ -44,6 +61,14 @@ class TestPublisher < Facebooker::Rails::Publisher
     text fbml
   end
   
+  def render_notification(to,f)
+    send_as :notification
+    recipients to
+    from f
+    fbml render(:inline=>"<%=module_helper_loaded%>")
+  end
+    
+  
   def profile_update(to,f)
     send_as :profile
     recipients to
@@ -63,6 +88,7 @@ class TestPublisher < Facebooker::Rails::Publisher
   end
   
 end
+
 
 class PublisherTest < Test::Unit::TestCase
   
@@ -126,6 +152,8 @@ class PublisherTest < Test::Unit::TestCase
     
   end
   
+  
+  
   def test_deliver_templatized_action
     @user.expects(:publish_action)
     TestPublisher.deliver_templatized_action(@user)
@@ -185,6 +213,18 @@ class PublisherTest < Test::Unit::TestCase
     tp=TestPublisher.new
     tp.recipients "a"
     assert_equal("a",tp.recipients)
+  end
+  
+  def test_symbol_helper
+    assert TestPublisher.new.symbol_helper_loaded
+  end
+  def test_module_helper
+    assert TestPublisher.new.module_helper_loaded
+  end
+  
+  def test_with_render
+    notification=TestPublisher.create_render_notification(12451752,@user)
+    assert_equal "true",notification.fbml
   end
   
 end

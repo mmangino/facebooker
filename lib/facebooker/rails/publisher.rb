@@ -47,6 +47,16 @@ module Facebooker
     #       fbml 'text'
     #       text fbml
     #     end
+    #     # This will render the profile in /users/profile.erb
+    #     #   it will set @user to user_to_update in the template
+    #     #  The mobile profile will be rendered from the app/views/test_publisher/_mobile.erb
+    #     #   template
+    #     def profile_update(user_to_update,user_with_session_to_use)
+    #       from user_with_session_to_use
+    #       to user_to_update
+    #       profile render(:action=>"/users/profile",:assigns=>{:user=>user_to_update})
+    #       profile_action "A string"
+    #       mobile_profile render(:partial=>"mobile",:assigns=>{:user=>user_to_update})
     #   end
     #
     # To send a message, use ActionMailer like semantics
@@ -58,6 +68,10 @@ module Facebooker
     #
     # Publisher makes many helpers available, including the linking and asset helpers
     class Publisher
+      
+      class_inheritable_accessor :master_helper_module
+      
+      
       class InvalidSender < StandardError; end
       class UnknownBodyType < StandardError; end
       class UnspecifiedBodyType < StandardError; end
@@ -79,17 +93,8 @@ module Facebooker
 
       cattr_accessor :ignore_errors
       attr_accessor :_body
+    
   
-      include ActionView::Helpers::UrlHelper
-      include ActionController::UrlWriter  # This must come after the include for 
-                                           # ActionView::Helpers::UrlHelper or 
-                                           # else url_for gets overridden
-      include ActionView::Helpers::TextHelper
-      include ActionView::Helpers::TagHelper
-      include ActionView::Helpers::FormHelper
-      include ActionView::Helpers::FormTagHelper
-      include ActionView::Helpers::AssetTagHelper
-      include Facebooker::Rails::Helpers
 
       def recipients(*args)
         if args.size==0
@@ -169,8 +174,47 @@ module Facebooker
         end
       end
 
+      # nodoc
+      # needed for actionview
+      def logger
+        RAILS_DEFAULT_LOGGER
+      end
+
+      # nodoc
+      # delegate to action view. Set up assigns and render
+      def render(opts)
+        body = opts.delete(:assigns) || {}
+        initialize_template_class(body).render(opts)
+      end
+
+
+      def initialize_template_class(assigns)
+        template_root = "#{RAILS_ROOT}/app/views/"
+        returning ActionView::Base.new([template_root,File.join(template_root,self.class.controller_path)], assigns, self) do |template|
+          template.extend(self.class.master_helper_module)
+        end
+      end
+  
+      
+      self.master_helper_module = Module.new
+      self.master_helper_module.module_eval do
+        include ActionView::Helpers::UrlHelper
+        include ActionController::UrlWriter  # This must come after the include for 
+                                             # ActionView::Helpers::UrlHelper or 
+                                             # else url_for gets overridden
+        include ActionView::Helpers::TextHelper
+        include ActionView::Helpers::TagHelper
+        include ActionView::Helpers::FormHelper
+        include ActionView::Helpers::FormTagHelper
+        include ActionView::Helpers::AssetTagHelper
+        include Facebooker::Rails::Helpers
+      end
+      include self.master_helper_module
   
       class <<self
+        
+        
+        
         def method_missing(name,*args)
           should_send=false
           method=""
@@ -192,6 +236,33 @@ module Facebooker
           {:host => "apps.facebook.com" + Facebooker.facebook_path_prefix}
         end
     
+        def controller_path
+          self.to_s.underscore
+        end
+        
+        def helper(*args)
+          args.each do |arg|
+            case arg
+            when Symbol,String
+              add_template_helper("#{arg.to_s.classify}Helper".constantize)              
+            when Module
+              add_template_helper(arg)
+            end
+          end
+        end
+        
+        def add_template_helper(helper_module) #:nodoc:
+          master_helper_module.send :include,helper_module
+          include master_helper_module
+        end
+
+    
+        def inherited(child)
+          super          
+          child.master_helper_module=Module.new
+          child.master_helper_module.send!(:include,self.master_helper_module)
+          child.send(:include, child.master_helper_module)      
+        end
     
       end
     end
