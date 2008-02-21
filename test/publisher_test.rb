@@ -44,6 +44,15 @@ class TestPublisher < Facebooker::Rails::Publisher
     text fbml
   end
   
+  def profile_update(to,f)
+    send_as :profile
+    recipients to
+    from f
+    profile "profile"
+    profile_action "profile_action"
+    mobile_profile "mobile_profile"
+  end
+  
   def no_send_as(to)
     recipients to
   end
@@ -59,6 +68,7 @@ class PublisherTest < Test::Unit::TestCase
   
   def setup
     @user = Facebooker::User.new
+    @user.id=4
     @session = "session"
     @user.stubs(:session).returns(@session)
   end
@@ -119,6 +129,28 @@ class PublisherTest < Test::Unit::TestCase
   def test_deliver_templatized_action
     @user.expects(:publish_action)
     TestPublisher.deliver_templatized_action(@user)
+  end
+  def test_create_profile_update
+    p=TestPublisher.create_profile_update(@user,@user)
+    assert_equal Facebooker::Rails::Publisher::Profile,p.class
+    assert_equal "profile",p.profile
+    assert_equal "profile_action",p.profile_action
+    assert_equal "mobile_profile",p.mobile_profile
+  end
+  
+  def test_deliver_profile_update_same_session
+    @user.expects(:set_profile_fbml)
+    TestPublisher.deliver_profile_update(@user,@user)
+  end
+  def test_deliver_profile_update_same_session
+    @from_user = Facebooker::User.new
+    @new_user = Facebooker::User.new
+    @from_user.id =7
+    @session2 = Facebooker::Session.new("","")
+    @from_user.stubs(:session).returns(@session2)
+    Facebooker::User.expects(:new).with(@user,@from_user.session).returns(@new_user)
+    @new_user.expects(:set_profile_fbml)
+    TestPublisher.deliver_profile_update(@user,@from_user)
   end
   
   def test_no_sends_as_raises
