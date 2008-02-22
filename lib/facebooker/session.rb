@@ -55,7 +55,7 @@ module Facebooker
     
     attr_writer :auth_token
     attr_reader :session_key
-          
+    
     def self.create(api_key=nil, secret_key=nil)
       api_key ||= self.api_key
       secret_key ||= self.secret_key
@@ -146,21 +146,22 @@ module Facebooker
     end
     
     def fql_query(query, format = 'XML')
-      response = post('facebook.fql.query', :query => query, :format => format)
-      type = response.shift
-      response.shift.map do |hash|
-        case type
-        when 'user'
-          user = User.new
-          user.session = self
-          user.populate_from_hash!(hash)
-          user
-        when 'photo'
-          Photo.from_hash(hash)
-        when 'event_member'
-          Event::Attendance.from_hash(hash)
-        end
-      end        
+      post('facebook.fql.query', :query => query, :format => format) do |response|
+        type = response.shift
+        response.shift.map do |hash|
+          case type
+          when 'user'
+            user = User.new
+            user.session = self
+            user.populate_from_hash!(hash)
+            user
+          when 'photo'
+            Photo.from_hash(hash)
+          when 'event_member'
+            Event::Attendance.from_hash(hash)
+          end
+        end        
+      end
     end
     
     def user
@@ -175,14 +176,18 @@ module Facebooker
     # :end_time => Filter with this UTC as upper bound. A missing or zero parameter indicates no upper bound. (Time or Integer)
     # :rsvp_status => Filter by this RSVP status.
     def events(options = {})
-      @events ||= post('facebook.events.get', options).map do |hash|
-        Event.from_hash(hash)
+      @events ||= post('facebook.events.get', options) do |response|
+        response.map do |hash|
+          Event.from_hash(hash)
+        end
       end
     end
     
     def event_members(eid)
-      @members ||= post('facebook.events.getMembers', :eid => eid).map do |attendee_hash|
-        Event::Attendance.from_hash(attendee_hash)
+      @members ||= post('facebook.events.getMembers', :eid => eid) do |response|
+        response.map do |attendee_hash|
+          Event::Attendance.from_hash(attendee_hash)
+        end
       end
     end
     
@@ -224,20 +229,26 @@ module Facebooker
       if [subj_id, pids, aid].all? {|arg| arg.nil?}
         raise ArgumentError, "Can't get a photo without a picture, album or subject ID" 
       end
-      @photos = post('facebook.photos.get', :subj_id => subj_id, :pids => pids, :aid => aid ).map do |hash|
-        Photo.from_hash(hash)
+      @photos = post('facebook.photos.get', :subj_id => subj_id, :pids => pids, :aid => aid ) do |response|
+        response.map do |hash|
+          Photo.from_hash(hash)
+        end
       end
     end
     
     def get_albums(aids)
-      @albums = post('facebook.photos.getAlbums', :aids => aids).map do |hash|        
-        Album.from_hash(hash)
+      @albums = post('facebook.photos.getAlbums', :aids => aids) do |response|
+        response.map do |hash|        
+          Album.from_hash(hash)
+        end
       end
     end
     
     def get_tags(pids)
-      @tags = post('facebook.photos.getTags', :pids => pids).map do |hash|
-        Tag.from_hash(hash)
+      @tags = post('facebook.photos.getTags', :pids => pids)  do |response|
+        response.map do |hash|
+          Tag.from_hash(hash)
+        end
       end
     end
     
@@ -319,10 +330,75 @@ module Facebooker
         end
     end
     
-    def post(method, params = {})
+    def batch_request?
+      @batch_request
+    end
+    
+    def add_to_batch(req,&proc)
+      batch_request = BatchRequest.new(req,proc)
+      @batch_queue<<batch_request
+      batch_request
+    end
+    
+    # Submit the enclosed requests for this session inside a batch
+    # 
+    # All requests will be sent to Facebook at the end of the block
+    # each method inside the block will return a proxy object
+    # attempting to access the proxy before the end of the block will yield an exception
+    #
+    # For Example:
+    #
+    #   facebook_session.batch do
+    #     @send_result = facebook_session.send_notification([12451752],"Woohoo")
+    #     @albums = facebook_session.user.albums
+    #   end
+    #   puts @albums.first.inspect
+    #
+    # is valid, however
+    #
+    #   facebook_session.batch do
+    #     @send_result = facebook_session.send_notification([12451752],"Woohoo")
+    #     @albums = facebook_session.user.albums
+    #     puts @albums.first.inspect
+    #   end
+    #
+    # will raise Facebooker::BatchRequest::UnexecutedRequest
+    #
+    # If an exception is raised while processing the result, that exception will be
+    # re-raised on the next access to that object or when exception_raised? is called
+    #
+    # for example, if the send_notification resulted in TooManyUserCalls being raised,
+    # calling 
+    #   @send_result.exception_raised? 
+    # would re-raise that exception
+    # if there was an error retrieving the albums, it would be re-raised when 
+    #  @albums.first 
+    # is called
+    #
+    def batch(serial_only=false)
+      @batch_request=true
+      @batch_queue=[]
+      yield
+      # Set the batch request to false so that post will execute the batch job
+      @batch_request=false
+      BatchRun.current_batch=@batch_queue
+      post("facebook.batch.run",:method_feed=>@batch_queue.map{|q| q.uri}.to_json,:serial_only=>serial_only.to_s)
+    ensure
+      @batch_request=false
+      BatchRun.current_batch=nil
+    end
+    
+    def post(method, params = {},&proc)
       add_facebook_params(params, method)
       @session_key && params[:session_key] ||= @session_key
-      service.post(params.merge(:sig => signature_for(params)))      
+      final_params=params.merge(:sig => signature_for(params))
+      if batch_request?
+        add_to_batch(final_params,&proc)
+      else
+        result=service.post(final_params)
+        result = yield result if block_given?
+        result
+      end
     end
     
     def post_file(method, params = {})

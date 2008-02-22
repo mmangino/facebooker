@@ -144,6 +144,29 @@ module Facebooker
     end
   end
   
+  class BatchRun < Parser #:nodoc:
+    class << self
+      def current_batch=(current_batch)
+        @current_batch=current_batch
+      end
+      def current_batch
+        @current_batch
+      end
+    end
+    def self.process(data)
+      array_of_text_values(element('batch_run_response',data),"batch_run_response_elt").each_with_index do |response,i|
+        batch_request=@current_batch[i]
+        body=Struct.new(:body).new
+        body.body=CGI.unescapeHTML(response)
+        begin
+          batch_request.result=Parser.parse(batch_request.method,body)
+        rescue Exception=>ex
+          batch_request.exception_raised=ex
+        end
+      end
+    end
+  end
+  
   class GetAppUsers < Parser#:nodoc:
     def self.process(data)
       array_of_text_values(element('friends_getAppUsers_response', data), 'uid')
@@ -389,6 +412,7 @@ module Facebooker
       'facebook.admin.setAppProperties' => SetAppProperties,
       'facebook.admin.getAppProperties' => GetAppProperties,
       'facebook.admin.getAllocation' => GetAllocation,
+      'facebook.batch.run' => BatchRun,
       'facebook.fql.query' => FqlQuery,
       'facebook.photos.get' => GetPhotos,
       'facebook.photos.getAlbums' => GetAlbums,

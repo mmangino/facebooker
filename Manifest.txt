@@ -13,6 +13,7 @@ init.rb
 install.rb
 lib/facebooker.rb
 lib/facebooker/admin.rb
+lib/facebooker/batch_request.rb
 lib/facebooker/data.rb
 lib/facebooker/feed.rb
 lib/facebooker/model.rb
@@ -49,6 +50,7 @@ lib/net/http_multipart_post.rb
 lib/tasks/facebooker.rake
 lib/tasks/tunnel.rake
 setup.rb
+test/batch_request_test.rb
 test/event_test.rb
 test/facebook_admin_test.rb
 test/facebook_cache_test.rb

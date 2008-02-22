@@ -14,12 +14,12 @@ module Facebooker
     # +expires+ Time when the cookie should expire. If not specified, the cookie never expires. 
     # +path+ Path relative to the application's callback URL, with which the cookie should be associated. (default value is /?
     def set_cookie(user, name, value, expires=nil, path=nil)
-      (@session.post 'facebook.data.setCookie', 
+      @session.post('facebook.data.setCookie', 
         :uid => User.cast_to_facebook_id(user), 
         :name => name, 
         :value => value, 
         :expires => expires, 
-        :path => path) == '1'
+        :path => path) {|response| response == '1'}
     end
     
     ##
@@ -30,8 +30,10 @@ module Facebooker
     # +name+ The name of the cookie. If not specified, all the cookies for the given user get returned.
     def get_cookies(user, name=nil)
       @cookies = @session.post( 
-        'facebook.data.getCookies', :uid => User.cast_to_facebook_id(user), :name => name).map do |hash|
-        Cookie.from_hash(hash)
+        'facebook.data.getCookies', :uid => User.cast_to_facebook_id(user), :name => name) do |response|
+          response.map do |hash|
+            Cookie.from_hash(hash)
+          end
       end
     end    
   end

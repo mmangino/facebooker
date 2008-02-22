@@ -68,8 +68,9 @@ module Facebooker
     # Retrieve profile data for logged in user
     # Optional: list of fields to retrieve as symbols
     def populate(*fields)
-      results = session.post('facebook.users.getInfo', :fields => collect(fields), :uids => id)
-      populate_from_hash!(results.first)
+      session.post('facebook.users.getInfo', :fields => collect(fields), :uids => id) do |response|
+        populate_from_hash!(response.first)
+      end
     end
         
     def friends_with?(user_or_id)
@@ -108,13 +109,15 @@ module Facebooker
     end
     
     def albums
-      @albums ||= session.post('facebook.photos.getAlbums', :uid => self.id).map do |hash|
-        Album.from_hash(hash)
+      @albums ||= session.post('facebook.photos.getAlbums', :uid => self.id) do |response|
+        response.map do |hash|
+          Album.from_hash(hash)
+        end
       end
     end
     
     def create_album(params)
-      @album = Album.from_hash(session.post('facebook.photos.createAlbum', params))
+      @album = session.post('facebook.photos.createAlbum', params) {|response| Album.from_hash(response)}
     end
     
     def profile_photos

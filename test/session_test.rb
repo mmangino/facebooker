@@ -152,6 +152,44 @@ class SessionTest < Test::Unit::TestCase
     @session.expects(:post).with('facebook.notifications.send',{:to_ids=>"1",:notification=>"a"})
     @session.send_notification(["1"],"a")
   end
+  
+  def test_requests_inside_batch_are_added_to_batch
+    @session = Facebooker::Session.create(ENV['FACEBOOK_API_KEY'], ENV['FACEBOOK_SECRET_KEY'])
+    @session.send(:service).expects(:post).once
+    @session.batch do
+      @session.send_notification(["1"],"a")
+      @session.send_notification(["1"],"a")
+    end
+    
+  end
+
+  def test_parses_batch_response
+    @session = Facebooker::Session.create(ENV['FACEBOOK_API_KEY'], ENV['FACEBOOK_SECRET_KEY'])
+    expect_http_posts_with_responses(example_batch_run_xml)
+    @session.batch do
+      @fql_response = @session.fql_query('SELECT name, pic FROM user WHERE uid=211031 OR uid=4801660')      
+    end
+    assert_kind_of(Facebooker::Event::Attendance, @fql_response.first)
+    assert_equal('attending', @fql_response.first.rsvp_status)
+  end
+  def test_parses_batch_response_sets_exception
+    @session = Facebooker::Session.create(ENV['FACEBOOK_API_KEY'], ENV['FACEBOOK_SECRET_KEY'])
+    expect_http_posts_with_responses(example_batch_run_xml)
+    Facebooker::FqlQuery.expects(:process).raises(NoMethodError.new)
+    
+    @session.batch do
+      @fql_response = @session.fql_query('SELECT name, pic FROM user WHERE uid=211031 OR uid=4801660')      
+    end
+    assert_raises(NoMethodError) {
+      @fql_response.first
+    }
+  end
+
+  def test_can_set_and_get_current_batch
+    Facebooker::BatchRun.current_batch=4
+    assert_equal 4,Facebooker::BatchRun.current_batch
+  end
+  
   def teardown
     Facebooker::Session.configuration_file_path = nil
   end
@@ -358,6 +396,17 @@ class SessionTest < Test::Unit::TestCase
       </officers>
       <not_replied list="true"/>
     </groups_getMembers_response>    
+    XML
+  end
+  
+  def example_batch_run_xml
+    <<-XML
+    <?xml version="1.0" encoding="UTF-8"?>
+    <batch_run_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd" list="true">
+      <batch_run_response_elt>    
+      #{CGI.escapeHTML(example_fql_query_event_members_xml)}
+      </batch_run_response_elt>
+    </batch_run_response>
     XML
   end
   
