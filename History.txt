@@ -1,5 +1,6 @@
 === x.x.x / 2008-xx-xx
 
+* fixed typo in set app properties parser [Andrew Grim, shane]
 * Removed actor_id param from templatized feed [shane]
 * Added admin.get_allocation [shane]
 * Added data.get_cookies and data.set_cookie [shane]

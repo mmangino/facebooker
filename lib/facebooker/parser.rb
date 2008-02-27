@@ -128,7 +128,7 @@ module Facebooker
   
   class SetAppProperties < Parser#:nodoc:
     def self.process(data)
-      element('data_setAppProperties_response', data).text_value
+      element('admin_setAppProperties_response', data).text_value
     end
   end  
   
