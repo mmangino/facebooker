@@ -132,6 +132,14 @@ module Facebooker
       def request_is_for_a_facebook_canvas?
         !params['fb_sig_in_canvas'].blank?
       end
+      def request_is_facebook_ajax?
+        params["fb_sig_is_mockajax"]=="1" || params["fb_sig_is_ajax"]=="1"
+      end
+      def xml_http_request?
+        request_is_facebook_ajax? || super
+      end
+      
+      
       
       def application_is_installed?
         facebook_params['added']
@@ -153,7 +161,7 @@ module Facebooker
       end
       
       def set_fbml_format
-        params[:format]="fbml" if request_is_for_a_facebook_canvas?
+        params[:format]="fbml" if request_is_for_a_facebook_canvas? or request_is_facebook_ajax?
       end
       
       module ClassMethods

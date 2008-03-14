@@ -52,6 +52,7 @@ module Facebooker
     #     #  The mobile profile will be rendered from the app/views/test_publisher/_mobile.erb
     #     #   template
     #     def profile_update(user_to_update,user_with_session_to_use)
+    #       send_as :profile
     #       from user_with_session_to_use
     #       to user_to_update
     #       profile render(:action=>"/users/profile",:assigns=>{:user=>user_to_update})

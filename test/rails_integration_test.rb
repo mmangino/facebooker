@@ -717,7 +717,7 @@ class RailsFacebookFormbuilderTest < Test::Unit::TestCase
   end
   
   def test_create_button
-    assert_equal "<fb:editor-button value=\"first\"></fb:editor-button>",@form_builder.create_button(:first)
+    assert_equal "<fb:editor-button name=\"commit\" value=\"first\"></fb:editor-button>",@form_builder.create_button(:first)
   end
   
   def test_custom

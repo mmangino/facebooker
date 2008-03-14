@@ -84,6 +84,7 @@ module Facebooker
       # <em> See: </em> http://wiki.developers.facebook.com/index.php/Fb:multi-friend-selector for options 
       # <em> Note: </em> I don't think the block is used here.
       def fb_multi_friend_selector(message,options={},&block)
+        options = options.dup
         tag("fb:multi-friend-selector",stringify_vals(options.merge(:showborder=>false,:actiontext=>message,:max=>20)))
       end
 
@@ -92,6 +93,7 @@ module Facebooker
       # <em> See: </em> http://wiki.developers.facebook.com/index.php/Fb:multi-friend-selector_%28condensed%29 for options
       # <em> Note: </em> I don't think the block is used here.
       def fb_multi_friend_selector_condensed(options={},&block)
+        options = options.dup
         tag("fb:multi-friend-selector",stringify_vals(options.merge(:condensed=>true)))
       end
 
@@ -163,6 +165,7 @@ module Facebooker
       # Use this tag on FBML pages instead of retrieving the user's info and rendering the name explicitly.
       #
       def fb_name(user, options={})
+        options = options.dup
         options.transform_keys!(FB_NAME_OPTION_KEYS_TO_TRANSFORM)
         options.assert_valid_keys(FB_NAME_VALID_OPTION_KEYS)
         options.merge!(:uid => cast_to_facebook_id(user))
@@ -183,6 +186,7 @@ module Facebooker
       # <em> See </em> http://wiki.developers.facebook.com/index.php/Fb:pronoun for complete list of options.
       #      
       def fb_pronoun(user, options={})
+        options = options.dup
         options.transform_keys!(FB_PRONOUN_OPTION_KEYS_TO_TRANSFORM)
         options.assert_valid_keys(FB_PRONOUN_VALID_OPTION_KEYS)
         options.merge!(:uid => cast_to_facebook_id(user))
@@ -225,6 +229,7 @@ module Facebooker
       #
       # Valid sizes are :thumb, :small, :normal and :square
       def fb_profile_pic(user, options={})
+        options = options.dup
         validate_fb_profile_pic_size(options)
         options.merge!(:uid => cast_to_facebook_id(user))
         tag("fb:profile-pic", stringify_vals(options))
@@ -234,6 +239,7 @@ module Facebooker
       # photo is either a Facebooker::Photo or an id of a Facebook photo or an object that responds to photo_id.
       # <em> See: </em> http://wiki.developers.facebook.com/index.php/Fb:photo for complete list of options.
       def fb_photo(photo, options={})
+        options = options.dup
         options.assert_valid_keys(FB_PHOTO_VALID_OPTION_KEYS)
         options.merge!(:pid => cast_to_photo_id(photo))
         validate_fb_photo_size(options)
@@ -268,6 +274,7 @@ module Facebooker
       # Options can contains :selected => true to indicate that a tab is the current tab.
       # <em> See: </em> http://wiki.developers.facebook.com/index.php/Fb:tab-item for complete list of options
       def fb_tab_item(title, url, options={})
+        options= options.dup
         options.assert_valid_keys(FB_TAB_ITEM_VALID_OPTION_KEYS)
         options.merge!(:title => title, :href => url)  	
         validate_fb_tab_item_align_value(options)
@@ -402,6 +409,7 @@ module Facebooker
 			# <em>See:</em> http://wiki.developers.facebook.com/index.php/Fb:comments for full details 
 			# TODO: Comments can optionally take an fb:title tag. 
 			def fb_comments(xid,canpost=true,candelete=false,numposts=5,options={})
+			  options = options.dup
 			  tag "fb:comments",stringify_vals(options.merge(:xid=>xid,:canpost=>canpost.to_s,:candelete=>candelete.to_s,:numposts=>numposts))
 			end
 			
@@ -418,6 +426,7 @@ module Facebooker
       # 
       # +uacct+: Your Urchin/Google Analytics account ID.
       def fb_google_analytics(uacct, options={})
+        options = options.dup
         tag "fb:google-analytics", stringify_vals(options.merge(:uacct => uacct))
       end
       
@@ -433,6 +442,7 @@ module Facebooker
       #<% end %>       
       def fb_if_is_app_user(user,options={},&proc)
         content = capture(&proc) 
+        options = options.dup
         concat(content_tag("fb:if-is-app-user",content,stringify_vals(options.merge(:uid=>cast_to_facebook_id(user)))),proc.binding)
       end
 
@@ -448,6 +458,7 @@ module Facebooker
       #<% end %>       
       def fb_if_user_has_added_app(user,options={},&proc)
         content = capture(&proc) 
+        options = options.dup
         concat(content_tag("fb:if-user-has-added-app",content,stringify_vals(options.merge(:uid=>cast_to_facebook_id(user)))),proc.binding)
       end
       
@@ -486,6 +497,7 @@ module Facebooker
       # Embed a discussion board named xid on the current page
       # 
       def fb_board(xid,options={})
+        options = options.dup
         tag("fb:board",stringify_vals(options.merge(:xid=>xid)))
       end
       

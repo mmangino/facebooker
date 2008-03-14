@@ -90,6 +90,12 @@ class SessionTest < Test::Unit::TestCase
       assert_equal(['first', 'second'], photo.anonymous_fields)
     end
   end
+  def test_no_results_returns_empty_array
+    @session = Facebooker::Session.create(ENV['FACEBOOK_API_KEY'], ENV['FACEBOOK_SECRET_KEY'])
+    expect_http_posts_with_responses(no_results_fql)    
+    response = @session.fql_query('Lets be frank. We are not testing the query here')
+    assert_equal [],response
+  end
   
   def test_can_fql_query_for_event_members
     @session = Facebooker::Session.create(ENV['FACEBOOK_API_KEY'], ENV['FACEBOOK_SECRET_KEY'])
@@ -375,6 +381,15 @@ class SessionTest < Test::Unit::TestCase
       </photo>
     </fql_query_response>
     XML
+  end
+  
+  def no_results_fql
+    <<-XML
+    <?xml version="1.0" encoding="UTF-8"?>
+    <fql_query_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" list="true">
+    </fql_query_response>
+    XML
+    
   end
   
   def example_group_members_xml

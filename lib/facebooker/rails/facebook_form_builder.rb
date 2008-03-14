@@ -99,7 +99,7 @@ module Facebooker
       end
       
       def create_button(name)
-        @template.content_tag("fb:editor-button","",:value=>name)
+        @template.content_tag("fb:editor-button","",:value=>name,:name=>"commit")
       end
       
       def add_default_name_and_id(options,method)

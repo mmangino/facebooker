@@ -6,14 +6,14 @@ namespace :facebooker do
     # http://www.LearningRails.com
     desc "Create a reverse ssh tunnel from a public server to a private development server." 
     task :start => [ :environment, :config ] do  
-      puts "Starting tunnel #{@public_host}:#{@public_port} to 0.0.0.0:#{@local_port}" 
-      exec "ssh -nNT -g -R *:#{@public_port}:0.0.0.0:#{@local_port} #{@public_host_username}@#{@public_host}" 
+      puts @notification 
+      exec @ssh_command
     end 
 
     desc "Create a reverse ssh tunnel in the background. Requires ssh keys to be setup." 
     task :background_start => [ :environment, :config ] do  
-      puts "Starting tunnel #{@public_host}:#{@public_port} to 0.0.0.0:#{@local_port}" 
-      exec "ssh -nNT -g -R *:#{@public_port}:0.0.0.0:#{@local_port} #{@public_host_username}@#{@public_host} > /dev/null 2>&1 &" 
+      puts @notification 
+      exec "#{@ssh_command} > /dev/null 2>&1 &" 
     end 
     
     # Adapted from Evan Weaver: http://blog.evanweaver.com/articles/2007/07/13/developing-a-facebook-app-locally/ 
@@ -34,6 +34,10 @@ namespace :facebooker do
      @public_host = FACEBOOKER['tunnel']['public_host'] 
      @public_port = FACEBOOKER['tunnel']['public_port'] 
      @local_port = FACEBOOKER['tunnel']['local_port'] 
+     @ssh_port = FACEBOOKER['tunnel']['ssh_port'] || 22
+     @notification = "Starting tunnel #{@public_host}:#{@public_port} to 0.0.0.0:#{@local_port}"
+     @notification << " using SSH port #{@ssh_port}" unless @ssh_port == 22
+     @ssh_command = "ssh -p #{@ssh_port} -nNT -g -R *:#{@public_port}:0.0.0.0:#{@local_port} #{@public_host_username}@#{@public_host}" 
     end
   end
 end

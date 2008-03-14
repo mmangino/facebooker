@@ -48,5 +48,5 @@ if File.exist?(facebook_config)
   ENV['FACEBOOK_API_KEY'] = FACEBOOKER['api_key']
   ENV['FACEBOOK_SECRET_KEY'] = FACEBOOKER['secret_key']
   ENV['FACEBOOKER_RELATIVE_URL_ROOT'] = FACEBOOKER['canvas_page_name']
-  ActionController::Base.asset_host = FACEBOOKER['callback_url']
+  ActionController::Base.asset_host ||= FACEBOOKER['callback_url']
 end

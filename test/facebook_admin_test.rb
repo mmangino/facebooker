@@ -36,8 +36,8 @@ class FacebookAdminTest < Test::Unit::TestCase
   def example_set_properties_xml
     <<-XML
     <?xml version="1.0" encoding="UTF-8"?>
-    <data_setAppProperties_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-    xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd">1</data_setAppProperties_response>
+    <admin_setAppProperties_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd">1</admin_setAppProperties_response>
     XML
   end
 

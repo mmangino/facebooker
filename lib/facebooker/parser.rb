@@ -249,7 +249,7 @@ module Facebooker
     def self.process(data)
       root = element('fql_query_response', data)
       first_child = root.children.reject{|c| c.kind_of?(REXML::Text)}.first
-      [first_child.name, array_of_hashes(root, first_child.name)]
+      first_child.nil? ? [] : [first_child.name, array_of_hashes(root, first_child.name)]
     end
   end
   
