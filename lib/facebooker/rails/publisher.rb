@@ -184,14 +184,16 @@ module Facebooker
       # nodoc
       # delegate to action view. Set up assigns and render
       def render(opts)
+        opts = opts.dup
         body = opts.delete(:assigns) || {}
-        initialize_template_class(body).render(opts)
+        initialize_template_class(body.dup.merge(:controller=>self)).render(opts)
       end
 
 
       def initialize_template_class(assigns)
         template_root = "#{RAILS_ROOT}/app/views/"
         returning ActionView::Base.new([template_root,File.join(template_root,self.class.controller_path)], assigns, self) do |template|
+          template.controller=self
           template.extend(self.class.master_helper_module)
         end
       end
@@ -199,10 +201,10 @@ module Facebooker
       
       self.master_helper_module = Module.new
       self.master_helper_module.module_eval do
+        # url_helper delegates to @controller, 
+        # so we need to define that in the template
+        # we make it point to the publisher
         include ActionView::Helpers::UrlHelper
-        include ActionController::UrlWriter  # This must come after the include for 
-                                             # ActionView::Helpers::UrlHelper or 
-                                             # else url_for gets overridden
         include ActionView::Helpers::TextHelper
         include ActionView::Helpers::TagHelper
         include ActionView::Helpers::FormHelper
@@ -210,8 +212,10 @@ module Facebooker
         include ActionView::Helpers::AssetTagHelper
         include Facebooker::Rails::Helpers
       end
+      ActionController::Routing::Routes.named_routes.install(self.master_helper_module)
       include self.master_helper_module
-  
+      # Publisher is the controller, it should do the rewriting
+      include ActionController::UrlWriter
       class <<self
         
         
