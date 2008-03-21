@@ -407,10 +407,10 @@ module Facebooker
 			# Create a comment area
 			# All the data for this content area is stored on the facebook servers.
 			# <em>See:</em> http://wiki.developers.facebook.com/index.php/Fb:comments for full details 
-			# TODO: Comments can optionally take an fb:title tag. 
 			def fb_comments(xid,canpost=true,candelete=false,numposts=5,options={})
 			  options = options.dup
-			  tag "fb:comments",stringify_vals(options.merge(:xid=>xid,:canpost=>canpost.to_s,:candelete=>candelete.to_s,:numposts=>numposts))
+                          title = (title = options.delete(:title)) ? fb_title(title) : nil 
+			  content_tag "fb:comments",title,stringify_vals(options.merge(:xid=>xid,:canpost=>canpost.to_s,:candelete=>candelete.to_s,:numposts=>numposts))
 			end
 			
 			# Adds a title to the title bar

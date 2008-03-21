@@ -4,7 +4,7 @@ require 'flexmock/test_unit'
 
 require File.dirname(__FILE__)+'/../lib/facebooker/rails/test_helpers'
 
-#$: << File.join(File.dirname(__FILE__), '..', 'lib')
+$: << File.join(File.dirname(__FILE__), '..', 'lib')
 
 RAILS_ROOT=File.join(File.dirname(__FILE__),'..','..')
 require 'facebooker'

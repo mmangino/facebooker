@@ -630,7 +630,10 @@ class RailsHelperTest < Test::Unit::TestCase
     assert_equal "<fb:create-button href=\"/growingpets/invite\">Invite Friends</fb:create-button>", @h.fb_create_button('Invite Friends', '/growingpets/invite')
   end
   def test_fb_comments
-    assert_equal "<fb:comments candelete=\"false\" canpost=\"true\" numposts=\"4\" optional=\"false\" xid=\"xxx\" />", @h.fb_comments("xxx",true,false,4,:optional=>false) 
+    assert_equal "<fb:comments candelete=\"false\" canpost=\"true\" numposts=\"4\" optional=\"false\" xid=\"xxx\"></fb:comments>", @h.fb_comments("xxx",true,false,4,:optional=>false) 
+  end
+  def test_fb_comments_with_title
+    assert_equal "<fb:comments candelete=\"false\" canpost=\"true\" numposts=\"4\" optional=\"false\" xid=\"xxx\"><fb:title>TITLE</fb:title></fb:comments>", @h.fb_comments("xxx",true,false,4,:optional=>false, :title => "TITLE") 
   end
   def test_fb_board
     assert_equal "<fb:board optional=\"false\" xid=\"xxx\" />", @h.fb_board("xxx",:optional => false) 
