@@ -78,6 +78,13 @@ class TestPublisher < Facebooker::Rails::Publisher
     mobile_profile "mobile_profile"
   end
   
+  def ref_update(user)
+    send_as :ref
+    from user
+    fbml "fbml"
+    handle "handle"
+  end
+  
   def no_send_as(to)
     recipients to
   end
@@ -181,6 +188,19 @@ class PublisherTest < Test::Unit::TestCase
     TestPublisher.deliver_profile_update(@user,@from_user)
   end
   
+  def test_create_ref_update
+    p=TestPublisher.create_ref_update(@user)
+    assert_equal Facebooker::Rails::Publisher::Ref,p.class
+    assert_equal "fbml",p.fbml
+    assert_equal "handle",p.handle
+  end
+  
+  def test_deliver_ref_update
+    @server_cache="server_cache"
+    @session.expects(:server_cache).returns(@server_cache)
+    @server_cache.expects(:set_ref_handle).with("handle","fbml")
+    TestPublisher.deliver_ref_update(@user)
+  end
   def test_no_sends_as_raises
     assert_raises(Facebooker::Rails::Publisher::UnspecifiedBodyType) {
       TestPublisher.deliver_no_send_as(@user)

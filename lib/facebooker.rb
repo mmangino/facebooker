@@ -1,5 +1,4 @@
-require 'json'
-
+require 'json' 
 require 'facebooker/batch_request'
 require 'facebooker/feed'
 require 'facebooker/model'

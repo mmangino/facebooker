@@ -91,6 +91,10 @@ module Facebooker
         attr_accessor :profile_action
         attr_accessor :mobile_profile
       end
+      class Ref
+        attr_accessor :handle
+        attr_accessor :fbml
+      end
 
       cattr_accessor :ignore_errors
       attr_accessor :_body
@@ -128,6 +132,8 @@ module Facebooker
           Email.new
         when :profile
           Profile.new
+        when :ref
+          Ref.new
         else
           raise UnknownBodyType.new("Unknown type to publish")
         end
@@ -161,7 +167,7 @@ module Facebooker
                                              _body.title, 
                                              _body.text, 
                                              _body.fbml)
-       when Profile
+        when Profile
          # If recipient and from aren't the same person, create a new user object using the
          # userid from recipient and the session from from
          if @from != @recipients.first
@@ -170,6 +176,8 @@ module Facebooker
          from.set_profile_fbml(_body.profile, 
                                             _body.mobile_profile, 
                                             _body.profile_action)
+        when Ref
+          @from.session.server_cache.set_ref_handle(_body.handle,_body.fbml)
         else
           raise UnspecifiedBodyType.new("You must specify a valid send_as")
         end
