@@ -60,6 +60,15 @@ module Facebooker
     #       mobile_profile render(:partial=>"mobile",:assigns=>{:user=>user_to_update})
     #   end
     #
+    #     #  Update the given handle ref with the content from a
+    #     #   template
+    #     def ref_update(user)
+    #       send_as :ref
+    #       from user
+    #       fbml render(:action=>"/users/profile",:assigns=>{:user=>user_to_update})
+    #       handle "a_ref_handle"
+    #   end
+    #
     # To send a message, use ActionMailer like semantics
     #    TestPublisher.deliver_action(@user)
     #
