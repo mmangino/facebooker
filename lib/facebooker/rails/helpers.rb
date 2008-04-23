@@ -8,6 +8,32 @@ module Facebooker
     #
     module Helpers
       
+      
+      # Create an fb:dialog
+      # id must be a unique name e.g. "my_dialog"
+      # cancel_button is true or false
+      def fb_dialog( id, cancel_button, &block )
+        content = capture(&block)
+        concat( content_tag("fb:dialog", content, {:id => id, :cancel_button => cancel_button}), block.binding )
+      end
+      
+      def fb_dialog_title( title )
+        content_tag "fb:dialog-title", title
+      end
+      
+      def fb_dialog_content( &block )
+        content = capture(&block)  
+        concat( content_tag("fb:dialog-content", content), block.binding )      
+      end
+      
+      def fb_dialog_button( type, value, options={} )
+        options.assert_valid_keys FB_DIALOG_BUTTON_VALID_OPTION_KEYS
+        options.merge! :type => type, :value => value
+        tag "fb:dialog-button", options
+      end
+      
+      FB_DIALOG_BUTTON_VALID_OPTION_KEYS = [:close_dialog, :href, :form_id, :clickrewriteurl, :clickrewriteid, :clickrewriteform]
+      
       # Create an fb:request-form without a selector
       #
       # The block passed to this tag is used as the content of the form

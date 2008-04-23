@@ -561,6 +561,27 @@ class RailsHelperTest < Test::Unit::TestCase
       (@h.fb_multi_friend_request("invite","ignored","action") {})
   end
   
+  def test_fb_dialog
+    @h.expects(:capture).returns("dialog content")
+    @h.fb_dialog( "my_dialog", "1" ) do
+    end
+    assert_equal '<fb:dialog cancel_button="1" id="my_dialog">dialog content</fb:dialog>', _erbout
+  end
+  def test_fb_dialog_title
+    assert_equal '<fb:dialog-title>My Little Dialog</fb:dialog-title>', @h.fb_dialog_title("My Little Dialog")
+  end
+  def test_fb_dialog_content
+    @h.expects(:capture).returns("dialog content content")
+    @h.fb_dialog_content do
+    end
+    assert_equal '<fb:dialog-content>dialog content content</fb:dialog-content>', _erbout
+  end
+  def test_fb_dialog_button
+    assert_equal '<fb:dialog-button clickrewriteform="my_form" clickrewriteid="my_dialog" clickrewriteurl="http://www.some_url_here.com/dialog_return.php" type="submit" value="Yes" />',
+      @h.fb_dialog_button("submit", "Yes", {:clickrewriteurl => "http://www.some_url_here.com/dialog_return.php",
+                                            :clickrewriteid => "my_dialog", :clickrewriteform => "my_form" } )
+  end
+  
   def test_fb_request_form
     @h.expects(:capture).returns("body")
     assert_equal "<fb:request-form action=\"action\" content=\"Test Param\" invite=\"true\" method=\"post\" type=\"invite\">body</fb:request-form>",
