@@ -1,18 +1,25 @@
 module Facebooker
   module Rails
     module TestHelpers
-      def assert_fb_redirect_to(url)
+      def assert_facebook_redirect_to(url)
         assert_response :success
         assert_not_nil facebook_redirect_url
         assert_equal url, facebook_redirect_url
       end
-      
-      def facebook_post(path, params={})
-        params = default_facebook_parameters.update(params)
-        params.merge!(:fb_sig => generate_signature(facebook_params(params).stringify_keys))
 
-        params = params.update(:canvas => true).update(params)
-        post path, params
+      def follow_facebook_redirect!
+        facebook_post facebook_redirect_url
+      end
+      
+      def facebook_post(path, params={}, fb_params=facebook_parameters)
+        params = fb_params.merge(:canvas => true).merge(params)
+        post path, params    
+      end
+      
+      def facebook_parameters(overrides=nil)
+        overrides ||= {}
+        params = default_facebook_parameters.merge(overrides)
+        params.merge(:fb_sig => generate_signature(params.stringify_keys))
       end
 
       private
