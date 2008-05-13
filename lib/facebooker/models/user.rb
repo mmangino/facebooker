@@ -159,6 +159,25 @@ module Facebooker
     end
     
     ##
+    # Set the status of the user
+    #
+    # DOES NOT prepend "is" to the message
+    #
+    # requires extended permission. 
+    def status=(message)
+      case message
+      when String
+        session.post('facebook.users.setStatus',:status=>message,:status_includes_verb=>1) do |ret|
+          ret
+        end
+      when Status
+        @status = message
+      when Hash
+        @status = Status.from_hash(message)
+      end
+    end
+    
+    ##
     # Convenience method to send email to the current user
     def send_email(subject, text=nil, fbml=nil)
       session.send_email([@id], subject, text, fbml)

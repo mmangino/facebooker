@@ -340,6 +340,12 @@ module Facebooker
       end
     end
   end
+  
+  class SetStatus < Parser
+    def self.process(data)
+      element('users_setStatus_response',data)=='1'
+    end
+  end
     
   class Errors < Parser#:nodoc:
     EXCEPTIONS = {
@@ -353,6 +359,7 @@ module Facebooker
       103 => Facebooker::Session::CallOutOfOrder,
       104 => Facebooker::Session::IncorrectSignature,
       120 => Facebooker::Session::InvalidAlbumId,
+      250 => Facebooker::Session::ExtendedPermissionRequired,
       321 => Facebooker::Session::AlbumIsFull,
       324 => Facebooker::Session::MissingOrInvalidImageFile,
       325 => Facebooker::Session::TooManyUnapprovedPhotosPending,
@@ -393,6 +400,7 @@ module Facebooker
       'facebook.auth.createToken' => CreateToken,
       'facebook.auth.getSession' => GetSession,
       'facebook.users.getInfo' => UserInfo,
+      'facebook.users.setStatus' => SetStatus,
       'facebook.friends.get' => GetFriends,
       'facebook.friends.areFriends' => AreFriends,
       'facebook.friends.getAppUsers' => GetAppUsers,

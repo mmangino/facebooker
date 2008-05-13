@@ -145,6 +145,24 @@ module Facebooker
         facebook_params['added']
       end
       
+      def ensure_has_status_update
+        has_extended_permission?("status_update") || application_needs_permission("status_update")
+      end
+      def ensure_has_photo_upload
+        has_extended_permission?("photo_upload") || application_needs_permission("photo_upload")
+      end
+      def ensure_has_create_listing
+        has_extended_permission?("create_listing") || application_needs_permission("create_listing")
+      end
+      
+      def application_needs_permission(perm)
+        redirect_to(facebook_session.permission_url(perm))
+      end
+      
+      def has_extended_permission?(perm)
+        params["fb_sig_ext_perms"] and params["fb_sig_ext_perms"].include?(perm)
+      end
+      
       def ensure_authenticated_to_facebook
         set_facebook_session || create_new_facebook_session_and_redirect!
       end

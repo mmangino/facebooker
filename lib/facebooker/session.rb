@@ -45,6 +45,7 @@ module Facebooker
     class AlbumIsFull < StandardError; end
     class MissingOrInvalidImageFile < StandardError; end
     class TooManyUnapprovedPhotosPending < StandardError; end
+    class ExtendedPermissionRequired < StandardError; end
   
     API_SERVER_BASE_URL       = "api.facebook.com"
     API_PATH_REST             = "/restserver.php"
@@ -88,16 +89,28 @@ module Facebooker
       "http://www.facebook.com/install.php?api_key=#{@api_key}&v=1.0#{install_url_optional_parameters(options)}"
     end
 
+    def permission_url(permission,options={})
+      options = default_login_url_options.merge(options)
+      "http://www.facebook.com/authorize.php?api_key=#{@api_key}&v=1.0&ext_perm=#{permission}#{install_url_optional_parameters(options)}"
+    end
+
     def install_url_optional_parameters(options)
-      optional_parameters = []
-      optional_parameters << "&next=#{CGI.escape(options[:next])}" if options[:next]
+      optional_parameters = []      
+      optional_parameters += add_next_parameters(options)
       optional_parameters.join
+    end
+
+    def add_next_parameters(options)
+      opts = []
+      opts << "&next=#{CGI.escape(options[:next])}" if options[:next]
+      opts << "&next_cancel=#{CGI.escape(options[:next_cancel])}" if options[:next_cancel]
+      opts
     end
 
     def login_url_optional_parameters(options)
       # It is important that unused options are omitted as stuff like &canvas=false will still display the canvas. 
       optional_parameters = []
-      optional_parameters << "&next=#{CGI.escape(options[:next])}" if options[:next]
+      optional_parameters += add_next_parameters(options)
       optional_parameters << "&skipcookie=true" if options[:skip_cookie]
       optional_parameters << "&hide_checkbox=true" if options[:hide_checkbox]
       optional_parameters << "&canvas=true" if options[:canvas]

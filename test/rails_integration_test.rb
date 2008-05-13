@@ -22,6 +22,15 @@ begin
     include Facebooker::Rails::Controller
     def rescue_action(e) raise e end
   end
+  class ControllerWhichRequiresExtendedPermissions< NoisyController
+    ensure_authenticated_to_facebook
+    before_filter :ensure_has_status_update
+    before_filter :ensure_has_photo_upload
+    before_filter :ensure_has_create_listing
+    def index
+      render :text => 'score!'
+    end
+  end
   
   class ControllerWhichRequiresFacebookAuthentication < NoisyController
     ensure_authenticated_to_facebook
@@ -135,6 +144,44 @@ begin
   
   end
   
+class RailsIntegrationTestForExtendedPermissions < Test::Unit::TestCase
+  def setup
+    ENV['FACEBOOK_API_KEY'] = '1234567'
+    ENV['FACEBOOK_SECRET_KEY'] = '7654321'
+    @controller = ControllerWhichRequiresExtendedPermissions.new
+    @request    = ActionController::TestRequest.new
+    @response   = ActionController::TestResponse.new
+    @controller.stubs(:verify_signature).returns(true)
+  end
+  
+  def test_redirects_without_set_status
+    post :index,example_rails_params_including_fb
+    assert_response :success
+    assert_equal("<fb:redirect url=\"http://www.facebook.com/authorize.php?api_key=1234567&v=1.0&ext_perm=status_update\" />", @response.body)
+  end
+  def test_redirects_without_photo_upload
+    post :index,example_rails_params_including_fb.merge(:fb_sig_ext_perms=>"status_update")
+    assert_response :success
+    assert_equal("<fb:redirect url=\"http://www.facebook.com/authorize.php?api_key=1234567&v=1.0&ext_perm=photo_upload\" />", @response.body)
+  end
+  def test_redirects_without_create_listing
+    post :index,example_rails_params_including_fb.merge(:fb_sig_ext_perms=>"status_update,photo_upload")
+    assert_response :success
+    assert_equal("<fb:redirect url=\"http://www.facebook.com/authorize.php?api_key=1234567&v=1.0&ext_perm=create_listing\" />", @response.body)
+  end
+  
+  def test_renders_with_permission
+    post :index,example_rails_params_including_fb.merge(:fb_sig_ext_perms=>"status_update,photo_upload,create_listing")
+    assert_response :success
+    assert_equal("score!", @response.body)
+    
+  end
+  private
+    def example_rails_params_including_fb
+      {"fb_sig_time"=>"1186588275.5988", "fb_sig"=>"7371a6400329b229f800a5ecafe03b0a", "action"=>"index", "fb_sig_in_canvas"=>"1", "fb_sig_session_key"=>"c452b5d5d60cbd0a0da82021-744961110", "controller"=>"controller_which_requires_facebook_authentication", "fb_sig_expires"=>"0", "fb_sig_friends"=>"417358,702720,1001170,1530839,3300204,3501584,6217936,9627766,9700907,22701786,33902768,38914148,67400422,135301144,157200364,500103523,500104930,500870819,502149612,502664898,502694695,502852293,502985816,503254091,504510130,504611551,505421674,509229747,511075237,512548373,512830487,517893818,517961878,518890403,523589362,523826914,525812984,531555098,535310228,539339781,541137089,549405288,552706617,564393355,564481279,567640762,568091401,570201702,571469972,573863097,574415114,575543081,578129427,578520568,582262836,582561201,586550659,591631962,592318318,596269347,596663221,597405464,599764847,602995438,606661367,609761260,610544224,620049417,626087078,628803637,632686250,641422291,646763898,649678032,649925863,653288975,654395451,659079771,661794253,665861872,668960554,672481514,675399151,678427115,685772348,686821151,687686894,688506532,689275123,695551670,710631572,710766439,712406081,715741469,718976395,719246649,722747311,725327717,725683968,725831016,727580320,734151780,734595181,737944528,748881410,752244947,763868412,768578853,776596978,789728437,873695441", "fb_sig_added"=>"0", "fb_sig_api_key"=>"b6c9c857ac543ca806f4d3187cd05e09", "fb_sig_user"=>"744961110", "fb_sig_profile_update_time"=>"1180712453"}
+    end
+  
+end  
   
 class RailsIntegrationTestForApplicationInstallation < Test::Unit::TestCase
   def setup
