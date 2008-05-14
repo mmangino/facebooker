@@ -45,7 +45,7 @@ module Facebooker
       end
 
       def facebook_redirect_url
-        match = response.body.match(/<fb:redirect url="([^"]+)"/)
+        match = @response.body.match(/<fb:redirect url="([^"]+)"/)
         match.nil? ? nil : match.captures[0]
       end
 
