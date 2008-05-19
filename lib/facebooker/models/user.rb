@@ -39,6 +39,17 @@ module Facebooker
       end      
     end
 
+    # Returns a user's events, params correspond to API call parameters (except UID):
+    # http://wiki.developers.facebook.com/index.php/Events.get
+    # E.g:
+    #  @user.events(:start_time => Time.now.to_i, :end_time => 1.month.from_now.to_i)
+    #  # => Returns events betwen now and a month from now
+    def events(params={})
+      @events ||= @session.post('facebook.events.get', {:uid => self.id}.merge(params)).map do |event|
+        Event.from_hash(event)
+      end
+    end
+
 
     # 
     # Set the list of friends, given an array of User objects.  If the list has been retrieved previously, will not set

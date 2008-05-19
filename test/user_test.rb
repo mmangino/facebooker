@@ -78,7 +78,17 @@ class UserTest < Test::Unit::TestCase
     @user.status="my status"
   end
   
-    
+  def test_get_events
+    @user = Facebooker::User.new(9507801, @session)
+    expect_http_posts_with_responses(example_events_get_xml)
+    events = @user.events
+    assert_equal "29511517904", events.first.eid
+  end
+  
+  def test_can_get_events
+    @user.expects(:events)
+    @user.events
+  end
   
   def test_to_s
     assert_equal("1234",@user.to_s)
@@ -115,4 +125,35 @@ class UserTest < Test::Unit::TestCase
     </photos_get_response>"
   end
   
+  def example_events_get_xml
+    "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+    <events_get_response xmlns=\"http://api.facebook.com/1.0/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd\" list=\"true\">
+      <event>
+        <eid>29511517904</eid>
+        <name>PUMA SALE</name>
+        <tagline/>
+        <nid>0</nid>
+        <pic>http://profile.ak.facebook.com/object3/370/66/s29511517904_6952.jpg</pic>
+        <pic_big>http://profile.ak.facebook.com/object3/370/66/n29511517904_6952.jpg</pic_big>
+        <pic_small>http://profile.ak.facebook.com/object3/370/66/t29511517904_6952.jpg</pic_small>
+        <host>PUMA</host>
+        <description>PUMA SALE</description>
+        <event_type>Education</event_type>
+        <event_subtype>Study Group</event_subtype>
+        <start_time>1212166800</start_time>
+        <end_time>1212364800</end_time>
+        <creator>1234261165</creator>
+        <update_time>1209768148</update_time>
+        <location>PUMA LOT</location>
+        <venue>
+          <street>5 LYBERTY WAY</street>
+          <city>Westford</city>
+          <state>Massachusetts</state>
+          <country>United States</country>
+          <latitude>42.5792</latitude>
+          <longitude>-71.4383</longitude>
+        </venue>
+      </event>
+    </events_get_response>"
+  end
 end
