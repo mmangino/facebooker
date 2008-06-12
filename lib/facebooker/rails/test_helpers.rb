@@ -11,6 +11,29 @@ module Facebooker
         facebook_post facebook_redirect_url
       end
       
+      def facebook_get(path,params={})
+        facebook_verb(:get,path,params)
+      end
+      
+      def facebook_post(path,params={})
+        facebook_verb(:post,path,params)
+      end
+      
+      def facebook_put(path,params={})
+        facebook_verb(:put,path,params)
+      end
+      def facebook_delete(path,params={})
+        facebook_verb(:delete,path,params)
+      end
+      
+      def facebook_verb(verb,path, params={})
+        params = default_facebook_parameters.update(params)
+        params.merge!(:fb_sig => generate_signature(facebook_params(params).stringify_keys))
+
+        params = params.update(:canvas => true).update(params)
+        send verb, path, params
+      end
+      
       def facebook_post(path, params={}, fb_params=facebook_parameters)
         params = fb_params.merge(:canvas => true).merge(params)
         post path, params    
