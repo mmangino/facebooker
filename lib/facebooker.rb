@@ -22,6 +22,8 @@ require 'facebooker/models/cookie'
 require 'facebooker/models/applicationproperties'
 require 'facebooker/models/tag'
 require 'facebooker/models/user'
+require 'facebooker/models/info_item'
+require 'facebooker/models/info_section'
 
 module Facebooker
   class << self

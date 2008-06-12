@@ -402,9 +402,9 @@ module Facebooker
       BatchRun.current_batch=nil
     end
     
-    def post(method, params = {},&proc)
+    def post(method, params = {},use_session_key=true,&proc)
       add_facebook_params(params, method)
-      @session_key && params[:session_key] ||= @session_key
+      use_session_key && @session_key && params[:session_key] ||= @session_key
       final_params=params.merge(:sig => signature_for(params))
       if batch_request?
         add_to_batch(final_params,&proc)

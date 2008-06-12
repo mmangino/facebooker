@@ -169,6 +169,12 @@ module Facebooker
       session.post('facebook.profile.setFBML', parameters)
     end
     
+    def set_info(title,sections,format=:text)
+      format_id = format.to_s == "text" ? 1 : 5
+      sections = [sections] unless sections.is_a?(Array)
+      session.post('facebook.profile.setInfo',{:title=>title,:info_fields=>sections.to_json,:type=>format_id,:uid=>id},false)
+    end
+    
     ##
     # Set the status of the user
     #

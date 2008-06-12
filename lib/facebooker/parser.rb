@@ -252,6 +252,13 @@ module Facebooker
       first_child.nil? ? [] : [first_child.name, array_of_hashes(root, first_child.name)]
     end
   end
+
+  class SetInfo < Parser#:nodoc:
+    def self.process(data)
+      raise data
+      element('fbml_setRefHandle_response', data).text_value
+    end
+  end
   
   class SetRefHandle < Parser#:nodoc:
     def self.process(data)
@@ -432,7 +439,8 @@ module Facebooker
       'facebook.groups.get' => GroupsGet,
       'facebook.events.getMembers' => EventMembersGet,
       'facebook.groups.getMembers' => GroupGetMembers,
-      'facebook.notifications.sendEmail' => NotificationsSendEmail
+      'facebook.notifications.sendEmail' => NotificationsSendEmail,
+      'facebook.profile.setInfo' => SetInfo
       
     }
   end

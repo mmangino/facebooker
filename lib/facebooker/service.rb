@@ -10,6 +10,7 @@ module Facebooker
     
    # TODO: support ssl 
    def post(params)
+     puts params.to_json
       Parser.parse(params[:method], Net::HTTP.post_form(url, params))
     end
     
