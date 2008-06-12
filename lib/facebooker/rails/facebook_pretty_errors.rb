@@ -1,4 +1,4 @@
-if RAILS_ENV=="development"
+if Module.const_defined?("RAILS_ENV") and RAILS_ENV=="development"
   class ActionController::Base
     def rescues_path_with_facebooker(template_name)
       t="#{RAILS_ROOT}/vendor/plugins/facebooker/templates/#{template_name}.erb"
