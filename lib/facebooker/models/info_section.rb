@@ -4,7 +4,7 @@ module Facebooker
     attr_accessor :field, :items
     
     def to_json
-      {:field=>field,:items=>items}.to_json
+      {:field => field, :items => items}.to_json
     end
   end
 end

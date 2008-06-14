@@ -44,7 +44,7 @@ module Facebooker
     def with_asset_path_for_canvas
       original_asset_host = ActionController::Base.asset_host
       begin
-        ActionController::Base.asset_host = "http://apps.facebook.com"
+        ActionController::Base.asset_host = ENV["FACEBOOKER_API"] == "new" ? "http://apps.new.facebook.com" : "http://apps.facebook.com"
         request_for_canvas(true) do
           yield
         end

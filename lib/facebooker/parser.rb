@@ -245,18 +245,23 @@ module Facebooker
     end
   end
   
+  class ProfileInfo < Parser#:nodoc:
+    def self.process(data)
+      hashinate(element('profile_getInfo_response info_fields', data))
+    end
+  end
+  
+  class ProfileInfoSet < Parser#:nodoc:
+    def self.process(data)
+      element('profile_setInfo_response', data).text_value
+    end
+  end
+  
   class FqlQuery < Parser#nodoc
     def self.process(data)
       root = element('fql_query_response', data)
       first_child = root.children.reject{|c| c.kind_of?(REXML::Text)}.first
       first_child.nil? ? [] : [first_child.name, array_of_hashes(root, first_child.name)]
-    end
-  end
-
-  class SetInfo < Parser#:nodoc:
-    def self.process(data)
-      raise data
-      element('fbml_setRefHandle_response', data).text_value
     end
   end
   
@@ -419,6 +424,8 @@ module Facebooker
       'facebook.notifications.sendRequest' => SendRequest,
       'facebook.profile.getFBML' => ProfileFBML,
       'facebook.profile.setFBML' => ProfileFBMLSet,
+      'facebook.profile.getInfo' => ProfileInfo,
+      'facebook.profile.setInfo' => ProfileInfoSet,
       'facebook.fbml.setRefHandle' => SetRefHandle,
       'facebook.fbml.refreshRefUrl' => RefreshRefURL,
       'facebook.fbml.refreshImgSrc' => RefreshImgSrc,
@@ -439,9 +446,7 @@ module Facebooker
       'facebook.groups.get' => GroupsGet,
       'facebook.events.getMembers' => EventMembersGet,
       'facebook.groups.getMembers' => GroupGetMembers,
-      'facebook.notifications.sendEmail' => NotificationsSendEmail,
-      'facebook.profile.setInfo' => SetInfo
-      
+      'facebook.notifications.sendEmail' => NotificationsSendEmail
     }
   end
 end

@@ -22,7 +22,7 @@ module Facebooker
     populating_hash_settable_list_accessor :affiliations, Affiliation
     populating_hash_settable_list_accessor :education_history, EducationInfo
     populating_hash_settable_list_accessor :work_history, WorkInfo
-
+    
     # Can pass in these two forms:
     # id, session, (optional) attribute_hash
     # attribute_hash
@@ -49,8 +49,7 @@ module Facebooker
         Event.from_hash(event)
       end
     end
-
-
+    
     # 
     # Set the list of friends, given an array of User objects.  If the list has been retrieved previously, will not set
     def friends=(list_of_friends)
@@ -114,7 +113,7 @@ module Facebooker
     def publish_action(action)
       publish(action)
     end
-
+    
     def publish_templatized_action(action)
       publish(action)
     end
@@ -138,7 +137,7 @@ module Facebooker
     def upload_photo(multipart_post_file)
       Photo.from_hash(session.post_file('facebook.photos.upload', {nil => multipart_post_file}))
     end
-
+    
     def profile_fbml
       session.post('facebook.profile.getFBML', :uid => @id)  
     end    
@@ -156,7 +155,7 @@ module Facebooker
     def mobile_fbml=(markup)
       set_profile_fbml(nil, markup, nil)
     end
-
+    
     def profile_action=(markup)
       set_profile_fbml(nil, nil, markup)
     end
@@ -169,10 +168,18 @@ module Facebooker
       session.post('facebook.profile.setFBML', parameters)
     end
     
-    def set_info(title,sections,format=:text)
-      format_id = format.to_s == "text" ? 1 : 5
-      sections = [sections] unless sections.is_a?(Array)
-      session.post('facebook.profile.setInfo',{:title=>title,:info_fields=>sections.to_json,:type=>format_id,:uid=>id},false)
+    ## ** NEW PROFILE DESIGN ***
+    # Set a info section for this user
+    #
+    # Note: using set_profile_info as I feel using user.set_info could be confused with the user.getInfo facebook method.
+    #       Also, I feel it fits in line with user.set_profile_fbml.
+    def set_profile_info(title, info_fields, format = :text)
+      session.post('facebook.profile.setInfo', :title => title, :uid => @id, 
+        :type => format.to_s == "text" ? 1 : 5, :info_fields => info_fields.to_json)
+    end
+    
+    def get_profile_info
+      session.post('facebook.profile.getInfo', :uid => @id)
     end
     
     ##
@@ -247,5 +254,5 @@ module Facebooker
       (uid << 32) + (aid & 0xFFFFFFFF)
     end
     
-  end  
+  end
 end

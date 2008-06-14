@@ -1,3 +1,16 @@
+# Added support to the Facebooker.yml file for switching to the new profile design..
+# Config parsing needs to happen before files are required.
+facebook_config = "#{RAILS_ROOT}/config/facebooker.yml"
+
+if File.exist?(facebook_config)
+  FACEBOOKER = YAML.load_file(facebook_config)[RAILS_ENV] 
+  ENV['FACEBOOK_API_KEY'] = FACEBOOKER['api_key']
+  ENV['FACEBOOK_SECRET_KEY'] = FACEBOOKER['secret_key']
+  ENV['FACEBOOKER_RELATIVE_URL_ROOT'] = FACEBOOKER['canvas_page_name']
+  ENV['FACEBOOKER_API'] = FACEBOOKER['api']
+  ActionController::Base.asset_host = FACEBOOKER['callback_url'] if(ActionController::Base.asset_host.blank?)
+end
+
 require 'net/http_multipart_post'
 require 'facebooker/rails/controller'
 require 'facebooker/rails/facebook_url_rewriting'
@@ -21,7 +34,6 @@ module ::ActionController
   end
 end
 
-
 class ActionController::Routing::Route
   def recognition_conditions_with_facebooker
     defaults = recognition_conditions_without_facebooker 
@@ -30,6 +42,7 @@ class ActionController::Routing::Route
   end
   alias_method_chain :recognition_conditions, :facebooker
 end
+
 # We turn off route optimization to make named routes use our code for figuring out if they should go to the session
 # If this fails, it means we're on rails 1.2, we can ignore it
 begin
@@ -37,16 +50,7 @@ begin
 rescue NoMethodError=>e
   nil
 end
+
 # pull :canvas=> into env in routing to allow for conditions
 ActionController::Routing::RouteSet.send :include,  Facebooker::Rails::Routing::RouteSetExtensions
 ActionController::Routing::RouteSet::Mapper.send :include, Facebooker::Rails::Routing::MapperExtensions
-
-facebook_config = "#{RAILS_ROOT}/config/facebooker.yml"
-
-if File.exist?(facebook_config)
-  FACEBOOKER = YAML.load_file(facebook_config)[RAILS_ENV] 
-  ENV['FACEBOOK_API_KEY'] = FACEBOOKER['api_key']
-  ENV['FACEBOOK_SECRET_KEY'] = FACEBOOKER['secret_key']
-  ENV['FACEBOOKER_RELATIVE_URL_ROOT'] = FACEBOOKER['canvas_page_name']
-  ActionController::Base.asset_host = FACEBOOKER['callback_url'] if(ActionController::Base.asset_host.blank?)
-end

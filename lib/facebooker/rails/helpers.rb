@@ -581,4 +581,11 @@ class Hash
     self[newkey] = self.delete(oldkey) if self.has_key?(oldkey)
     self
   end
+
+  # We can allow css attributes.
+  FB_ALWAYS_VALID_OPTION_KEYS = [:class, :style]
+  def assert_valid_keys(*valid_keys)
+    unknown_keys = keys - [valid_keys + FB_ALWAYS_VALID_OPTION_KEYS].flatten
+    raise(ArgumentError, "Unknown key(s): #{unknown_keys.join(", ")}") unless unknown_keys.empty?
+  end    
 end
