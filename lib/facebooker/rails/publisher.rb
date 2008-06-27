@@ -184,7 +184,7 @@ module Facebooker
          end
          from.set_profile_fbml(_body.profile, 
                                             _body.mobile_profile, 
-                                            _body.profile_action)
+                                            _body.profile_action, nil)
         when Ref
           @from.session.server_cache.set_ref_handle(_body.handle,_body.fbml)
         else
@@ -208,8 +208,11 @@ module Facebooker
 
 
       def initialize_template_class(assigns)
-        template_root = "#{RAILS_ROOT}/app/views/"
-        returning ActionView::Base.new([template_root,File.join(template_root,self.class.controller_path)], assigns, self) do |template|
+        template_root = "#{RAILS_ROOT}/app/views"
+	      controller_root = File.join(template_root,self.class.controller_path)
+	      # only add the view path once
+	      ActionController::Base.append_view_path(controller_root) unless ActionController::Base.view_paths.include?(controller_root)
+        returning ActionView::Base.new([template_root,controller_root], assigns, self) do |template|
           template.controller=self
           template.extend(self.class.master_helper_module)
         end
