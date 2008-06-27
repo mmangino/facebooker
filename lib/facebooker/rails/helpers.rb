@@ -52,7 +52,7 @@ module Facebooker
       def fb_request_form(type,message_param,url,&block)
         content = capture(&block)
         message = @template.instance_variable_get("@content_for_#{message_param}") 
-        concat(content_tag("fb:request-form", content,
+        concat(content_tag("fb:request-form", content + token_tag,
                   {:action=>url,:method=>"post",:invite=>true,:type=>type,:content=>message}),
               block.binding)
       end
@@ -561,7 +561,15 @@ module Facebooker
         else
           content_tag("fb:#{type}", content_tag("fb:message", message) + text)
         end
-      end      
+      end
+
+      def token_tag
+        unless protect_against_forgery?
+          ''
+        else
+          tag(:input, :type => "hidden", :name => request_forgery_protection_token.to_s, :value => form_authenticity_token)
+        end
+      end
     end
   end
 end

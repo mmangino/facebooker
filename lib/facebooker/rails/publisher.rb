@@ -210,8 +210,11 @@ module Facebooker
       def initialize_template_class(assigns)
         template_root = "#{RAILS_ROOT}/app/views"
 	      controller_root = File.join(template_root,self.class.controller_path)
-	      # only add the view path once
-	      ActionController::Base.append_view_path(controller_root) unless ActionController::Base.view_paths.include?(controller_root)
+        #only do this on Rails 2.1
+	      if ActionController::Base.respond_to?(:append_view_path)
+  	      # only add the view path once
+	        ActionController::Base.append_view_path(controller_root) unless ActionController::Base.view_paths.include?(controller_root)
+	      end
         returning ActionView::Base.new([template_root,controller_root], assigns, self) do |template|
           template.controller=self
           template.extend(self.class.master_helper_module)

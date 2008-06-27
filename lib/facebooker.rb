@@ -1,4 +1,10 @@
-require 'json' 
+begin
+  unless ActiveSupport.const_defined?("JSON")
+    require 'json' 
+  end 
+rescue
+  require 'json' 
+end
 require 'facebooker/batch_request'
 require 'facebooker/feed'
 require 'facebooker/model'

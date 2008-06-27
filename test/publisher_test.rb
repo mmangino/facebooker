@@ -243,6 +243,10 @@ class PublisherTest < Test::Unit::TestCase
   end
   
   def test_with_render
+    #normally Rails would do this for us
+    if ActionController::Base.respond_to?(:append_view_path)
+      ActionController::Base.append_view_path("./test/../../app/views")
+    end
     notification=TestPublisher.create_render_notification(12451752,@user)
     assert_equal "true",notification.fbml
   end
