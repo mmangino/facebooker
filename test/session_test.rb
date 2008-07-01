@@ -228,6 +228,30 @@ class SessionTest < Test::Unit::TestCase
     Facebooker::BatchRun.current_batch=4
     assert_equal 4,Facebooker::BatchRun.current_batch
   end
+
+  def test_can_query_for_pages
+    expect_http_posts_with_responses(example_pages_xml)
+    example_page = Facebooker::Page.new(
+      :page_id => 4846711747,
+      :name => "Kronos Quartet",
+      :website => "http://www.kronosquartet.org",
+      :company_overview => "",
+      :session => @session)
+    pages = @session.pages(:fields => %w[ page_id name website company_overview ])
+
+    assert_equal 1, pages.size
+
+    page = pages.first
+    assert_equal "4846711747", page.page_id
+    assert_equal "Kronos Quartet", page.name
+    assert_equal "http://www.kronosquartet.org", page.website
+    # TODO we really need a way to differentiate between hash/list and text attributes
+    assert_equal({}, page.company_overview)
+
+    genre = page.genre
+    assert_equal false, genre.dance
+    assert_equal true, genre.party
+  end
   
   def teardown
     Facebooker::Session.configuration_file_path = nil
@@ -484,6 +508,24 @@ class SessionTest < Test::Unit::TestCase
     <feed_registerTemplateBundle_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/">
          17876842716
     </feed_registerTemplateBundle_response>
+    XML
+  end
+
+  def example_pages_xml
+    <<-XML
+    <?xml version="1.0" encoding="UTF-8"?>
+    <pages_getInfo_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd" list="true">
+      <page>
+        <page_id>4846711747</page_id>
+        <name>Kronos Quartet</name>
+        <website>http://www.kronosquartet.org</website>
+        <company_overview/>
+        <genre>
+          <dance>0</dance>
+          <party>1</party>
+        </genre>
+      </page>
+    </pages_getInfo_response>
     XML
   end
   

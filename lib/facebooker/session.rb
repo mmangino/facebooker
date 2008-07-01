@@ -209,7 +209,17 @@ module Facebooker
         end
       end
     end
-    
+
+    def pages(options = {})
+      raise ArgumentError, 'fields option is mandatory' unless options.has_key?(:fields)
+      @pages ||= {}
+      @pages[options] ||= post('facebook.pages.getInfo', options) do |response|
+        response.map do |hash|
+          Page.from_hash(hash)
+        end
+      end
+    end
+
     #
     # Returns a proxy object for handling calls to Facebook cached items
     # such as images and FBML ref handles
