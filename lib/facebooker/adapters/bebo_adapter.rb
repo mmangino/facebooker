@@ -5,7 +5,7 @@ Facebooker::PublishTemplatizedAction
 module Facebooker
    class User
     def set_profile_fbml_with_bebo_adapter(profile_fbml, mobile_fbml, profile_action_fbml)
-      if(Facebooker::BeboSession === self.session )
+      if(Facebooker.is_for?(:bebo))
         self.session.post('facebook.profile.setFBML', :uid => @id, :markup => profile_fbml)
       else
         set_profile_fbml_without_bebo_adapter(profile_fbml,mobile_fbml, profile_action_fbml)
@@ -17,7 +17,7 @@ module Facebooker
     
     BEBO_FIELDS = FIELDS - [:meeting_sex, :wall_count, :meeting_for]
     def collect(fields)
-      if(Facebooker::BeboSession === self.session )
+      if(Facebooker.is_for?(:bebo) )
          BEBO_FIELDS.reject{|field_name| !fields.empty? && !fields.include?(field_name)}.join(',')
       else
          FIELDS.reject{|field_name| !fields.empty? && !fields.include?(field_name)}.join(',')

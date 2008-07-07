@@ -69,7 +69,6 @@ module Facebooker
     end
     
     def self.secret_key
-      key = Facebooker.secret_key
       extract_key_from_environment(:secret) || extract_key_from_configuration_file(:secret) rescue report_inability_to_find_key(:secret)
     end
     

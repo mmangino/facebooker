@@ -1,6 +1,5 @@
 module Facebooker
   class AdapterBase
-    class << self
       def facebook_path_prefix
         "/" + (@facebook_path_prefix || canvas_page_name)
       end
@@ -10,12 +9,7 @@ module Facebooker
       end
       
       def  facebooker_config
-        return @facebooker_config if @facebooker_config
-        
-        facebook_config_file = "#{RAILS_ROOT}/config/facebooker.yml"
-        if File.exist?(facebook_config_file)
-          @facebooker_config = YAML.load_file(facebook_config_file)[RAILS_ENV]     
-        end
+        @config
       end
       
        def api_server_base_url
@@ -25,24 +19,49 @@ module Facebooker
        def is_for?(application_context)
          raise "SubClassShouldDefine"
        end
-      
+       
+       def initialize(config)
+         @config = config
+       end
+       
+        # TODO: Get someone to look into this for desktop apps.  
+     def  self.facebooker_config
+        return @facebooker_config if @facebooker_config
+        
+        facebook_config_file = "#{RAILS_ROOT}/config/facebooker.yml"
+        if File.exist?(facebook_config_file)
+          @facebooker_config = YAML.load_file(facebook_config_file)[RAILS_ENV]     
+        end
+     end
      
-    end
-    
+     def self.load_adapter(params)
+       if(api_key = params[:fb_sig_api_key])
+       facebooker_config.each do |key,value|
+         if(value == api_key)
+           key_base = key.match(/(.*)[_]?api_key/)[1]
+           adapter_class_name = key_base.blank? ? "FacebookAdapter" : facebooker_config[key_base + "adapter"]
+           adpater_class = "Facebooker::#{adapter_class_name}".constantize
+           # Collect the rest of the configuration
+           adapter_config = {}
+           facebooker_config.each do |key,value|
+             next unless( match = key.match(/#{key_base}[_]?(.*)/))
+             adapter_config[match[1]] = value
+           end
+           return adpater_class.new(adapter_config)
+         end
+       end
+       else
+         raise "UnableToLoadAdapter"
+       end
+     end
+      [:canvas_page_name, :api_key,:secret_key].each do |key_method|
+        define_method(key_method){ return facebooker_config[key_method.to_s]}
+      end
+         
   end
+   
   class FacebookAdapter < AdapterBase
-    class << self
-      def canvas_page_name
-        facebooker_config["canvas_page_name"]
-      end
-      def api_key
-        facebooker_config["api_key"]
-      end
-      
-      def secret_key
-        facebooker_config["secret_key"]
-      end
-      
+         
       def canvas_server_base
         "apps.facebook.com"
       end
@@ -63,37 +82,25 @@ module Facebooker
             ENV["FACEBOOKER_API"] == "new" ? "www.new.facebook.com" : "www.facebook.com"
        end
        
-       def login_url_base(api_key)
-         "http://#{Facebooker.www_server_base_url}/login.php?api_key=#{api_key}&v=1.0"
+       def login_url_base
+         "http://#{www_server_base_url}/login.php?api_key=#{api_key}&v=1.0"
        end
        
-       def install_url_base(api_key)
-         "http://#{Facebooker.www_server_base_url}/install.php?api_key=#{api_key}&v=1.0"
+       def install_url_base
+         "http://#{www_server_base_url}/install.php?api_key=#{api_key}&v=1.0"
        end
     
-  end
   end
 end
 
 
 module Facebooker
   class BeboAdapter < AdapterBase
-    class << self
-      def canvas_page_name
-        facebooker_config["bebo_canvas_page_name"]
-      end
+      
       def canvas_server_base
         "apps.bebo.com"
       end
       
-      def api_key
-        facebooker_config["bebo_api_key"]
-      end
-      
-      def secret_key
-        facebooker_config["bebo_secret_key"]
-      end
-     
        def api_server_base
         'apps.bebo.com'
       end
@@ -111,14 +118,13 @@ module Facebooker
        end
 
        
-       def login_url_base(api_key)
-      options = default_login_url_options.merge(options)
-      "http://#{Facebooker.www_server_base_url}/SignIn.jsp?ApiKey=#{api_key}&v=1.0"
-    end
+       def login_url_base
+        options = default_login_url_options.merge(options)
+        "http://#{www_server_base_url}/SignIn.jsp?ApiKey=#{api_key}&v=1.0"
+        end
 
-    def install_url_base(api_key)
-      "http://#{Facebooker.www_server_base_url}/c/apps/add?ApiKey=#{api_key}&v=1.0"
-    end
+    def install_url_base
+      "http://#{www_server_base_url}/c/apps/add?ApiKey=#{api_key}&v=1.0"
     end
   end
 end

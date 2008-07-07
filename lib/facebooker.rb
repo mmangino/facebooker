@@ -40,11 +40,11 @@ module Facebooker
     def current_adapter
       @current_adapter
     end
-      
-    def path_prefix
-      @path_prefix
+    
+    def load_adapter(params)
+      self.current_adapter = Facebooker::AdapterBase.load_adapter(params)
     end
-  
+      
     def facebook_path_prefix=(path)
       current_adapter.facebook_path_prefix = path
     end
@@ -54,26 +54,20 @@ module Facebooker
       current_adapter.facebook_path_prefix
     end
     
-    # Default is apps.facebook.com
-    def canvas_server_base
-      current_adapter.canvas_server_base
+    def is_for?(application_container)
+      current_adapter.is_for?(application_container)
     end
     
-    def api_server_base_url
-        current_adapter.api_server_base_url
-    end
-    
-    def api_server_base
-      current_adapter.api_server_base
-    end
-    
-    
-    [:api_key,:secret_key, :www_server_base_url,:login_url_base,:api_rest_path].each do |delegated_method|
+   
+   
+    [:api_key,:secret_key, :www_server_base_url,:login_url_base,:install_url_base,:api_rest_path,:api_server_base,:api_server_base_url,:canvas_server_base].each do |delegated_method|
       define_method(delegated_method){ return current_adapter.send(delegated_method)}
     end
     
     
-  
+       def path_prefix
+      @path_prefix
+      end
     
     
     # Set the asset path to the canvas path for just this one request

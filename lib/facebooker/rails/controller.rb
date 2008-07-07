@@ -9,22 +9,7 @@ module Facebooker
         controller.helper_attr :facebook_session_parameters
       end
 
-      def set_adapter
-        if( fb_sig_network == :bebo)
-          Facebooker.current_adapter =  Facebooker::BeboAdapter
-        else
-          Facebooker.current_adapter = Facebooker::FacebookAdapter
-        end
-      end
-
-      def fb_sig_network
-        if ( network = params[:fb_sig_network] )
-           network.downcase.to_sym
-        else
-          :facebook
-        end
-      end
-
+    
       def facebook_session
         @facebook_session
       end
@@ -36,7 +21,7 @@ module Facebooker
       
       def set_facebook_session
         
-        returning session_set = session_already_secured? || secure_with_token! || secure_with_facebook_params!  do
+        returning session_set = session_already_secured? ||  secure_with_facebook_params! ||secure_with_token!  do
           if session_set
             capture_facebook_friends_if_available! 
             Session.current = facebook_session
@@ -197,6 +182,10 @@ module Facebooker
       def set_fbml_format
         params[:format]="fbml" if request_is_for_a_facebook_canvas? or request_is_facebook_ajax?
       end
+      def set_adapter
+        Facebooker.load_adapter(params) if(params[:fb_sig_api_key])
+      end
+
       
       module ClassMethods
         #
