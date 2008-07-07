@@ -261,7 +261,7 @@ module Facebooker
         end
     
         def default_url_options
-          {:host => "apps.facebook.com" + Facebooker.facebook_path_prefix}
+          {:host => Facebooker.api_server_base_url + Facebooker.facebook_path_prefix}
         end
     
         def controller_path

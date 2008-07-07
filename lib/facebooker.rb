@@ -33,24 +33,55 @@ require 'facebooker/models/info_section'
 
 module Facebooker
   class << self
+     def current_adapter=(adapter_class)
+      @current_adapter = adapter_class
+    end
+    
+    def current_adapter
+      @current_adapter
+    end
+      
     def path_prefix
       @path_prefix
     end
   
     def facebook_path_prefix=(path)
-      @facebook_path_prefix = path
+      current_adapter.facebook_path_prefix = path
     end
   
+    # Default is canvas_page_name in yml file
     def facebook_path_prefix
-      "/" + (@facebook_path_prefix || ENV["FACEBOOK_CANVAS_PATH"] || ENV["FACEBOOKER_RELATIVE_URL_ROOT"])
+      current_adapter.facebook_path_prefix
     end
+    
+    # Default is apps.facebook.com
+    def canvas_server_base
+      current_adapter.canvas_server_base
+    end
+    
+    def api_server_base_url
+        current_adapter.api_server_base_url
+    end
+    
+    def api_server_base
+      current_adapter.api_server_base
+    end
+    
+    
+    [:api_key,:secret_key, :www_server_base_url,:login_url_base,:api_rest_path].each do |delegated_method|
+      define_method(delegated_method){ return current_adapter.send(delegated_method)}
+    end
+    
+    
   
+    
+    
     # Set the asset path to the canvas path for just this one request
     # by definition, we will make this a canvas request
     def with_asset_path_for_canvas
       original_asset_host = ActionController::Base.asset_host
       begin
-        ActionController::Base.asset_host = ENV["FACEBOOKER_API"] == "new" ? "http://apps.new.facebook.com" : "http://apps.facebook.com"
+        ActionController::Base.asset_host = Facebooker.api_server_base_url
         request_for_canvas(true) do
           yield
         end

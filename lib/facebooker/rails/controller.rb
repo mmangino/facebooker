@@ -4,11 +4,27 @@ module Facebooker
     module Controller
       def self.included(controller)
         controller.extend(ClassMethods)
+        controller.before_filter :set_adapter
         controller.before_filter :set_fbml_format
         controller.helper_attr :facebook_session_parameters
-        
       end
-      
+
+      def set_adapter
+        if( fb_sig_network == :bebo)
+          Facebooker.current_adapter =  Facebooker::BeboAdapter
+        else
+          Facebooker.current_adapter = Facebooker::FacebookAdapter
+        end
+      end
+
+      def fb_sig_network
+        if ( network = params[:fb_sig_network] )
+           network.downcase.to_sym
+        else
+          :facebook
+        end
+      end
+
       def facebook_session
         @facebook_session
       end
@@ -64,7 +80,7 @@ module Facebooker
       end
       
       def new_facebook_session
-        Facebooker::Session.create(Facebooker::Session.api_key, Facebooker::Session.secret_key)
+        Facebooker::Session.create(Facebooker.api_key, Facebooker.secret_key)
       end
       
       def capture_facebook_friends_if_available!

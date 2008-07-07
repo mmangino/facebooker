@@ -69,6 +69,7 @@ module Facebooker
     end
     
     def self.secret_key
+      key = Facebooker.secret_key
       extract_key_from_environment(:secret) || extract_key_from_configuration_file(:secret) rescue report_inability_to_find_key(:secret)
     end
     
@@ -82,16 +83,16 @@ module Facebooker
     
     def login_url(options={})
       options = default_login_url_options.merge(options)
-      "http://www.facebook.com/login.php?api_key=#{@api_key}&v=1.0#{login_url_optional_parameters(options)}"
+      "#{Facebooker.login_url_base(@api_key)}#{login_url_optional_parameters(options)}"
     end
     
     def install_url(options={})
-      "http://www.facebook.com/install.php?api_key=#{@api_key}&v=1.0#{install_url_optional_parameters(options)}"
+      "#{Facebooker.install_url_base(@api_key)}#{install_url_optional_parameters(options)}"
     end
     
     def permission_url(permission,options={})
       options = default_login_url_options.merge(options)
-      "http://www.facebook.com/authorize.php?api_key=#{@api_key}&v=1.0&ext_perm=#{permission}#{install_url_optional_parameters(options)}"
+      "http://#{Facebooker.www_server_base_url}/authorize.php?api_key=#{@api_key}&v=1.0&ext_perm=#{permission}#{install_url_optional_parameters(options)}"
     end
     
     def install_url_optional_parameters(options)
@@ -437,8 +438,9 @@ module Facebooker
         hash[:v] = "1.0"
       end
       
+      # This ultimately delgates to the adapter
       def self.extract_key_from_environment(key_name)
-        val = ENV["FACEBOOK_" + key_name.to_s.upcase + "_KEY"]
+             Facebooker.send(key_name.to_s + "_key") rescue nil
       end
       
       def self.extract_key_from_configuration_file(key_name)
@@ -454,7 +456,7 @@ module Facebooker
       end
       
       def service
-        @service ||= Service.new(API_SERVER_BASE_URL, API_PATH_REST, @api_key)      
+        @service ||= Service.new(Facebooker.api_server_base, Facebooker.api_rest_path, @api_key)      
       end
       
       def uid
