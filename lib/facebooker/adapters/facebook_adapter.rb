@@ -35,9 +35,9 @@ module Facebooker
     end
      
     def self.load_adapter(params)
-      if(api_key = params[:fb_sig_api_key])
+      if(  ( api_key = ( params[:fb_sig_api_key] || facebooker_config["#{params[:config_key_base]}api_key"])))
          
-        if(facebooker_config)
+        if(  facebooker_config)
           facebooker_config.each do |key,value|
             if(value == api_key)
               key_base = key.match(/(.*)[_]?api_key/)[1]
