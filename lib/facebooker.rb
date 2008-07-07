@@ -30,6 +30,7 @@ require 'facebooker/models/tag'
 require 'facebooker/models/user'
 require 'facebooker/models/info_item'
 require 'facebooker/models/info_section'
+require 'facebooker/adapters/facebook_adapter'
 
 module Facebooker
   class << self
@@ -38,7 +39,7 @@ module Facebooker
     end
     
     def current_adapter
-      @current_adapter
+      @current_adapter || Facebooker::AdapterBase.default_adapter
     end
     
     def load_adapter(params)

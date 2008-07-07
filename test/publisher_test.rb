@@ -8,6 +8,7 @@ require 'facebooker/rails/controller'
 require 'facebooker/rails/helpers'
 require 'facebooker/rails/publisher'
 
+
 module SymbolHelper
   def symbol_helper_loaded
     true

@@ -6,7 +6,8 @@ class SessionTest < Test::Unit::TestCase
   def setup
     ENV['FACEBOOK_API_KEY'] = '1234567'
     ENV['FACEBOOK_SECRET_KEY'] = '7654321'   
-    @session = Facebooker::Session.create('whatever', 'doesnotmatterintest')     
+    Facebooker.current_adapter = nil 
+    @session = Facebooker::Session.create('whatever', 'doesnotmatterintest')   
   end
 
   def teardown
