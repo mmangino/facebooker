@@ -10,7 +10,7 @@ module Facebooker
           env = extract_request_environment_without_facebooker(request)
           env.merge :canvas => (request.parameters[:fb_sig_in_canvas]=="1")
         end
-      end
+      end 
       module MapperExtensions
 
         # Generates pseudo-resource routes. Since everything is a POST, routes can't be identified

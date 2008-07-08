@@ -1,6 +1,38 @@
+module Facebooker
+  class BeboAdapter < AdapterBase
+      
+    def canvas_server_base
+      "apps.bebo.com"
+    end
+      
+    def api_server_base
+      'apps.bebo.com'
+    end
+    
+    def api_rest_path
+      "/restserver.php"
+    end
+      
+    def is_for?(application_context)
+      application_context == :bebo
+    end
+       
+    def www_server_base_url
+      "www.bebo.com"
+    end
 
-# Things that don't actually work in BEBO
+       
+    def login_url_base
+      "http://#{www_server_base_url}/SignIn.jsp?ApiKey=#{api_key}&v=1.0"
+    end
 
+    def install_url_base
+      "http://#{www_server_base_url}/c/apps/add?ApiKey=#{api_key}&v=1.0"
+    end
+  end
+end
+
+# Things that don't actually work as expected in BEBO
 Facebooker::PublishTemplatizedAction
 module Facebooker
    class User

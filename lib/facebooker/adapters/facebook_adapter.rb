@@ -1,5 +1,9 @@
 module Facebooker
+  
   class AdapterBase
+    class UnableToLoadAdapter < Exception; end
+    require 'active_support'
+    include  ActiveSupport::CoreExtensions::String::Inflections
     def facebook_path_prefix
       "/" + (@facebook_path_prefix || canvas_page_name || ENV['FACEBOOK_CANVAS_PATH'] || ENV['FACEBOOKER_RELATIVE_URL_ROOT'])
     end
@@ -27,19 +31,22 @@ module Facebooker
     # TODO: Get someone to look into this for desktop apps.  
     def  self.facebooker_config
       return @facebooker_config if @facebooker_config
-        
+        puts "Hey we shouldn't be here. should we?" if ENV["GO_FOR_IT"]
       facebook_config_file = "#{RAILS_ROOT}/config/facebooker.yml"
       if File.exist?(facebook_config_file)
         @facebooker_config = YAML.load_file(facebook_config_file)[RAILS_ENV]     
       end
     end
+ 
+    
      
     def self.load_adapter(params)
       
       config_key_base = params[:config_key_base] # This allows for loading of a aspecific adapter
       config_key_base += "_" unless config_key_base.blank?
+    
       if(  ( api_key = ( params[:fb_sig_api_key] || facebooker_config["#{config_key_base}api_key"])))
-         
+      
         if(  facebooker_config)
           facebooker_config.each do |key,value|
             if(value == api_key)
@@ -59,7 +66,7 @@ module Facebooker
           self.default_adapter
         end
       else
-        raise "UnableToLoadAdapter"
+        raise Facebooker::AdapterBase::UnableToLoadAdapter
       end
     end
      
@@ -120,37 +127,3 @@ module Facebooker
 end
 
 
-module Facebooker
-  class BeboAdapter < AdapterBase
-      
-    def canvas_server_base
-      "apps.bebo.com"
-    end
-      
-    def api_server_base
-      'apps.bebo.com'
-    end
-    
-    def api_rest_path
-      "/restserver.php"
-    end
-      
-    def is_for?(application_context)
-      application_context == :bebo
-    end
-       
-    def www_server_base_url
-      "www.bebo.com"
-    end
-
-       
-    def login_url_base
-      options = default_login_url_options.merge(options)
-      "http://#{www_server_base_url}/SignIn.jsp?ApiKey=#{api_key}&v=1.0"
-    end
-
-    def install_url_base
-      "http://#{www_server_base_url}/c/apps/add?ApiKey=#{api_key}&v=1.0"
-    end
-  end
-end
