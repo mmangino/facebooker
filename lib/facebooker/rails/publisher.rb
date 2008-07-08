@@ -184,7 +184,7 @@ module Facebooker
          end
          from.set_profile_fbml(_body.profile, 
                                             _body.mobile_profile, 
-                                            _body.profile_action, nil)
+                                            _body.profile_action)
         when Ref
           @from.session.server_cache.set_ref_handle(_body.handle,_body.fbml)
         else

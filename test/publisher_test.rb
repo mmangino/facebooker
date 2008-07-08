@@ -173,6 +173,11 @@ class PublisherTest < Test::Unit::TestCase
     assert_equal "mobile_profile",p.mobile_profile
   end
   
+  def test_deliver_profile
+    @user.expects(:set_profile_fbml).with('profile', 'mobile_profile', 'profile_action')
+    TestPublisher.deliver_profile_update(@user,@user)    
+  end
+  
   def test_deliver_profile_update_same_session
     @user.expects(:set_profile_fbml)
     TestPublisher.deliver_profile_update(@user,@user)
