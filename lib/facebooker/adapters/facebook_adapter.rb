@@ -35,7 +35,10 @@ module Facebooker
     end
      
     def self.load_adapter(params)
-      if(  ( api_key = ( params[:fb_sig_api_key] || facebooker_config["#{params[:config_key_base]}api_key"])))
+      
+      config_key_base = params[:config_key_base] # This allows for loading of a aspecific adapter
+      config_key_base += "_" unless config_key_base.blank?
+      if(  ( api_key = ( params[:fb_sig_api_key] || facebooker_config["#{config_key_base}api_key"])))
          
         if(  facebooker_config)
           facebooker_config.each do |key,value|
@@ -61,7 +64,7 @@ module Facebooker
     end
      
     def self.default_adapter
-      if( facebooker_config.nil? || facebooker_config.blank? )
+      if( facebooker_config.nil? || (facebooker_config.blank? rescue nil) )
         config = { "api_key" => ENV['FACEBOOK_API_KEY'], "secret_key" =>  ENV['FACEBOOK_SECRET_KEY']}
       else
         config = facebooker_config
