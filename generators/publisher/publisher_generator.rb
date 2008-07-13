@@ -3,6 +3,10 @@ class PublisherGenerator < Rails::Generator::NamedBase
     record do |m|
       m.directory "app/models"
       m.template "publisher.rb", "app/models/#{file_name}_publisher.rb"
+      migration_file_name="create_facebook_templates"
+      unless  m.migration_exists?(migration_file_name)
+        m.migration_template "create_facebook_templates.rb", "db/migrate", :migration_file_name=>migration_file_name
+      end
     end
   end
   

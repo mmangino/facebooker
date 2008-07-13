@@ -27,6 +27,7 @@ module Facebooker
     class FeedBodyLengthTooLong < StandardError; end
     class InvalidFeedPhotoSource < StandardError; end
     class InvalidFeedPhotoLink < StandardError; end    
+    class TemplateDataMissingRequiredTokens < StandardError; end
     class FeedMarkupInvalid < StandardError; end
     class FeedTitleDataInvalid < StandardError; end
     class FeedTitleTemplateInvalid < StandardError; end
@@ -34,6 +35,7 @@ module Facebooker
     class FeedBodyTemplateInvalid < StandardError; end
     class FeedPhotosNotRetrieved < StandardError; end
     class FeedTargetIdsInvalid < StandardError; end
+    class TemplateBundleInvalid < StandardError; end
     class ConfigurationMissing < StandardError; end
     class FQLParseError < StandardError; end
     class FQLFieldDoesNotExist < StandardError; end
@@ -299,7 +301,7 @@ module Facebooker
       if !full_story_template.blank?
         parameters[:full_story_template]= full_story_template.to_json
       end
-      post("facebook.feed.registerTemplateBundle", parameters)
+      post("facebook.feed.registerTemplateBundle", parameters,false)
     end
     
     ##

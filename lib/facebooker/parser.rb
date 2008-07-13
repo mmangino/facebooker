@@ -387,6 +387,7 @@ module Facebooker
       321 => Facebooker::Session::AlbumIsFull,
       324 => Facebooker::Session::MissingOrInvalidImageFile,
       325 => Facebooker::Session::TooManyUnapprovedPhotosPending,
+      330 => Facebooker::Session::TemplateDataMissingRequiredTokens,
       340 => Facebooker::Session::TooManyUserCalls,
       341 => Facebooker::Session::TooManyUserActionCalls,
       342 => Facebooker::Session::InvalidFeedTitleLink,
@@ -408,12 +409,14 @@ module Facebooker
       603 => Facebooker::Session::FQLTableDoesNotExist,
       604 => Facebooker::Session::FQLStatementNotIndexable,
       605 => Facebooker::Session::FQLFunctionDoesNotExist,
-      606 => Facebooker::Session::FQLWrongNumberArgumentsPassedToFunction
+      606 => Facebooker::Session::FQLWrongNumberArgumentsPassedToFunction,
+      807 => Facebooker::Session::TemplateBundleInvalid
     }
     def self.process(data)
       response_element = element('error_response', data) rescue nil
       if response_element
         hash = hashinate(response_element)
+        puts "Got exception #{hash['error_code']} with message #{hash['error_msg']}"
         raise EXCEPTIONS[Integer(hash['error_code'])].new(hash['error_msg'])
       end
     end
