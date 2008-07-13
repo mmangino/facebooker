@@ -281,6 +281,40 @@ module Facebooker
     end 
     
     ##
+    # Register a template bundle with Facebook.
+    # returns the template id to use to send using this template
+    def register_template_bundle(one_line_story_templates,short_story_templates=nil,full_story_template=nil)
+
+      if !one_line_story_templates.is_a?(Array)
+        one_line_story_templates = [one_line_story_templates]
+      end
+      parameters = {:one_line_story_templates=>one_line_story_templates.to_json}
+
+      
+      if !short_story_templates.blank?
+        short_story_templates = [short_story_templates] unless short_story_templates.is_a?(Array)
+        parameters[:short_story_templates]= short_story_templates.to_json
+      end
+
+      if !full_story_template.blank?
+        parameters[:full_story_template]= full_story_template.to_json
+      end
+      post("facebook.feed.registerTemplateBundle", parameters)
+    end
+    
+    ##
+    # publish a previously rendered template bundle
+    # see http://wiki.developers.facebook.com/index.php/Feed.publishUserAction
+    #
+    def publish_user_action(bundle_id,data={},target_ids=nil,body_general=nil)
+      parameters={:template_bundle_id=>bundle_id,:template_data=>data.to_json}
+      parameters[:target_ids] = target_ids.to_json unless target_ids.blank?
+      parameters[:body_general] = body_general unless body_general.blank?
+      post("facebook.feed.publishUserAction", parameters)
+    end
+    
+    
+    ##
     # Send email to as many as 100 users at a time
     def send_email(user_ids, subject, text, fbml = nil) 			
       user_ids = Array(user_ids)

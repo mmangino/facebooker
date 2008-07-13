@@ -114,6 +114,18 @@ module Facebooker
     end
   end
   
+  class RegisterTemplateBundle < Parser#:nodoc:
+    def self.process(data)
+      element('feed_registerTemplateBundle_response', data).text_value.to_i
+    end    
+  end
+  
+  class PublishUserAction < Parser#:nodoc:
+    def self.process(data)
+      element('feed_publishUserAction_response', data).children[1].text_value == "1"
+    end
+  end
+  
   class PublishActionOfUser < Parser#:nodoc:
     def self.process(data)
       element('feed_publishActionOfUser_response', data).text_value
@@ -419,6 +431,8 @@ module Facebooker
       'facebook.feed.publishStoryToUser' => PublishStoryToUser,
       'facebook.feed.publishActionOfUser' => PublishActionOfUser,
       'facebook.feed.publishTemplatizedAction' => PublishTemplatizedAction,
+      'facebook.feed.registerTemplateBundle' => RegisterTemplateBundle,
+      'facebook.feed.publishUserAction' => PublishUserAction,
       'facebook.notifications.get' => NotificationsGet,
       'facebook.notifications.send' => NotificationsSend,
       'facebook.notifications.sendRequest' => SendRequest,
