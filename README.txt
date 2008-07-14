@@ -7,7 +7,7 @@
 Facebooker is a Ruby wrapper over the Facebook[http://facebook.com] {REST API}[http://developer.facebook.com].  Its goals are:
 
 * Idiomatic Ruby
-* No dependencies outside of the Ruby standard library
+* No dependencies outside of the Ruby standard library (This is true with Rails 2.1. Previous Rails versions require the JSON gem)
 * Concrete classes and methods modeling the Facebook data, so it's easy for a Rubyist to understand what's available
 * Well tested
 
@@ -21,7 +21,7 @@ Facebooker is a Ruby wrapper over the Facebook[http://facebook.com] {REST API}[h
 
 == SYNOPSIS:
 
-View David Clements' {excellent tutorial}[http://apps.facebook.com/facebooker_tutorial] at {http://apps.facebook.com/facebooker_tutorial/}[http://apps.facebook.com/facebooker_tutorial]
+View David Clements' {excellent tutorial}[http://apps.facebook.com/facebooker_tutorial] at {http://apps.facebook.com/facebooker_tutorial/}[http://apps.facebook.com/facebooker_tutorial] or check out {Developing Facebook Platform Applications with Rails}[http://www.pragprog.com/titles/mmfacer].
 
 == REQUIREMENTS:
 
@@ -43,7 +43,9 @@ If, for some reason, you can't/won't use RubyGems, you can do:
 
 Facebooker can be installed as a Rails plugin by:
 
-  script/plugin install http://facebooker.rubyforge.org/svn/trunk/facebooker/
+  script/plugin install git://github.com/mmangino/facebooker.git
+
+If you don't have git, the plugin can be downloaded from http://github.com/mmangino/facebooker/tarball/master
 
 Once the plugin is installed, you will need to configure your Facebook app in config/facebooker.yml. 
 

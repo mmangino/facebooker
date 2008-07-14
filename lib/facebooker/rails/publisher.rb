@@ -79,7 +79,23 @@ module Facebooker
     # Publisher makes many helpers available, including the linking and asset helpers
     class Publisher
       
+      class FacebookTemplate < ActiveRecord::Base
+        def self.register(t_id,name)
+          t=find_or_initialize_by_template_name(name)
+          t.update_attribute(:bundle_id,t_id)
+          t
+        end
+
+        def self.for(name)
+          find_by_template_name(name).bundle_id rescue nil
+        end
+      end
+      
       class_inheritable_accessor :master_helper_module
+      attr_accessor :one_line_story_templates, :short_story_templates
+      
+      cattr_accessor :skip_registry
+      self.skip_registry = false
       
       
       class InvalidSender < StandardError; end
@@ -104,7 +120,13 @@ module Facebooker
         attr_accessor :handle
         attr_accessor :fbml
       end
-
+      class UserAction
+        attr_accessor :data
+        attr_accessor :target_ids
+        attr_accessor :body_general
+        attr_accessor :template_id
+      end
+      
       cattr_accessor :ignore_errors
       attr_accessor :_body
     
@@ -143,9 +165,29 @@ module Facebooker
           Profile.new
         when :ref
           Ref.new
+        when :user_action
+          UserAction.new
         else
           raise UnknownBodyType.new("Unknown type to publish")
         end
+      end
+      
+      def full_story_template(story=nil)
+        if story.nil?
+          @full_story_template
+        else
+          @full_story_template=story
+        end
+      end
+      
+      def one_line_story_template(str)
+        @one_line_story_templates ||= []
+        @one_line_story_templates << str
+      end
+      
+      def short_story_template(title,body,params={})
+        @short_story_templates ||= []
+        @short_story_templates << params.merge(:template_title=>title, :template_body=>body)
       end
       
       def method_missing(name,*args)
@@ -158,7 +200,7 @@ module Facebooker
         end
       end
   
-      def send_message
+      def send_message(method)
         @recipients = @recipients.is_a?(Array) ? @recipients : [@recipients]
         if from.nil? and @recipients.size==1
           @from = @recipients.first
@@ -184,9 +226,11 @@ module Facebooker
          end
          from.set_profile_fbml(_body.profile, 
                                             _body.mobile_profile, 
-                                            _body.profile_action, nil)
+                                            _body.profile_action)
         when Ref
           @from.session.server_cache.set_ref_handle(_body.handle,_body.fbml)
+        when UserAction
+          @from.session.publish_user_action(_body.template_id || FacebookTemplate.for(method) ,_body.data,_body.target_ids,_body.body_general)
         else
           raise UnspecifiedBodyType.new("You must specify a valid send_as")
         end
@@ -241,7 +285,14 @@ module Facebooker
       include ActionController::UrlWriter
       class <<self
         
-        
+        def register_all_templates
+          all_templates = instance_methods.grep(/_template$/) - %w(short_story_template full_story_template one_line_story_template) 
+          all_templates.each do |template|
+            template_name=template.sub(/_template$/,"")
+            puts "Registering #{template_name}"
+            send("register_"+template_name)
+          end
+        end
         
         def method_missing(name,*args)
           should_send=false
@@ -251,13 +302,18 @@ module Facebooker
           elsif md=/^deliver_(.*)$/.match(name.to_s)
             method=md[1]
             should_send=true
+          elsif md=/^register_(.*)$/.match(name.to_s)
+            (publisher=new).send(md[1]+"_template")
+            template_id = Facebooker::Session.create.register_template_bundle(publisher.one_line_story_templates,publisher.short_story_templates,publisher.full_story_template)
+            FacebookTemplate.register(template_id,md[1]) unless skip_registry
+            return template_id
           else
             super
           end
       
           #now create the item
           (publisher=new).send(method,*args)
-          should_send ? publisher.send_message : publisher._body
+          should_send ? publisher.send_message(method) : publisher._body
         end
     
         def default_url_options

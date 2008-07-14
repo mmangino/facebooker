@@ -160,6 +160,19 @@ class SessionTest < Test::Unit::TestCase
     @session.send_notification(["1"],"a")
   end
   
+  def test_can_register_template_bundle
+    expect_http_posts_with_responses(example_register_template_bundle_return_xml)
+    @session = Facebooker::Session.create(ENV['FACEBOOK_API_KEY'], ENV['FACEBOOK_SECRET_KEY'])
+    assert_equal 17876842716, @session.register_template_bundle("{*actor*} did something")
+  end
+  
+  
+  def test_can_publish_user_action
+    expect_http_posts_with_responses(publish_user_action_return_xml)
+    @session = Facebooker::Session.create(ENV['FACEBOOK_API_KEY'], ENV['FACEBOOK_SECRET_KEY'])
+    assert @session.publish_user_action(17876842716,{})
+  end
+  
   def test_requests_inside_batch_are_added_to_batch
     @session = Facebooker::Session.create(ENV['FACEBOOK_API_KEY'], ENV['FACEBOOK_SECRET_KEY'])
     @session.send(:service).expects(:post).once
@@ -443,6 +456,24 @@ class SessionTest < Test::Unit::TestCase
         <uid>222336</uid>
       </not_replied>
     </events_getMembers_response>
+    XML
+  end
+  
+  def example_register_template_bundle_return_xml
+    <<-XML
+    <?xml version="1.0" encoding="UTF-8"?>
+    <feed_registerTemplateBundle_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/">
+         17876842716
+    </feed_registerTemplateBundle_response>
+    XML
+  end
+  
+  def publish_user_action_return_xml
+    <<-XML
+    <?xml version="1.0" encoding="UTF-8"?>
+    <feed_publishUserAction_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd" list="true">
+      <feed_publishUserAction_response_elt>1</feed_publishUserAction_response_elt>
+    </feed_publishUserAction_response>
     XML
   end
   
