@@ -89,6 +89,7 @@ class TestPublisher < Facebooker::Rails::Publisher
   def user_action_template
     one_line_story_template "{*actor*} did stuff with {*friend*}"
     short_story_template "{*actor*} has a title {*friend*}", render(:inline=>"This is a test render")
+    full_story_template "{*actor*} did a lot","This is the full body",:img=>{:some_params=>true}
   end
   
   def user_action(user)

@@ -172,11 +172,11 @@ module Facebooker
         end
       end
       
-      def full_story_template(story=nil)
-        if story.nil?
+      def full_story_template(title=nil,body=nil,params={})
+        if title.nil?
           @full_story_template
         else
-          @full_story_template=story
+          @full_story_template=params.merge(:template_title=>title, :template_body=>body)
         end
       end
       
