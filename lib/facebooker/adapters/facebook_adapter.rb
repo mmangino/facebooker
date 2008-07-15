@@ -31,7 +31,6 @@ module Facebooker
     # TODO: Get someone to look into this for desktop apps.  
     def  self.facebooker_config
       return @facebooker_config if @facebooker_config
-        puts "Hey we shouldn't be here. should we?" if ENV["GO_FOR_IT"]
       facebook_config_file = "#{RAILS_ROOT}/config/facebooker.yml"
       if File.exist?(facebook_config_file)
         @facebooker_config = YAML.load_file(facebook_config_file)[RAILS_ENV]     
@@ -86,13 +85,15 @@ module Facebooker
   end
    
   class FacebookAdapter < AdapterBase
-         
+    def self.new_api?
+      (ENV["FACEBOOKER_API"] == "new") 
+    end    
     def canvas_server_base
-      "apps.facebook.com"
+      FacebookAdapter.new_api? ? "apps.new.facebook.com" : "apps.facebook.com"
     end
       
     def api_server_base
-      ENV["FACEBOOKER_API"] == "new" ? "api.new.facebook.com" : "api.facebook.com"
+       FacebookAdapter.new_api? ? "api.new.facebook.com" : "api.facebook.com"
     end
     
     def api_rest_path
@@ -112,7 +113,7 @@ module Facebooker
     end
        
     def www_server_base_url
-      ENV["FACEBOOKER_API"] == "new" ? "www.new.facebook.com" : "www.facebook.com"
+      FacebookAdapter.new_api? ? "www.new.facebook.com" : "www.facebook.com"
     end
        
     def login_url_base
