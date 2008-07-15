@@ -614,8 +614,20 @@ class RailsHelperTest < Test::Unit::TestCase
   
   def test_fb_multi_friend_request
     @h.expects(:capture).returns("body")
+    @h.expects(:protect_against_forgery?).returns(false)
     @h.expects(:fb_multi_friend_selector).returns("friend selector")
     assert_equal "<fb:request-form action=\"action\" content=\"body\" invite=\"true\" method=\"post\" type=\"invite\">friend selector</fb:request-form>",
+      (@h.fb_multi_friend_request("invite","ignored","action") {})
+  end
+  
+  def test_fb_multi_friend_request_with_protection_against_forgery
+    @h.expects(:capture).returns("body")
+    @h.expects(:protect_against_forgery?).returns(true)
+    @h.expects(:request_forgery_protection_token).returns('forgery_token')
+    @h.expects(:form_authenticity_token).returns('form_token')
+
+    @h.expects(:fb_multi_friend_selector).returns("friend selector")
+    assert_equal "<fb:request-form action=\"action\" content=\"body\" invite=\"true\" method=\"post\" type=\"invite\">friend selector<input name=\"forgery_token\" type=\"hidden\" value=\"form_token\" /></fb:request-form>",
       (@h.fb_multi_friend_request("invite","ignored","action") {})
   end
   
@@ -681,9 +693,18 @@ class RailsHelperTest < Test::Unit::TestCase
   end
   
   def test_facebook_form_for
+    @h.expects(:protect_against_forgery?).returns(false)
     form_body=@h.facebook_form_for(:model,:url=>"action") do
     end
     assert_equal "<fb:editor action=\"action\"></fb:editor>",form_body
+  end
+  
+  def test_facebook_form_for_with_authenticity_token
+    @h.expects(:protect_against_forgery?).returns(true)
+    @h.expects(:request_forgery_protection_token).returns('forgery_token')
+    @h.expects(:form_authenticity_token).returns('form_token')
+    assert_equal "<fb:editor action=\"action\"><input name=\"forgery_token\" type=\"hidden\" value=\"form_token\" /></fb:editor>",
+      (@h.facebook_form_for(:model, :url => "action") {})
   end
   
   def test_fb_friend_selector
