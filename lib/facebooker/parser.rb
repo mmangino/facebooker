@@ -101,6 +101,12 @@ module Facebooker
       array_of_text_values(element('friends_get_response', data), 'uid')
     end
   end
+  
+  class FriendListsGet < Parser#:nodoc:
+    def self.process(data)
+      array_of_hashes(element('friends_getLists_response', data), 'friendlist')
+    end
+  end
  
   class UserInfo < Parser#:nodoc:
     def self.process(data)
@@ -429,6 +435,7 @@ module Facebooker
       'facebook.users.getInfo' => UserInfo,
       'facebook.users.setStatus' => SetStatus,
       'facebook.friends.get' => GetFriends,
+      'facebook.friends.getLists' => FriendListsGet,
       'facebook.friends.areFriends' => AreFriends,
       'facebook.friends.getAppUsers' => GetAppUsers,
       'facebook.feed.publishStoryToUser' => PublishStoryToUser,

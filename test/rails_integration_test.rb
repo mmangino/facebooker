@@ -302,7 +302,7 @@ class RailsIntegrationTest < Test::Unit::TestCase
   
   def test_user_friends_can_be_populated_from_facebook_params_if_available
     get :index, example_rails_params_including_fb
-    assert_not_nil(friends = @controller.facebook_session.user.instance_variable_get("@friends"))
+    assert_not_nil(friends = @controller.facebook_session.user.friends)
     assert_equal(111, friends.size)    
   end
   

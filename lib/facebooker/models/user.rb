@@ -52,18 +52,48 @@ module Facebooker
     
     # 
     # Set the list of friends, given an array of User objects.  If the list has been retrieved previously, will not set
-    def friends=(list_of_friends)
-      @friends ||= list_of_friends
+    def friends=(list_of_friends,flid=nil)
+      @friends_hash ||= {}
+     	flid=cast_to_friend_list_id(flid)
+     	#use __blank instead of nil so that this is cached
+     	cache_key = flid||"__blank"
+     	
+      @friends_hash[cache_key] ||= list_of_friends
     end
     
+    def cast_to_friend_list_id(flid)
+      case flid
+ 	    when String
+ 	      list=friend_lists.detect {|f| f.name==flid}
+ 	      raise Facebooker::Session::InvalidFriendList unless list
+ 	      list.flid
+ 	    when FriendList
+ 	      flid.flid
+ 	    else
+ 	      flid
+ 	    end
+ 	  end
     ##
     # Retrieve friends
-    def friends
-      @friends ||= @session.post('facebook.friends.get').map do |uid|
-        User.new(uid, @session)
+    def friends(flid = nil)
+     	@friends_hash ||= {}
+     	flid=cast_to_friend_list_id(flid)
+      
+     	#use __blank instead of nil so that this is cached
+     	cache_key = flid||"__blank"
+     	@friends_hash[cache_key] ||= @session.post('facebook.friends.get', (flid.nil? ? {} : {:flid => flid})).map do |uid|
+          User.new(uid, @session)
       end
+      @friends_hash[cache_key]
     end
     
+     def friend_lists    
+       @friend_lists ||= @session.post('facebook.friends.getLists').map do |hash|
+         friend_list = FriendList.from_hash(hash)                               
+         friend_list.session = session                                          
+         friend_list                                                            
+       end                                                                      
+     end
     ###
     # Retrieve friends with user info populated
     # Subsequent calls will be retrieved from memory.

@@ -30,6 +30,7 @@ require 'facebooker/models/tag'
 require 'facebooker/models/user'
 require 'facebooker/models/info_item'
 require 'facebooker/models/info_section'
+require 'facebooker/models/friend_list'
 
 module Facebooker
   class << self
