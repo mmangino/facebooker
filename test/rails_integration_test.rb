@@ -788,6 +788,11 @@ class RailsFacebookFormbuilderTest < Test::Unit::TestCase
         @form_builder.text_area(:name)    
   end
   
+  def test_default_name_and_id
+    assert_equal "<fb:editor-text id=\"different_id\" label=\"Name\" name=\"different_name\" value=\"Mike\"></fb:editor-text>",
+        @form_builder.text_field(:name, {:name => 'different_name', :id => 'different_id'})
+  end
+  
   def test_collection_typeahead
     flexmock(@form_builder) do |fb|
       fb.should_receive(:collection_typeahead_internal).with(:name,["ABC"],:size,:to_s,{})
