@@ -79,7 +79,7 @@ module Facebooker
     # Publisher makes many helpers available, including the linking and asset helpers
     class Publisher
       
-      class FacebookTemplate < ActiveRecord::Base
+      class FacebookTemplate < ::ActiveRecord::Base
         def self.register(t_id,name)
           t=find_or_initialize_by_template_name(name)
           t.update_attribute(:bundle_id,t_id)
