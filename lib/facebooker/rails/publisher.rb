@@ -304,6 +304,11 @@ module Facebooker
         include ActionView::Helpers::FormTagHelper
         include ActionView::Helpers::AssetTagHelper
         include Facebooker::Rails::Helpers
+        
+        #define this for the publisher views
+        def protect_against_forgery?
+          @paf ||= ActionController::Base.new.send(:protect_against_forgery?)
+        end
       end
       ActionController::Routing::Routes.named_routes.install(self.master_helper_module)
       include self.master_helper_module
