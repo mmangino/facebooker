@@ -1,9 +1,12 @@
 require File.dirname(__FILE__) + '/test_helper.rb'
+require 'net/http_multipart_post'
 class TestFacebooker < Test::Unit::TestCase
 
   def setup
     @api_key = "95a71599e8293s66f1f0a6f4aeab3df7"
     @secret_key = "3e4du8eea435d8e205a6c9b5d095bed1"
+    ENV["FACEBOOK_API_KEY"] = @api_key
+    ENV["FACEBOOK_SECRET_KEY"] = @secret_key
     @session = Facebooker::Session.create(@api_key, @secret_key)
     @desktop_session = Facebooker::Session::Desktop.create(@api_key, @secret_key)
     @service = Facebooker::Service.new('http://apibase.com', '/api/path', @api_key)

@@ -44,6 +44,10 @@ begin
       render :text=>url_for(options)
     end
     
+     def named_route_test
+      render :text=>comments_url()
+    end
+    
     def image_test
       render :inline=>"<%=image_tag 'image.png'%>"
     end
@@ -125,10 +129,7 @@ begin
       get :named_route_test, example_rails_params_including_fb
       assert_equal "http://apps.facebook.com/facebook_app_name/comments",@response.body
     end
-    def test_named_route_includes_new_canvas_path_when_in_new_canvas
-      get :named_route_test, example_rails_params_including_fb.merge("fb_sig_in_new_facebook"=>"1")
-      assert_equal "http://apps.new.facebook.com/facebook_app_name/comments",@response.body
-    end
+   
     def test_named_route_doesnt_include_canvas_path_when_in_canvas_with_canvas_equals_false
       get :canvas_false_test, example_rails_params_including_fb
       assert_equal "http://test.host/comments",@response.body
@@ -233,6 +234,11 @@ class RailsIntegrationTest < Test::Unit::TestCase
     @controller.stubs(:verify_signature).returns(true)
     
   end
+  
+   def test_named_route_includes_new_canvas_path_when_in_new_canvas
+      get :named_route_test, example_rails_params_including_fb.merge("fb_sig_in_new_facebook"=>"1")
+      assert_equal "http://apps.new.facebook.com/root/comments",@response.body
+    end
 
   def test_if_controller_requires_facebook_authentication_unauthenticated_requests_will_redirect
     get :index

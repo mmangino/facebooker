@@ -1,6 +1,7 @@
 require 'test/unit'
 require 'rubygems'
 require 'flexmock/test_unit'
+require 'mocha'
 
 require File.dirname(__FILE__)+'/../lib/facebooker/rails/test_helpers'
 

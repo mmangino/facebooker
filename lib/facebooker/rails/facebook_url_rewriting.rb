@@ -20,7 +20,7 @@ module ::ActionController
       options = args.first.is_a?(Hash) ? args.first : args.last
       is_link_to_canvas = link_to_canvas?(@request.request_parameters, options)
       if is_link_to_canvas && !options.has_key?(:host)
-        options[:host] = "apps.#{"new." if link_to_new_canvas?}facebook.com"
+        options[:host] = Facebooker.canvas_server_base
       end 
       options.delete(:canvas)
       Facebooker.request_for_canvas(is_link_to_canvas) do

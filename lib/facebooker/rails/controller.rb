@@ -4,11 +4,12 @@ module Facebooker
     module Controller
       def self.included(controller)
         controller.extend(ClassMethods)
+        controller.before_filter :set_adapter
         controller.before_filter :set_fbml_format
         controller.helper_attr :facebook_session_parameters
-        
       end
-      
+
+    
       def facebook_session
         @facebook_session
       end
@@ -20,7 +21,7 @@ module Facebooker
       
       def set_facebook_session
         
-        returning session_set = session_already_secured? || secure_with_token! || secure_with_facebook_params!  do
+        returning session_set = session_already_secured? ||  secure_with_facebook_params! ||secure_with_token!  do
           if session_set
             capture_facebook_friends_if_available! 
             Session.current = facebook_session
@@ -64,7 +65,7 @@ module Facebooker
       end
       
       def new_facebook_session
-        Facebooker::Session.create(Facebooker::Session.api_key, Facebooker::Session.secret_key)
+        Facebooker::Session.create(Facebooker.api_key, Facebooker.secret_key)
       end
       
       def capture_facebook_friends_if_available!
@@ -181,6 +182,10 @@ module Facebooker
       def set_fbml_format
         params[:format]="fbml" if request_is_for_a_facebook_canvas? or request_is_facebook_ajax?
       end
+      def set_adapter
+        Facebooker.load_adapter(params) if(params[:fb_sig_api_key])
+      end
+
       
       module ClassMethods
         #
