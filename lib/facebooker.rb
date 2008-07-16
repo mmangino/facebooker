@@ -32,6 +32,8 @@ require 'facebooker/models/info_item'
 require 'facebooker/models/info_section'
 require 'facebooker/adapters/facebook_adapter'
 require 'facebooker/adapters/bebo_adapter'
+require 'facebooker/models/friend_list'
+
 module Facebooker
   class << self
      def current_adapter=(adapter_class)

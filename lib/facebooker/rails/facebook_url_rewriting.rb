@@ -7,7 +7,9 @@ module ::ActionController
   
   class UrlRewriter
     RESERVED_OPTIONS << :canvas
-  
+    def link_to_new_canvas?
+      @request.parameters["fb_sig_in_new_facebook"] == "1" 
+    end
     def link_to_canvas?(params, options)
       option_override = options[:canvas]
       return false if option_override == false # important to check for false. nil should use default behavior

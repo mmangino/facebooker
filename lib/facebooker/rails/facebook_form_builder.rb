@@ -103,7 +103,7 @@ module Facebooker
       end
       
       def add_default_name_and_id(options,method)
-        options[:name] = "#{object.class.name.downcase}[#{method}]"
+        options[:name] ||= "#{object.class.name.downcase}[#{method}]"
         options[:id] ||= "#{object.class.name.downcase}_#{method}"
       end
 

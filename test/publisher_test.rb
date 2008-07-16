@@ -3,6 +3,7 @@ require 'rubygems'
 require 'flexmock/test_unit'
 require 'action_controller'
 require 'action_controller/test_process'
+require 'active_record'
 require File.dirname(__FILE__)+'/../init'
 require 'facebooker/rails/controller'
 require 'facebooker/rails/helpers'
@@ -89,6 +90,7 @@ class TestPublisher < Facebooker::Rails::Publisher
   def user_action_template
     one_line_story_template "{*actor*} did stuff with {*friend*}"
     short_story_template "{*actor*} has a title {*friend*}", render(:inline=>"This is a test render")
+    full_story_template "{*actor*} did a lot","This is the full body",:img=>{:some_params=>true}
   end
   
   def user_action(user)
@@ -222,6 +224,7 @@ class PublisherTest < Test::Unit::TestCase
   def test_register_user_action
     ActionController::Base.append_view_path("./test/../../app/views")
     Facebooker::Session.any_instance.expects(:register_template_bundle)
+    Facebooker::Rails::Publisher::FacebookTemplate.expects(:register)
     TestPublisher.register_user_action
   end
   
@@ -230,6 +233,7 @@ class PublisherTest < Test::Unit::TestCase
     @session = Facebooker::Session.new("","")
     @from_user.stubs(:session).returns(@session)
     @session.expects(:publish_user_action).with(20309041537,{:friend=>"Mike"},nil,nil)
+    Facebooker::Rails::Publisher::FacebookTemplate.expects(:for).returns(20309041537)
     TestPublisher.deliver_user_action(@from_user)
   end
   def test_no_sends_as_raises

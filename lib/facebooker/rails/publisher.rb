@@ -17,6 +17,31 @@ module Facebooker
     #       title "Action Title"
     #       body "Body FBML here #{fb_name(f)} #{link_to "text",new_invitation_url}"
     #     end
+    #
+    #     # The new message templates are supported as well
+    #     # First, create a method that contains your templates:
+    #     # You may include multiple one line story templates and short story templates
+    #     # but only one full story template
+    #     #  Your most specific template should be first
+    #     #
+    #     # Before using, you must register your template by calling register. For this example
+    #     #  You would call TestPublisher.register_publish_action
+    #     #  Registering the template will store the template id returned from Facebook in the 
+    #     # facebook_templates table that is created when you create your first publisher
+    #     def publish_action_template
+    #       one_line_story_template "{*actor*} did stuff with {*friend*}"
+    #       one_line_story_template "{*actor*} did stuff"
+    #       short_story_template "{*actor*} has a title {*friend*}", render(:partial=>"short_body")
+    #       short_story_template "{*actor*} has a title", render(:partial=>"short_body")
+    #       full_story_template "{*actor*} has a title {*friend*}", render(:partial=>"full_body")    
+    #     end
+    #
+    #     # To send a registered template, you need to create a method to set the data
+    #     # The publisher will look up the template id from the facebook_templates table
+    #     def publish_action(f)
+    #       from f
+    #       data :friend=>"Mike"
+    #     end
     #   
     #     # Templatized Action uses From
     #     def templatized_action(f)
@@ -69,6 +94,7 @@ module Facebooker
     #       handle "a_ref_handle"
     #   end
     #
+    #
     # To send a message, use ActionMailer like semantics
     #    TestPublisher.deliver_action(@user)
     #
@@ -79,7 +105,7 @@ module Facebooker
     # Publisher makes many helpers available, including the linking and asset helpers
     class Publisher
       
-      class FacebookTemplate < ActiveRecord::Base
+      class FacebookTemplate < ::ActiveRecord::Base
         def self.register(t_id,name)
           t=find_or_initialize_by_template_name(name)
           t.update_attribute(:bundle_id,t_id)
@@ -172,11 +198,11 @@ module Facebooker
         end
       end
       
-      def full_story_template(story=nil)
-        if story.nil?
+      def full_story_template(title=nil,body=nil,params={})
+        if title.nil?
           @full_story_template
         else
-          @full_story_template=story
+          @full_story_template=params.merge(:template_title=>title, :template_body=>body)
         end
       end
       

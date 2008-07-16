@@ -44,6 +44,10 @@ begin
       render :text=>url_for(options)
     end
     
+     def named_route_test
+      render :text=>comments_url()
+    end
+    
     def image_test
       render :inline=>"<%=image_tag 'image.png'%>"
     end
@@ -125,6 +129,7 @@ begin
       get :named_route_test, example_rails_params_including_fb
       assert_equal "http://apps.facebook.com/facebook_app_name/comments",@response.body
     end
+   
     def test_named_route_doesnt_include_canvas_path_when_in_canvas_with_canvas_equals_false
       get :canvas_false_test, example_rails_params_including_fb
       assert_equal "http://test.host/comments",@response.body
@@ -229,6 +234,11 @@ class RailsIntegrationTest < Test::Unit::TestCase
     @controller.stubs(:verify_signature).returns(true)
     
   end
+  
+   def test_named_route_includes_new_canvas_path_when_in_new_canvas
+      get :named_route_test, example_rails_params_including_fb.merge("fb_sig_in_new_facebook"=>"1")
+      assert_equal "http://apps.new.facebook.com/root/comments",@response.body
+    end
 
   def test_if_controller_requires_facebook_authentication_unauthenticated_requests_will_redirect
     get :index
@@ -298,7 +308,7 @@ class RailsIntegrationTest < Test::Unit::TestCase
   
   def test_user_friends_can_be_populated_from_facebook_params_if_available
     get :index, example_rails_params_including_fb
-    assert_not_nil(friends = @controller.facebook_session.user.instance_variable_get("@friends"))
+    assert_not_nil(friends = @controller.facebook_session.user.friends)
     assert_equal(111, friends.size)    
   end
   
@@ -782,6 +792,11 @@ class RailsFacebookFormbuilderTest < Test::Unit::TestCase
   def test_text_area
     assert_equal "<fb:editor-textarea id=\"testmodel_name\" label=\"Name\" name=\"testmodel[name]\">Mike</fb:editor-textarea>",
         @form_builder.text_area(:name)    
+  end
+  
+  def test_default_name_and_id
+    assert_equal "<fb:editor-text id=\"different_id\" label=\"Name\" name=\"different_name\" value=\"Mike\"></fb:editor-text>",
+        @form_builder.text_field(:name, {:name => 'different_name', :id => 'different_id'})
   end
   
   def test_collection_typeahead

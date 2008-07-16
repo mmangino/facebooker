@@ -37,20 +37,22 @@ module Facebooker
       end
     end
  
-    
+    def self.new_api?
+      (ENV["FACEBOOKER_API"] == "new") 
+    end 
      
     def self.load_adapter(params)
       
       config_key_base = params[:config_key_base] # This allows for loading of a aspecific adapter
       config_key_base += "_" unless config_key_base.blank?
-    
+      new_facebook = ( new_api? || (params["fb_sig_in_new_facebook"] == "1"))
       if(  ( api_key = ( params[:fb_sig_api_key] || facebooker_config["#{config_key_base}api_key"])))
       
         if(  facebooker_config)
           facebooker_config.each do |key,value|
             if(value == api_key)
               key_base = key.match(/(.*)[_]?api_key/)[1]
-              adapter_class_name = key_base.blank? ? "FacebookAdapter" : facebooker_config[key_base + "adapter"]
+              adapter_class_name = key_base.blank? ? ( new_facebook ? "FacebookNewAdapter" : "FacebookAdapter") : facebooker_config[key_base + "adapter"]
               adpater_class = "Facebooker::#{adapter_class_name}".constantize
               # Collect the rest of the configuration
               adapter_config = {}
@@ -62,20 +64,21 @@ module Facebooker
             end     
           end
         else
-          self.default_adapter
+          self.default_adapter(params)
         end
       else
         raise Facebooker::AdapterBase::UnableToLoadAdapter
       end
     end
      
-    def self.default_adapter
+    def self.default_adapter(params = {})
+      new_facebook = ( new_api? || (params["fb_sig_in_new_facebook"] == "1"))
       if( facebooker_config.nil? || (facebooker_config.blank? rescue nil) )
         config = { "api_key" => ENV['FACEBOOK_API_KEY'], "secret_key" =>  ENV['FACEBOOK_SECRET_KEY']}
       else
         config = facebooker_config
       end
-      FacebookAdapter.new(config)
+     (new_facebook ? FacebookNewAdapter : FacebookAdapter).new(config)
     end
      
     [:canvas_page_name, :api_key,:secret_key].each do |key_method|
@@ -83,17 +86,21 @@ module Facebooker
     end
          
   end
+  
+  
    
   class FacebookAdapter < AdapterBase
-    def self.new_api?
-      (ENV["FACEBOOKER_API"] == "new") 
-    end    
+      
     def canvas_server_base
       FacebookAdapter.new_api? ? "apps.new.facebook.com" : "apps.facebook.com"
     end
       
     def api_server_base
        FacebookAdapter.new_api? ? "api.new.facebook.com" : "api.facebook.com"
+    end
+    
+      def www_server_base_url
+      FacebookAdapter.new_api? ? "www.new.facebook.com" : "www.facebook.com"
     end
     
     def api_rest_path
@@ -112,9 +119,7 @@ module Facebooker
       application_context == :facebook
     end
        
-    def www_server_base_url
-      FacebookAdapter.new_api? ? "www.new.facebook.com" : "www.facebook.com"
-    end
+  
        
     def login_url_base
       "http://#{www_server_base_url}/login.php?api_key=#{api_key}&v=1.0"
@@ -124,6 +129,20 @@ module Facebooker
       "http://#{www_server_base_url}/install.php?api_key=#{api_key}&v=1.0"
     end
     
+  end
+  
+  class FacebookNewAdapter < FacebookAdapter
+      def canvas_server_base
+      "apps.new.facebook.com" 
+    end
+      
+    def api_server_base
+       "api.new.facebook.com"
+    end
+    
+      def www_server_base_url
+     "www.new.facebook.com" 
+    end
   end
 end
 
