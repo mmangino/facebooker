@@ -484,6 +484,19 @@ class RailsHelperTest < Test::Unit::TestCase
   def test_fb_photo_with_style
     assert_equal "<fb:photo pid=\"1234\" style=\"some=css;put=here;\" />",@h.fb_photo("1234", :style => "some=css;put=here;")
   end
+  
+  def test_fb_prompt_permission_valid_no_callback
+    assert_equal "<fb:prompt-permission perms=\"email\" />",@h.fb_prompt_permission("email")    
+  end
+  
+  def test_fb_prompt_permission_valid_with_callback
+    assert_equal "<fb:prompt-permission next_fbjs=\"do_stuff()\" perms=\"email\" />",@h.fb_prompt_permission("email","do_stuff()")
+  end
+  
+  def test_fb_prompt_permission_invalid_option
+    assert_raises(ArgumentError) {@h.fb_prompt_permission("invliad")}
+    
+  end
 
   def test_fb_name_with_invalid_key
     assert_raises(ArgumentError) {@h.fb_name(1234, :sizee => false)}

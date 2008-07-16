@@ -283,7 +283,7 @@ module Facebooker
       VALID_FB_SHARED_PHOTO_SIZES = [:thumb, :small, :normal, :square]
       VALID_FB_PHOTO_SIZES = VALID_FB_SHARED_PHOTO_SIZES      
       VALID_FB_PROFILE_PIC_SIZES = VALID_FB_SHARED_PHOTO_SIZES
-      
+      VALID_PERMISSIONS=[:email, :infinite_session, :status_update, :photo_upload, :create_listing]
       
       # Render an fb:tabs tag containing some number of fb:tab_item tags.
       # Example:
@@ -528,6 +528,12 @@ module Facebooker
         tag("fb:board",stringify_vals(options.merge(:xid=>xid)))
       end
       
+      def fb_prompt_permission(permission,callback=nil)
+        raise (ArgumentError, "Unknown value for permission: #{permission}") unless VALID_PERMISSIONS.include?(permission.to_sym)
+        args={:perms=>permission}
+        args[:next_fbjs]=callback unless callback.nil?
+        tag("fb:prompt-permission",args)
+      end
       
       protected
       
