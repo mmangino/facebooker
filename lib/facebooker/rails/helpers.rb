@@ -529,7 +529,7 @@ module Facebooker
       end
       
       def fb_prompt_permission(permission,callback=nil)
-        raise (ArgumentError, "Unknown value for permission: #{permission}") unless VALID_PERMISSIONS.include?(permission.to_sym)
+        raise(ArgumentError, "Unknown value for permission: #{permission}") unless VALID_PERMISSIONS.include?(permission.to_sym)
         args={:perms=>permission}
         args[:next_fbjs]=callback unless callback.nil?
         tag("fb:prompt-permission",args)

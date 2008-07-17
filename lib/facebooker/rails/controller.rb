@@ -36,7 +36,11 @@ module Facebooker
       private
       
       def session_already_secured?
-        (@facebook_session = session[:facebook_session]) && session[:facebook_session].secured?
+        (@facebook_session = session[:facebook_session]) && session[:facebook_session].secured? if valid_session_key_in_session?
+      end
+      
+      def valid_session_key_in_session?
+       !session[:facebook_session].blank? && (facebook_params[:session_key].blank? || session[:facebook_session].session_key == facebook_params[:session_key])
       end
       
       def secure_with_token!

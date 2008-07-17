@@ -290,11 +290,26 @@ class RailsIntegrationTest < Test::Unit::TestCase
   
   def test_existing_secured_session_is_used_if_available
     session = Facebooker::Session.create(ENV['FACEBOOK_API_KEY'], ENV['FACEBOOK_SECRET_KEY'])
-    session.secure_with!("a session key", "1111111", Time.now.to_i + 60)
+    session.secure_with!("c452b5d5d60cbd0a0da82021-744961110", "1111111", Time.now.to_i + 60)
     get :index, example_rails_params_including_fb, {:facebook_session => session}
     assert_equal(1111111, @controller.facebook_session.user.id)
   end
-  
+
+  def test_facebook_params_used_if_existing_secured_session_key_does_not_match
+    session = Facebooker::Session.create(ENV['FACEBOOK_API_KEY'], ENV['FACEBOOK_SECRET_KEY'])
+    session.secure_with!("a session key", "1111111", Time.now.to_i + 60)
+    get :index, example_rails_params_including_fb, {:facebook_session => session}
+    assert_equal(744961110, @controller.facebook_session.user.id)
+  end
+
+  def test_existing_secured_session_is_used_if_available_and_facebook_params_session_key_is_nil
+    session = Facebooker::Session.create(ENV['FACEBOOK_API_KEY'], ENV['FACEBOOK_SECRET_KEY'])
+    session.secure_with!("a session key", "1111111", Time.now.to_i + 60)
+    get :index, example_rails_params_including_fb.merge("fb_sig_session_key" => ''), {:facebook_session => session}
+    
+    assert_equal(1111111, @controller.facebook_session.user.id)
+  end
+
   def test_session_can_be_secured_with_auth_token
     auth_token = 'ohaiauthtokenhere111'
     modified_params = example_rails_params_including_fb
