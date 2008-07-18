@@ -39,6 +39,7 @@ module Facebooker
     #     # To send a registered template, you need to create a method to set the data
     #     # The publisher will look up the template id from the facebook_templates table
     #     def publish_action(f)
+    #       send_as :user_action
     #       from f
     #       data :friend=>"Mike"
     #     end
@@ -151,6 +152,12 @@ module Facebooker
         attr_accessor :target_ids
         attr_accessor :body_general
         attr_accessor :template_id
+        attr_accessor :template_name
+        
+        def template_id
+          @template_id || FacebookTemplate.for(template_name)
+        end
+        
       end
       
       cattr_accessor :ignore_errors
@@ -224,6 +231,10 @@ module Facebooker
         else
           super
         end
+      end
+      
+      def image(src,url)
+        {:src=>image_path(src),:href=>url}
       end
   
       def send_message(method)
@@ -344,6 +355,11 @@ module Facebooker
       
           #now create the item
           (publisher=new).send(method,*args)
+          case publisher._body
+          when UserAction
+            publisher._body.template_name=method
+          end
+          
           should_send ? publisher.send_message(method) : publisher._body
         end
     

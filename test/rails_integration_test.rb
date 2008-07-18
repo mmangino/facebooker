@@ -56,6 +56,30 @@ begin
       render :text=>facebook_params['user']
     end
     
+    def publisher_test
+      if wants_interface?
+        render :text=>"interface"
+      else
+        render :text=>"not interface"
+      end
+    end
+    
+    def publisher_test_interface
+      render_publisher_interface("This is a test",false,true)
+    end
+    
+    def publisher_test_response
+      ua=Facebooker::Rails::Publisher::UserAction.new
+      ua.data = {:params=>true}
+      ua.template_name = "template_name"
+      ua.template_id =  1234
+      render_publisher_response(ua)
+    end
+    
+    def publisher_test_error
+      render_publisher_error("Title","Body")
+    end
+    
   end
   class ControllerWhichRequiresApplicationInstallation < NoisyController
     ensure_application_is_installed_by_facebook_user
@@ -368,6 +392,30 @@ class RailsIntegrationTest < Test::Unit::TestCase
     assert_equal "<img alt=\"Image\" src=\"http://root.example.com/images/image.png\" />",@response.body
   end
   
+  def test_wants_interface_is_available_and_detects_method
+    get :publisher_test, example_rails_params_including_fb.merge(:method=>"publisher_getInterface")
+    assert_equal "interface",@response.body
+  end
+  def test_wants_interface_is_available_and_detects_not_interface
+    get :publisher_test, example_rails_params_including_fb.merge(:method=>"publisher_getFeedStory")
+    assert_equal "not interface",@response.body
+  end
+  
+  def test_publisher_test_error
+    get :publisher_test_error, example_rails_params_including_fb
+    assert_equal "{\"errorMessage\": \"Body\", \"errorCode\": 1, \"errorTitle\": \"Title\"}",@response.body
+  end
+  
+  def test_publisher_test_interface
+    get :publisher_test_interface, example_rails_params_including_fb
+    assert_equal "{\"method\": \"publisher_getInterface\", \"content\": {\"publishEnabled\": false, \"commentEnabled\": true, \"fbml\": \"This is a test\"}}",@response.body
+  end
+  
+  def test_publisher_test_reponse
+    get :publisher_test_response, example_rails_params_including_fb
+    assert_equal "{\"method\": \"publisher_getFeedStory\", \"content\": {\"feed\": {\"template_id\": 1234, \"template_data\": {\"params\": true}}}}",@response.body
+    
+  end
   
   private
   def example_rails_params_including_fb_for_user_not_logged_into_application

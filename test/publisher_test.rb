@@ -228,6 +228,14 @@ class PublisherTest < Test::Unit::TestCase
     TestPublisher.register_user_action
   end
   
+  def test_create_user_action
+      @from_user = Facebooker::User.new
+      @session = Facebooker::Session.new("","")
+      @from_user.stubs(:session).returns(@session)
+      ua=TestPublisher.create_user_action(@from_user)
+      assert_equal "user_action",ua.template_name
+    end
+  
   def test_publisher_user_action
     @from_user = Facebooker::User.new
     @session = Facebooker::Session.new("","")

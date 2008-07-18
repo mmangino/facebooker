@@ -509,7 +509,7 @@ module Facebooker
       
       # Render fb:else tag
       # Must be used within if block such as fb_if_is_user or fb_if_is_app_user . See example in fb_if_is_app_user
-      def fb_else
+      def fb_else(&proc)
         content = capture(&proc) 
         concat(content_tag("fb:else",content),proc.binding)
       end

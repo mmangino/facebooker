@@ -1,7 +1,9 @@
 require 'facebooker'
+require 'facebooker/rails/profile_publisher_extensions'
 module Facebooker
   module Rails
     module Controller
+      include Facebooker::Rails::ProfilePublisherExtensions
       def self.included(controller)
         controller.extend(ClassMethods)
         controller.before_filter :set_adapter
