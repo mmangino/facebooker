@@ -403,17 +403,17 @@ class RailsIntegrationTest < Test::Unit::TestCase
   
   def test_publisher_test_error
     get :publisher_test_error, example_rails_params_including_fb
-    assert_equal "{\"errorMessage\": \"Body\", \"errorCode\": 1, \"errorTitle\": \"Title\"}",@response.body
+    assert_equal "{\"errorCode\": 1, \"errorTitle\": \"Title\", \"errorMessage\": \"Body\"}",@response.body
   end
   
   def test_publisher_test_interface
     get :publisher_test_interface, example_rails_params_including_fb
-    assert_equal "{\"method\": \"publisher_getInterface\", \"content\": {\"publishEnabled\": false, \"commentEnabled\": true, \"fbml\": \"This is a test\"}}",@response.body
+    assert_equal "{\"method\": \"publisher_getInterface\", \"content\": {\"fbml\": \"This is a test\", \"publishEnabled\": false, \"commentEnabled\": true}}",@response.body
   end
   
   def test_publisher_test_reponse
     get :publisher_test_response, example_rails_params_including_fb
-    assert_equal "{\"method\": \"publisher_getFeedStory\", \"content\": {\"feed\": {\"template_id\": 1234, \"template_data\": {\"params\": true}}}}",@response.body
+    assert_equal "{\"method\": \"publisher_getFeedStory\", \"content\": {\"feed\": {\"template_data\": {\"params\": true}, \"template_id\": 1234}}}",@response.body
     
   end
   
@@ -549,15 +549,15 @@ class RailsHelperTest < Test::Unit::TestCase
   end
   
   def test_fb_prompt_permission_valid_no_callback
-    assert_equal "<fb:prompt-permission perms=\"email\" />",@h.fb_prompt_permission("email")    
+    assert_equal "<fb:prompt-permission perms=\"email\">Can I email you?</fb:prompt-permission>",@h.fb_prompt_permission("email","Can I email you?")    
   end
   
   def test_fb_prompt_permission_valid_with_callback
-    assert_equal "<fb:prompt-permission next_fbjs=\"do_stuff()\" perms=\"email\" />",@h.fb_prompt_permission("email","do_stuff()")
+    assert_equal "<fb:prompt-permission next_fbjs=\"do_stuff()\" perms=\"email\">a message</fb:prompt-permission>",@h.fb_prompt_permission("email","a message","do_stuff()")
   end
   
   def test_fb_prompt_permission_invalid_option
-    assert_raises(ArgumentError) {@h.fb_prompt_permission("invliad")}
+    assert_raises(ArgumentError) {@h.fb_prompt_permission("invliad", "a message")}
     
   end
 

@@ -280,7 +280,13 @@ module Facebooker
       if email_fbml
         params[:email] = email_fbml
       end
-      post 'facebook.notifications.send', params
+      params[:type]="general"
+      # if there is no uid, this is an announcement
+      unless uid?
+        params[:type]="announcement"
+      end
+      
+      post 'facebook.notifications.send', params,uid?
     end 
     
     ##
@@ -497,6 +503,10 @@ module Facebooker
       
       def uid
         @uid || (secure!; @uid)
+      end
+      
+      def uid?
+        ! @uid.nil?
       end
       
       def signature_for(params)

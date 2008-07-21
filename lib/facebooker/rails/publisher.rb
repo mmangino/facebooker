@@ -157,6 +157,10 @@ module Facebooker
         def template_id
           @template_id || FacebookTemplate.for(template_name)
         end
+
+        def target_ids=(val)
+          @target_ids = val.is_a?(Array) ? val : [val]
+        end
         
       end
       
@@ -237,19 +241,25 @@ module Facebooker
         {:src=>image_path(src),:href=>url}
       end
   
+      def announcement_notification?(from,body)
+        from.nil? and body.is_a?(Notification)
+      end
+      
       def send_message(method)
         @recipients = @recipients.is_a?(Array) ? @recipients : [@recipients]
-        if from.nil? and @recipients.size==1
+        if from.nil? and @recipients.size==1 and ! announcement_notification?(from,_body)
           @from = @recipients.first
         end
-        raise InvalidSender.new("Sender must be a Facebooker::User") unless from.is_a?(Facebooker::User)
+        # notifications can 
+        # omit the from address
+        raise InvalidSender.new("Sender must be a Facebooker::User") unless from.is_a?(Facebooker::User) || announcement_notification?(from,_body)
         case _body
         when Facebooker::Feed::TemplatizedAction,Facebooker::Feed::Action
           from.publish_action(_body)
         when Facebooker::Feed::Story
           @recipients.each {|r| r.publish_story(_body)}
         when Notification
-          from.session.send_notification(@recipients,_body.fbml)
+          (from.nil? ? Facebooker::Session.create : from.session).send_notification(@recipients,_body.fbml)
         when Email
           from.session.send_email(@recipients, 
                                              _body.title, 

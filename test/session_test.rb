@@ -149,14 +149,22 @@ class SessionTest < Test::Unit::TestCase
   
   def test_can_send_notification_with_object
     @session = Facebooker::Session.create(ENV['FACEBOOK_API_KEY'], ENV['FACEBOOK_SECRET_KEY'])
-    @session.expects(:post).with('facebook.notifications.send',{:to_ids=>"1",:notification=>"a"})
+    @session.expects(:post).with('facebook.notifications.send',{:to_ids=>"1",:notification=>"a",:type=>"general"},true)
+    @session.send(:instance_variable_set,"@uid",3)
     user=flexmock("user")
     user.should_receive(:facebook_id).and_return("1").once
     @session.send_notification([user],"a")
   end
   def test_can_send_notification_with_string
     @session = Facebooker::Session.create(ENV['FACEBOOK_API_KEY'], ENV['FACEBOOK_SECRET_KEY'])
-    @session.expects(:post).with('facebook.notifications.send',{:to_ids=>"1",:notification=>"a"})
+    @session.send(:instance_variable_set,"@uid",3)
+    @session.expects(:post).with('facebook.notifications.send',{:to_ids=>"1",:notification=>"a", :type=>"general"},true)
+    @session.send_notification(["1"],"a")
+  end
+  
+  def test_can_send_announcement_notification
+    @session = Facebooker::Session.create(ENV['FACEBOOK_API_KEY'], ENV['FACEBOOK_SECRET_KEY'])
+    @session.expects(:post).with('facebook.notifications.send',{:to_ids=>"1",:notification=>"a", :type=>"announcement"},false)
     @session.send_notification(["1"],"a")
   end
   

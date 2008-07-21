@@ -125,7 +125,7 @@ module Facebooker
       end
       
       def redirect_to(*args)
-        if request_is_for_a_facebook_canvas?
+        if request_is_for_a_facebook_canvas? and !request_is_facebook_tab?
           render :text => fbml_redirect_tag(*args)
         else
           super
@@ -139,6 +139,11 @@ module Facebooker
       def request_is_for_a_facebook_canvas?
         !params['fb_sig_in_canvas'].blank?
       end
+      
+      def request_is_facebook_tab?
+        !params["fb_sig_in_profile_tab"].blank?
+      end
+      
       def request_is_facebook_ajax?
         params["fb_sig_is_mockajax"]=="1" || params["fb_sig_is_ajax"]=="1"
       end
@@ -168,6 +173,14 @@ module Facebooker
       
       def has_extended_permission?(perm)
         params["fb_sig_ext_perms"] and params["fb_sig_ext_perms"].include?(perm)
+      end
+      
+      def disallow_viewing_in_tab
+        request_is_facebook_tab? && disallowed_tab_action
+      end
+      
+      def disallowed_tab_action
+        redirect_to :controller=>request.request_uri,:canvas=>true
       end
       
       def ensure_authenticated_to_facebook

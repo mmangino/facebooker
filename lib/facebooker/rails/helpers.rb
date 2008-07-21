@@ -528,11 +528,11 @@ module Facebooker
         tag("fb:board",stringify_vals(options.merge(:xid=>xid)))
       end
       
-      def fb_prompt_permission(permission,callback=nil)
+      def fb_prompt_permission(permission,message,callback=nil)
         raise(ArgumentError, "Unknown value for permission: #{permission}") unless VALID_PERMISSIONS.include?(permission.to_sym)
         args={:perms=>permission}
         args[:next_fbjs]=callback unless callback.nil?
-        tag("fb:prompt-permission",args)
+        content_tag("fb:prompt-permission",message,args)
       end
       
       protected
