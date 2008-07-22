@@ -175,14 +175,6 @@ module Facebooker
         params["fb_sig_ext_perms"] and params["fb_sig_ext_perms"].include?(perm)
       end
       
-      def disallow_viewing_in_tab
-        request_is_facebook_tab? && disallowed_tab_action
-      end
-      
-      def disallowed_tab_action
-        redirect_to :controller=>request.request_uri,:canvas=>true
-      end
-      
       def ensure_authenticated_to_facebook
         set_facebook_session || create_new_facebook_session_and_redirect!
       end
