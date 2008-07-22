@@ -126,6 +126,10 @@ class UserTest < Test::Unit::TestCase
     assert_equal("1234",@user.to_s)
   end
   
+  def test_equality
+    assert_equal @user, @user.dup
+  end
+  
   private
   def example_profile_photos_get_xml
     "<?xml version=\"1.0\" encoding=\"UTF-8\"?>

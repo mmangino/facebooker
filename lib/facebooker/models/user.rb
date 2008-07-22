@@ -264,6 +264,13 @@ module Facebooker
       id.to_s
     end
     
+    ##
+    # Two Facebooker::User objects should be considered equal if their Facebook ids are equal
+    def ==(other_user)
+      id == other_user.id
+    end
+    
+    
     def self.cast_to_facebook_id(object)
       if object.respond_to?(:facebook_id)
         object.facebook_id
