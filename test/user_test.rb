@@ -60,9 +60,19 @@ class UserTest < Test::Unit::TestCase
     @user.profile_fbml="test"
   end
   
+  def test_can_set_profile_main
+    @user.expects(:set_profile_fbml).with(nil,nil,nil,"test")
+    @user.profile_main="test"
+  end
+  
   def test_can_call_set_profile_fbml
     @session.expects(:post).with('facebook.profile.setFBML', :uid=>1234,:profile=>"profile",:profile_action=>"action",:mobile_profile=>"mobile")
     @user.set_profile_fbml("profile","mobile","action")
+  end
+  
+  def test_can_call_set_profile_fbml_with_profile_main
+    @session.expects(:post).with('facebook.profile.setFBML', :uid=>1234,:profile=>"profile",:profile_action=>"action",:mobile_profile=>"mobile", :profile_main => 'profile_main')
+    @user.set_profile_fbml("profile","mobile","action",'profile_main')
   end
   
   def test_can_get_profile_photos

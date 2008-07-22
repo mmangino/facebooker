@@ -36,11 +36,11 @@ end
 Facebooker::PublishTemplatizedAction
 module Facebooker
    class User
-    def set_profile_fbml_with_bebo_adapter(profile_fbml, mobile_fbml, profile_action_fbml)
+    def set_profile_fbml_with_bebo_adapter(profile_fbml, mobile_fbml, profile_action_fbml, profile_main = nil)
       if(Facebooker.is_for?(:bebo))
         self.session.post('facebook.profile.setFBML', :uid => @id, :markup => profile_fbml)
       else
-        set_profile_fbml_without_bebo_adapter(profile_fbml,mobile_fbml, profile_action_fbml)
+        set_profile_fbml_without_bebo_adapter(profile_fbml,mobile_fbml, profile_action_fbml, profile_main)
       end
     end
     alias_method_chain :set_profile_fbml, :bebo_adapter

@@ -190,11 +190,16 @@ module Facebooker
       set_profile_fbml(nil, nil, markup)
     end
     
-    def set_profile_fbml(profile_fbml, mobile_fbml, profile_action_fbml)
+    def profile_main=(markup)
+     set_profile_fbml(nil,nil,nil,markup)
+    end
+    
+    def set_profile_fbml(profile_fbml, mobile_fbml, profile_action_fbml, profile_main = nil)
       parameters = {:uid => @id}
       parameters[:profile] = profile_fbml if profile_fbml
       parameters[:profile_action] = profile_action_fbml if profile_action_fbml
       parameters[:mobile_profile] = mobile_fbml if mobile_fbml
+      parameters[:profile_main] = profile_main if profile_main
       session.post('facebook.profile.setFBML', parameters)
     end
     
