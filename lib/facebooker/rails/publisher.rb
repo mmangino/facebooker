@@ -58,6 +58,8 @@ module Facebooker
     #       title 'Story Title'
     #     end
     #  
+    #     # Provide a from user to send a general notification
+    #     # if from is nil, this will send an announcement
     #     def notification(to,f)
     #       send_as :notification
     #       recipients to
