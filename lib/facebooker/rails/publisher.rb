@@ -142,6 +142,7 @@ module Facebooker
         attr_accessor :profile
         attr_accessor :profile_action
         attr_accessor :mobile_profile
+        attr_accessor :profile_main
       end
       class Ref
         attr_accessor :handle
@@ -271,9 +272,7 @@ module Facebooker
          if @from != @recipients.first
            @from = Facebooker::User.new(Facebooker::User.cast_to_facebook_id(@recipients.first),from.session) 
          end
-         from.set_profile_fbml(_body.profile, 
-                                            _body.mobile_profile, 
-                                            _body.profile_action)
+         from.set_profile_fbml(_body.profile, _body.mobile_profile, _body.profile_action, _body.profile_main)
         when Ref
           @from.session.server_cache.set_ref_handle(_body.handle,_body.fbml)
         when UserAction

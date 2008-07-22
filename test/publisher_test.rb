@@ -78,6 +78,17 @@ class TestPublisher < Facebooker::Rails::Publisher
     profile "profile"
     profile_action "profile_action"
     mobile_profile "mobile_profile"
+    
+  end
+  
+   def profile_update_with_profile_main(to,f)
+    send_as :profile
+    recipients to
+    from f
+    profile "profile"
+    profile_action "profile_action"
+    mobile_profile "mobile_profile"
+    profile_main "profile_main"
   end
   
   def ref_update(user)
@@ -186,10 +197,24 @@ class PublisherTest < Test::Unit::TestCase
     assert_equal "profile_action",p.profile_action
     assert_equal "mobile_profile",p.mobile_profile
   end
+   def test_create_profile_update_with_profile_main
+    p=TestPublisher.create_profile_update_with_profile_main(@user,@user)
+    assert_equal Facebooker::Rails::Publisher::Profile,p.class
+    assert_equal "profile",p.profile
+    assert_equal "profile_action",p.profile_action
+    assert_equal "mobile_profile",p.mobile_profile
+    assert_equal "profile_main",p.profile_main
+  end
+  
   
   def test_deliver_profile
-    @user.expects(:set_profile_fbml).with('profile', 'mobile_profile', 'profile_action')
+    @user.expects(:set_profile_fbml).with('profile', 'mobile_profile', 'profile_action',nil)
     TestPublisher.deliver_profile_update(@user,@user)    
+  end
+  
+   def test_deliver_profile_with_main
+    @user.expects(:set_profile_fbml).with('profile', 'mobile_profile', 'profile_action','profile_main')
+    TestPublisher.deliver_profile_update_with_profile_main(@user,@user)    
   end
   
   def test_deliver_profile_update_same_session
