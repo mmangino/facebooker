@@ -283,7 +283,7 @@ module Facebooker
       VALID_FB_SHARED_PHOTO_SIZES = [:thumb, :small, :normal, :square]
       VALID_FB_PHOTO_SIZES = VALID_FB_SHARED_PHOTO_SIZES      
       VALID_FB_PROFILE_PIC_SIZES = VALID_FB_SHARED_PHOTO_SIZES
-      VALID_PERMISSIONS=[:email, :infinite_session, :status_update, :photo_upload, :create_listing]
+      VALID_PERMISSIONS=[:email, :offline_access, :status_update, :photo_upload, :create_listing]
       
       # Render an fb:tabs tag containing some number of fb:tab_item tags.
       # Example:
