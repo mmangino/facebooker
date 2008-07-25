@@ -34,7 +34,7 @@ var Element = {
 };
 
 function encodeURIComponent(str) {
-	return str.replace('=','%3D').replace('&','%26');
+	return str.replace(/=/g,'%3D').replace(/&/g,'%26');
 };
 
 var Form = {};
@@ -75,8 +75,8 @@ Ajax.Updater = function (container,url,options) {
 	pairs=options['parameters'].split('&');
 	for (var i=0; i<pairs.length; i++) {
 		kv=pairs[i].split('=');
-		key=kv[0].replace('%3D','=').replace('%26','&');
-		val=kv[1].replace('%3D','=').replace('%26','&');
+		key=kv[0].replace(/%3D/g,'=').replace(/%26/g,'&');
+		val=kv[1].replace(/%3D/g,'=').replace(/%26/g,'&');
 		parameters[key]=val;
 	}
   this.ajax.post(url,parameters);	
