@@ -317,7 +317,7 @@ module Facebooker
     #
     def publish_user_action(bundle_id,data={},target_ids=nil,body_general=nil)
       parameters={:template_bundle_id=>bundle_id,:template_data=>data.to_json}
-      parameters[:target_ids] = target_ids.to_json unless target_ids.blank?
+      parameters[:target_ids] = target_ids unless target_ids.blank?
       parameters[:body_general] = body_general unless body_general.blank?
       post("facebook.feed.publishUserAction", parameters)
     end
