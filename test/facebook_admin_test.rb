@@ -26,9 +26,10 @@ class FacebookAdminTest < Test::Unit::TestCase
   def test_can_get_properties
     mock_http = establish_session
     mock_http.should_receive(:post_form).and_return(example_get_properties_xml).once.ordered(:posts)
-    p = @session.admin.get_app_properties(:application_name, :dev_mode)
+    p = @session.admin.get_app_properties(:application_name, :dev_mode, :canvas_name)
     assert_equal 'Video Jukebox', p.application_name
     assert_equal 0, p.dev_mode
+    assert_equal 'my_canvas', p.canvas_name
   end
 
   def test_can_get_allocation
@@ -54,7 +55,7 @@ class FacebookAdminTest < Test::Unit::TestCase
       xmlns="http://api.facebook.com/1.0/"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:schemaLocation="http://api.facebook.com/1.0/http://api.facebook.com/1.0/facebook.xsd">
-        {&quot;application_name&quot;:&quot;Video Jukebox&quot;,&quot;callback_url&quot;:&quot;http:\/\/67.207.144.245\/&quot;,&quot;dev_mode&quot;:0}
+        {&quot;application_name&quot;:&quot;Video Jukebox&quot;,&quot;callback_url&quot;:&quot;http:\/\/67.207.144.245\/&quot;,&quot;dev_mode&quot;:0,&quot;canvas_name&quot;:&quot;my_canvas&quot;}
     </admin_getAppProperties_response>
     XML
   end
