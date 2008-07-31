@@ -89,6 +89,12 @@ module Facebooker
       element('auth_createToken_response', data).text_value
     end
   end
+  
+  class RegisterUsers
+    def self.process(data)
+      Facebooker.json_decode(data)
+    end
+  end
 
   class GetSession < Parser#:nodoc:
     def self.process(data)      
@@ -431,6 +437,7 @@ module Facebooker
     PARSERS = {
       'facebook.auth.createToken' => CreateToken,
       'facebook.auth.getSession' => GetSession,
+      'facebook.connect.registerUsers' => RegisterUsers,
       'facebook.users.getInfo' => UserInfo,
       'facebook.users.setStatus' => SetStatus,
       'facebook.friends.get' => GetFriends,

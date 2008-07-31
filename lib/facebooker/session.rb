@@ -1,4 +1,3 @@
-require 'digest/md5'
 require 'cgi'
 
 module Facebooker
@@ -49,6 +48,9 @@ module Facebooker
     class TooManyUnapprovedPhotosPending < StandardError; end
     class ExtendedPermissionRequired < StandardError; end
     class InvalidFriendList < StandardError; end
+    class UserRegistrationFailed < StandardError
+      attr_accessor :failed_users
+    end
     
     API_SERVER_BASE_URL       = ENV["FACEBOOKER_API"] == "new" ? "api.new.facebook.com" : "api.facebook.com"
     API_PATH_REST             = "/restserver.php"

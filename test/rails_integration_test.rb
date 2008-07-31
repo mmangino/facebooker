@@ -1,5 +1,4 @@
 require File.dirname(__FILE__) + '/test_helper.rb'
-require 'ruby-debug'
 begin
   require 'action_controller'
   require 'action_controller/test_process'

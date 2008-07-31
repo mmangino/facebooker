@@ -1,7 +1,7 @@
 require 'facebooker/model'
 require 'facebooker/models/affiliation'
 require 'facebooker/models/work_info'
-
+require 'active_support'
 module Facebooker
   # 
   # Holds attributes and behavior for a Facebook User
@@ -270,6 +270,42 @@ module Facebooker
       id == other_user.id
     end
     
+    
+    # register a user with Facebook
+    # users should be a hast with at least an :email field
+    # you can optionally provide an :account_id field as well
+        
+    def self.register(users)
+      user_map={}
+      users=users.map do |h|
+        returning h.dup do |d|
+          if email=d.delete(:email)
+            user_map
+            hash = hash_email(email)
+            user_map[hash]=h
+            d[:email_hash]=hash
+          end
+        end
+      end
+      Facebooker::Session.create.post("facebook.connect.registerUsers",:accounts=>users.to_json) do |ret|
+        ret.each do |hash|
+          user_map.delete(hash)
+        end
+        unless user_map.blank?
+          e=Facebooker::Session::UserRegistrationFailed.new
+          e.failed_users = user_map.values
+          raise e
+        end
+        ret
+      end
+    end
+    
+    def self.hash_email(email)
+      email = email.downcase.strip
+      crc=Zlib.crc32(email)
+      md5=Digest::MD5.hexdigest(email)
+      "#{crc}_#{md5}"
+    end
     
     def self.cast_to_facebook_id(object)
       if object.respond_to?(:facebook_id)

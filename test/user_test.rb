@@ -8,6 +8,10 @@ class UserTest < Test::Unit::TestCase
     @session = Facebooker::Session.create('apikey', 'secretkey')
     @user = Facebooker::User.new(1234, @session)
     @other_user = Facebooker::User.new(4321, @session)
+    ENV['FACEBOOK_CANVAS_PATH'] ='facebook_app_name'
+    ENV['FACEBOOK_API_KEY'] = '1234567'
+    ENV['FACEBOOK_SECRET_KEY'] = '7654321'
+    
     @user.friends = [@other_user]
   end
   
@@ -128,6 +132,26 @@ class UserTest < Test::Unit::TestCase
   
   def test_equality
     assert_equal @user, @user.dup
+  end
+  
+  def test_hash_email
+    assert_equal "4228600737_c96da02bba97aedfd26136e980ae3761", Facebooker::User.hash_email("mary@example.com")
+  end
+  def test_hash_email_not_normalized
+    assert_equal "4228600737_c96da02bba97aedfd26136e980ae3761", Facebooker::User.hash_email(" MaRy@example.com  ")
+  end
+  
+  def test_register_with_array
+    expect_http_posts_with_responses(["4228600737_c96da02bba97aedfd26136e980ae3761"].to_json)
+    assert_equal ["4228600737_c96da02bba97aedfd26136e980ae3761"],Facebooker::User.register([{:email=>"mary@example.com",:account_id=>1}])
+  end
+  
+  def test_failed_registration
+    expect_http_posts_with_responses([""].to_json)
+    Facebooker::User.register([{:email=>"mary@example.com",:account_id=>1}])
+    fail "Expected UserRegistrationFailed to be raised but it wasn't"
+  rescue Facebooker::Session::UserRegistrationFailed=>e
+    assert_equal({:email=>"mary@example.com",:account_id=>1},e.failed_users.first)
   end
   
   private
