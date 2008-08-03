@@ -308,6 +308,18 @@ class TestFacebooker < Test::Unit::TestCase
       assert_equal 1240077, @session.post('facebook.users.getLoggedInUser', :session_key => @session.session_key)
   end
 
+  def test_pages_is_admin_true
+    mock_http = establish_session
+    mock_http.should_receive(:post_form).and_return(example_pages_is_admin_true_xml).once.ordered(:posts)
+      assert_equal true, @session.post('facebook.pages.isAdmin', :page_id => 123)
+  end
+
+  def test_pages_is_admin_false
+    mock_http = establish_session
+    mock_http.should_receive(:post_form).and_return(example_pages_is_admin_false_xml).once.ordered(:posts)
+      assert_equal false, @session.post('facebook.pages.isAdmin', :page_id => 123)
+  end
+
   def test_desktop_apps_cannot_request_to_get_or_set_profile_fbml_for_any_user_other_than_logged_in_user
     mock_http = establish_session(@desktop_session)
     mock_http.should_receive(:post_form).and_return(example_friends_xml).once.ordered(:posts)
@@ -350,6 +362,20 @@ class TestFacebooker < Test::Unit::TestCase
     {:method=>"facebook.auth.createToken", :sig=>"18b3dc4f5258a63c0ad641eebd3e3930"}
   end  
   
+  def example_pages_is_admin_true_xml
+    <<-XML
+    <?xml version="1.0" encoding="UTF-8"?>
+      <pages_isAdmin_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd">1</pages_isAdmin_response>
+    XML
+  end
+
+  def example_pages_is_admin_false_xml
+    <<-XML
+    <?xml version="1.0" encoding="UTF-8"?>
+      <pages_isAdmin_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd">0</pages_isAdmin_response>
+    XML
+  end
+
   def example_set_fbml_xml
     <<-XML
     <?xml version="1.0" encoding="UTF-8"?>
