@@ -7,7 +7,13 @@ require File.dirname(__FILE__)+'/../lib/facebooker/rails/test_helpers'
 
 $: << File.join(File.dirname(__FILE__), '..', 'lib')
 
-RAILS_ROOT=File.join(File.dirname(__FILE__),'..','..')
+rails_root = File.join(File.dirname(__FILE__),'..','..')
+if defined? RAILS_ROOT
+  RAILS_ROOT.replace(rails_root)
+else
+  RAILS_ROOT = rails_root
+end
+
 require 'facebooker'
 
 class Test::Unit::TestCase
