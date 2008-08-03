@@ -132,6 +132,12 @@ module Facebooker
     end
   end
 
+  class PagesGetInfo < Parser#:nodoc:
+    def self.process(data)
+      array_of_hashes(element('pages_getInfo_response', data), 'page')
+    end
+  end
+
   class PublishStoryToUser < Parser#:nodoc:
     def self.process(data)
       element('feed_publishStoryToUser_response', data).text_value
@@ -454,6 +460,7 @@ module Facebooker
       'facebook.users.setStatus' => SetStatus,
       'facebook.users.getLoggedInUser' => GetLoggedInUser,
       'facebook.pages.isAdmin' => PagesIsAdmin,
+      'facebook.pages.getInfo' => PagesGetInfo,
       'facebook.friends.get' => GetFriends,
       'facebook.friends.getLists' => FriendListsGet,
       'facebook.friends.areFriends' => AreFriends,

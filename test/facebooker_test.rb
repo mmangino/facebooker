@@ -305,19 +305,31 @@ class TestFacebooker < Test::Unit::TestCase
   def test_get_logged_in_user
     mock_http = establish_session
     mock_http.should_receive(:post_form).and_return(example_get_logged_in_user_xml).once.ordered(:posts)
-      assert_equal 1240077, @session.post('facebook.users.getLoggedInUser', :session_key => @session.session_key)
+    assert_equal 1240077, @session.post('facebook.users.getLoggedInUser', :session_key => @session.session_key)
+  end
+
+  def test_pages_get_info
+    mock_http = establish_session
+    mock_http.should_receive(:post_form).and_return(example_pages_get_info_xml).once.ordered(:posts)
+    info = {
+      'page_id' => '4846711747',
+      'name' => 'Kronos Quartet',
+      'website' => 'http://www.kronosquartet.org',
+      'company_overview' => {}
+    }
+    assert_equal [info], @session.post('facebook.pages.getInfo', :fields => ['company_overview', 'website', 'name', 'page_id'].join(','), :page_ids => [4846711747].join(','))
   end
 
   def test_pages_is_admin_true
     mock_http = establish_session
     mock_http.should_receive(:post_form).and_return(example_pages_is_admin_true_xml).once.ordered(:posts)
-      assert_equal true, @session.post('facebook.pages.isAdmin', :page_id => 123)
+    assert_equal true, @session.post('facebook.pages.isAdmin', :page_id => 123)
   end
 
   def test_pages_is_admin_false
     mock_http = establish_session
     mock_http.should_receive(:post_form).and_return(example_pages_is_admin_false_xml).once.ordered(:posts)
-      assert_equal false, @session.post('facebook.pages.isAdmin', :page_id => 123)
+    assert_equal false, @session.post('facebook.pages.isAdmin', :page_id => 123)
   end
 
   def test_desktop_apps_cannot_request_to_get_or_set_profile_fbml_for_any_user_other_than_logged_in_user
@@ -360,7 +372,21 @@ class TestFacebooker < Test::Unit::TestCase
   
   def sample_args_to_post
     {:method=>"facebook.auth.createToken", :sig=>"18b3dc4f5258a63c0ad641eebd3e3930"}
-  end  
+  end
+
+  def example_pages_get_info_xml
+    <<-XML
+    <?xml version="1.0" encoding="UTF-8"?>
+    <pages_getInfo_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd" list="true">
+      <page>
+        <page_id>4846711747</page_id>
+        <name>Kronos Quartet</name>
+        <website>http://www.kronosquartet.org</website>
+        <company_overview/>
+      </page>
+    </pages_getInfo_response>
+    XML
+  end
   
   def example_pages_is_admin_true_xml
     <<-XML
