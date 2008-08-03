@@ -302,6 +302,12 @@ class TestFacebooker < Test::Unit::TestCase
     }
   end
   
+  def test_get_logged_in_user
+    mock_http = establish_session
+    mock_http.should_receive(:post_form).and_return(example_get_logged_in_user_xml).once.ordered(:posts)
+      assert_equal 1240077, @session.post('facebook.users.getLoggedInUser', :session_key => @session.session_key)
+  end
+
   def test_desktop_apps_cannot_request_to_get_or_set_profile_fbml_for_any_user_other_than_logged_in_user
     mock_http = establish_session(@desktop_session)
     mock_http.should_receive(:post_form).and_return(example_friends_xml).once.ordered(:posts)

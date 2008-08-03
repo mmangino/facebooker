@@ -59,6 +59,17 @@ class SessionTest < Test::Unit::TestCase
     session = Facebooker::Session.create(ENV['FACEBOOK_API_KEY'], ENV['FACEBOOK_SECRET_KEY'])
     session.secure_with!("a session key", "123456", Time.now.to_i + 60)
     assert(session.secured?)
+    assert_equal 'a session key', session.session_key
+    assert_equal 123456, session.user.to_i
+  end
+
+  def test_session_can_be_secured_with_existing_values_and_a_nil_uid
+    flexmock(session = Facebooker::Session.create(ENV['FACEBOOK_API_KEY'], ENV['FACEBOOK_SECRET_KEY']))
+    session.should_receive(:post).with('facebook.users.getLoggedInUser', :session_key => 'a session key').returns(321)
+    session.secure_with!("a session key", nil, Time.now.to_i + 60)
+    assert(session.secured?)
+    assert_equal 'a session key', session.session_key
+    assert_equal 321, session.user.to_i
   end
   
   # The Facebook API for this is hideous.  Oh well.
