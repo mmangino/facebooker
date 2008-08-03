@@ -402,17 +402,17 @@ class RailsIntegrationTest < Test::Unit::TestCase
   
   def test_publisher_test_error
     get :publisher_test_error, example_rails_params_including_fb
-    assert_equal "{\"errorCode\": 1, \"errorTitle\": \"Title\", \"errorMessage\": \"Body\"}",@response.body
+    assert_equal JSON.parse("{\"errorCode\": 1, \"errorTitle\": \"Title\", \"errorMessage\": \"Body\"}"), JSON.parse(@response.body)
   end
   
   def test_publisher_test_interface
     get :publisher_test_interface, example_rails_params_including_fb
-    assert_equal "{\"method\": \"publisher_getInterface\", \"content\": {\"fbml\": \"This is a test\", \"publishEnabled\": false, \"commentEnabled\": true}}",@response.body
+    assert_equal JSON.parse("{\"method\": \"publisher_getInterface\", \"content\": {\"fbml\": \"This is a test\", \"publishEnabled\": false, \"commentEnabled\": true}}"), JSON.parse(@response.body)
   end
   
   def test_publisher_test_reponse
     get :publisher_test_response, example_rails_params_including_fb
-    assert_equal "{\"method\": \"publisher_getFeedStory\", \"content\": {\"feed\": {\"template_data\": {\"params\": true}, \"template_id\": 1234}}}",@response.body
+    assert_equal JSON.parse("{\"method\": \"publisher_getFeedStory\", \"content\": {\"feed\": {\"template_data\": {\"params\": true}, \"template_id\": 1234}}}"), JSON.parse(@response.body)
     
   end
   
