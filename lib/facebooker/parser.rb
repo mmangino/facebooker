@@ -446,7 +446,8 @@ module Facebooker
       response_element = element('error_response', data) rescue nil
       if response_element
         hash = hashinate(response_element)
-        raise EXCEPTIONS[Integer(hash['error_code'])].new(hash['error_msg'])
+        exception = EXCEPTIONS[Integer(hash['error_code'])] || StandardError
+        raise exception.new(hash['error_msg'])
       end
     end
   end
