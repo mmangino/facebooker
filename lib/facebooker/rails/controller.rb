@@ -42,7 +42,9 @@ module Facebooker
       end
       
       def valid_session_key_in_session?
-       !session[:facebook_session].blank? && (facebook_params[:session_key].blank? || session[:facebook_session].session_key == facebook_params[:session_key])
+        #before we access the facebook_params, make sure we have the parameters
+        #otherwise we will blow up trying to access the secure parameters
+       !session[:facebook_session].blank? &&  (params[:fb_sig_session_key].blank? || session[:facebook_session].session_key == facebook_params[:session_key])
       end
       
       def secure_with_token!
