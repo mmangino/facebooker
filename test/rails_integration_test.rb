@@ -560,6 +560,14 @@ class RailsHelperTest < Test::Unit::TestCase
     assert_raises(ArgumentError) {@h.fb_prompt_permission("invliad", "a message")}
     
   end
+  
+  def test_fb_add_profile_section
+    assert_equal "<fb:add-section-button section=\"profile\" />",@h.fb_add_profile_section
+  end
+
+  def test_fb_add_info_section
+    assert_equal "<fb:add-section-button section=\"info\" />",@h.fb_add_info_section
+  end
 
   def test_fb_name_with_invalid_key
     assert_raises(ArgumentError) {@h.fb_name(1234, :sizee => false)}

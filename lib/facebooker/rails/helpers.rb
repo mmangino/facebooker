@@ -528,6 +528,14 @@ module Facebooker
         tag("fb:board",stringify_vals(options.merge(:xid=>xid)))
       end
       
+      def fb_add_profile_section
+        tag "fb:add-section-button",:section=>"profile"
+      end
+      
+      def fb_add_info_section
+        tag "fb:add-section-button",:section=>"info"
+      end
+      
       def fb_prompt_permission(permission,message,callback=nil)
         raise(ArgumentError, "Unknown value for permission: #{permission}") unless VALID_PERMISSIONS.include?(permission.to_sym)
         args={:perms=>permission}
