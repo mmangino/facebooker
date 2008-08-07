@@ -74,7 +74,6 @@ class TestPublisher < Facebooker::Rails::Publisher
   def profile_update(to,f)
     send_as :profile
     recipients to
-    from f
     profile "profile"
     profile_action "profile_action"
     mobile_profile "mobile_profile"
@@ -93,7 +92,6 @@ class TestPublisher < Facebooker::Rails::Publisher
   
   def ref_update(user)
     send_as :ref
-    from user
     fbml "fbml"
     handle "handle"
   end
@@ -208,29 +206,17 @@ class PublisherTest < Test::Unit::TestCase
   
   
   def test_deliver_profile
+    Facebooker::User.stubs(:new).returns(@user)
     @user.expects(:set_profile_fbml).with('profile', 'mobile_profile', 'profile_action',nil)
     TestPublisher.deliver_profile_update(@user,@user)    
   end
   
    def test_deliver_profile_with_main
+    Facebooker::User.stubs(:new).returns(@user)
     @user.expects(:set_profile_fbml).with('profile', 'mobile_profile', 'profile_action','profile_main')
     TestPublisher.deliver_profile_update_with_profile_main(@user,@user)    
   end
   
-  def test_deliver_profile_update_same_session
-    @user.expects(:set_profile_fbml)
-    TestPublisher.deliver_profile_update(@user,@user)
-  end
-  def test_deliver_profile_update_same_session
-    @from_user = Facebooker::User.new
-    @new_user = Facebooker::User.new
-    @from_user.id =7
-    @session2 = Facebooker::Session.new("","")
-    @from_user.stubs(:session).returns(@session2)
-    Facebooker::User.expects(:new).with(@user,@from_user.session).returns(@new_user)
-    @new_user.expects(:set_profile_fbml)
-    TestPublisher.deliver_profile_update(@user,@from_user)
-  end
   
   def test_create_ref_update
     p=TestPublisher.create_ref_update(@user)
@@ -240,6 +226,7 @@ class PublisherTest < Test::Unit::TestCase
   end
   
   def test_deliver_ref_update
+    Facebooker::Session.stubs(:create).returns(@session)
     @server_cache="server_cache"
     @session.expects(:server_cache).returns(@server_cache)
     @server_cache.expects(:set_ref_handle).with("handle","fbml")

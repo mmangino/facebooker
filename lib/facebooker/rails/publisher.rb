@@ -244,18 +244,30 @@ module Facebooker
         {:src=>image_path(src),:href=>url}
       end
   
+      def requires_from_user?(from,body)
+        ! (announcement_notification?(from,body) or ref_update?(body) or profile_update?(body))
+      end
+      
+      def profile_update?(body)
+        body.is_a?(Profile)
+      end
+      
+      def ref_update?(body)
+        body.is_a?(Ref)
+      end
+  
       def announcement_notification?(from,body)
         from.nil? and body.is_a?(Notification)
       end
       
       def send_message(method)
         @recipients = @recipients.is_a?(Array) ? @recipients : [@recipients]
-        if from.nil? and @recipients.size==1 and ! announcement_notification?(from,_body)
+        if from.nil? and @recipients.size==1 and requires_from_user?(from,_body)
           @from = @recipients.first
         end
         # notifications can 
         # omit the from address
-        raise InvalidSender.new("Sender must be a Facebooker::User") unless from.is_a?(Facebooker::User) || announcement_notification?(from,_body)
+        raise InvalidSender.new("Sender must be a Facebooker::User") unless from.is_a?(Facebooker::User) || !requires_from_user?(from,_body)
         case _body
         when Facebooker::Feed::TemplatizedAction,Facebooker::Feed::Action
           from.publish_action(_body)
@@ -271,12 +283,10 @@ module Facebooker
         when Profile
          # If recipient and from aren't the same person, create a new user object using the
          # userid from recipient and the session from from
-         if @from != @recipients.first
-           @from = Facebooker::User.new(Facebooker::User.cast_to_facebook_id(@recipients.first),from.session) 
-         end
-         from.set_profile_fbml(_body.profile, _body.mobile_profile, _body.profile_action, _body.profile_main)
+         @from = Facebooker::User.new(Facebooker::User.cast_to_facebook_id(@recipients.first),Facebooker::Session.create) 
+         @from.set_profile_fbml(_body.profile, _body.mobile_profile, _body.profile_action, _body.profile_main)
         when Ref
-          @from.session.server_cache.set_ref_handle(_body.handle,_body.fbml)
+          Facebooker::Session.create.server_cache.set_ref_handle(_body.handle,_body.fbml)
         when UserAction
           @from.session.publish_user_action(_body.template_id || FacebookTemplate.for(method) ,_body.data,_body.target_ids,_body.body_general)
         else
