@@ -10,7 +10,13 @@ module Facebooker
     
     # TODO: support ssl 
     def post(params)
+      attempt = 0
       Parser.parse(params[:method], Net::HTTP.post_form(url, params))
+    rescue Errno::ECONNRESET, EOFError
+      if attempt == 0
+        attempt += 1
+        retry
+      end
     end
     
     def post_file(params)

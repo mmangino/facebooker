@@ -149,6 +149,11 @@ module Facebooker
       element('feed_registerTemplateBundle_response', data).text_value.to_i
     end    
   end
+  class GetRegisteredTemplateBundles < Parser
+    def self.process(data)
+      array_of_hashes(element('feed_getRegisteredTemplateBundles_response',data), 'template_bundle')
+    end
+  end
   
   class PublishUserAction < Parser#:nodoc:
     def self.process(data)
@@ -189,15 +194,15 @@ module Facebooker
   class BatchRun < Parser #:nodoc:
     class << self
       def current_batch=(current_batch)
-        @current_batch=current_batch
+        Thread.current[:facebooker_current_batch]=current_batch
       end
       def current_batch
-        @current_batch
+        Thread.current[:facebooker_current_batch]
       end
     end
     def self.process(data)
       array_of_text_values(element('batch_run_response',data),"batch_run_response_elt").each_with_index do |response,i|
-        batch_request=@current_batch[i]
+        batch_request=current_batch[i]
         body=Struct.new(:body).new
         body.body=CGI.unescapeHTML(response)
         begin
@@ -470,6 +475,7 @@ module Facebooker
       'facebook.feed.publishActionOfUser' => PublishActionOfUser,
       'facebook.feed.publishTemplatizedAction' => PublishTemplatizedAction,
       'facebook.feed.registerTemplateBundle' => RegisterTemplateBundle,
+      'facebook.feed.getRegisteredTemplateBundles' => GetRegisteredTemplateBundles,
       'facebook.feed.publishUserAction' => PublishUserAction,
       'facebook.notifications.get' => NotificationsGet,
       'facebook.notifications.send' => NotificationsSend,
