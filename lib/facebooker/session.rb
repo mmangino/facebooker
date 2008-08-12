@@ -282,10 +282,10 @@ module Facebooker
       if email_fbml
         params[:email] = email_fbml
       end
-      params[:type]="general"
+      params[:type]="user_to_user"
       # if there is no uid, this is an announcement
       unless uid?
-        params[:type]="announcement"
+        params[:type]="app_to_user"
       end
       
       post 'facebook.notifications.send', params,uid?
