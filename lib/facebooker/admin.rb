@@ -7,7 +7,7 @@ module Facebooker
     # ** BETA ***
     # +properties+: Hash of properties you want to set
     def set_app_properties(properties)
-      properties.respond_to?(:to_json) ? properties.to_json : properties
+      properties = properties.respond_to?(:to_json) ? properties.to_json : properties
       (@session.post 'facebook.admin.setAppProperties', :properties => properties) == '1'
     end
     

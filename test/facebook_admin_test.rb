@@ -10,6 +10,12 @@ class FacebookAdminTest < Test::Unit::TestCase
     properties = { :application_name => "Video Jukebox", :dev_mode => 0 }    
     assert(@session.admin.set_app_properties(properties))
   end
+
+  def test_set_app_properties_json_conversion
+    properties = { :application_name => "Video Jukebox", :dev_mode => 0 }
+    flexmock(@session).should_receive(:post).with('facebook.admin.setAppProperties', :properties => properties.to_json).and_return('1').once
+    assert(@session.admin.set_app_properties(properties))
+  end
     
   def test_can_ask_facebook_to_get_app_properties
     expect_http_posts_with_responses(example_get_properties_xml)
