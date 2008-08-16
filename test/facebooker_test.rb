@@ -61,14 +61,12 @@ class TestFacebooker < Test::Unit::TestCase
   end
 
   def test_can_get_current_users_friends
-    mock_http = establish_session
-    mock_http.should_receive(:post_form).and_return(example_friends_xml).once.ordered(:posts)
+    expect_http_posts_with_responses(example_friends_xml)
     assert_equal([222333, 1240079], @session.user.friends.map{|friend| friend.id})
   end
   
   def test_can_get_current_users_friend_lists
-    mock_http = establish_session
-    mock_http.should_receive(:post_form).and_return(example_friend_lists_xml).once.ordered(:posts)
+    expect_http_posts_with_responses(example_friend_lists_xml)
     assert_equal([12089150545, 16361710545], @session.user.friend_lists.map{|friend_list| friend_list.flid})
   end
   
@@ -101,8 +99,7 @@ class TestFacebooker < Test::Unit::TestCase
   end
 
   def test_session_can_expire_on_server_and_client_handles_appropriately
-    mock_http = establish_session
-    mock_http.should_receive(:post_form).and_return(example_session_expired_error_response).once.ordered(:posts)
+    expect_http_posts_with_responses(example_session_expired_error_response)
     assert_raises(Facebooker::Session::SessionExpired) {
       @session.user.friends
     }
@@ -110,8 +107,7 @@ class TestFacebooker < Test::Unit::TestCase
 
   
   def test_can_publish_story_to_users_feed
-    mock_http = establish_session
-    mock_http.should_receive(:post_form).and_return(example_publish_story_xml).once.ordered(:posts)
+    expect_http_posts_with_responses(example_publish_story_xml)
     assert_nothing_raised {
       assert(@session.user.publish_story((s = Facebooker::Feed::Story.new; s.title = 'o hai'; s.body = '4srsly'; s)))
     }
@@ -119,21 +115,19 @@ class TestFacebooker < Test::Unit::TestCase
   
   
   def test_can_publish_action_to_users_feed
-    mock_http = establish_session
-    mock_http.should_receive(:post_form).and_return(example_publish_action_xml).once.ordered(:posts)
+    expect_http_posts_with_responses(example_publish_action_xml)
     assert_nothing_raised {
       assert(@session.user.publish_action((s = Facebooker::Feed::Action.new; s.title = 'o hai'; s.body = '4srsly'; s)))
     }
   end
   
   def test_can_publish_templatized_action_to_users_feed
-     mock_http = establish_session
-     mock_http.should_receive(:post_form).and_return(example_publish_templatized_action_xml).once.ordered(:posts)
-     assert_nothing_raised {
-       action = Facebooker::Feed::TemplatizedAction.new
-       action.title_template = "{actor} did something"
-       assert(@session.user.publish_templatized_action(action))
-     }
+    expect_http_posts_with_responses(example_publish_templatized_action_xml)
+    assert_nothing_raised {
+      action = Facebooker::Feed::TemplatizedAction.new
+      action.title_template = "{actor} did something"
+      assert(@session.user.publish_templatized_action(action))
+    }
   end
   
   def test_can_publish_templatized_action_to_users_feed_with_params_as_string
@@ -155,39 +149,35 @@ class TestFacebooker < Test::Unit::TestCase
   end
   
   def test_can_get_notifications_for_logged_in_user
-    mock_http = establish_session
-    mock_http.should_receive(:post_form).and_return(example_notifications_get_xml).once.ordered(:posts)
-    assert_equal("1", @session.user.notifications.messages.unread)  
-    assert_equal("0", @session.user.notifications.pokes.unread)    
-    assert_equal("1", @session.user.notifications.shares.unread)        
+    expect_http_posts_with_responses(example_notifications_get_xml)
+    assert_equal("1", @session.user.notifications.messages.unread)
+    assert_equal("0", @session.user.notifications.pokes.unread)
+    assert_equal("1", @session.user.notifications.shares.unread)
   end
   
   def test_can_send_notifications
-    mock_http = establish_session
-    mock_http.should_receive(:post_form).and_return(example_notifications_send_xml).once.ordered(:posts)
+    expect_http_posts_with_responses(example_notifications_send_xml)
     assert_nothing_raised {
       user_ids = [123, 321]
       notification_fbml = "O HAI!!!"
       optional_email_fbml = "This would be in the email.  If this is not passed, facebook sends no mailz!"
       assert_equal('http://www.facebook.com/send_email.php?from=211031&id=52', @session.send_notification(user_ids, notification_fbml, optional_email_fbml))
     }
-  end   
+  end
 
   def test_can_send_emails
-    mock_http = establish_session
-    mock_http.should_receive(:post_form).and_return(example_notifications_send_email_xml).once.ordered(:posts)
+    expect_http_posts_with_responses(example_notifications_send_email_xml)
     assert_nothing_raised {
       user_ids = [123, 321]
       text = "Hi I am the text part of the email."
-      fbml = "Hi I am the fbml version of the <b>email</a>"   
+      fbml = "Hi I am the fbml version of the <b>email</a>"
       subject = "Somethign you should really pay attention to."
       assert_equal('123,321', @session.send_email(user_ids, subject,text,fbml ))
     }
   end
   
   def test_can_find_friends_who_have_installed_app
-    mock_http = establish_session
-    mock_http.should_receive(:post_form).and_return(example_app_users_xml).once.ordered(:posts)
+    expect_http_posts_with_responses(example_app_users_xml)
     assert_equal(2, @session.user.friends_with_this_app.size)
     assert_equal([222333, 1240079], @session.user.friends_with_this_app.map{|f| f.id})
   end
@@ -200,7 +190,7 @@ class TestFacebooker < Test::Unit::TestCase
       assert_not_nil(reloaded_session.instance_variable_get(iv_name))
     end
     assert_nil(reloaded_session.user.instance_variable_get("@friends"))
-  end 
+  end
   
   def test_sessions_can_be_infinite_or_can_expire
     establish_session
@@ -213,22 +203,20 @@ class TestFacebooker < Test::Unit::TestCase
   def test_session_can_tell_you_if_it_has_been_secured
     mock = flexmock(Net::HTTP).should_receive(:post_form).and_return(example_auth_token_xml).once.ordered(:posts)
     mock.should_receive(:post_form).and_return(example_get_session_xml.sub(/1173309298/, (Time.now + 60).to_i.to_s)).once.ordered(:posts)
-    @session.secure!    
+    @session.secure!
     assert(@session.secured?)
   end
   
-  def test_can_get_photos_by_pids    
-    mock_http = establish_session
-    mock_http.should_receive(:post_form).and_return(example_get_photo_xml).once.ordered(:posts)
-    photos = @session.get_photos([97503428461115590, 97503428461115573])    
+  def test_can_get_photos_by_pids
+    expect_http_posts_with_responses(example_get_photo_xml)
+    photos = @session.get_photos([97503428461115590, 97503428461115573])
     assert_equal 2, photos.size
     assert_equal "Rooftop barbecues make me act funny", photos.first.caption
   end
   
   def test_can_get_photos_by_subject_and_album
-    mock_http = establish_session
-    mock_http.should_receive(:post_form).and_return(example_get_photo_xml).once.ordered(:posts)
-    photos = @session.get_photos(nil, 22701786, 97503428432802022 )    
+    expect_http_posts_with_responses(example_get_photo_xml)
+    photos = @session.get_photos(nil, 22701786, 97503428432802022 )
     assert_equal '97503428432802022', photos.first.aid
   end
   
@@ -238,43 +226,38 @@ class TestFacebooker < Test::Unit::TestCase
   end
   
   def test_can_get_albums_for_user
-    mock_http = establish_session
-    mock_http.should_receive(:post_form).and_return(example_user_albums_xml).once.ordered(:posts)
+    expect_http_posts_with_responses(example_user_albums_xml)
     assert_equal('Summertime is Best', @session.user.albums.first.name)
     assert_equal(2, @session.user.albums.size)
   end
   
   def test_can_get_albums_by_album_ids
-    mock_http = establish_session
-    mock_http.should_receive(:post_form).and_return(example_user_albums_xml).once.ordered(:posts)
+    expect_http_posts_with_responses(example_user_albums_xml)
     albums = @session.get_albums([97503428432802022, 97503428432797817] )
     assert_equal('Summertime is Best', albums[0].name)
     assert_equal('Bonofon\'s Recital', albums[1].name)
   end
   
   def test_can_create_album
-    mock_http = establish_session
-    mock_http.should_receive(:post_form).and_return(example_new_album_xml).once.ordered(:posts)
+    expect_http_posts_with_responses(example_new_album_xml)
     assert_equal "My Empty Album", @session.user.create_album(:name => "My Empty Album", :location => "Limboland").name
-  end  
+  end
   
   def test_can_upload_photo
     mock_http = establish_session
     mock_http.should_receive(:post_multipart_form).and_return(example_upload_photo_xml).once.ordered(:posts)
     f = Net::HTTP::MultipartPostFile.new("image.jpg", "image/jpeg", "RAW DATA")
     assert_equal "Under the sunset", @session.user.upload_photo(f).caption
-  end  
+  end
   
   def test_can_get_photo_tags
-    mock_http = establish_session
-    mock_http.should_receive(:post_form).and_return(example_photo_tags_xml).once.ordered(:posts)
+    expect_http_posts_with_responses(example_photo_tags_xml)
     assert_instance_of Facebooker::Tag, @session.get_tags(:pids => 97503428461115571 ).first
   end
   
   # TODO: how to test that tags were created properly? Response doesn't contain much
   def test_can_tag_a_user_in_a_photo
-    mock_http = establish_session
-    mock_http.should_receive(:post_form).and_return(example_add_tag_xml).once.ordered(:posts)
+    expect_http_posts_with_responses(example_add_tag_xml)
     assert !@session.add_tags(pid = 97503428461115571, x= 30.0, y = 62.5, tag_uid = 1234567890).nil?
   end
   
@@ -282,35 +265,30 @@ class TestFacebooker < Test::Unit::TestCase
   end
   
   def test_can_get_coordinates_for_photo_tags
-    mock_http = establish_session
-    mock_http.should_receive(:post_form).and_return(example_photo_tags_xml).once.ordered(:posts)
+    expect_http_posts_with_responses(example_photo_tags_xml)
     tag = @session.get_tags([97503428461115571]).first
     assert_equal ['65.4248', '16.8627'], tag.coordinates
   end
   
   def test_can_get_app_profile_fbml_for_user
-    mock_http = establish_session
-    mock_http.should_receive(:post_form).and_return(example_get_fbml_xml).once.ordered(:posts)
+    expect_http_posts_with_responses(example_get_fbml_xml)
     assert_match(/My profile!/, @session.user.profile_fbml)
   end
   
   def test_can_set_app_profile_fbml_for_user
-    mock_http = establish_session
-    mock_http.should_receive(:post_form).and_return(example_set_fbml_xml).once.ordered(:posts)
+    expect_http_posts_with_responses(example_set_fbml_xml)
     assert_nothing_raised {
       @session.user.profile_fbml = 'aha!'
     }
   end
   
   def test_get_logged_in_user
-    mock_http = establish_session
-    mock_http.should_receive(:post_form).and_return(example_get_logged_in_user_xml).once.ordered(:posts)
+    expect_http_posts_with_responses(example_get_logged_in_user_xml)
     assert_equal 1240077, @session.post('facebook.users.getLoggedInUser', :session_key => @session.session_key)
   end
 
   def test_pages_get_info
-    mock_http = establish_session
-    mock_http.should_receive(:post_form).and_return(example_pages_get_info_xml).once.ordered(:posts)
+    expect_http_posts_with_responses(example_pages_get_info_xml)
     info = {
       'page_id' => '4846711747',
       'name' => 'Kronos Quartet',
@@ -321,14 +299,12 @@ class TestFacebooker < Test::Unit::TestCase
   end
 
   def test_pages_is_admin_true
-    mock_http = establish_session
-    mock_http.should_receive(:post_form).and_return(example_pages_is_admin_true_xml).once.ordered(:posts)
+    expect_http_posts_with_responses(example_pages_is_admin_true_xml)
     assert_equal true, @session.post('facebook.pages.isAdmin', :page_id => 123)
   end
 
   def test_pages_is_admin_false
-    mock_http = establish_session
-    mock_http.should_receive(:post_form).and_return(example_pages_is_admin_false_xml).once.ordered(:posts)
+    expect_http_posts_with_responses(example_pages_is_admin_false_xml)
     assert_equal false, @session.post('facebook.pages.isAdmin', :page_id => 123)
   end
 
@@ -361,23 +337,18 @@ class TestFacebooker < Test::Unit::TestCase
   end
 
   def populate_user_info_with_limited_fields
-    mock_http = establish_session
-    mock_http.should_receive(:post_form).and_return(example_limited_user_info_xml).once.ordered(:posts)
+    expect_http_posts_with_responses(example_limited_user_info_xml)
     @session.user.populate(:affiliations, :status, :meeting_for)
   end
   
   def populate_session_friends
-    mock_http = establish_session
-    mock_http.should_receive(:post_form).and_return(example_friends_xml).once.ordered(:posts)
-    mock_http.should_receive(:post_form).and_return(example_user_info_xml).once.ordered(:posts)
-    @session.user.friends!    
+    expect_http_posts_with_responses(example_friends_xml, example_user_info_xml)
+    @session.user.friends!
   end
   
   def populate_session_friends_with_limited_fields
-    mock_http = establish_session
-    mock_http.should_receive(:post_form).and_return(example_friends_xml).once.ordered(:posts)
-    mock_http.should_receive(:post_form).and_return(example_limited_user_info_xml).once.ordered(:posts)
-    @session.user.friends!(:affiliations, :status, :meeting_for)    
+    expect_http_posts_with_responses(example_friends_xml, example_limited_user_info_xml)
+    @session.user.friends!(:affiliations, :status, :meeting_for)
   end
   
   def sample_args_to_post
