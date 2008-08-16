@@ -332,6 +332,16 @@ class TestFacebooker < Test::Unit::TestCase
     assert_equal false, @session.post('facebook.pages.isAdmin', :page_id => 123)
   end
 
+  def test_users_set_status_true
+    expect_http_posts_with_responses(example_users_set_status_true_xml)
+    assert_equal true, @session.post('facebook.users.setStatus', :uid => 123, :status => 'message')
+  end
+
+  def test_users_set_status_false
+    expect_http_posts_with_responses(example_users_set_status_false_xml)
+    assert_equal false, @session.post('facebook.users.setStatus', :uid => 123, :status => 'message')
+  end
+
   def test_desktop_apps_cannot_request_to_get_or_set_profile_fbml_for_any_user_other_than_logged_in_user
     mock_http = establish_session(@desktop_session)
     mock_http.should_receive(:post_form).and_return(example_friends_xml).once.ordered(:posts)
@@ -399,6 +409,20 @@ class TestFacebooker < Test::Unit::TestCase
     <<-XML
     <?xml version="1.0" encoding="UTF-8"?>
       <pages_isAdmin_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd">0</pages_isAdmin_response>
+    XML
+  end
+
+  def example_users_set_status_true_xml
+    <<-XML
+    <?xml version="1.0" encoding="UTF-8"?>
+      <users_setStatus_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd">1</users_setStatus_response>
+    XML
+  end
+
+  def example_users_set_status_false_xml
+    <<-XML
+    <?xml version="1.0" encoding="UTF-8"?>
+      <users_setStatus_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd">0</users_setStatus_response>
     XML
   end
 

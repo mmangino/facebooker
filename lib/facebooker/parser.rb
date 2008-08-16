@@ -402,7 +402,7 @@ module Facebooker
   
   class SetStatus < Parser
     def self.process(data)
-      element('users_setStatus_response',data)=='1'
+      element('users_setStatus_response',data).text_value == '1'
     end
   end
     
