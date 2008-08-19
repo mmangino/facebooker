@@ -34,7 +34,16 @@ var Element = {
 };
 
 function encodeURIComponent(str) {
-	return str.replace(/=/g,'%3D').replace(/&/g,'%26');
+	if (typeof(str) == "string") {
+		return str.replace(/=/g,'%3D').replace(/&/g,'%26');
+	}
+	//checkboxes and radio buttons return objects instead of a string
+	else if(typeof(str) == "object"){
+		for (prop in str)
+		{
+			return str[prop].replace(/=/g,'%3D').replace(/&/g,'%26');
+		}
+	}
 };
 
 var Form = {};
@@ -66,6 +75,7 @@ Ajax.Updater = function (container,url,options) {
 	if (options["onFailure"]) {
 		this.ajax.onerror = options["onFailure"];
 	}
+
 	// Yes, this is an excercise in undoing what we just did
 	// FB doesn't provide encodeURI, but they will encode things passed as a hash
 	// so we turn it into a string, esaping & and =
@@ -80,6 +90,9 @@ Ajax.Updater = function (container,url,options) {
 		parameters[key]=val;
 	}
   this.ajax.post(url,parameters);	
+	if (options["onLoading"]) {
+     options["onLoading"].call() 
+  }
 };
 Ajax.Request = function(url,options) {
 	Ajax.Updater('unused',url,options);
