@@ -16,7 +16,7 @@ class SessionTest < Test::Unit::TestCase
   
   def test_install_url_escapes_optional_next_parameter
     session = Facebooker::CanvasSession.create(ENV['FACEBOOK_API_KEY'], ENV['FACEBOOK_SECRET_KEY'])
-    assert_equal("http://www.facebook.com/install.php?api_key=1234567&v=1.0&next=next_url%3Fa%3D1%26b%3D2", session.install_url(:next => "next_url?a=1&b=2"))
+    assert_equal("http://www.new.facebook.com/install.php?api_key=1234567&v=1.0&next=next_url%3Fa%3D1%26b%3D2", session.install_url(:next => "next_url?a=1&b=2"))
   end
   
   def test_can_get_api_and_secret_key_from_environment
@@ -548,6 +548,6 @@ class CanvasSessionTest < Test::Unit::TestCase
    
   def test_login_url_will_display_callback_url_in_canvas
     session = Facebooker::CanvasSession.create(ENV['FACEBOOK_API_KEY'], ENV['FACEBOOK_SECRET_KEY'])
-    assert_equal("http://www.facebook.com/login.php?api_key=1234567&v=1.0&canvas=true", session.login_url)
+    assert_equal("http://www.new.facebook.com/login.php?api_key=1234567&v=1.0&canvas=true", session.login_url)
   end
 end

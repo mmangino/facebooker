@@ -150,7 +150,7 @@ begin
     end
     def test_named_route_includes_canvas_path_when_in_canvas
       get :named_route_test, example_rails_params_including_fb
-      assert_equal "http://apps.facebook.com/facebook_app_name/comments",@response.body
+      assert_equal "http://apps.new.facebook.com/facebook_app_name/comments",@response.body
     end
    
     def test_named_route_doesnt_include_canvas_path_when_in_canvas_with_canvas_equals_false
@@ -159,7 +159,7 @@ begin
     end
     def test_named_route_does_include_canvas_path_when_not_in_canvas_with_canvas_equals_true
       get :canvas_true_test, example_rails_params
-      assert_equal "http://apps.facebook.com/facebook_app_name/comments",@response.body
+      assert_equal "http://apps.new.facebook.com/facebook_app_name/comments",@response.body
     end
     
     private
@@ -185,17 +185,17 @@ class RailsIntegrationTestForExtendedPermissions < Test::Unit::TestCase
   def test_redirects_without_set_status
     post :index,example_rails_params_including_fb
     assert_response :success
-    assert_equal("<fb:redirect url=\"http://www.facebook.com/authorize.php?api_key=1234567&v=1.0&ext_perm=status_update\" />", @response.body)
+    assert_equal("<fb:redirect url=\"http://www.new.facebook.com/authorize.php?api_key=1234567&v=1.0&ext_perm=status_update\" />", @response.body)
   end
   def test_redirects_without_photo_upload
     post :index,example_rails_params_including_fb.merge(:fb_sig_ext_perms=>"status_update")
     assert_response :success
-    assert_equal("<fb:redirect url=\"http://www.facebook.com/authorize.php?api_key=1234567&v=1.0&ext_perm=photo_upload\" />", @response.body)
+    assert_equal("<fb:redirect url=\"http://www.new.facebook.com/authorize.php?api_key=1234567&v=1.0&ext_perm=photo_upload\" />", @response.body)
   end
   def test_redirects_without_create_listing
     post :index,example_rails_params_including_fb.merge(:fb_sig_ext_perms=>"status_update,photo_upload")
     assert_response :success
-    assert_equal("<fb:redirect url=\"http://www.facebook.com/authorize.php?api_key=1234567&v=1.0&ext_perm=create_listing\" />", @response.body)
+    assert_equal("<fb:redirect url=\"http://www.new.facebook.com/authorize.php?api_key=1234567&v=1.0&ext_perm=create_listing\" />", @response.body)
   end
   
   def test_renders_with_permission
@@ -224,13 +224,13 @@ class RailsIntegrationTestForApplicationInstallation < Test::Unit::TestCase
   def test_if_controller_requires_application_installation_unauthenticated_requests_will_redirect_to_install_page
     get :index
     assert_response :redirect
-    assert_equal("http://www.facebook.com/install.php?api_key=1234567&v=1.0", @response.headers['Location'])
+    assert_equal("http://www.new.facebook.com/install.php?api_key=1234567&v=1.0", @response.headers['Location'])
   end
   
   def test_if_controller_requires_application_installation_authenticated_requests_without_installation_will_redirect_to_install_page
     get :index, example_rails_params_including_fb
     assert_response :success
-    assert_equal("<fb:redirect url=\"http://www.facebook.com/install.php?api_key=1234567&v=1.0\" />", @response.body)
+    assert_equal("<fb:redirect url=\"http://www.new.facebook.com/install.php?api_key=1234567&v=1.0\" />", @response.body)
   end
   
   def test_if_controller_requires_application_installation_authenticated_requests_with_installation_will_render
@@ -266,7 +266,7 @@ class RailsIntegrationTest < Test::Unit::TestCase
   def test_if_controller_requires_facebook_authentication_unauthenticated_requests_will_redirect
     get :index
     assert_response :redirect
-    assert_equal("http://www.facebook.com/login.php?api_key=1234567&v=1.0", @response.headers['Location'])
+    assert_equal("http://www.new.facebook.com/login.php?api_key=1234567&v=1.0", @response.headers['Location'])
   end
 
   def test_facebook_params_are_parsed_into_a_separate_hash
@@ -353,18 +353,18 @@ class RailsIntegrationTest < Test::Unit::TestCase
   
   def test_fbml_redirect_tag_handles_hash_parameters_correctly
     get :index, example_rails_params_including_fb
-    assert_equal "<fb:redirect url=\"http://apps.facebook.com/root/require_auth\" />", @controller.send(:fbml_redirect_tag, :action => :index,:canvas=>true)
+    assert_equal "<fb:redirect url=\"http://apps.new.facebook.com/root/require_auth\" />", @controller.send(:fbml_redirect_tag, :action => :index,:canvas=>true)
   end
   
   def test_redirect_to_renders_fbml_redirect_tag_if_request_is_for_a_facebook_canvas
     get :index, example_rails_params_including_fb_for_user_not_logged_into_application
     assert_response :success
-    assert_equal("<fb:redirect url=\"http://www.facebook.com/login.php?api_key=1234567&v=1.0\" />", @response.body)
+    assert_equal("<fb:redirect url=\"http://www.new.facebook.com/login.php?api_key=1234567&v=1.0\" />", @response.body)
   end
   
   def test_url_for_links_to_canvas_if_canvas_is_true_and_not_in_canvas
     get :link_test,example_rails_params_including_fb.merge(:fb_sig_in_canvas=>0,:canvas=>true)
-    assert_match /apps.facebook.com/,@response.body
+    assert_match /apps.new.facebook.com/,@response.body
   end
   
   def test_includes_relative_url_root_when_linked_to_canvas
@@ -384,7 +384,7 @@ class RailsIntegrationTest < Test::Unit::TestCase
   
   def test_url_for_links_to_canvas_if_canvas_is_not_set
     get :link_test,example_rails_params_including_fb
-    assert_match /apps.facebook.com/,@response.body
+    assert_match /apps.new.facebook.com/,@response.body
   end
   
   def test_image_tag
@@ -646,7 +646,7 @@ class RailsHelperTest < Test::Unit::TestCase
   
   def test_fb_about_url
     ENV["FACEBOOK_API_KEY"]="1234"
-    assert_equal "http://www.facebook.com/apps/application.php?api_key=1234", @h.fb_about_url
+    assert_equal "http://www.new.facebook.com/apps/application.php?api_key=1234", @h.fb_about_url
   end
   
   def test_fb_ref_with_url
@@ -822,7 +822,7 @@ class RailsHelperTest < Test::Unit::TestCase
   end
   
   def test_fb_help
-    assert_equal "<fb:help href=\"http://www.facebook.com/apps/application.php?id=6236036681\">Help</fb:help>", @h.fb_help("Help", "http://www.facebook.com/apps/application.php?id=6236036681")      
+    assert_equal "<fb:help href=\"http://www.new.facebook.com/apps/application.php?id=6236036681\">Help</fb:help>", @h.fb_help("Help", "http://www.new.facebook.com/apps/application.php?id=6236036681")      
   end
   
   def test_fb_create_button

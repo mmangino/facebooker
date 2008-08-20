@@ -19,7 +19,7 @@ class TestFacebooker < Test::Unit::TestCase
   
   def test_session_can_tell_you_its_login_url
     assert_not_nil(@session.login_url)
-    assert_equal("http://www.facebook.com/login.php?api_key=#{@api_key}&v=1.0", @session.login_url)
+    assert_equal("http://www.new.facebook.com/login.php?api_key=#{@api_key}&v=1.0", @session.login_url)
   end
   
   def test_desktop_session_returns_auth_toke_as_part_of_login_url
@@ -30,7 +30,7 @@ class TestFacebooker < Test::Unit::TestCase
 
   def test_service_posts_data_to_http_location
     flexmock(Net::HTTP).should_receive(:post_form).and_return(example_auth_token_xml)
-    assert_equal("http://www.facebook.com/login.php?api_key=#{@api_key}&v=1.0&auth_token=3e4a22bb2f5ed75114b0fc9995ea85f1", @desktop_session.login_url)
+    assert_equal("http://www.new.facebook.com/login.php?api_key=#{@api_key}&v=1.0&auth_token=3e4a22bb2f5ed75114b0fc9995ea85f1", @desktop_session.login_url)
   end
 
   # def test_serivce_post_file_delegates_to_post_multipart_form
@@ -161,7 +161,7 @@ class TestFacebooker < Test::Unit::TestCase
       user_ids = [123, 321]
       notification_fbml = "O HAI!!!"
       optional_email_fbml = "This would be in the email.  If this is not passed, facebook sends no mailz!"
-      assert_equal('http://www.facebook.com/send_email.php?from=211031&id=52', @session.send_notification(user_ids, notification_fbml, optional_email_fbml))
+      assert_equal('http://www.new.facebook.com/send_email.php?from=211031&id=52', @session.send_notification(user_ids, notification_fbml, optional_email_fbml))
     }
   end
 
@@ -418,7 +418,7 @@ class TestFacebooker < Test::Unit::TestCase
   def example_notifications_send_xml
     <<-XML
 <?xml version="1.0" encoding="UTF-8"?>
-<notifications_send_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd">http://www.facebook.com/send_email.php?from=211031&id=52</notifications_send_response>
+<notifications_send_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd">http://www.new.facebook.com/send_email.php?from=211031&id=52</notifications_send_response>
     XML
   end     
   
@@ -432,7 +432,7 @@ class TestFacebooker < Test::Unit::TestCase
   def example_request_send_xml
     <<-XML
     <?xml version="1.0" encoding="UTF-8"?>
-    <notifications_sendRequest_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd">http://www.facebook.com/send_req.php?from=211031&id=6</notifications_sendRequest_response>    
+    <notifications_sendRequest_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd">http://www.new.facebook.com/send_req.php?from=211031&id=6</notifications_sendRequest_response>    
     XML
   end  
   
@@ -736,7 +736,7 @@ class TestFacebooker < Test::Unit::TestCase
         <modified>1185465771</modified>
         <description>Happenings on or around Summer '07</description>
         <location>Brooklyn, New York</location>
-        <link>http://www.facebook.com/album.php?aid=2011366&amp;id=22701786</link>
+        <link>http://www.new.facebook.com/album.php?aid=2011366&amp;id=22701786</link>
         <size>49</size>
       </album>
       <album>
@@ -748,7 +748,7 @@ class TestFacebooker < Test::Unit::TestCase
         <modified>1165382364</modified>
         <description>The whole Ewing fam flies out to flatland to watch the Bonofon's senior recital.  That boy sure can tinkle them ivories.</description>
         <location>Grinnell College, Grinnell Iowa</location>
-        <link>http://www.facebook.com/album.php?aid=2007161&amp;id=22701786</link>
+        <link>http://www.new.facebook.com/album.php?aid=2007161&amp;id=22701786</link>
         <size>14</size>
       </album>
     </photos_getAlbums_response>
@@ -765,7 +765,7 @@ class TestFacebooker < Test::Unit::TestCase
       <src>http://ip002.facebook.com/v67/161/72/219074/s219074_31637752_5455.jpg</src>
       <src_big>http://ip002.facebook.com/v67/161/72/219074/n219074_31637752_5455.jpg</src_big>
       <src_small>http://ip002.facebook.com/v67/161/72/219074/t219074_31637752_5455.jpg</src_small>
-      <link>http://www.facebook.com/photo.php?pid=31637752&id=219074</link>
+      <link>http://www.new.facebook.com/photo.php?pid=31637752&id=219074</link>
       <caption>Under the sunset</caption>
     </photos_upload_response>
     XML
@@ -783,7 +783,7 @@ class TestFacebooker < Test::Unit::TestCase
       <modified>1132553363</modified>
       <description>No I will not make out with you</description>
       <location>York, PA</location>
-      <link>http://www.facebook.com/album.php?aid=2002205&id=8055</link>
+      <link>http://www.new.facebook.com/album.php?aid=2002205&id=8055</link>
       <size>0</size>
     </photos_createAlbum_response>
     XML
@@ -821,7 +821,7 @@ class TestFacebooker < Test::Unit::TestCase
         <src>http://photos-c.ak.facebook.com/photos-ak-sf2p/v77/74/112/22701786/s22701786_30324934_7816.jpg</src>
         <src_big>http://photos-c.ak.facebook.com/photos-ak-sf2p/v77/74/112/22701786/n22701786_30324934_7816.jpg</src_big>
         <src_small>http://photos-c.ak.facebook.com/photos-ak-sf2p/v77/74/112/22701786/t22701786_30324934_7816.jpg</src_small>
-        <link>http://www.facebook.com/photo.php?pid=30324934&amp;id=22701786</link>
+        <link>http://www.new.facebook.com/photo.php?pid=30324934&amp;id=22701786</link>
         <caption>Rooftop barbecues make me act funny</caption>
         <created>1184120987</created>
       </photo>
@@ -832,7 +832,7 @@ class TestFacebooker < Test::Unit::TestCase
         <src>http://photos-b.ak.facebook.com/photos-ak-sf2p/v77/74/112/22701786/s22701786_30324917_4555.jpg</src>
         <src_big>http://photos-b.ak.facebook.com/photos-ak-sf2p/v77/74/112/22701786/n22701786_30324917_4555.jpg</src_big>
         <src_small>http://photos-b.ak.facebook.com/photos-ak-sf2p/v77/74/112/22701786/t22701786_30324917_4555.jpg</src_small>
-        <link>http://www.facebook.com/photo.php?pid=30324917&amp;id=22701786</link>
+        <link>http://www.new.facebook.com/photo.php?pid=30324917&amp;id=22701786</link>
         <caption/>
         <created>1184120654</created>
       </photo>

@@ -38,7 +38,7 @@ module Facebooker
     end
 
     def self.new_api?
-      (@facebooker_config && @facebooker_config["use_new_api"]) || (ENV["FACEBOOKER_API"] == "new")
+      !((facebooker_config && facebooker_config["use_old_api"]) || (ENV["FACEBOOKER_API"] == "old"))
     end
 
     def self.load_adapter(params)

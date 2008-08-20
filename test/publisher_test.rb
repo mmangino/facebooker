@@ -294,7 +294,7 @@ class PublisherTest < Test::Unit::TestCase
   
   def test_default_url_options
     Facebooker.expects(:facebook_path_prefix).returns("/mike")
-    assert_equal({:host=>"apps.facebook.com/mike"},TestPublisher.default_url_options)
+    assert_equal({:host=>"apps.new.facebook.com/mike"},TestPublisher.default_url_options)
   end
   
   def test_recipients

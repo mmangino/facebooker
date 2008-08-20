@@ -517,7 +517,7 @@ module Facebooker
       #
       # Return the URL for the about page of the application
       def fb_about_url
-        "http://www.facebook.com/apps/application.php?api_key=#{Facebooker.api_key}"
+        "http://#{Facebooker.www_server_base_url}/apps/application.php?api_key=#{Facebooker.api_key}"
       end
       
       #
