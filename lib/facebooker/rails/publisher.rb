@@ -288,7 +288,7 @@ module Facebooker
         when Ref
           Facebooker::Session.create.server_cache.set_ref_handle(_body.handle,_body.fbml)
         when UserAction
-          @from.session.publish_user_action(_body.template_id || FacebookTemplate.for(method) ,_body.data,_body.target_ids,_body.body_general)
+          @from.session.publish_user_action(_body.template_id || FacebookTemplate.for(method) ,_body.data||{},_body.target_ids,_body.body_general)
         else
           raise UnspecifiedBodyType.new("You must specify a valid send_as")
         end
