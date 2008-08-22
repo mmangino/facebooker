@@ -386,7 +386,7 @@ module Facebooker
         secret
       end
       
-      def post(method, params = {})
+      def post(method, params = {},use_session=false)
         if method == 'facebook.profile.getFBML' || method == 'facebook.profile.setFBML'
           raise NonSessionUser.new("User #{@uid} is not the logged in user.") unless @uid == params[:uid]
         end

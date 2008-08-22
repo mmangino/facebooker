@@ -36,7 +36,7 @@ module Facebooker
       end
       if args.last.kind_of?(Hash)
         populate_from_hash!(args.pop)
-      end      
+      end     
     end
 
     # Returns a user's events, params correspond to API call parameters (except UID):
@@ -200,7 +200,7 @@ module Facebooker
       parameters[:profile_action] = profile_action_fbml if profile_action_fbml
       parameters[:mobile_profile] = mobile_fbml if mobile_fbml
       parameters[:profile_main] = profile_main if profile_main
-      session.post('facebook.profile.setFBML', parameters)
+      session.post('facebook.profile.setFBML', parameters,false)
     end
     
     ## ** NEW PROFILE DESIGN ***
@@ -313,6 +313,10 @@ module Facebooker
       else
         object
       end
+    end
+    
+    def facebook_id
+      @id
     end
     
     private
