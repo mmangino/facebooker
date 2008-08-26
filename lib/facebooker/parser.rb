@@ -143,18 +143,25 @@ module Facebooker
       element('feed_publishStoryToUser_response', data).text_value
     end
   end
-  
+
   class RegisterTemplateBundle < Parser#:nodoc:
     def self.process(data)
       element('feed_registerTemplateBundle_response', data).text_value.to_i
-    end    
+    end
   end
+
   class GetRegisteredTemplateBundles < Parser
     def self.process(data)
       array_of_hashes(element('feed_getRegisteredTemplateBundles_response',data), 'template_bundle')
     end
   end
-  
+
+  class DeactivateTemplateBundleByID < Parser#:nodoc:
+    def self.process(data)
+      element('feed_deactivateTemplateBundleByID_response', data).text_value == '1'
+    end
+  end
+
   class PublishUserAction < Parser#:nodoc:
     def self.process(data)
       element('feed_publishUserAction_response', data).children[1].text_value == "1"
@@ -475,6 +482,7 @@ module Facebooker
       'facebook.feed.publishActionOfUser' => PublishActionOfUser,
       'facebook.feed.publishTemplatizedAction' => PublishTemplatizedAction,
       'facebook.feed.registerTemplateBundle' => RegisterTemplateBundle,
+      'facebook.feed.deactivateTemplateBundleByID' => DeactivateTemplateBundleByID,
       'facebook.feed.getRegisteredTemplateBundles' => GetRegisteredTemplateBundles,
       'facebook.feed.publishUserAction' => PublishUserAction,
       'facebook.notifications.get' => NotificationsGet,

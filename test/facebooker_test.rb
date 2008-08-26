@@ -147,7 +147,12 @@ class TestFacebooker < Test::Unit::TestCase
     action.title_data=hash
     assert_equal action.to_params[:title_data],json_data
   end
-  
+
+  def test_can_deactivate_template_bundle_by_id
+    expect_http_posts_with_responses(example_deactivate_template_bundle_by_id_xml)
+    assert_equal true, @session.post('facebook.feed.deactivateTemplateBundleByID', :template_bundle_id => 123)
+  end
+
   def test_can_get_notifications_for_logged_in_user
     expect_http_posts_with_responses(example_notifications_get_xml)
     assert_equal("1", @session.user.notifications.messages.unread)
@@ -485,7 +490,14 @@ class TestFacebooker < Test::Unit::TestCase
     </feed_publishTemplatizedAction_response>
     XML
   end
-  
+
+  def example_deactivate_template_bundle_by_id_xml
+    <<-XML
+    <?xml version="1.0" encoding="UTF-8"?>
+    <feed_deactivateTemplateBundleByID_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/">1</feed_deactivateTemplateBundleByID_response>
+    XML
+  end
+
   def example_user_info_xml
     <<-XML
     <?xml version="1.0" encoding="UTF-8"?>
