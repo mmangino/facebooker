@@ -31,7 +31,7 @@ module Facebooker
                :uninstall_url, :ip_list, :email, :description, :use_iframe, :desktop, :is_mobile,
                :default_fbml, :default_column, :message_url, :message_action, :about_url,
                :private_install, :installable, :privacy_url, :help_url, :see_all_url, :tos_url,
-               :dev_mode, :preload_fql, :icon_url, :canvas_name, :logo_url ]
+               :dev_mode, :preload_fql, :icon_url, :canvas_name, :logo_url, :connect_logo_url ]
     
     attr_accessor *FIELDS
          
