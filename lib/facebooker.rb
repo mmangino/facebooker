@@ -21,6 +21,7 @@ require 'digest/md5'
 
 require 'facebooker/batch_request'
 require 'facebooker/feed'
+require 'facebooker/logging'
 require 'facebooker/model'
 require 'facebooker/parser'
 require 'facebooker/service'

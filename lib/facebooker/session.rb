@@ -456,23 +456,35 @@ module Facebooker
       BatchRun.current_batch=nil
     end
     
-    def post(method, params = {},use_session_key=true,&proc)
+    def post_without_logging(method, params = {}, use_session_key = true, &proc)
       add_facebook_params(params, method)
       use_session_key && @session_key && params[:session_key] ||= @session_key
       final_params=params.merge(:sig => signature_for(params))
       if batch_request?
         add_to_batch(final_params,&proc)
       else
-        result=service.post(final_params)
+        result = service.post(final_params)
         result = yield result if block_given?
         result
       end
     end
     
+    def post(method, params = {}, use_session_key = true, &proc)
+      if batch_request?
+        post_without_logging(method, params, use_session_key, &proc)
+      else
+        Logging.log_fb_api(method, params) do
+          post_without_logging(method, params, use_session_key, &proc)
+        end
+      end
+    end
+    
     def post_file(method, params = {})
-      add_facebook_params(params, method)
-      @session_key && params[:session_key] ||= @session_key
-      service.post_file(params.merge(:sig => signature_for(params.reject{|key, value| key.nil?})))
+      Logging.log_fb_api(method, params) do
+        add_facebook_params(params, method)
+        @session_key && params[:session_key] ||= @session_key
+        service.post_file(params.merge(:sig => signature_for(params.reject{|key, value| key.nil?})))
+      end
     end
     
     

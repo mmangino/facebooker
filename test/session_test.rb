@@ -11,7 +11,8 @@ class SessionTest < Test::Unit::TestCase
   end
 
   def teardown
-    flexmock_close
+    Facebooker::Session.configuration_file_path = nil
+    super    
   end
   
   def test_install_url_escapes_optional_next_parameter
@@ -192,6 +193,15 @@ class SessionTest < Test::Unit::TestCase
     assert @session.publish_user_action(17876842716,{})
   end
   
+  def test_logs_api_calls
+    call_name = 'sample.api.call'
+    params = { :param1 => true, :param2 => 'value' }
+    flexmock(Facebooker::Logging, :Logging).should_receive(:log_fb_api).once.with(
+       call_name, params, Proc)
+    @session = Facebooker::Session.create(ENV['FACEBOOK_API_KEY'], ENV['FACEBOOK_SECRET_KEY'])
+    @session.post(call_name, params)
+  end
+  
   def test_requests_inside_batch_are_added_to_batch
     @session = Facebooker::Session.create(ENV['FACEBOOK_API_KEY'], ENV['FACEBOOK_SECRET_KEY'])
     @session.send(:service).expects(:post).once
@@ -252,11 +262,7 @@ class SessionTest < Test::Unit::TestCase
     assert_equal false, genre.dance
     assert_equal true, genre.party
   end
-  
-  def teardown
-    Facebooker::Session.configuration_file_path = nil
-  end
-  
+    
   private
   
   def example_groups_get_xml
