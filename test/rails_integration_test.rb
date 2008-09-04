@@ -325,10 +325,19 @@ class RailsIntegrationTest < Test::Unit::TestCase
     assert_equal(744961110, @controller.facebook_session.user.id)
   end
 
-  def test_existing_secured_session_is_used_if_available_and_facebook_params_session_key_is_nil
+  def test_existing_secured_session_is_NOT_used_if_available_and_facebook_params_session_key_is_nil_and_in_canvas
     session = Facebooker::Session.create(ENV['FACEBOOK_API_KEY'], ENV['FACEBOOK_SECRET_KEY'])
     session.secure_with!("a session key", "1111111", Time.now.to_i + 60)
     get :index, example_rails_params_including_fb.merge("fb_sig_session_key" => ''), {:facebook_session => session}
+    
+    assert_equal(744961110, @controller.facebook_session.user.id)
+  end
+
+  def test_existing_secured_session_IS_used_if_available_and_facebook_params_session_key_is_nil_and_NOT_in_canvas
+    @contoller = PlainOldRailsController.new
+    session = Facebooker::Session.create(ENV['FACEBOOK_API_KEY'], ENV['FACEBOOK_SECRET_KEY'])
+    session.secure_with!("a session key", "1111111", Time.now.to_i + 60)
+    get :index,{}, {:facebook_session => session}
     
     assert_equal(1111111, @controller.facebook_session.user.id)
   end
@@ -891,11 +900,11 @@ class RailsFacebookFormbuilderTest < Test::Unit::TestCase
   end
   
   def test_text_field
-    assert_equal "<fb:editor-text id=\"testmodel_name\" label=\"Name\" name=\"testmodel[name]\" value=\"Mike\"></fb:editor-text>",
+    assert_equal "<fb:editor-text id=\"test_model_name\" label=\"Name\" name=\"test_model[name]\" value=\"Mike\"></fb:editor-text>",
         @form_builder.text_field(:name)
   end
   def test_text_area
-    assert_equal "<fb:editor-textarea id=\"testmodel_name\" label=\"Name\" name=\"testmodel[name]\">Mike</fb:editor-textarea>",
+    assert_equal "<fb:editor-textarea id=\"test_model_name\" label=\"Name\" name=\"test_model[name]\">Mike</fb:editor-textarea>",
         @form_builder.text_area(:name)    
   end
   
@@ -912,7 +921,7 @@ class RailsFacebookFormbuilderTest < Test::Unit::TestCase
   end
   
   def test_collection_typeahead_internal
-    assert_equal "<fb:typeahead-input id=\"testmodel_name\" name=\"testmodel[name]\" value=\"Mike\"><fb:typeahead-option value=\"3\">ABC</fb:typeahead-option></fb:typeahead-input>",
+    assert_equal "<fb:typeahead-input id=\"test_model_name\" name=\"test_model[name]\" value=\"Mike\"><fb:typeahead-option value=\"3\">ABC</fb:typeahead-option></fb:typeahead-input>",
       @form_builder.collection_typeahead_internal(:name,["ABC"],:size,:to_s)        
   end
   
