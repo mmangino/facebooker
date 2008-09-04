@@ -412,7 +412,7 @@ module Facebooker
         def inherited(child)
           super          
           child.master_helper_module=Module.new
-          child.master_helper_module.send!(:include,self.master_helper_module)
+          child.master_helper_module.__send__(:include,self.master_helper_module)
           child.send(:include, child.master_helper_module)      
         end
     
