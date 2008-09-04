@@ -5,6 +5,12 @@ module ::ActionController
     end                                         
   end
   
+  class Base
+    def self.relative_url_root
+      Facebooker.path_prefix
+    end
+  end  
+  
   class UrlRewriter
     RESERVED_OPTIONS << :canvas
     def link_to_new_canvas?
