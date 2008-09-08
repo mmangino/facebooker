@@ -2,14 +2,8 @@
 # Config parsing needs to happen before files are required.
 facebook_config = "#{RAILS_ROOT}/config/facebooker.yml"
 
-if File.exist?(facebook_config)
-  FACEBOOKER = YAML.load_file(facebook_config)[RAILS_ENV] 
-  ENV['FACEBOOK_API_KEY'] = FACEBOOKER['api_key']
-  ENV['FACEBOOK_SECRET_KEY'] = FACEBOOKER['secret_key']
-  ENV['FACEBOOKER_RELATIVE_URL_ROOT'] = FACEBOOKER['canvas_page_name']
-  ENV['FACEBOOKER_API'] = FACEBOOKER['api']
-  ActionController::Base.asset_host = FACEBOOKER['callback_url'] if(ActionController::Base.asset_host.blank?)
-end
+require 'facebooker'
+FACEBOOKER = Facebooker.load_configuration(facebook_config)
 
 require 'net/http_multipart_post'
 require 'facebooker/rails/controller'
@@ -19,8 +13,6 @@ require 'facebooker/rails/facebook_asset_path'
 require 'facebooker/rails/facebook_request_fix'
 require 'facebooker/rails/routing'
 require 'facebooker/rails/facebook_pretty_errors' rescue nil
-require 'facebooker/adapters/facebook_adapter'
-require 'facebooker/adapters/bebo_adapter'
 module ::ActionController
   class Base
     def self.inherited_with_facebooker(subclass)

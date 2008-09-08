@@ -6,6 +6,11 @@
 * Added data.get_cookies and data.set_cookie [shane]
 * Added admin.get_app_properties and admin.set_app_properties [shane]
 
+=== 0.9.9 / 2008-09-08
+
+* Re-package as gem after reworking for new API
+
+
 === 0.9.5 / 2008-02-13
 
 * Next release of documentation

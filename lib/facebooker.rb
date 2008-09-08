@@ -18,6 +18,7 @@ rescue
 end
 require 'zlib'
 require 'digest/md5'
+
 require 'facebooker/batch_request'
 require 'facebooker/feed'
 require 'facebooker/model'
@@ -50,7 +51,31 @@ require 'facebooker/adapters/bebo_adapter'
 require 'facebooker/models/friend_list'
 
 module Facebooker
-  class << self
+      
+    class << self
+    
+    def load_configuration(facebooker_yaml_file)
+      if File.exist?(facebooker_yaml_file)
+        if Module.const_defined?("RAILS_ENV")
+          facebooker = YAML.load_file(facebooker_yaml_file)[RAILS_ENV] 
+        else
+          facebooker = YAML.load_file(facebooker_yaml_file)["development"]           
+        end
+        ENV['FACEBOOK_API_KEY'] = facebooker['api_key']
+        ENV['FACEBOOK_SECRET_KEY'] = facebooker['secret_key']
+        ENV['FACEBOOKER_RELATIVE_URL_ROOT'] = facebooker['canvas_page_name']
+        ENV['FACEBOOKER_API'] = facebooker['api']
+        if Module.const_defined?("ActionController")
+          ActionController::Base.asset_host = facebooker['callback_url'] if(ActionController::Base.asset_host.blank?)
+        end
+        @facebooker_configuration = facebooker
+      end
+    end
+    
+    def facebooker_config
+      @facebooker_configuration 
+    end
+    
      def current_adapter=(adapter_class)
       @current_adapter = adapter_class
     end

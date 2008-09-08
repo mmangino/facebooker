@@ -11,7 +11,9 @@ generators/publisher/publisher_generator.rb
 generators/publisher/templates/publisher.rb
 init.rb
 install.rb
-lib/facebooker.rb
+lib/facebooker/adapters/adapter_base.rb
+lib/facebooker/adapters/bebo_adapter.rb
+lib/facebooker/adapters/facebook_adapter.rb
 lib/facebooker/admin.rb
 lib/facebooker/batch_request.rb
 lib/facebooker/data.rb
@@ -23,9 +25,13 @@ lib/facebooker/models/applicationproperties.rb
 lib/facebooker/models/cookie.rb
 lib/facebooker/models/education_info.rb
 lib/facebooker/models/event.rb
+lib/facebooker/models/friend_list.rb
 lib/facebooker/models/group.rb
+lib/facebooker/models/info_item.rb
+lib/facebooker/models/info_section.rb
 lib/facebooker/models/location.rb
 lib/facebooker/models/notifications.rb
+lib/facebooker/models/page.rb
 lib/facebooker/models/photo.rb
 lib/facebooker/models/tag.rb
 lib/facebooker/models/user.rb
@@ -34,10 +40,12 @@ lib/facebooker/parser.rb
 lib/facebooker/rails/controller.rb
 lib/facebooker/rails/facebook_asset_path.rb
 lib/facebooker/rails/facebook_form_builder.rb
+lib/facebooker/rails/facebook_pretty_errors.rb
 lib/facebooker/rails/facebook_request_fix.rb
 lib/facebooker/rails/facebook_session_handling.rb
 lib/facebooker/rails/facebook_url_rewriting.rb
 lib/facebooker/rails/helpers.rb
+lib/facebooker/rails/profile_publisher_extensions.rb
 lib/facebooker/rails/publisher.rb
 lib/facebooker/rails/routing.rb
 lib/facebooker/rails/test_helpers.rb
@@ -46,6 +54,7 @@ lib/facebooker/server_cache.rb
 lib/facebooker/service.rb
 lib/facebooker/session.rb
 lib/facebooker/version.rb
+lib/facebooker.rb
 lib/net/http_multipart_post.rb
 lib/tasks/facebooker.rake
 lib/tasks/tunnel.rake

@@ -28,13 +28,8 @@ module Facebooker
       @config = config
     end
 
-    # TODO: Get someone to look into this for desktop apps.
     def  self.facebooker_config
-      return @facebooker_config if @facebooker_config
-      facebook_config_file = "#{RAILS_ROOT}/config/facebooker.yml"
-      if File.exist?(facebook_config_file)
-        @facebooker_config = YAML.load_file(facebook_config_file)[RAILS_ENV]
-      end
+      Facebooker.facebooker_config
     end
 
     def self.new_api?
