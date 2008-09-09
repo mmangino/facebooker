@@ -56,7 +56,7 @@ module Facebooker
     
     def load_configuration(facebooker_yaml_file)
       if File.exist?(facebooker_yaml_file)
-        if Module.const_defined?("RAILS_ENV")
+        if defined? RAILS_ENV
           facebooker = YAML.load_file(facebooker_yaml_file)[RAILS_ENV] 
         else
           facebooker = YAML.load_file(facebooker_yaml_file)           
