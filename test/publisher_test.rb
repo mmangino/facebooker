@@ -123,7 +123,6 @@ class TestPublisher < Facebooker::Rails::Publisher
   
 end
 
-
 class PublisherTest < Test::Unit::TestCase
   
   def setup
@@ -290,6 +289,14 @@ class PublisherTest < Test::Unit::TestCase
     assert_raises(NoMethodError) {
       TestPublisher.new.fake
     }
+  end
+  
+  def test_image_urls
+    Facebooker.expects(:facebook_path_prefix).returns("/mike")
+    assert_equal({:src => '/images/image.png', :href => 'raw_string' },
+        TestPublisher.new.image('image.png', 'raw_string'))
+    assert_equal({:src => '/images/image.png', :href => 'http://apps.new.facebook.com/mike/pokes/do/1' },
+        TestPublisher.new.image('image.png', {:controller => :pokes, :action => :do, :id => 1}))    
   end
   
   def test_default_url_options

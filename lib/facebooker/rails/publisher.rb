@@ -240,8 +240,8 @@ module Facebooker
         end
       end
       
-      def image(src,url)
-        {:src=>image_path(src),:href=>url}
+      def image(src,target)
+        {:src=>image_path(src),:href=> target.respond_to?(:to_str) ? target : url_for(target)}
       end
   
       def requires_from_user?(from,body)
