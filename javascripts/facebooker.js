@@ -82,12 +82,14 @@ Ajax.Updater = function (container,url,options) {
 	// then we split it all back out here
 	// this could be killed if encodeURIComponent was available
 	parameters={};
-	pairs=options['parameters'].split('&');
-	for (var i=0; i<pairs.length; i++) {
-		kv=pairs[i].split('=');
-		key=kv[0].replace(/%3D/g,'=').replace(/%26/g,'&');
-		val=kv[1].replace(/%3D/g,'=').replace(/%26/g,'&');
-		parameters[key]=val;
+  if (options['parameters']) {
+		pairs=options['parameters'].split('&');	
+		for (var i=0; i<pairs.length; i++) {
+			kv=pairs[i].split('=');
+			key=kv[0].replace(/%3D/g,'=').replace(/%26/g,'&');
+			val=kv[1].replace(/%3D/g,'=').replace(/%26/g,'&');
+			parameters[key]=val;
+		}
 	}
   this.ajax.post(url,parameters);	
 	if (options["onLoading"]) {
