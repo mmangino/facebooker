@@ -5,6 +5,9 @@ facebook_config = "#{RAILS_ROOT}/config/facebooker.yml"
 require 'facebooker'
 FACEBOOKER = Facebooker.load_configuration(facebook_config)
 
+# enable logger before including everything else, in case we ever want to log initialization 
+Facebooker.logger = RAILS_DEFAULT_LOGGER if Object.const_defined? :RAILS_DEFAULT_LOGGER
+
 require 'net/http_multipart_post'
 require 'facebooker/rails/controller'
 require 'facebooker/rails/facebook_url_rewriting'

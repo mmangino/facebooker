@@ -8,6 +8,19 @@ module Facebooker
   end
 
   module Logging
+    def self.refresh_colorize_logging
+      if Object.const_defined? :ActiveRecord
+        @@colorize = ActiveRecord::Base.colorize_logging
+      else
+        @@colorize = false
+      end
+    end
+    refresh_colorize_logging
+    
+    def self.colorize_logging
+      @@colorize
+    end
+    
     @@row_even = false
     def self.log_fb_api(method, params)
       message = method # might customize later
@@ -35,14 +48,13 @@ module Facebooker
     end
     
     def self.log_info(message, dump, seconds = 0)
-      logger = Facebooker.logger || ActiveRecord::Base.logger
-      return unless logger
-      logger.debug format_log_entry("#{message} (#{'%f' % seconds})", dump)
+      return unless Facebooker.logger
+      Facebooker.logger.debug format_log_entry("#{message} (#{'%f' % seconds})", dump)
     end
     
     # stolen from active record  
     def self.format_log_entry(message, dump = nil)
-      if ActiveRecord::Base.colorize_logging
+      if colorize_logging
         if @@row_even
           @@row_even = false
           message_color, dump_color = "4;36;1", "0;1"
