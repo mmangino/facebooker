@@ -1,4 +1,4 @@
-if  RAILS_ENV=="development"
+if Facebooker.facebooker_config['pretty_errors'] || (Facebooker.facebooker_config['pretty_errors'].nil? && RAILS_ENV=="development")
   class ActionController::Base
     def rescues_path_with_facebooker(template_name)
       t="#{RAILS_ROOT}/vendor/plugins/facebooker/templates/#{template_name}.erb"

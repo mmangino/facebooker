@@ -11,6 +11,7 @@ development:
   secret_key: 
   canvas_page_name:
   callback_url:
+  pretty_errors: true
   tunnel:
     public_host_username: 
     public_host: 
