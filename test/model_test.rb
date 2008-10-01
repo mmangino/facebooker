@@ -26,6 +26,18 @@ class TestFacebooker < Test::Unit::TestCase
     assert_equal("Blob", Thing.from_hash(h).name)
   end
   
+  def test_ignores_non_model_keys
+    h = {:name => "Blob", :job => "Monster", :not_there=>true}
+    assert_equal("Blob", Thing.from_hash(h).name)    
+  end
+  
+  def test_logs_non_model_keys
+    flexmock(Facebooker::Logging).should_receive(:log_info)
+    h = {:name => "Blob", :job => "Monster", :not_there=>true}
+    Thing.from_hash(h)
+  end
+    
+  
   def test_if_no_hash_is_given_to_model_constructor_no_attributes_are_set
     assert_nothing_raised {
       t = Thing.new
