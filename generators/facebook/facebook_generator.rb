@@ -1,7 +1,7 @@
-class FacebookerGenerator < Rails::Generator::Base
+class FacebookGenerator < Rails::Generator::Base
   def manifest
     record do |m|
-      m.file 'config/facebooker.yml.tmpl',       'config/facebooker.yml'
+      m.file 'config/facebooker.yml',            'config/facebooker.yml'
       m.file 'public/javascripts/facebooker.js', 'public/javascripts/facebooker.js'
     end
   end

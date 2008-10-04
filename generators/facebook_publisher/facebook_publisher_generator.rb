@@ -1,4 +1,4 @@
-class FacebookerPublisherGenerator < Rails::Generator::NamedBase
+class FacebookPublisherGenerator < Rails::Generator::NamedBase
   def manifest
     record do |m|
       m.directory "app/models"

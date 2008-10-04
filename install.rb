@@ -2,7 +2,7 @@ require 'fileutils'
 require 'rubygems'
 
 dir = File.dirname(__FILE__)
-templates = File.join(dir, 'generators', 'facebooker', 'templates')
+templates = File.join(dir, 'generators', 'facebook', 'templates')
 config = File.join('config', 'facebooker.yml')
 script = File.join('public', 'javascripts', 'facebooker.js')
 
