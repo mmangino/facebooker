@@ -1,4 +1,4 @@
-class ControllerGenerator < Rails::Generator::NamedBase
+class FacebookerControllerGenerator < Rails::Generator::NamedBase
   def manifest
     record do |m|
       # Check for class naming collisions.

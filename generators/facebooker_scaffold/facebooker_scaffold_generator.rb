@@ -14,7 +14,7 @@ class Rails::Generator::Commands::Destroy
     end
 end
 
-class ScaffoldGenerator < Rails::Generator::NamedBase
+class FacebookerScaffoldGenerator < Rails::Generator::NamedBase
   default_options :skip_timestamps => false, :skip_migration => false
 
   attr_reader   :controller_name,
