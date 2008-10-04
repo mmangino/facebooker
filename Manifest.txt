@@ -7,6 +7,9 @@ README.txt
 Rakefile
 TODO.txt
 facebooker.yml.tpl
+generators/facebooker/facebooker_generator.rb
+generators/facebooker/templates/config/facebooker.yml.tmpl
+generators/facebooker/templates/public/javascripts/facebooker.js
 generators/publisher/publisher_generator.rb
 generators/publisher/templates/publisher.rb
 generators/controller/USAGE
