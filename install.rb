@@ -1,7 +1,12 @@
 require 'fileutils'
 require 'rubygems'
-facebook_config = File.join(RAILS_ROOT,"config","facebooker.yml")
-facebook_js = File.join(RAILS_ROOT,"public","javascripts",'facebooker.js')
-FileUtils.cp File.join(File.dirname(__FILE__) , 'facebooker.yml.tpl'), facebook_config unless File.exist?(facebook_config)
-FileUtils.cp File.join(File.dirname(__FILE__) , 'javascripts','facebooker.js'), facebook_js unless File.exist?(facebook_js)
-puts IO.read(File.join(File.dirname(__FILE__), 'README'))
+
+dir = File.dirname(__FILE__)
+templates = File.join(dir, 'generators', 'facebooker', 'templates')
+config = File.join('config', 'facebooker.yml')
+script = File.join('public', 'javascripts', 'facebooker.js')
+
+[config, script].each do |path| 
+  FileUtils.cp File.join(templates, path), File.join(RAILS_ROOT, path) unless File.exist?(File.join(RAILS_ROOT, path))
+end
+puts IO.read(File.join(dir, 'README'))

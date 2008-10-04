@@ -11,6 +11,4 @@ class PublisherGenerator < Rails::Generator::NamedBase
       end
     end
   end
-  
-  
 end
