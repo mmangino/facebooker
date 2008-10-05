@@ -470,7 +470,8 @@ module Facebooker
       def fb_if_is_app_user(user,options={},&proc)
         content = capture(&proc) 
         options = options.dup
-        concat(content_tag("fb:if-is-app-user",content,stringify_vals(options.merge(:uid=>cast_to_facebook_id(user)))),proc.binding)
+        options.merge!(:uid=>cast_to_facebook_id(user)) if user
+        concat(content_tag("fb:if-is-app-user",content,stringify_vals(options)),proc.binding)
       end
 
       # Render if-user-has-added-app tag
