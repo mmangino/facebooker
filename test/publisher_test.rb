@@ -295,13 +295,13 @@ class PublisherTest < Test::Unit::TestCase
     Facebooker.expects(:facebook_path_prefix).returns("/mike")
     assert_equal({:src => '/images/image.png', :href => 'raw_string' },
         TestPublisher.new.image('image.png', 'raw_string'))
-    assert_equal({:src => '/images/image.png', :href => 'http://apps.new.facebook.com/mike/pokes/do/1' },
+    assert_equal({:src => '/images/image.png', :href => 'http://apps.facebook.com/mike/pokes/do/1' },
         TestPublisher.new.image('image.png', {:controller => :pokes, :action => :do, :id => 1}))    
   end
   
   def test_default_url_options
     Facebooker.expects(:facebook_path_prefix).returns("/mike")
-    assert_equal({:host=>"apps.new.facebook.com/mike"},TestPublisher.default_url_options)
+    assert_equal({:host=>"apps.facebook.com/mike"},TestPublisher.default_url_options)
   end
   
   def test_recipients

@@ -23,7 +23,7 @@ class SessionTest < Test::Unit::TestCase
     ENV['FACEBOOK_SECRET_KEY'] = nil   
     Facebooker.current_adapter = nil 
     Facebooker::AdapterBase.stubs(:facebooker_config).returns({"api_key" => "facebook_key", "secret_key" => "facebook_secret" })
-    assert( Facebooker::FacebookNewAdapter === Facebooker.current_adapter)
+    assert( Facebooker::FacebookAdapter === Facebooker.current_adapter)
     assert_equal("facebook_key", Facebooker::Session.api_key)
   end
   
@@ -46,10 +46,10 @@ class SessionTest < Test::Unit::TestCase
   def test_adapter_details
      test_load_default_adapter
 
-     assert_equal("apps.new.facebook.com", Facebooker.canvas_server_base)
-     assert_equal("api.new.facebook.com", Facebooker.api_server_base)
-     assert_equal("www.new.facebook.com", Facebooker.www_server_base_url)
-     assert_equal("http://api.new.facebook.com", Facebooker.api_server_base_url)
+     assert_equal("apps.facebook.com", Facebooker.canvas_server_base)
+     assert_equal("api.facebook.com", Facebooker.api_server_base)
+     assert_equal("www.facebook.com", Facebooker.www_server_base_url)
+     assert_equal("http://api.facebook.com", Facebooker.api_server_base_url)
      assert(Facebooker.is_for?(:facebook))
     load_bebo_adapter
     

@@ -4,15 +4,15 @@ module Facebooker
   class FacebookAdapter < AdapterBase
       
     def canvas_server_base
-      FacebookAdapter.new_api? ? "apps.new.facebook.com" : "apps.facebook.com"
+      "apps.facebook.com"
     end
       
     def api_server_base
-       FacebookAdapter.new_api? ? "api.new.facebook.com" : "api.facebook.com"
+       "api.facebook.com"
     end
     
-      def www_server_base_url
-      FacebookAdapter.new_api? ? "www.new.facebook.com" : "www.facebook.com"
+    def www_server_base_url
+      "www.facebook.com"
     end
     
     def api_rest_path
@@ -43,19 +43,6 @@ module Facebooker
     
   end
   
-  class FacebookNewAdapter < FacebookAdapter
-      def canvas_server_base
-      "apps.new.facebook.com" 
-    end
-      
-    def api_server_base
-       "api.new.facebook.com"
-    end
-    
-      def www_server_base_url
-     "www.new.facebook.com" 
-    end
-  end
 end
 
 
