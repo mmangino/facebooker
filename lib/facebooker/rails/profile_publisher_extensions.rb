@@ -30,7 +30,7 @@ module Facebooker
       def render_publisher_response(user_action)
         render :json=>{:content=> {
             :feed=>{
-              :template_id=>user_action.template_id,
+              :template_id=>user_action.bundle_id,
               :template_data=>user_action.data
             }
           },

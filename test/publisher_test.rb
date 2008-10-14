@@ -243,9 +243,22 @@ class PublisherTest < Test::Unit::TestCase
   end
   
   def test_register_user_action
+    expected_content =  [["{*actor*} did stuff with {*friend*}"],
+                         [{:template_title=>"{*actor*} has a title {*friend*}",
+                           :template_body=>"This is a test render"}],
+                         {:template_title=>"{*actor*} did a lot",
+                          :template_body=>"This is the full body",
+                          :img=>{:some_params=>true}}]
+
+    pseudo_template = Struct.new(:bundle_id, :content_hash).new
+    pseudo_template.expects(:matches_content?).returns(false)
+    Facebooker::Rails::Publisher::FacebookTemplate.expects(:for).returns(pseudo_template)
+    Facebooker::Rails::Publisher::FacebookTemplate.expects(:register).
+                                                   with(20309041537, 'user_action', expected_content).
+                                                   returns(nil)
+    
     ActionController::Base.append_view_path("./test/../../app/views")
-    Facebooker::Session.any_instance.expects(:register_template_bundle)
-    Facebooker::Rails::Publisher::FacebookTemplate.expects(:register)
+    Facebooker::Session.any_instance.expects(:register_template_bundle).returns(20309041537)
     TestPublisher.register_user_action
   end
   def test_register_user_action_with_action_links
@@ -259,7 +272,9 @@ class PublisherTest < Test::Unit::TestCase
       @from_user = Facebooker::User.new
       @session = Facebooker::Session.new("","")
       @from_user.stubs(:session).returns(@session)
-      ua=TestPublisher.create_user_action(@from_user)
+      TestPublisher::FacebookerBundleIds['user_action'] = 20309041537
+      ua = TestPublisher.create_user_action(@from_user)
+      TestPublisher::FacebookerBundleIds.delete 'user_action'
       assert_equal "user_action",ua.template_name
     end
   
@@ -268,8 +283,12 @@ class PublisherTest < Test::Unit::TestCase
     @session = Facebooker::Session.new("","")
     @from_user.stubs(:session).returns(@session)
     @session.expects(:publish_user_action).with(20309041537,{:friend=>"Mike"},nil,nil)
-    Facebooker::Rails::Publisher::FacebookTemplate.expects(:for).returns(20309041537)
+    
+    pseudo_template = Struct.new(:bundle_id, :content_hash).new(20309041537, '')
+    pseudo_template.expects(:matches_content?).returns(true)
+    Facebooker::Rails::Publisher::FacebookTemplate.expects(:for).returns(pseudo_template)
     TestPublisher.deliver_user_action(@from_user)
+    TestPublisher.clear_cached_bundle_ids!
   end
   
   def test_publishing_user_data_no_action_gives_nil_hash
@@ -277,8 +296,12 @@ class PublisherTest < Test::Unit::TestCase
     @session = Facebooker::Session.new("","")
     @from_user.stubs(:session).returns(@session)
     @session.expects(:publish_user_action).with(20309041537,{},nil,nil)
-    Facebooker::Rails::Publisher::FacebookTemplate.expects(:for).returns(20309041537)
+    
+    # this tests bundle ID caching -- the test will blow up if
+    # deliver_ doesn't use the cached value and tries to render the template
+    TestPublisher::FacebookerBundleIds['user_action_no_data'] = 20309041537
     TestPublisher.deliver_user_action_no_data(@from_user)
+    TestPublisher.clear_cached_bundle_ids!
   end
   def test_no_sends_as_raises
     assert_raises(Facebooker::Rails::Publisher::UnspecifiedBodyType) {
@@ -290,6 +313,19 @@ class PublisherTest < Test::Unit::TestCase
     assert_raises(Facebooker::Rails::Publisher::UnknownBodyType) {
       TestPublisher.deliver_invalid_send_as(@user)
     }
+  end
+  
+  def test_template_content_hashing
+    a1 = [['1', '2'], ['3', '4'], []]
+    a2 = [['1', '2'], [], ['3', '4']]
+    a3 = [['1', '2', '3'], ['4'], []]
+    a11 = [['1', '2'], ['3', '4'], []]
+    
+    hasher = Facebooker::Rails::Publisher::FacebookTemplate
+    assert_equal hasher.hash_content!(a1), hasher.hash_content!(a11)
+    assert_not_equal hasher.hash_content!(a1), hasher.hash_content!(a2)
+    assert_not_equal hasher.hash_content!(a1), hasher.hash_content!(a3)
+    assert_not_equal hasher.hash_content!(a2), hasher.hash_content!(a3)    
   end
   
   def test_keeps_class_method_missing

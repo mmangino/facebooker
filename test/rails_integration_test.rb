@@ -71,7 +71,7 @@ begin
       ua=Facebooker::Rails::Publisher::UserAction.new
       ua.data = {:params=>true}
       ua.template_name = "template_name"
-      ua.template_id =  1234
+      ua.bundle_id =  1234
       render_publisher_response(ua)
     end
     

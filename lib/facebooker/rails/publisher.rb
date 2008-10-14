@@ -89,14 +89,23 @@ module Facebooker
     class Publisher
       
       class FacebookTemplate < ::ActiveRecord::Base
-        def self.register(t_id,name)
-          t=find_or_initialize_by_template_name(name)
-          t.update_attribute(:bundle_id,t_id)
+        def self.register(bundle_id, name, bundle_content)
+          t = find_or_initialize_by_template_name(name)
+          t.update_attributes! :bundle_id => bundle_id,
+                               :content_hash => FacebookTemplate.hash_content!(bundle_content)
           t
         end
 
         def self.for(name)
-          find_by_template_name(name).bundle_id rescue nil
+          find_by_template_name(name)
+        end
+        
+        def self.hash_content!(bundle_content)
+          Digest::SHA2.hexdigest bundle_content.to_json
+        end
+        
+        def matches_content?(bundle_content)
+          FacebookTemplate.hash_content!(bundle_content) == content_hash
         end
       end
       
@@ -134,13 +143,9 @@ module Facebooker
         attr_accessor :data
         attr_accessor :target_ids
         attr_accessor :body_general
-        attr_accessor :template_id
+        attr_accessor :bundle_id
         attr_accessor :template_name
         
-        def template_id
-          @template_id || FacebookTemplate.for(template_name)
-        end
-
         def target_ids=(val)
           @target_ids = val.is_a?(Array) ? val.join(",") : val
         end
@@ -149,8 +154,6 @@ module Facebooker
       
       cattr_accessor :ignore_errors
       attr_accessor :_body
-    
-  
 
       def recipients(*args)
         if args.size==0
@@ -280,7 +283,7 @@ module Facebooker
         when Ref
           Facebooker::Session.create.server_cache.set_ref_handle(_body.handle,_body.fbml)
         when UserAction
-          @from.session.publish_user_action(_body.template_id || FacebookTemplate.for(method) ,_body.data||{},_body.target_ids,_body.body_general)
+          @from.session.publish_user_action(_body.bundle_id,_body.data||{},_body.target_ids,_body.body_general)
         else
           raise UnspecifiedBodyType.new("You must specify a valid send_as")
         end
@@ -349,19 +352,32 @@ module Facebooker
           end
         end
         
+        def clear_cached_bundle_ids!
+          self.const_get(:FacebookerBundleIds).clear
+        end
+        
         def method_missing(name,*args)
-          should_send=false
-          method=""
-          if md=/^create_(.*)$/.match(name.to_s)
-            method=md[1]
-          elsif md=/^deliver_(.*)$/.match(name.to_s)
-            method=md[1]
-            should_send=true
-          elsif md=/^register_(.*)$/.match(name.to_s)
-            (publisher=new).send(md[1]+"_template")
-            template_id = Facebooker::Session.create.register_template_bundle(publisher.one_line_story_templates,publisher.short_story_templates,publisher.full_story_template,publisher.action_links)
-            FacebookTemplate.register(template_id,md[1]) unless skip_registry
-            return template_id
+          should_send = false
+          method = ''
+          if md = /^create_(.*)$/.match(name.to_s)
+            method = md[1]
+          elsif md = /^deliver_(.*)$/.match(name.to_s)
+            method = md[1]
+            should_send = true            
+          elsif md = /^register_(.*)$/.match(name.to_s)
+            bundle_name = md[1]
+            (publisher=new).send bundle_name + '_template'
+            bundle_contents = [publisher.one_line_story_templates, publisher.short_story_templates, publisher.full_story_template]
+            template = FacebookTemplate.for bundle_name
+            if template && template.matches_content?(bundle_contents)
+              bundle_id = template.bundle_id
+            else
+              bundle_id = Facebooker::Session.create.register_template_bundle(*bundle_contents)
+              FacebookTemplate.register(bundle_id, bundle_name, bundle_contents) unless skip_registry
+            end
+            self.const_get(:FacebookerBundleIds)[bundle_name] = bundle_id unless skip_registry
+            
+            return bundle_id
           else
             super
           end
@@ -370,7 +386,10 @@ module Facebooker
           (publisher=new).send(method,*args)
           case publisher._body
           when UserAction
-            publisher._body.template_name=method
+            publisher._body.template_name = method
+            bundle_ids = self.const_get(:FacebookerBundleIds)
+            send('register_' + method) unless bundle_ids.has_key? method
+            publisher._body.bundle_id = self.const_get(:FacebookerBundleIds)[method]
           end
           
           should_send ? publisher.send_message(method) : publisher._body
@@ -405,7 +424,8 @@ module Facebooker
           super          
           child.master_helper_module=Module.new
           child.master_helper_module.__send__(:include,self.master_helper_module)
-          child.send(:include, child.master_helper_module)      
+          child.send(:include, child.master_helper_module)
+          child.const_set :FacebookerBundleIds, Hash.new
         end
     
       end
