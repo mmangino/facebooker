@@ -37,6 +37,7 @@ namespace :facebooker do
      @ssh_port = FACEBOOKER['tunnel']['ssh_port'] || 22
      @notification = "Starting tunnel #{@public_host}:#{@public_port} to 0.0.0.0:#{@local_port}"
      @notification << " using SSH port #{@ssh_port}" unless @ssh_port == 22
+     # "GatewayPorts yes" needs to be enabled in the remote's sshd config
      @ssh_command = "ssh -v -p #{@ssh_port} -nNT4 -R *:#{@public_port}:localhost:#{@local_port} #{@public_host_username}@#{@public_host}" 
     end
   end
