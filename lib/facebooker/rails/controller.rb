@@ -45,7 +45,7 @@ module Facebooker
         # if we're inside the facebook session and there is no session key,
         # that means the user revoked our access
         # we don't want to keep using the old expired key from the cookie. 
-        request_is_for_a_facebook_canvas? and params[:fb_sig_session_key].blank?
+        request_comes_from_facebook? and params[:fb_sig_session_key].blank?
       end
       
       def clear_facebook_session_information
@@ -74,7 +74,7 @@ module Facebooker
       end
       
       def secure_with_facebook_params!
-        return unless request_is_for_a_facebook_canvas?
+        return unless request_comes_from_facebook?
         
         if ['user', 'session_key'].all? {|element| facebook_params[element]}
           @facebook_session = new_facebook_session
@@ -100,7 +100,7 @@ module Facebooker
       end
       
       def capture_facebook_friends_if_available!
-        return unless request_is_for_a_facebook_canvas?
+        return unless request_comes_from_facebook?
         if friends = facebook_params['friends']
           facebook_session.user.friends = friends.map do |friend_uid|
             User.new(friend_uid, facebook_session)
@@ -161,6 +161,10 @@ module Facebooker
         "<fb:redirect url=\"#{url_for(url)}\" />"
       end
       
+      def request_comes_from_facebook?
+        request_is_for_a_facebook_canvas? || request_is_facebook_ajax?
+      end
+      
       def request_is_for_a_facebook_canvas?
         !params['fb_sig_in_canvas'].blank?
       end
@@ -216,7 +220,7 @@ module Facebooker
       end
       
       def set_fbml_format
-        params[:format]="fbml" if request_is_for_a_facebook_canvas? or request_is_facebook_ajax?
+        params[:format]="fbml" if request_comes_from_facebook?
       end
       def set_adapter
         Facebooker.load_adapter(params) if(params[:fb_sig_api_key])
