@@ -3,7 +3,7 @@ class CreateFacebookTemplates < ActiveRecord::Migration
     create_table :facebook_templates, :force => true do |t|      
       t.string :template_name, :null => false
       t.string :content_hash, :null => false
-      t.string :bundle_id, :null => true
+      t.string :template_id, :null => true
     end
     add_index :facebook_templates, :template_name, :unique => true
   end

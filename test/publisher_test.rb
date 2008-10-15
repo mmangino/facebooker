@@ -130,12 +130,19 @@ class TestPublisher < Facebooker::Rails::Publisher
 end
 
 class PublisherTest < Test::Unit::TestCase
+  FacebookTemplate = Facebooker::Rails::Publisher::FacebookTemplate
   
   def setup
+    super
     @user = Facebooker::User.new
     @user.id=4
     @session = "session"
     @user.stubs(:session).returns(@session)
+  end
+  
+  def teardown
+    super
+    FacebookTemplate.clear_template_ids!
   end
   
   def test_create_action
@@ -243,22 +250,9 @@ class PublisherTest < Test::Unit::TestCase
   end
   
   def test_register_user_action
-    expected_content =  [["{*actor*} did stuff with {*friend*}"],
-                         [{:template_title=>"{*actor*} has a title {*friend*}",
-                           :template_body=>"This is a test render"}],
-                         {:template_title=>"{*actor*} did a lot",
-                          :template_body=>"This is the full body",
-                          :img=>{:some_params=>true}}]
-
-    pseudo_template = Struct.new(:bundle_id, :content_hash).new
-    pseudo_template.expects(:matches_content?).returns(false)
-    Facebooker::Rails::Publisher::FacebookTemplate.expects(:for).returns(pseudo_template)
-    Facebooker::Rails::Publisher::FacebookTemplate.expects(:register).
-                                                   with(20309041537, 'user_action', expected_content).
-                                                   returns(nil)
+    FacebookTemplate.expects(:find_or_register_template_id).
+                     with('user_action', TestPublisher, :skip_template_cache => true).returns(20309041537)
     
-    ActionController::Base.append_view_path("./test/../../app/views")
-    Facebooker::Session.any_instance.expects(:register_template_bundle).returns(20309041537)
     TestPublisher.register_user_action
   end
   def test_register_user_action_with_action_links
@@ -269,14 +263,15 @@ class PublisherTest < Test::Unit::TestCase
   end
   
   def test_create_user_action
-      @from_user = Facebooker::User.new
-      @session = Facebooker::Session.new("","")
-      @from_user.stubs(:session).returns(@session)
-      TestPublisher::FacebookerBundleIds['user_action'] = 20309041537
-      ua = TestPublisher.create_user_action(@from_user)
-      TestPublisher::FacebookerBundleIds.delete 'user_action'
-      assert_equal "user_action",ua.template_name
-    end
+    @from_user = Facebooker::User.new
+    @session = Facebooker::Session.new("","")
+    @from_user.stubs(:session).returns(@session)
+    Facebooker::Rails::Publisher::FacebookTemplate.expects(:template_id_for).
+                                                   with('user_action', TestPublisher).
+                                                   returns(20309041537)
+    ua = TestPublisher.create_user_action(@from_user)
+    assert_equal "user_action", ua.template_name
+  end
   
   def test_publisher_user_action
     @from_user = Facebooker::User.new
@@ -284,11 +279,13 @@ class PublisherTest < Test::Unit::TestCase
     @from_user.stubs(:session).returns(@session)
     @session.expects(:publish_user_action).with(20309041537,{:friend=>"Mike"},nil,nil)
     
-    pseudo_template = Struct.new(:bundle_id, :content_hash).new(20309041537, '')
-    pseudo_template.expects(:matches_content?).returns(true)
-    Facebooker::Rails::Publisher::FacebookTemplate.expects(:for).returns(pseudo_template)
+    Facebooker::Rails::Publisher::FacebookTemplate.expects(:template_id_for).
+                                                   with('user_action', TestPublisher).
+                                                   returns(20309041537)
+    # pseudo_template = Struct.new(:bundle_id, :content_hash).new(20309041537, '')
+    # pseudo_template.expects(:matches_content?).returns(true)
+    # Facebooker::Rails::Publisher::FacebookTemplate.expects(:for).returns(pseudo_template)
     TestPublisher.deliver_user_action(@from_user)
-    TestPublisher.clear_cached_bundle_ids!
   end
   
   def test_publishing_user_data_no_action_gives_nil_hash
@@ -297,11 +294,8 @@ class PublisherTest < Test::Unit::TestCase
     @from_user.stubs(:session).returns(@session)
     @session.expects(:publish_user_action).with(20309041537,{},nil,nil)
     
-    # this tests bundle ID caching -- the test will blow up if
-    # deliver_ doesn't use the cached value and tries to render the template
-    TestPublisher::FacebookerBundleIds['user_action_no_data'] = 20309041537
+    Facebooker::Rails::Publisher::FacebookTemplate.expects(:template_id_for).returns(20309041537)
     TestPublisher.deliver_user_action_no_data(@from_user)
-    TestPublisher.clear_cached_bundle_ids!
   end
   def test_no_sends_as_raises
     assert_raises(Facebooker::Rails::Publisher::UnspecifiedBodyType) {
@@ -326,6 +320,72 @@ class PublisherTest < Test::Unit::TestCase
     assert_not_equal hasher.hash_content!(a1), hasher.hash_content!(a2)
     assert_not_equal hasher.hash_content!(a1), hasher.hash_content!(a3)
     assert_not_equal hasher.hash_content!(a2), hasher.hash_content!(a3)    
+  end
+  
+  def test_template_publisher_content
+    expected_content =  [["{*actor*} did stuff with {*friend*}"],
+                         [{:template_title=>"{*actor*} has a title {*friend*}",
+                           :template_body=>"This is a test render"}],
+                         {:template_title=>"{*actor*} did a lot",
+                          :template_body=>"This is the full body",
+                          :img=>{:some_params=>true}}]
+    assert_equal expected_content, FacebookTemplate.publisher_content('user_action', TestPublisher)
+  end  
+  
+  def test_template_cache
+    FacebookTemplate.update_template_cache! 12345, 't_a', 'TestPublisher'
+    FacebookTemplate.update_template_cache! 12346, 't_b', 'TestPublisher'
+    FacebookTemplate.update_template_cache! 12347, 't_c', 'TestPublisher2'
+    
+    assert_equal 12345, FacebookTemplate.template_id_for('t_a')
+    assert_equal 12346, FacebookTemplate.template_id_for('t_b')
+    assert_equal 12347, FacebookTemplate.template_id_for('t_c')
+    assert_raise(RuntimeError) { FacebookTemplate.template_id_for('t_d') }
+
+    FacebookTemplate.clear_template_ids_for_class! TestPublisher
+    assert_raise(RuntimeError) { FacebookTemplate.template_id_for('t_a') }
+    assert_raise(RuntimeError) { FacebookTemplate.template_id_for('t_b') }
+    assert_equal 12347, FacebookTemplate.template_id_for('t_c')
+    
+    FacebookTemplate.clear_template_ids!
+    assert_raise(RuntimeError) { FacebookTemplate.template_id_for('t_c') }    
+  end
+  
+  def test_register_new_template_id
+    content = FacebookTemplate.publisher_content 'user_action', TestPublisher
+    Facebooker::Session.any_instance.expects(:register_template_bundle).with(*content).returns(20309041537)
+    FacebookTemplate.expects(:update_template_db!).with(20309041537, 'user_action', content).returns(nil)
+
+    template_id = FacebookTemplate.register_new_template_id!('user_action', TestPublisher, content)    
+    assert_equal 20309041537, template_id
+    assert_equal 20309041537, FacebookTemplate.template_id_for('user_action')
+  end
+  
+  def test_find_or_register_template_id_registers_new_content
+    ActionController::Base.append_view_path("./test/../../app/views")
+    
+    expected_content = FacebookTemplate.publisher_content 'user_action', TestPublisher
+    pseudo_template = Object.new
+    pseudo_template.expects(:matches_content?).with(expected_content).returns(false)
+    FacebookTemplate.expects(:for).returns(pseudo_template)
+    FacebookTemplate.expects(:register_new_template_id!).with('user_action', TestPublisher, expected_content).
+                                                         returns(20309041537)
+    
+    template_id = FacebookTemplate.find_or_register_template_id 'user_action', TestPublisher
+    assert_equal 20309041537, template_id
+  end
+  
+  def test_find_or_register_template_id_honors_db_cache
+    ActionController::Base.append_view_path("./test/../../app/views")
+    
+    expected_content = FacebookTemplate.publisher_content 'user_action', TestPublisher
+    pseudo_template = Struct.new(:template_id).new(20309041537)
+    pseudo_template.expects(:matches_content?).returns(true)
+    FacebookTemplate.expects(:for).returns(pseudo_template)
+    FacebookTemplate.expects(:register_new_template_id!).never
+
+    template_id = FacebookTemplate.find_or_register_template_id 'user_action', TestPublisher
+    assert_equal 20309041537, template_id    
   end
   
   def test_keeps_class_method_missing
@@ -387,4 +447,3 @@ class PublisherTest < Test::Unit::TestCase
     assert_equal "true",notification.fbml
   end
 end
-  
