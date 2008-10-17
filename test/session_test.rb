@@ -238,6 +238,12 @@ class SessionTest < Test::Unit::TestCase
     Facebooker::BatchRun.current_batch=4
     assert_equal 4,Facebooker::BatchRun.current_batch
   end
+  
+  def test_can_get_stanard_info
+    expect_http_posts_with_responses(standard_info_xml)
+    result = @session.users_standard([4])
+    assert_equal "Mike Mangino",result.first.name
+  end
 
   def test_can_query_for_pages
     expect_http_posts_with_responses(example_pages_xml)
@@ -544,6 +550,19 @@ class SessionTest < Test::Unit::TestCase
     XML
   end
   
+  def standard_info_xml
+    <<-XML
+    <?xml version="1.0" encoding="UTF-8"?>
+    <?xml version="1.0" encoding="UTF-8"?>
+
+    <users_getStandardInfo_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd" list="true">
+      <standard_user_info>
+        <uid>12451752</uid>
+        <name>Mike Mangino</name>
+      </standard_user_info>
+    </users_getStandardInfo_response>
+    XML
+  end
 end
 
 class CanvasSessionTest < Test::Unit::TestCase

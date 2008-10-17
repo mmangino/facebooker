@@ -120,6 +120,12 @@ module Facebooker
     end
   end
   
+  class UserStandardInfo < Parser#:nodoc:
+    def self.process(data)
+      array_of_hashes(element('users_getStandardInfo_response', data), 'standard_user_info')
+    end
+  end
+  
   class GetLoggedInUser < Parser#:nodoc:
     def self.process(data)
       Integer(element('users_getLoggedInUser_response', data).text_value)
@@ -470,6 +476,7 @@ module Facebooker
       'facebook.auth.getSession' => GetSession,
       'facebook.connect.registerUsers' => RegisterUsers,
       'facebook.users.getInfo' => UserInfo,
+      'facebook.users.getStandardInfo' => UserStandardInfo,
       'facebook.users.setStatus' => SetStatus,
       'facebook.users.getLoggedInUser' => GetLoggedInUser,
       'facebook.pages.isAdmin' => PagesIsAdmin,
