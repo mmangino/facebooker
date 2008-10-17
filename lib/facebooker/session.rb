@@ -176,6 +176,10 @@ module Facebooker
             user
           when 'photo'
             Photo.from_hash(hash)
+          when 'page'
+            Page.from_hash(hash)
+          when 'page_admin'
+            Page.from_hash(hash)
           when 'event_member'
             Event::Attendance.from_hash(hash)
           end
