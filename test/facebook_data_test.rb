@@ -22,6 +22,22 @@ class FacebookDataTest < Test::Unit::TestCase
     assert_equal 'Foo', cookies.first.name
     assert_equal 'Bar', cookies.first.value
   end
+  
+  def test_can_ask_facebook_to_set_a_preference
+    expect_http_posts_with_responses(example_set_preference_xml)
+    assert(@session.data.set_preference(0, 'hello'))
+  end
+    
+  def test_can_ask_facebook_to_get_preference
+    expect_http_posts_with_responses(example_get_preference_xml)
+    assert(@session.data.get_preference(0))
+  end
+  
+  def test_can_get_preference
+    mock_http = establish_session
+    mock_http.should_receive(:post_form).and_return(example_get_preference_xml).once.ordered(:posts)
+    assert_equal 'hello', @session.data.get_preference(0) 
+  end
 
   private
   def example_set_cookie_xml
@@ -45,6 +61,24 @@ class FacebookDataTest < Test::Unit::TestCase
         <path>/tmp/</path>
       </cookies>
     </data_getCookie_response>
+    XML
+  end
+  
+  def example_set_preference_xml
+    <<-XML
+    <?xml version="1.0" encoding="UTF-8"?>
+    <data_setUserPreference_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd"/>
+    XML
+  end
+
+  def example_get_preference_xml
+    <<-XML
+    <?xml version="1.0" encoding="UTF-8"?>
+    <data_getUserPreference_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd">
+      hello
+    </data_getUserPreference_response>
     XML
   end
 end

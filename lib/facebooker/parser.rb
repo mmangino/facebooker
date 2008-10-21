@@ -418,6 +418,18 @@ module Facebooker
       element('users_setStatus_response',data).text_value == '1'
     end
   end
+  
+  class GetPreference < Parser#:nodoc:
+    def self.process(data)
+      element('data_getUserPreference_response', data).text_value
+    end
+  end
+  
+  class SetPreference < Parser#:nodoc:
+    def self.process(data)
+      element('data_setUserPreference_response', data).text_value
+    end
+  end
     
   class Errors < Parser#:nodoc:
     EXCEPTIONS = {
@@ -519,7 +531,9 @@ module Facebooker
       'facebook.groups.get' => GroupsGet,
       'facebook.events.getMembers' => EventMembersGet,
       'facebook.groups.getMembers' => GroupGetMembers,
-      'facebook.notifications.sendEmail' => NotificationsSendEmail
+      'facebook.notifications.sendEmail' => NotificationsSendEmail,
+      'facebook.data.getUserPreference' => GetPreference,
+      'facebook.data.setUserPreference' => SetPreference
     }
   end
 end
