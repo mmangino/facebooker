@@ -90,9 +90,9 @@ module Facebooker
     end
   end
   
-  class RegisterUsers
+  class RegisterUsers < Parser
     def self.process(data)
-      Facebooker.json_decode(data)
+      array_of_text_values(element("connect_registerUsers_response", data), "connect_registerUsers_response_elt")
     end
   end
 

@@ -281,7 +281,6 @@ module Facebooker
       users=users.map do |h|
         returning h.dup do |d|
           if email=d.delete(:email)
-            user_map
             hash = hash_email(email)
             user_map[hash]=h
             d[:email_hash]=hash

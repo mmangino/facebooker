@@ -1,5 +1,3 @@
-[ ] Remove facebook prefix from resource routes, making them worth with facebook and regular Rails controllers
-[ ] Use fb_sig_request_method to make facebook routes more Rails-like
 [ ] Refactor facebook form builder so erbout won't be deeply nested, causing erubis to break
 [ ] Support missing parameters on methods---most notably authentication-related parameters such as next and canvas
 [ ] Finish FQL Querying
@@ -8,3 +6,5 @@
 
 [x] Specify fields wanted when getting user info (defaults to all now) [shane]
 [x] Create facebooker.yml config file and merge with tunnel.yml [shane]
+[X] Remove facebook prefix from resource routes, making them worth with facebook and regular Rails controllers [mike]
+[X] Use fb_sig_request_method to make facebook routes more Rails-like [mike]

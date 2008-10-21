@@ -142,17 +142,18 @@ class UserTest < Test::Unit::TestCase
   end
   
   def test_register_with_array
-    expect_http_posts_with_responses(["4228600737_c96da02bba97aedfd26136e980ae3761"].to_json)
+    expect_http_posts_with_responses(register_response_xml)
     assert_equal ["4228600737_c96da02bba97aedfd26136e980ae3761"],Facebooker::User.register([{:email=>"mary@example.com",:account_id=>1}])
   end
   
-  def test_failed_registration
-    expect_http_posts_with_responses([""].to_json)
-    Facebooker::User.register([{:email=>"mary@example.com",:account_id=>1}])
-    fail "Expected UserRegistrationFailed to be raised but it wasn't"
-  rescue Facebooker::Session::UserRegistrationFailed=>e
-    assert_equal({:email=>"mary@example.com",:account_id=>1},e.failed_users.first)
+  def test_register_with_array_raises_if_not_all_success
+    expect_http_posts_with_responses(register_response_xml)
+    assert_equal ["4228600737_c96da02bba97aedfd26136e980ae3761"],Facebooker::User.register([{:email=>"mary@example.com",:account_id=>1},{:email=>"mike@example.com",:account_id=>2}])
+    fail "Should have raised Facebooker::Session::UserRegistrationFailed"
+  rescue Facebooker::Session::UserRegistrationFailed => e
+    assert_equal({:email=>"mike@example.com",:account_id=>2},e.failed_users.first)
   end
+  
   
   private
   def example_profile_photos_get_xml
@@ -215,5 +216,14 @@ class UserTest < Test::Unit::TestCase
         </venue>
       </event>
     </events_get_response>"
+  end
+  
+  def register_response_xml
+    <<-XML
+    <?xml version="1.0" encoding="UTF-8"?> 
+    <connect_registerUsers_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/facebook.xsd" list="true"> 
+      <connect_registerUsers_response_elt>4228600737_c96da02bba97aedfd26136e980ae3761</connect_registerUsers_response_elt> 
+    </connect_registerUsers_response>
+    XML
   end
 end
