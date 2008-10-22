@@ -186,7 +186,11 @@ class SessionTest < Test::Unit::TestCase
     assert_equal 17876842716, @session.register_template_bundle("{*actor*} did something")
   end
   
-  
+  def test_can_register_template_bundle_with_action_links
+    expect_http_posts_with_responses(example_register_template_bundle_return_xml)
+    @session = Facebooker::Session.create(ENV['FACEBOOK_API_KEY'], ENV['FACEBOOK_SECRET_KEY'])
+    assert_equal 17876842716, @session.register_template_bundle("{*actor*} did something",nil,nil,[{:text=>"text",:href=>"href"}])
+  end
   def test_can_publish_user_action
     expect_http_posts_with_responses(publish_user_action_return_xml)
     @session = Facebooker::Session.create(ENV['FACEBOOK_API_KEY'], ENV['FACEBOOK_SECRET_KEY'])

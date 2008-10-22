@@ -121,7 +121,7 @@ module Facebooker
       end
       
       class_inheritable_accessor :master_helper_module
-      attr_accessor :one_line_story_templates, :short_story_templates
+      attr_accessor :one_line_story_templates, :short_story_templates, :action_links
       
       cattr_accessor :skip_registry
       self.skip_registry = false
@@ -230,6 +230,14 @@ module Facebooker
         @short_story_templates << params.merge(:template_title=>title, :template_body=>body)
       end
       
+      def action_links(*links)
+        if links.blank?
+          @action_links
+        else
+          @action_links = links
+        end
+      end
+      
       def method_missing(name,*args)
         if args.size==1 and self._body.respond_to?("#{name}=")
           self._body.send("#{name}=",*args)
@@ -242,6 +250,10 @@ module Facebooker
       
       def image(src,target)
         {:src=>image_path(src),:href=> target.respond_to?(:to_str) ? target : url_for(target)}
+      end
+      
+      def action_link(text,target)
+        {:text=>text, :href=>target}
       end
   
       def requires_from_user?(from,body)
@@ -367,7 +379,7 @@ module Facebooker
             should_send=true
           elsif md=/^register_(.*)$/.match(name.to_s)
             (publisher=new).send(md[1]+"_template")
-            template_id = Facebooker::Session.create.register_template_bundle(publisher.one_line_story_templates,publisher.short_story_templates,publisher.full_story_template)
+            template_id = Facebooker::Session.create.register_template_bundle(publisher.one_line_story_templates,publisher.short_story_templates,publisher.full_story_template,publisher.action_links)
             FacebookTemplate.register(template_id,md[1]) unless skip_registry
             return template_id
           else

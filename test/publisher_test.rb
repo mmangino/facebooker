@@ -101,6 +101,12 @@ class TestPublisher < Facebooker::Rails::Publisher
     short_story_template "{*actor*} has a title {*friend*}", render(:inline=>"This is a test render")
     full_story_template "{*actor*} did a lot","This is the full body",:img=>{:some_params=>true}
   end
+  def user_action_with_action_links_template
+    one_line_story_template "{*actor*} did stuff with {*friend*}"
+    short_story_template "{*actor*} has a title {*friend*}", render(:inline=>"This is a test render")
+    full_story_template "{*actor*} did a lot","This is the full body",:img=>{:some_params=>true}
+    action_links action_link("Source","HREF")
+  end
   
   def user_action(user)
     send_as :user_action
@@ -242,6 +248,12 @@ class PublisherTest < Test::Unit::TestCase
     Facebooker::Rails::Publisher::FacebookTemplate.expects(:register)
     TestPublisher.register_user_action
   end
+  def test_register_user_action_with_action_links
+    ActionController::Base.append_view_path("./test/../../app/views")
+    Facebooker::Session.any_instance.expects(:register_template_bundle)
+    Facebooker::Rails::Publisher::FacebookTemplate.expects(:register)
+    TestPublisher.register_user_action_with_action_links
+  end
   
   def test_create_user_action
       @from_user = Facebooker::User.new
@@ -297,6 +309,10 @@ class PublisherTest < Test::Unit::TestCase
         TestPublisher.new.image('image.png', 'raw_string'))
     assert_equal({:src => '/images/image.png', :href => 'http://apps.facebook.com/mike/pokes/do/1' },
         TestPublisher.new.image('image.png', {:controller => :pokes, :action => :do, :id => 1}))    
+  end
+  
+  def test_action_link
+    assert_equal({:text=>"text", :href=>"href"}, TestPublisher.new.action_link("text","href"))
   end
   
   def test_default_url_options
