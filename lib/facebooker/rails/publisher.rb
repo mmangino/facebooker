@@ -34,6 +34,7 @@ module Facebooker
     #       short_story_template "{*actor*} has a title {*friend*}", render(:partial=>"short_body")
     #       short_story_template "{*actor*} has a title", render(:partial=>"short_body")
     #       full_story_template "{*actor*} has a title {*friend*}", render(:partial=>"full_body")    
+    #       action_links action_link("My text {*template_var*}","{*link_url*}")
     #     end
     #
     #     # To send a registered template, you need to create a method to set the data
@@ -44,19 +45,6 @@ module Facebooker
     #       data :friend=>"Mike"
     #     end
     #   
-    #     # Templatized Action uses From
-    #     def templatized_action(f)
-    #       send_as :templatized_action
-    #       from f
-    #       title_template "Templatized Action Title {name}"
-    #       title_data :name=>"Mike"
-    #     end
-    #     # story is published to the story of the to user
-    #     def story(to)
-    #       send_as :story
-    #       recipients to
-    #       title 'Story Title'
-    #     end
     #  
     #     # Provide a from user to send a general notification
     #     # if from is nil, this will send an announcement
