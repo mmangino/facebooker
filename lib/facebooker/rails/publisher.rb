@@ -4,20 +4,12 @@ module Facebooker
     # 
     # To use, create a subclass and define methods
     # Each method should start by calling send_as to specify the type of message
-    # Valid options are :action, :templatized_action, :story, :email and :notification
+    # Valid options are  :email and :notification, :user_action, :profile, :ref
     # 
     #
     # Below is an example of each type
     #
     #   class TestPublisher < Facebooker::Rails::Publisher
-    #     # Action is published using the session of the from user
-    #     def action(f)
-    #       send_as :action
-    #       from f
-    #       title "Action Title"
-    #       body "Body FBML here #{fb_name(f)} #{link_to "text",new_invitation_url}"
-    #     end
-    #
     #     # The new message templates are supported as well
     #     # First, create a method that contains your templates:
     #     # You may include multiple one line story templates and short story templates
