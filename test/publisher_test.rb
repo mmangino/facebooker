@@ -335,30 +335,31 @@ class PublisherTest < Test::Unit::TestCase
   def test_template_cache
     FacebookTemplate.update_template_cache! 12345, 't_a', 'TestPublisher'
     FacebookTemplate.update_template_cache! 12346, 't_b', 'TestPublisher'
-    FacebookTemplate.update_template_cache! 12347, 't_c', 'TestPublisher2'
+    FacebookTemplate.update_template_cache! 12347, 't_a', 'TestPublisher2'
     
-    assert_equal 12345, FacebookTemplate.template_id_for('t_a')
-    assert_equal 12346, FacebookTemplate.template_id_for('t_b')
-    assert_equal 12347, FacebookTemplate.template_id_for('t_c')
-    assert_raise(RuntimeError) { FacebookTemplate.template_id_for('t_d') }
+    assert_equal 12345, FacebookTemplate.template_id_for('t_a', 'TestPublisher')
+    assert_equal 12346, FacebookTemplate.template_id_for('t_b', 'TestPublisher')
+    assert_equal 12347, FacebookTemplate.template_id_for('t_a', 'TestPublisher2')
+    assert_raise(RuntimeError) { FacebookTemplate.template_id_for('t_d', 'TestPublisher') }
 
     FacebookTemplate.clear_template_ids_for_class! TestPublisher
-    assert_raise(RuntimeError) { FacebookTemplate.template_id_for('t_a') }
-    assert_raise(RuntimeError) { FacebookTemplate.template_id_for('t_b') }
-    assert_equal 12347, FacebookTemplate.template_id_for('t_c')
+    assert_raise(RuntimeError) { FacebookTemplate.template_id_for('t_a', 'TestPublisher') }
+    assert_raise(RuntimeError) { FacebookTemplate.template_id_for('t_b', 'TestPublisher') }
+    assert_equal 12347, FacebookTemplate.template_id_for('t_a', 'TestPublisher2')
     
     FacebookTemplate.clear_template_ids!
-    assert_raise(RuntimeError) { FacebookTemplate.template_id_for('t_c') }    
+    assert_raise(RuntimeError) { FacebookTemplate.template_id_for('t_a', 'TestPublishe2') }    
   end
   
   def test_register_new_template_id
     content = FacebookTemplate.publisher_content 'user_action', TestPublisher
     Facebooker::Session.any_instance.expects(:register_template_bundle).with(*content).returns(20309041537)
-    FacebookTemplate.expects(:update_template_db!).with(20309041537, 'user_action', content).returns(nil)
+    FacebookTemplate.expects(:update_template_db!).
+                     with(20309041537, 'user_action', TestPublisher, content).returns(nil)
 
     template_id = FacebookTemplate.register_new_template_id!('user_action', TestPublisher, content)    
     assert_equal 20309041537, template_id
-    assert_equal 20309041537, FacebookTemplate.template_id_for('user_action')
+    assert_equal 20309041537, FacebookTemplate.template_id_for('user_action', TestPublisher)
   end
   
   def test_find_or_register_template_id_registers_new_content

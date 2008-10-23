@@ -98,22 +98,31 @@ module Facebooker
         
         def self.clear_template_ids_for_class!(klass)
           return unless @@class_templates.has_key? klass.name
-          @@class_templates.delete(klass.name).each do |template_name|
-            @@template_ids.delete template_name
+          @@class_templates.delete(klass.name).each do |template_uid|
+            @@template_ids.delete template_uid
           end
         end
         
-        def self.update_template_cache!(template_id, template_name, class_name)
-          @@template_ids[template_name] = template_id
+        def self.update_template_cache!(template_id, template_name, template_class)
+          template_uid = self.unique_id(template_name, template_class)
+          class_name = template_class.to_s
+          @@template_ids[template_uid] = template_id
           @@class_templates[class_name] ||= []
-          @@class_templates[class_name] << template_name
+          @@class_templates[class_name] << template_uid
         end
         
-        def self.template_id_for(template_name, publisher_class = nil)
-          return @@template_ids[template_name] if @@template_ids[template_name]
+        def self.template_id_for(template_name, publisher_class)
+          template_uid = self.unique_id(template_name, publisher_class)          
+          return @@template_ids[template_uid] if @@template_ids[template_uid]
           
-          raise "template_id_for called for unregistered name, without a publisher class" unless publisher_class
+          unless publisher_class.instance_of? Class
+            raise "template_id_for called for unregistered name, without a publisher class"
+          end
           find_or_register_template_id(template_name, publisher_class)
+        end
+        
+        def self.unique_id(template_name, publisher_class)
+          "#{template_name}\##{publisher_class}"
         end
         
         def self.hash_content!(bundle_content)
@@ -131,11 +140,11 @@ module Facebooker
         end
         
         def self.find_or_register_template_id(template_name, publisher_class, options = {})
-          template = FacebookTemplate.for template_name
           content = publisher_content template_name, publisher_class
                     
           unless options[:skip_template_cache]
-            return template.template_id if template && template.matches_content?(content)            
+            template = FacebookTemplate.for template_name, publisher_class
+            return template.template_id if template && template.matches_content?(content)
           end
           
           register_new_template_id! template_name, publisher_class, content
@@ -144,20 +153,21 @@ module Facebooker
         def self.register_new_template_id!(template_name, publisher_class, content)
           template_id = Facebooker::Session.create.register_template_bundle(*content)
           update_template_cache! template_id, template_name, publisher_class.name
-          update_template_db! template_id, template_name, content
+          update_template_db! template_id, template_name, publisher_class, content
           template_id
         end
                 
-        def self.update_template_db!(template_id, template_name, content)          
-          template = find_or_initialize_by_template_name template_name
+        def self.update_template_db!(template_id, template_name, publisher_class, content)
+          template_uid = unique_id(template_name, publisher_class)
+          template = find_or_initialize_by_template_uid template_uid
           template.update_attributes! :template_id => template_id,
                                       :content_hash => hash_content!(content)
           template
         end
 
-        def self.for(name)
-          find_by_template_name(name)
-        end        
+        def self.for(template_name, publisher_class)
+          find_by_template_uid(unique_id(template_name, publisher_class))
+        end
       end
       
       class_inheritable_accessor :master_helper_module
