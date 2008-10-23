@@ -1,6 +1,6 @@
 namespace :facebooker do
   
-  namespace :tunnel do 
+  tunnel_ns = namespace :tunnel do 
     # Courtesy of Christopher Haupt
     # http://www.BuildingWebApps.com
     # http://www.LearningRails.com
@@ -40,5 +40,7 @@ namespace :facebooker do
      # "GatewayPorts yes" needs to be enabled in the remote's sshd config
      @ssh_command = "ssh -v -p #{@ssh_port} -nNT4 -R *:#{@public_port}:localhost:#{@local_port} #{@public_host_username}@#{@public_host}" 
     end
-  end
+  end  
+  desc "Create a reverse ssh tunnel from a public server to a private development server."
+  task :tunnel => tunnel_ns[:start]
 end
