@@ -1,3 +1,4 @@
+require 'benchmark'
 module Facebooker
   @@logger = nil
   def self.logger=(logger)
