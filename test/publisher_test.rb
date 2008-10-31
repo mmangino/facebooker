@@ -161,27 +161,27 @@ class FacebookTemplateTest < Test::Unit::TestCase
   end
   
   def test_find_in_db_should_run_find
-    FacebookTemplate.expects(:find_by_name).with("TestPublisher::simple_user_action").returns(@template)
+    FacebookTemplate.expects(:find_by_template_name).with("TestPublisher::simple_user_action").returns(@template)
     @template.stubs(:changed?).returns(false)
     assert_equal FacebookTemplate.find_in_db(TestPublisher,"simple_user_action"), @template
   end
   
   def test_find_in_db_should_register_if_not_found
-    FacebookTemplate.expects(:find_by_name).with("TestPublisher::simple_user_action").returns(nil)
+    FacebookTemplate.expects(:find_by_template_name).with("TestPublisher::simple_user_action").returns(nil)
     FacebookTemplate.expects(:register).with(TestPublisher,"simple_user_action").returns(@template)
     FacebookTemplate.find_cached(TestPublisher,"simple_user_action")
     
   end
   
   def test_find_in_db_should_check_for_change_if_found
-    FacebookTemplate.stubs(:find_by_name).returns(@template)
+    FacebookTemplate.stubs(:find_by_template_name).returns(@template)
     FacebookTemplate.stubs(:hashed_content).returns("MY CONTENT")
     @template.expects(:changed?).with("MY CONTENT").returns(false)
     FacebookTemplate.find_in_db(TestPublisher,"simple_user_action")  
   end
   
   def test_find_in_db_should_destroy_old_record_if_changed
-    FacebookTemplate.stubs(:find_by_name).returns(@template)
+    FacebookTemplate.stubs(:find_by_template_name).returns(@template)
     FacebookTemplate.stubs(:hashed_content).returns("MY CONTENT")
     @template.stubs(:changed?).returns(true)
     @template.expects(:destroy)
@@ -189,7 +189,7 @@ class FacebookTemplateTest < Test::Unit::TestCase
   end
   
   def test_find_in_db_should_re_register_if_changed
-    FacebookTemplate.stubs(:find_by_name).with("TestPublisher::simple_user_action").returns(@template)
+    FacebookTemplate.stubs(:find_by_template_name).with("TestPublisher::simple_user_action").returns(@template)
     FacebookTemplate.stubs(:hashed_content).returns("MY CONTENT")
     @template.stubs(:changed?).returns(true)
     @template.stubs(:destroy)
@@ -331,8 +331,8 @@ class PublisherTest < Test::Unit::TestCase
     @from_user = Facebooker::User.new
     @session = Facebooker::Session.new("","")
     @from_user.stubs(:session).returns(@session)
-    Facebooker::Rails::Publisher::FacebookTemplate.expects(:template_id_for).
-                                                   with('user_action', TestPublisher).
+    Facebooker::Rails::Publisher::FacebookTemplate.expects(:bundle_id_for_class_and_method).
+                                                   with(TestPublisher,'user_action').
                                                    returns(20309041537)
     ua = TestPublisher.create_user_action(@from_user)
     assert_equal "user_action", ua.template_name
@@ -344,8 +344,8 @@ class PublisherTest < Test::Unit::TestCase
     @from_user.stubs(:session).returns(@session)
     @session.expects(:publish_user_action).with(20309041537,{:friend=>"Mike"},nil,nil)
     
-    Facebooker::Rails::Publisher::FacebookTemplate.expects(:template_id_for).
-                                                   with('user_action', TestPublisher).
+    Facebooker::Rails::Publisher::FacebookTemplate.expects(:bundle_id_for_class_and_method).
+                                                   with(TestPublisher, 'user_action').
                                                    returns(20309041537)
     # pseudo_template = Struct.new(:bundle_id, :content_hash).new(20309041537, '')
     # pseudo_template.expects(:matches_content?).returns(true)
@@ -359,7 +359,7 @@ class PublisherTest < Test::Unit::TestCase
     @from_user.stubs(:session).returns(@session)
     @session.expects(:publish_user_action).with(20309041537,{},nil,nil)
     
-    Facebooker::Rails::Publisher::FacebookTemplate.expects(:template_id_for).returns(20309041537)
+    Facebooker::Rails::Publisher::FacebookTemplate.stubs(:bundle_id_for_class_and_method).returns(20309041537)
     TestPublisher.deliver_user_action_no_data(@from_user)
   end
   def test_no_sends_as_raises
