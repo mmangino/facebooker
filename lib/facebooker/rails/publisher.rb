@@ -97,12 +97,16 @@ module Facebooker
           "FacebookTemplate"
         end
         
+        def changed?(hash)
+          content_hash != hash
+        end
+        
         class << self
           
           def register(klass,method)
             publisher = setup_publisher(klass,method)            
             template_id = Facebooker::Session.create.register_template_bundle(publisher.one_line_story_templates,publisher.short_story_templates,publisher.full_story_template,publisher.action_links)
-            template = find_or_initialize_by_template_name(template_name(klass,method))
+            template = find_or_initialize_by_name(template_name(klass,method))
             template.template_bundle_id = template_id
             template.content_hash = hashed_content(klass,method)
             template.save!
@@ -112,6 +116,9 @@ module Facebooker
           
           def for_class_and_method(klass,method)
             find_cached(klass,method) 
+          end
+          def template_bundle_id_for_class_and_method(klass,method)
+            for_class_and_method(klass,method).template_bundle_id
           end
           
           def cache(klass,method,template)
@@ -419,7 +426,7 @@ module Facebooker
           case publisher._body
           when UserAction
             publisher._body.template_name = method
-            publisher._body.template_id = FacebookTemplate.template_id_for(method, self)
+            publisher._body.template_id = FacebookTemplate.template_bundle_id_for_class_and_method(self,method)
           end
           
           should_send ? publisher.send_message(method) : publisher._body
@@ -455,6 +462,7 @@ module Facebooker
           child.master_helper_module=Module.new
           child.master_helper_module.__send__(:include,self.master_helper_module)
           child.send(:include, child.master_helper_module)
+          FacebookTemplate.clear_cache!
         end
     
       end
