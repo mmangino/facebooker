@@ -262,7 +262,7 @@ module Facebooker
         uids1 = pair.first
         uids2 = pair.last
       end
-      post('facebook.friends.areFriends', :uids1 => uids1, :uids2 => uids2)
+      post('facebook.friends.areFriends', :uids1 => uids1.join(','), :uids2 => uids2.join(','))
     end
     
     def get_photos(pids = nil, subj_id = nil,  aid = nil)
