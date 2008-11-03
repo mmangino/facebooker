@@ -16,6 +16,7 @@ require 'facebooker/rails/facebook_asset_path'
 require 'facebooker/rails/facebook_request_fix'
 require 'facebooker/rails/routing'
 require 'facebooker/rails/facebook_pretty_errors' rescue nil
+require 'facebooker/rails/facebook_url_helper'
 module ::ActionController
   class Base
     def self.inherited_with_facebooker(subclass)
