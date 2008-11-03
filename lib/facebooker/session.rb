@@ -259,8 +259,8 @@ module Facebooker
       uids1 = []
       uids2 = []
       array_of_pairs_of_users.each do |pair|
-        uids1 = pair.first
-        uids2 = pair.last
+        uids1 << pair.first
+        uids2 << pair.last
       end
       post('facebook.friends.areFriends', :uids1 => uids1.join(','), :uids2 => uids2.join(','))
     end
