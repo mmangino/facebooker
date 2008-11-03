@@ -298,7 +298,7 @@ class TestFacebooker < Test::Unit::TestCase
       'page_id' => '4846711747',
       'name' => 'Kronos Quartet',
       'website' => 'http://www.kronosquartet.org',
-      'company_overview' => {}
+      'company_overview' => ""
     }
     assert_equal [info], @session.post('facebook.pages.getInfo', :fields => ['company_overview', 'website', 'name', 'page_id'].join(','), :page_ids => [4846711747].join(','))
   end

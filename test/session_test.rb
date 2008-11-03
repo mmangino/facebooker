@@ -265,9 +265,14 @@ class SessionTest < Test::Unit::TestCase
     assert_equal "4846711747", page.page_id
     assert_equal "Kronos Quartet", page.name
     assert_equal "http://www.kronosquartet.org", page.website
+    
     # TODO we really need a way to differentiate between hash/list and text attributes
-    assert_equal({}, page.company_overview)
-
+    # assert_equal({}, page.company_overview)
+    
+    # sakkaoui : as a fix to the parser, I replace empty text node by "" instead of {}
+    # we have child.attributes['list'] == 'true' that let us know that we have a hash/list.
+    assert_equal("", page.company_overview)
+    
     genre = page.genre
     assert_equal false, genre.dance
     assert_equal true, genre.party
