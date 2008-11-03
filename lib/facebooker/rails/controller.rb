@@ -9,6 +9,7 @@ module Facebooker
         controller.before_filter :set_adapter
         controller.before_filter :set_fbml_format
         controller.helper_attr :facebook_session_parameters
+        controller.helper_method :request_comes_from_facebook?
       end
 
     

@@ -50,7 +50,7 @@ module ActionView
     module UrlHelper
       # Alters one and only one line of the Rails button_to.  See below.
       def button_to_with_facebooker(name, options={}, html_options = {})
-        if !request_is_for_a_facebook_canvas?
+        if !request_comes_from_facebook?
            button_to_without_facebooker(name,options,html_options)
         else
           html_options = html_options.stringify_keys
@@ -86,16 +86,11 @@ module ActionView
       alias_method_chain :button_to, :facebooker
 
       private
-	# Redefined from controller.rb.  Could be put into
-	# some utility module to avoid repetition.
-        def request_is_for_a_facebook_canvas?
-          !params['fb_sig_in_canvas'].blank?
-        end
 
 	# Altered to throw an error on :popup and sanitize the javascript
 	# for Facebook.
         def convert_options_to_javascript_with_facebooker!(html_options, url ='')
-          if !request_is_for_a_facebook_canvas?
+          if !request_comes_from_facebook?
             convert_options_to_javascript_without_facebooker!(html_options,url)
    	  else
             confirm, popup = html_options.delete("confirm"), html_options.delete("popup")
@@ -130,7 +125,7 @@ module ActionView
 	# link_to("Facebooker", "http://rubyforge.org/projects/facebooker", :confirm=>{:title=>"the page says:, :content=>"Go to Facebooker?"})
 	# link_to("Facebooker", "http://rubyforge.org/projects/facebooker", :confirm=>{:title=>"the page says:, :content=>"Go to Facebooker?", :color=>"pink"})
         def confirm_javascript_function_with_facebooker(confirm, fun = nil)
-          if !request_is_for_a_facebook_canvas?
+          if !request_comes_from_facebook?
             confirm_javascript_function_without_facebooker(confirm)
  	  else
   	    if(confirm.is_a?(Hash))
@@ -161,7 +156,7 @@ module ActionView
 	# Dynamically creates a form for link_to with method.  Calls confirm_javascript_function if and 
 	# only if (confirm && method) for link_to
         def method_javascript_function_with_facebooker(method, url = '', href = nil, confirm = nil)
-          if !request_is_for_a_facebook_canvas?
+          if !request_comes_from_facebook?
             method_javascript_function_without_facebooker(method,url,href)
  	  else
             action = (href && url.size > 0) ? "'#{url}'" : 'a.getHref()'

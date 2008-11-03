@@ -504,7 +504,7 @@ class RailsHelperTest < Test::Unit::TestCase
     def fields_for(*args)
       ""
     end
-    
+        
   end 
 
   # used for capturing the contents of some of the helper tests
@@ -992,18 +992,14 @@ class RailsUrlHelperExtensionsTest < Test::Unit::TestCase
   class UrlHelperExtensionsClass
     include ActionView::Helpers::UrlHelper
     include ActionView::Helpers::TagHelper
-    def initialize(controller, canvas)
+    def initialize(controller)
       @controller = controller
-      @canvas = canvas
     end
 
     def protect_against_forgery?
        false
     end
 
-    def request_is_for_a_facebook_canvas?
-        @canvas
-    end
   end 
   class UrlHelperExtensionsController < NoisyController    
     def index
@@ -1022,8 +1018,12 @@ class RailsUrlHelperExtensionsTest < Test::Unit::TestCase
     @request    = FacebookRequest.new
     @response   = ActionController::TestResponse.new
 
-    @u = UrlHelperExtensionsClass.new(@controller, true)
-    @non_canvas_u = UrlHelperExtensionsClass.new(@controller, false)
+    @u = UrlHelperExtensionsClass.new(@controller)
+    @u.stubs(:request_comes_from_facebook?).returns(true)
+    
+    @non_canvas_u = UrlHelperExtensionsClass.new(@controller)
+    @non_canvas_u.stubs(:request_comes_from_facebook?).returns(false)
+    
     @label = "Testing"
     @url = "test.host"
     @prompt = "Are you sure?"
