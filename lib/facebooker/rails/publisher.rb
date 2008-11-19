@@ -97,7 +97,7 @@ module Facebooker
           "FacebookTemplate"
         end
         
-        def changed?(hash)
+        def template_changed?(hash)
           if respond_to?(:content_hash)
             content_hash != hash 
           else
@@ -139,7 +139,7 @@ module Facebooker
           
           def find_in_db(klass,method)
             template = find_by_template_name(template_name(klass,method))
-            if template and template.changed?(hashed_content(klass,method))
+            if template and template.template_changed?(hashed_content(klass,method))
               template.destroy
               template = nil
             end

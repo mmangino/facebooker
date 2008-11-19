@@ -162,7 +162,7 @@ class FacebookTemplateTest < Test::Unit::TestCase
   
   def test_find_in_db_should_run_find
     FacebookTemplate.expects(:find_by_template_name).with("TestPublisher::simple_user_action").returns(@template)
-    @template.stubs(:changed?).returns(false)
+    @template.stubs(:template_changed?).returns(false)
     assert_equal FacebookTemplate.find_in_db(TestPublisher,"simple_user_action"), @template
   end
   
@@ -176,14 +176,14 @@ class FacebookTemplateTest < Test::Unit::TestCase
   def test_find_in_db_should_check_for_change_if_found
     FacebookTemplate.stubs(:find_by_template_name).returns(@template)
     FacebookTemplate.stubs(:hashed_content).returns("MY CONTENT")
-    @template.expects(:changed?).with("MY CONTENT").returns(false)
+    @template.expects(:template_changed?).with("MY CONTENT").returns(false)
     FacebookTemplate.find_in_db(TestPublisher,"simple_user_action")  
   end
   
   def test_find_in_db_should_destroy_old_record_if_changed
     FacebookTemplate.stubs(:find_by_template_name).returns(@template)
     FacebookTemplate.stubs(:hashed_content).returns("MY CONTENT")
-    @template.stubs(:changed?).returns(true)
+    @template.stubs(:template_changed).returns(true)
     @template.expects(:destroy)
     FacebookTemplate.find_in_db(TestPublisher,"simple_user_action")  
   end
@@ -191,7 +191,7 @@ class FacebookTemplateTest < Test::Unit::TestCase
   def test_find_in_db_should_re_register_if_changed
     FacebookTemplate.stubs(:find_by_template_name).with("TestPublisher::simple_user_action").returns(@template)
     FacebookTemplate.stubs(:hashed_content).returns("MY CONTENT")
-    @template.stubs(:changed?).returns(true)
+    @template.stubs(:template_changed).returns(true)
     @template.stubs(:destroy)
     FacebookTemplate.expects(:register).with(TestPublisher,"simple_user_action").returns(@template)
     FacebookTemplate.find_in_db(TestPublisher,"simple_user_action")    
