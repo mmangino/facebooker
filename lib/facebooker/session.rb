@@ -94,6 +94,18 @@ module Facebooker
       "#{Facebooker.install_url_base(@api_key)}#{install_url_optional_parameters(options)}"
     end
     
+    # The url to get user to approve extended permissions
+    # http://wiki.developers.facebook.com/index.php/Extended_permission
+    #
+    # permissions:
+    # * email
+    # * offline_access
+    # * status_update
+    # * photo_upload
+    # * create_listing
+    # * create_event
+    # * rsvp_event
+    # * sms
     def permission_url(permission,options={})
       options = default_login_url_options.merge(options)
       "http://#{Facebooker.www_server_base_url}/authorize.php?api_key=#{@api_key}&v=1.0&ext_perm=#{permission}#{install_url_optional_parameters(options)}"
