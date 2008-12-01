@@ -491,11 +491,12 @@ class RailsHelperTest < Test::Unit::TestCase
     include ActionView::Helpers::TagHelper
     include ActionView::Helpers::AssetTagHelper
     include Facebooker::Rails::Helpers
-    attr_accessor :flash
+    attr_accessor :flash, :output_buffer
     def initialize
       @flash={}
       @template = self
       @content_for_test_param="Test Param"
+      @output_buffer = ""
     end
     #used for stubbing out the form builder
     def url_for(arg)
@@ -717,7 +718,7 @@ class RailsHelperTest < Test::Unit::TestCase
     @h.expects(:capture).returns("wall content")
     @h.fb_wall do 
     end
-    assert_equal "<fb:wall>wall content</fb:wall>",_erbout
+    assert_equal "<fb:wall>wall content</fb:wall>",@h.output_buffer
   end
   
   def test_fb_multi_friend_request
@@ -743,7 +744,7 @@ class RailsHelperTest < Test::Unit::TestCase
     @h.expects(:capture).returns("dialog content")
     @h.fb_dialog( "my_dialog", "1" ) do
     end
-    assert_equal '<fb:dialog cancel_button="1" id="my_dialog">dialog content</fb:dialog>', _erbout
+    assert_equal '<fb:dialog cancel_button="1" id="my_dialog">dialog content</fb:dialog>', @h.output_buffer
   end
   def test_fb_dialog_title
     assert_equal '<fb:dialog-title>My Little Dialog</fb:dialog-title>', @h.fb_dialog_title("My Little Dialog")
@@ -752,7 +753,7 @@ class RailsHelperTest < Test::Unit::TestCase
     @h.expects(:capture).returns("dialog content content")
     @h.fb_dialog_content do
     end
-    assert_equal '<fb:dialog-content>dialog content content</fb:dialog-content>', _erbout
+    assert_equal '<fb:dialog-content>dialog content content</fb:dialog-content>', @h.output_buffer
   end
   def test_fb_dialog_button
     assert_equal '<fb:dialog-button clickrewriteform="my_form" clickrewriteid="my_dialog" clickrewriteurl="http://www.some_url_here.com/dialog_return.php" type="submit" value="Yes" />',
@@ -860,7 +861,7 @@ class RailsHelperTest < Test::Unit::TestCase
     @h.expects(:capture).returns("dashboard content")
     @h.fb_dashboard do 
     end
-    assert_equal "<fb:dashboard>dashboard content</fb:dashboard>", _erbout
+    assert_equal "<fb:dashboard>dashboard content</fb:dashboard>", @h.output_buffer
   end
   def test_fb_dashboard_non_block
     assert_equal "<fb:dashboard></fb:dashboard>", @h.fb_dashboard
@@ -870,14 +871,14 @@ class RailsHelperTest < Test::Unit::TestCase
     @h.expects(:capture).returns("wide profile content")
     @h.fb_wide do
     end
-    assert_equal "<fb:wide>wide profile content</fb:wide>", _erbout
+    assert_equal "<fb:wide>wide profile content</fb:wide>", @h.output_buffer
   end
   
   def test_fb_narrow
     @h.expects(:capture).returns("narrow profile content")
     @h.fb_narrow do
     end
-    assert_equal "<fb:narrow>narrow profile content</fb:narrow>", _erbout
+    assert_equal "<fb:narrow>narrow profile content</fb:narrow>", @h.output_buffer
   end  
 end
 class TestModel
@@ -890,9 +891,9 @@ class RailsFacebookFormbuilderTest < Test::Unit::TestCase
     include ActionView::Helpers::CaptureHelper
     include ActionView::Helpers::TagHelper
     include Facebooker::Rails::Helpers
-    attr_accessor :_erbout
+    attr_accessor :output_buffer
     def initialize
-      @_erbout=""
+      @output_buffer=""
     end
   end
   def setup
@@ -947,7 +948,7 @@ class RailsFacebookFormbuilderTest < Test::Unit::TestCase
   
   def test_custom
     @template.expects(:password_field).returns("password_field")
-    assert_equal "<fb:editor-custom label=\"Name\"></fb:editor-custom>",@form_builder.password_field(:name)
+    assert_equal "<fb:editor-custom label=\"Name\">password_field</fb:editor-custom>",@form_builder.password_field(:name)
   end
   
   def test_text
@@ -955,7 +956,7 @@ class RailsFacebookFormbuilderTest < Test::Unit::TestCase
   end
   
   def test_multi_friend_input
-    assert_equal "<fb:editor-custom label=\"Friends\"></fb:editor-custom>",@form_builder.multi_friend_input
+    assert_equal "<fb:editor-custom label=\"Friends\"><fb:multi-friend-input></fb:multi-friend-input></fb:editor-custom>",@form_builder.multi_friend_input
   end
 end
 
