@@ -9,7 +9,18 @@ module Facebooker
   end
 
   module Logging
+    
+    def self.skip_api_logging=(val)
+      @skip_api_logging=val
+    end
+    
+    def self.skip_api_logging
+      @skip_api_logging
+    end
+    
+    
     def self.log_fb_api(method, params)
+      return if skip_api_logging
       message = method # might customize later
       dump = format_fb_params(params)
       if block_given?

@@ -1,11 +1,11 @@
-require 'facebooker'
-require 'rubygems'
-require 'flexmock/test_unit'
+require File.dirname(__FILE__) + '/test_helper.rb'
+
 
 class LoggingTest < Test::Unit::TestCase
   def setup
     super
     Facebooker.logger = Logger.new(STDERR)
+    Facebooker::Logging.skip_api_logging=false
   end  
   def teardown
     Facebooker.logger = nil    
@@ -23,7 +23,14 @@ class LoggingTest < Test::Unit::TestCase
     Facebooker::Logging.log_fb_api('sample.api.call',
                           {'param1' => true, 'param2' => 'value2'})
   end
-
+  
+  def test_can_disable_logging
+    Facebooker::Logging.skip_api_logging = true
+    flexmock(Facebooker::Logging).should_receive(:log_info).never
+    Facebooker::Logging.log_fb_api('sample.api.call',
+                          {'param1' => true, 'param2' => 'value2'})
+  end 
+  
   def test_plain_format
     flexmock(Facebooker.logger, :logger).should_receive(:debug).once.with(
         'sample.api.call (0) param1 = true')
