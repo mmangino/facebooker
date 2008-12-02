@@ -20,16 +20,15 @@ module Facebooker
     
     
     def self.log_fb_api(method, params)
-      return if skip_api_logging
       message = method # might customize later
       dump = format_fb_params(params)
       if block_given?
         result = nil
         seconds = Benchmark.realtime { result = yield }
-        log_info(message, dump, seconds)
+        log_info(message, dump, seconds) unless skip_api_logging
         result
       else
-        log_info(message, dump)
+        log_info(message, dump) unless skip_api_logging
         nil
       end
     rescue Exception => e
