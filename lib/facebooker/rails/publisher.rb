@@ -87,6 +87,10 @@ module Facebooker
     #
     # Publisher makes many helpers available, including the linking and asset helpers
     class Publisher
+      def initialize
+        @controller = PublisherController.new        
+      end
+      
       class FacebookTemplate < ::ActiveRecord::Base
         
         
@@ -470,6 +474,16 @@ module Facebooker
         end
     
       end
+      class PublisherController
+        include Facebooker::Rails::Publisher.master_helper_module
+        include ActionController::UrlWriter
+        
+        def self.default_url_options(*args)
+          Facebooker::Rails::Publisher.default_url_options(*args)
+        end
+        
+      end
+      
     end
   end
 end
