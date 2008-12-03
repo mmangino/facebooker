@@ -402,8 +402,6 @@ module Facebooker
       end
       ActionController::Routing::Routes.named_routes.install(self.master_helper_module)
       include self.master_helper_module
-      # Publisher is the controller, it should do the rewriting
-      include ActionController::UrlWriter
       class <<self
         
         def register_all_templates
