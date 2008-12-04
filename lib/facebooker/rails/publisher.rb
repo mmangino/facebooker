@@ -91,6 +91,11 @@ module Facebooker
         @controller = PublisherController.new        
       end
       
+      # use facebook options everywhere
+      def request_comes_from_facebook?
+        true
+      end
+      
       class FacebookTemplate < ::ActiveRecord::Base
         
         
