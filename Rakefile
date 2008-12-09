@@ -34,6 +34,20 @@ namespace :test do
     t.verbose = true
   end
 end
+
+gem_spec_file = 'facebooker.gemspec'
+
+gem_spec = eval(File.read(gem_spec_file)) rescue nil
+
+desc "Generate the gemspec file."
+task :gemspec do
+  require 'erb'
+
+  File.open(gem_spec_file, 'w') do |f|
+    f.write ERB.new(File.read("#{gem_spec_file}.erb")).result(binding)
+  end
+end
+
 # vim: syntax=Ruby
 # 
 # 
