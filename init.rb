@@ -46,7 +46,11 @@ end
 # request out of date
 class ActionController::AbstractRequest
   def query_parameters_with_facebooker
-    (query_parameters_without_facebooker||{}).reject {|key,value| key.to_s =~ /^fb_sig/}
+    if request_parameters.blank?
+      query_parameters_without_facebooker
+    else
+      (query_parameters_without_facebooker||{}).reject {|key,value| key.to_s =~ /^fb_sig/}
+    end
   end
   
   alias_method_chain :query_parameters, :facebooker
