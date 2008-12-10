@@ -41,6 +41,17 @@ class ActionController::Routing::Route
   alias_method_chain :recognition_conditions, :facebooker
 end
 
+# When making get requests, Facebook sends fb_sig parameters both in the query string
+# and also in the post body. We want to ignore the query string ones because they are one
+# request out of date
+class ActionController::AbstractRequest
+  def query_parameters_with_facebooker
+    (query_parameters_without_facebooker||{}).reject {|key,value| key.to_s =~ /^fb_sig/}
+  end
+  
+  alias_method_chain :query_parameters, :facebooker
+end
+
 # We turn off route optimization to make named routes use our code for figuring out if they should go to the session
 # If this fails, it means we're on rails 1.2, we can ignore it
 begin
