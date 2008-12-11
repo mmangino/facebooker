@@ -109,9 +109,13 @@ class UserTest < Test::Unit::TestCase
     @user.send_email("subject", nil, "body fbml")
   end
   
+  def test_doesnt_post_to_facebook_when_assigning_status
+    @session.expects(:post).never
+    @user.status="my status"
+  end
   def test_can_set_status_with_string
     @session.expects(:post).with('facebook.users.setStatus', :status=>"my status",:status_includes_verb=>1)
-    @user.status="my status"
+    @user.set_status("my status")
   end
   
   def test_get_events

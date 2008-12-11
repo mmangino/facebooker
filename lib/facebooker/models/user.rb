@@ -219,21 +219,26 @@ module Facebooker
     end
     
     ##
-    # Set the status of the user
-    #
-    # DOES NOT prepend "is" to the message
-    #
-    # requires extended permission. 
+    # This DOES NOT set the status of a user on Facebook
+    # Use the set_status method instead
     def status=(message)
       case message
-      when String
-        session.post('facebook.users.setStatus',:status=>message,:status_includes_verb=>1) do |ret|
-          ret
-        end
-      when Status
+      when String,Status
         @status = message
       when Hash
         @status = Status.from_hash(message)
+      end
+    end
+    
+    ##
+    # Set the status for a user
+    # DOES NOT prepend "is" to the message
+    #
+    # requires extended permission. 
+    def set_status(message)
+      self.status=message
+      session.post('facebook.users.setStatus',:status=>message,:status_includes_verb=>1) do |ret|
+        ret
       end
     end
     

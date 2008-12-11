@@ -44,6 +44,7 @@ end
 # When making get requests, Facebook sends fb_sig parameters both in the query string
 # and also in the post body. We want to ignore the query string ones because they are one
 # request out of date
+# We only do thise when there are POST parameters so that IFrame linkage still works
 class ActionController::AbstractRequest
   def query_parameters_with_facebooker
     if request_parameters.blank?
