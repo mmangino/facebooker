@@ -16,7 +16,8 @@ class UserTest < Test::Unit::TestCase
   end
   
   def test_has_permission
-    assert !@user.has_permission?("status_update")
+    expect_http_posts_with_responses(has_app_permission_response_xml)
+    assert @user.has_permission?("status_update")
   end
   
   def test_can_ask_user_if_he_or_she_is_friends_with_another_user
@@ -232,6 +233,15 @@ class UserTest < Test::Unit::TestCase
     <connect_registerUsers_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/facebook.xsd" list="true"> 
       <connect_registerUsers_response_elt>4228600737_c96da02bba97aedfd26136e980ae3761</connect_registerUsers_response_elt> 
     </connect_registerUsers_response>
+    XML
+  end
+  
+  def has_app_permission_response_xml
+    <<-XML
+    <?xml version="1.0" encoding="UTF-8"?>
+    <users_hasAppPermission_response xmlns="http://api.facebook.com/1.0/"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd">1</users_hasAppPermission_response>
     XML
   end
 end
