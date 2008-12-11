@@ -15,6 +15,10 @@ class UserTest < Test::Unit::TestCase
     @user.friends = [@other_user]
   end
   
+  def test_has_permission
+    assert !@user.has_permission?("status_update")
+  end
+  
   def test_can_ask_user_if_he_or_she_is_friends_with_another_user
     assert(@user.friends_with?(@other_user))
   end

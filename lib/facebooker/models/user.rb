@@ -243,6 +243,12 @@ module Facebooker
     end
     
     ##
+    # Checks to see if the user has enabled the given extended permission
+    def has_permission?(ext_perm) # ext_perm = email, offline_access, status_update, photo_upload, create_listing, create_event, rsvp_event, sms
+      session.post('facebook.users.hasAppPermission',:ext_perm=>ext_perm) == "1"
+    end    
+    
+    ##
     # Convenience method to send email to the current user
     def send_email(subject, text=nil, fbml=nil)
       session.send_email([@id], subject, text, fbml)

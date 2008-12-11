@@ -401,8 +401,8 @@ module Facebooker
         memo
       end
     end
-    
-    private
+
+  private
     def self.are_friends?(raw_value)
       if raw_value == '1'
         true
@@ -432,6 +432,12 @@ module Facebooker
     end
   end
     
+  class UserHasPermission < Parser
+    def self.process(data)
+      element('users_hasAppPermission_response', data).text_value
+    end
+  end  
+
   class Errors < Parser#:nodoc:
     EXCEPTIONS = {
       1 	=> Facebooker::Session::UnknownError,
@@ -492,6 +498,7 @@ module Facebooker
       'facebook.users.getStandardInfo' => UserStandardInfo,
       'facebook.users.setStatus' => SetStatus,
       'facebook.users.getLoggedInUser' => GetLoggedInUser,
+      'facebook.users.hasAppPermission' => UserHasPermission,
       'facebook.pages.isAdmin' => PagesIsAdmin,
       'facebook.pages.getInfo' => PagesGetInfo,
       'facebook.friends.get' => GetFriends,
