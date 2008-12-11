@@ -1,7 +1,7 @@
 require 'facebooker/model'
 module Facebooker
   ##
-  # A simple representation of a photo album.
+  # A simple representation of a friend list.
   class FriendList
     include Model
     attr_accessor :flid, :name
