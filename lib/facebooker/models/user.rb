@@ -1,7 +1,6 @@
 require 'facebooker/model'
 require 'facebooker/models/affiliation'
 require 'facebooker/models/work_info'
-require 'active_support'
 module Facebooker
   # 
   # Holds attributes and behavior for a Facebook User
@@ -307,7 +306,7 @@ module Facebooker
         ret.each do |hash|
           user_map.delete(hash)
         end
-        unless user_map.blank?
+        unless user_map.empty?
           e=Facebooker::Session::UserRegistrationFailed.new
           e.failed_users = user_map.values
           raise e

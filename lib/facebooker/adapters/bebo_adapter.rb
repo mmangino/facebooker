@@ -43,7 +43,8 @@ module Facebooker
         set_profile_fbml_without_bebo_adapter(profile_fbml,mobile_fbml, profile_action_fbml, profile_main)
       end
     end
-    alias_method_chain :set_profile_fbml, :bebo_adapter
+    alias_method :set_profile_fbml_without_bebo_adapter, :set_profile_fbml
+    alias_method :set_profile_fbml, :set_profile_fbml_with_bebo_adapter
     
     private
     
@@ -67,7 +68,8 @@ module Facebooker
          process_without_bebo_adapter(data)
        end
       end
-      alias_method_chain :process, :bebo_adapter
+      alias_method :process_without_bebo_adapter, :process
+      alias_method :process, :process_with_bebo_adapter
     end
   end
 end
