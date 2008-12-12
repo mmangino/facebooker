@@ -129,11 +129,17 @@ class UserTest < Test::Unit::TestCase
     events = @user.events
     assert_equal "29511517904", events.first.eid
   end
-  
-  def test_can_get_events
-    @user.expects(:events)
-    @user.events
+
+  def test_events_caching_honors_params
+    @user = Facebooker::User.new(9507801, @session)
+    @session.expects(:post).returns([{:eid=>1}])
+    assert_equal 1,@user.events.first.eid
+    @session.expects(:post).returns([{:eid=>2}])
+    assert_equal 2,@user.events(:start_time=>1.day.ago).first.eid
+    @session.expects(:post).never
+    assert_equal 1,@user.events.first.eid
   end
+  
   
   def test_to_s
     assert_equal("1234",@user.to_s)
