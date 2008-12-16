@@ -31,7 +31,13 @@ module Facebooker
         send verb, path, facebook_params(params).reverse_merge(:canvas => true)
       end
       
-      private
+      def facebook_params(params = {})
+        params = default_facebook_parameters.with_indifferent_access.merge(params || {})
+        sig = generate_signature params
+        params.merge(:fb_sig => sig)
+      end
+
+    private
 
       def default_facebook_parameters
         {
@@ -42,12 +48,6 @@ module Facebooker
           :fb_sig_in_canvas => "1",
           :fb_sig_time => Time.now.to_f
         }
-      end
-
-      def facebook_params(params = {})
-        params = default_facebook_parameters.with_indifferent_access.merge(params || {})
-        sig = generate_signature params
-        params.merge(:fb_sig => sig)
       end
 
       def facebook_redirect_url
