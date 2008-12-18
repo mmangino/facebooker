@@ -240,6 +240,10 @@ module Facebooker
         def ensure_application_is_installed_by_facebook_user(options = {})
           before_filter :ensure_application_is_installed_by_facebook_user, options
         end
+        
+        def request_comes_from_facebook?
+          request_is_for_a_facebook_canvas? || request_is_facebook_ajax?
+        end
       end
     end
   end
