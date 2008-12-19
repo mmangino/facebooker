@@ -79,7 +79,7 @@ module Facebooker
       #   <% end %>
       #   <% fb_request_form("Invite","invite_user",create_invite_path) do %>
       #     Invite <%= fb_name(@facebook_user.friends.first.id)%> to the party <br />
-      #     <%= fb_request_form_submit(@facebook_user.friends.first.id,"Invite %n") %>
+      #     <%= fb_request_form_submit(:uid => @facebook_user.friends.first.id, :label => "Invite %n") %>
       #   <% end %>
       # <em>See:</em> http://wiki.developers.facebook.com/index.php/Fb:request-form-submit for options
       def fb_request_form_submit(options={})
