@@ -344,13 +344,13 @@ module Facebooker
 
       def validate_fb_tab_item_align_value(options)
         if options.has_key?(:align) && !VALID_FB_TAB_ITEM_ALIGN_VALUES.include?(options[:align].to_sym)
-          raise(ArgumentError, "Unkown value for align: #{options[:align]}")
+          raise(ArgumentError, "Unknown value for align: #{options[:align]}")
         end
       end
       
       def validate_fb_photo_align_value(options)
         if options.has_key?(:align) && !VALID_FB_PHOTO_ALIGN_VALUES.include?(options[:align].to_sym)
-          raise(ArgumentError, "Unkown value for align: #{options[:align]}")
+          raise(ArgumentError, "Unknown value for align: #{options[:align]}")
         end
       end
       
@@ -616,13 +616,13 @@ module Facebooker
       
       def validate_fb_profile_pic_size(options)
         if options.has_key?(:size) && !VALID_FB_PROFILE_PIC_SIZES.include?(options[:size].to_sym)
-          raise(ArgumentError, "Unkown value for size: #{options[:size]}")
+          raise(ArgumentError, "Unknown value for size: #{options[:size]}")
         end
       end
 
       def validate_fb_photo_size(options)
         if options.has_key?(:size) && !VALID_FB_PHOTO_SIZES.include?(options[:size].to_sym)
-          raise(ArgumentError, "Unkown value for size: #{options[:size]}")
+          raise(ArgumentError, "Unknown value for size: #{options[:size]}")
         end
       end
       
