@@ -404,6 +404,11 @@ module Facebooker
         def protect_against_forgery?
           @paf ||= ActionController::Base.new.send(:protect_against_forgery?)
         end
+        
+        # url_for calls in publishers tend to want full paths
+        def url_for(options = {})
+          super(options.kind_of?(Hash) ? {:only_path => false}.update(options) : options)
+        end
       end
       ActionController::Routing::Routes.named_routes.install(self.master_helper_module)
       include self.master_helper_module
