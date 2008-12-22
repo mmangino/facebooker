@@ -145,8 +145,13 @@ class UserTest < Test::Unit::TestCase
     assert_equal("1234",@user.to_s)
   end
   
-  def test_equality
+  def test_equality_with_same_id
     assert_equal @user, @user.dup
+    assert_equal @user, Facebooker::User.new(:id => @user.id)
+  end
+  
+  def test_not_equal_to_differnt_class
+    assert_not_equal @user, flexmock(:id => @user.id)
   end
   
   def test_hash_email
@@ -250,4 +255,5 @@ class UserTest < Test::Unit::TestCase
       xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd">1</users_hasAppPermission_response>
     XML
   end
+  
 end

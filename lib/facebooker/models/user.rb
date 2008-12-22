@@ -283,7 +283,7 @@ module Facebooker
     ##
     # Two Facebooker::User objects should be considered equal if their Facebook ids are equal
     def ==(other_user)
-      id == other_user.id
+      other_user.is_a?(User) && id == other_user.id
     end
     
     
