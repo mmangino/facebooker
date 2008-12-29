@@ -34,6 +34,7 @@ module Facebooker
     #     def publish_action(f)
     #       send_as :user_action
     #       from f
+    #       story_size SHORT # or ONE_LINE or FULL
     #       data :friend=>"Mike"
     #     end
     #   
@@ -87,6 +88,12 @@ module Facebooker
     #
     # Publisher makes many helpers available, including the linking and asset helpers
     class Publisher
+      
+      #story sizes from the Facebooker API
+      ONE_LINE=1
+      SHORT=2
+      FULL=4
+      
       def initialize
         @controller = PublisherController.new        
       end
@@ -213,11 +220,14 @@ module Facebooker
         attr_accessor :body_general
         attr_accessor :template_id
         attr_accessor :template_name
-        
+        attr_accessor :story_size
         def target_ids=(val)
           @target_ids = val.is_a?(Array) ? val.join(",") : val
         end
-        
+        def data_hash
+          default_data = story_size.nil? ? {} : {:story_size=>story_size}
+          default_data.merge(data||{})
+        end
       end
       
       cattr_accessor :ignore_errors
@@ -351,7 +361,7 @@ module Facebooker
         when Ref
           Facebooker::Session.create.server_cache.set_ref_handle(_body.handle,_body.fbml)
         when UserAction
-          @from.session.publish_user_action(_body.template_id,_body.data||{},_body.target_ids,_body.body_general)
+          @from.session.publish_user_action(_body.template_id,_body.data_hash,_body.target_ids,_body.body_general)
         else
           raise UnspecifiedBodyType.new("You must specify a valid send_as")
         end

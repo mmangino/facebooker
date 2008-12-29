@@ -2,7 +2,7 @@
 
 Gem::Specification.new do |s|
   s.name = %q{facebooker}
-  s.version = "1.0.4"
+  s.version = "1.0.5"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Chad Fowler", "Patrick Ewing", "Mike Mangino", "Shane Vitarana"]
@@ -31,4 +31,3 @@ Gem::Specification.new do |s|
     s.add_dependency(%q<hoe>, [">= 1.5.0"])
   end
 end
-
