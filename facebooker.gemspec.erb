@@ -15,7 +15,6 @@ Gem::Specification.new do |s|
   s.rdoc_options = ["--main", "README.txt"]
   s.require_paths = ["lib"]
   s.rubyforge_project = %q{facebooker}
-  s.rubygems_version = %q{1.3.0}
   s.summary = %q{Pure, idiomatic Ruby wrapper for the Facebook REST API.}
   s.test_files = ["test/test_helper.rb"]
 

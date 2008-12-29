@@ -111,7 +111,7 @@ module Facebooker
       # <em> Note: </em> I don't think the block is used here.
       def fb_multi_friend_selector(message,options={},&block)
         options = options.dup
-        tag("fb:multi-friend-selector",stringify_vals(options.merge(:showborder=>false,:actiontext=>message,:max=>20)))
+        tag("fb:multi-friend-selector",stringify_vals({:showborder=>false,:actiontext=>message,:max=>20}.merge(options)))
       end
 
       # Render a condensed <fb:multi-friend-selector> with the passed in welcome message 
