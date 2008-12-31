@@ -77,7 +77,7 @@ module Facebooker
           prefix = api_key+"_"
           parsed = {}
 
-          #find all str s.t. !cookies[key_str].nil, store as param[str] = cookies[val]
+          #find all str s.t. !cookies[key_str].nil, set param[str] = cookies[key_str]
           cookies.keys.select{|k| k[0, prefix.size] == prefix}.each{ |k|
              parsed[k[prefix.size,k.size]] = cookies[k]
           }
