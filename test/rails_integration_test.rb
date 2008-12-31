@@ -363,6 +363,32 @@ class RailsIntegrationTest < Test::Unit::TestCase
     get :index, modified_params
   end
   
+  def test_session_secured_with_auth_token_if_cookies_expired
+      auth_token = 'ohaiauthtokenhere111'
+      modified_params = example_rails_params_including_fb
+      modified_params.delete('fb_sig_session_key')
+      modified_params['auth_token'] = auth_token
+      session_mock = flexmock(session = Facebooker::Session.create(ENV['FACEBOOK_API_KEY'], ENV['FACEBOOK_SECRET_KEY']))
+      session_params = { 'session_key' => '123', 'uid' => '321' }
+      session_mock.should_receive(:post).with('facebook.auth.getSession', :auth_token => auth_token).once.and_return(session_params).ordered
+      flexmock(@controller).should_receive(:new_facebook_session).once.and_return(session).ordered
+      expired_cookie_hash_for_auth.each {|k,v| @request.cookies[ENV['FACEBOOK_API_KEY']+k] = CGI::Cookie.new(k,v)} 
+      get :index, modified_params
+      assert_equal(321, @controller.facebook_session.user.id)
+  end
+          
+  def test_session_can_be_secured_with_cookies
+    cookie_hash_for_auth.each {|k,v| @request.cookies[ENV['FACEBOOK_API_KEY']+k] = CGI::Cookie.new(k,v)} 
+    get :index, example_rails_params_for_fb_connect
+    assert_equal(77777, @controller.facebook_session.user.id)
+    end
+  
+  def test_session_does_NOT_secure_with_expired_cookies
+    expired_cookie_hash_for_auth.each {|k,v| @request.cookies[ENV['FACEBOOK_API_KEY']+k] = CGI::Cookie.new(k,v)} 
+    get :index, example_rails_params_for_fb_connect
+    assert_nil(@controller.facebook_session)
+  end
+      
   def test_user_friends_can_be_populated_from_facebook_params_if_available
     get :index, example_rails_params_including_fb
     assert_not_nil(friends = @controller.facebook_session.user.friends)
@@ -436,6 +462,18 @@ class RailsIntegrationTest < Test::Unit::TestCase
   end
   
   private
+  def example_rails_params_for_fb_connect
+    {"action"=>"index", "controller"=>"controller_which_requires_facebook_authentication"}
+  end
+
+  def expired_cookie_hash_for_auth
+    {"_ss" => "not_used", "_session_key"=> "whatever", "_user"=>"77777", "_expires"=>"#{1.day.ago.to_i}"}
+  end
+
+  def cookie_hash_for_auth
+    {"_ss" => "not_used", "_session_key"=> "whatever", "_user"=>"77777", "_expires"=>"#{1.day.from_now.to_i}"}
+  end
+   
   def example_rails_params_including_fb_for_user_not_logged_into_application
     {"fb_sig_time"=>"1186588275.5988", "fb_sig"=>"7371a6400329b229f800a5ecafe03b0a", "action"=>"index", "fb_sig_in_canvas"=>"1", "controller"=>"controller_which_requires_facebook_authentication", "fb_sig_added"=>"0", "fb_sig_api_key"=>"b6c9c857ac543ca806f4d3187cd05e09"}
   end

@@ -23,8 +23,7 @@ module Facebooker
       
       
       def set_facebook_session
-        
-        returning session_set = session_already_secured? ||  secure_with_facebook_params! ||secure_with_token!  do
+        returning session_set = session_already_secured? ||  secure_with_facebook_params! || secure_with_cookies! || secure_with_token!  do
           if session_set
             capture_facebook_friends_if_available! 
             Session.current = facebook_session
@@ -72,6 +71,29 @@ module Facebooker
           !session[:facebook_session].blank? &&  (params[:fb_sig_session_key].blank? || session[:facebook_session].session_key == facebook_params[:session_key])
         end
       end
+
+      def secure_with_cookies!
+          api_key = ENV['FACEBOOK_API_KEY']
+          prefix = api_key+"_"
+          parsed = {}
+
+
+          #find all str s.t. !cookies[key_str].nil, store as param[str] = cookies[val]
+          cookies.keys.select{|k| k[0, prefix.size] == prefix}.each{ |k|
+             parsed[k[prefix.size,k.size]] = cookies[k]
+          }
+ 
+          #returning gracefully if the cookies aren't set or have expired
+          return unless parsed['session_key'] && parsed['user'] && parsed['expires'] && parsed['ss'] 
+          return unless Time.at(parsed['expires'].to_f) > Time.now
+          
+          #if we have the unexpired cookies, we'll throw an exception if the sig doesn't verify
+          verify_signature(parsed,cookies[api_key])
+          
+          @facebook_session = new_facebook_session
+          @facebook_session.secure_with! (parsed['session_key'],parsed['user'],parsed['expires'],parsed['ss'])
+      end
+
             
       def secure_with_token!
         if params['auth_token']
@@ -142,7 +164,7 @@ module Facebooker
         raw_string = facebook_sig_params.map{ |*args| args.join('=') }.sort.join
         actual_sig = Digest::MD5.hexdigest([raw_string, Facebooker::Session.secret_key].join)
         raise Facebooker::Session::IncorrectSignature if actual_sig != expected_signature
-        raise Facebooker::Session::SignatureTooOld if Time.at(facebook_sig_params['time'].to_f) < earliest_valid_session
+        raise Facebooker::Session::SignatureTooOld if facebook_sig_params['time'] && Time.at(facebook_sig_params['time'].to_f) < earliest_valid_session
         true
       end
       
