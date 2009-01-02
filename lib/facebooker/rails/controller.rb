@@ -90,10 +90,9 @@ module Facebooker
           verify_signature(parsed,cookies[api_key])
           
           @facebook_session = new_facebook_session
-          @facebook_session.secure_with! (parsed['session_key'],parsed['user'],parsed['expires'],parsed['ss'])
+          @facebook_session.secure_with!(parsed['session_key'],parsed['user'],parsed['expires'],parsed['ss'])
       end
-
-            
+    
       def secure_with_token!
         if params['auth_token']
           @facebook_session = new_facebook_session
