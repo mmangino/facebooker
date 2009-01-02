@@ -373,19 +373,19 @@ class RailsIntegrationTest < Test::Unit::TestCase
       session_params = { 'session_key' => '123', 'uid' => '321' }
       session_mock.should_receive(:post).with('facebook.auth.getSession', :auth_token => auth_token).once.and_return(session_params).ordered
       flexmock(@controller).should_receive(:new_facebook_session).once.and_return(session).ordered
-      expired_cookie_hash_for_auth.each {|k,v| @request.cookies[ENV['FACEBOOK_API_KEY']+k] = CGI::Cookie.new(k,v)} 
+      expired_cookie_hash_for_auth.each {|k,v| @request.cookies[ENV['FACEBOOK_API_KEY']+k] = CGI::Cookie.new(ENV['FACEBOOK_API_KEY']+k,v)} 
       get :index, modified_params
       assert_equal(321, @controller.facebook_session.user.id)
   end
           
   def test_session_can_be_secured_with_cookies
-    cookie_hash_for_auth.each {|k,v| @request.cookies[ENV['FACEBOOK_API_KEY']+k] = CGI::Cookie.new(k,v)} 
+    cookie_hash_for_auth.each {|k,v| @request.cookies[ENV['FACEBOOK_API_KEY']+k] = CGI::Cookie.new(ENV['FACEBOOK_API_KEY']+k,v)} 
     get :index, example_rails_params_for_fb_connect
     assert_equal(77777, @controller.facebook_session.user.id)
     end
   
   def test_session_does_NOT_secure_with_expired_cookies
-    expired_cookie_hash_for_auth.each {|k,v| @request.cookies[ENV['FACEBOOK_API_KEY']+k] = CGI::Cookie.new(k,v)} 
+    expired_cookie_hash_for_auth.each {|k,v| @request.cookies[ENV['FACEBOOK_API_KEY']+k] = CGI::Cookie.new(ENV['FACEBOOK_API_KEY']+k,v)} 
     get :index, example_rails_params_for_fb_connect
     assert_nil(@controller.facebook_session)
   end
