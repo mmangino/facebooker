@@ -37,6 +37,8 @@ generators/facebook_scaffold/templates/view_new.fbml.erb
 generators/facebook_scaffold/templates/view_new.html.erb
 generators/facebook_scaffold/templates/view_show.fbml.erb
 generators/facebook_scaffold/templates/view_show.html.erb
+generators/xd_receiver/xd_receiver_generator.rb
+generators/xd_receiver/templates/xd_receiver.html
 init.rb
 install.rb
 lib/facebooker.rb
@@ -75,6 +77,7 @@ lib/facebooker/rails/facebook_request_fix.rb
 lib/facebooker/rails/facebook_session_handling.rb
 lib/facebooker/rails/facebook_url_rewriting.rb
 lib/facebooker/rails/helpers.rb
+lib/facebooker/rails/helpers/fb_connect.rb
 lib/facebooker/rails/profile_publisher_extensions.rb
 lib/facebooker/rails/publisher.rb
 lib/facebooker/rails/routing.rb
