@@ -23,8 +23,7 @@ module Facebooker
       
       
       def set_facebook_session
-        
-        returning session_set = session_already_secured? ||  secure_with_facebook_params! ||secure_with_token!  do
+        returning session_set = session_already_secured? ||  secure_with_facebook_params! || secure_with_cookies! || secure_with_token!  do
           if session_set
             capture_facebook_friends_if_available! 
             Session.current = facebook_session
@@ -72,7 +71,35 @@ module Facebooker
           !session[:facebook_session].blank? &&  (params[:fb_sig_session_key].blank? || session[:facebook_session].session_key == facebook_params[:session_key])
         end
       end
-            
+      
+      def clear_fb_cookies!
+        fb_cookie_names.each {|name| cookies[name] = nil }
+      end
+      
+      def fb_cookie_prefix
+        Facebooker.api_key+"_"
+      end
+
+      def fb_cookie_names
+        fb_cookie_names = cookies.keys.select{|k| k.starts_with?(fb_cookie_prefix)}
+      end
+
+      def secure_with_cookies!
+          parsed = {}
+          
+          fb_cookie_names.each { |key| parsed[key[fb_cookie_prefix.size,key.size]] = cookies[key] }
+ 
+          #returning gracefully if the cookies aren't set or have expired
+          return unless parsed['session_key'] && parsed['user'] && parsed['expires'] && parsed['ss'] 
+          return unless Time.at(parsed['expires'].to_f) > Time.now
+          
+          #if we have the unexpired cookies, we'll throw an exception if the sig doesn't verify
+          verify_signature(parsed,cookies[Facebooker.api_key])
+          
+          @facebook_session = new_facebook_session
+          @facebook_session.secure_with!(parsed['session_key'],parsed['user'],parsed['expires'],parsed['ss'])
+      end
+    
       def secure_with_token!
         if params['auth_token']
           @facebook_session = new_facebook_session
@@ -142,7 +169,7 @@ module Facebooker
         raw_string = facebook_sig_params.map{ |*args| args.join('=') }.sort.join
         actual_sig = Digest::MD5.hexdigest([raw_string, Facebooker::Session.secret_key].join)
         raise Facebooker::Session::IncorrectSignature if actual_sig != expected_signature
-        raise Facebooker::Session::SignatureTooOld if Time.at(facebook_sig_params['time'].to_f) < earliest_valid_session
+        raise Facebooker::Session::SignatureTooOld if facebook_sig_params['time'] && Time.at(facebook_sig_params['time'].to_f) < earliest_valid_session
         true
       end
       

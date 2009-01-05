@@ -3,6 +3,7 @@ begin
   require 'action_controller'
   require 'action_controller/test_process'
   require 'facebooker/rails/controller'
+  require 'facebooker/rails/helpers/fb_connect'
   require 'facebooker/rails/helpers'
   require 'facebooker/rails/facebook_form_builder'
   require File.dirname(__FILE__)+'/../init'
@@ -363,6 +364,32 @@ class RailsIntegrationTest < Test::Unit::TestCase
     get :index, modified_params
   end
   
+  def test_session_secured_with_auth_token_if_cookies_expired
+      auth_token = 'ohaiauthtokenhere111'
+      modified_params = example_rails_params_including_fb
+      modified_params.delete('fb_sig_session_key')
+      modified_params['auth_token'] = auth_token
+      session_mock = flexmock(session = Facebooker::Session.create(ENV['FACEBOOK_API_KEY'], ENV['FACEBOOK_SECRET_KEY']))
+      session_params = { 'session_key' => '123', 'uid' => '321' }
+      session_mock.should_receive(:post).with('facebook.auth.getSession', :auth_token => auth_token).once.and_return(session_params).ordered
+      flexmock(@controller).should_receive(:new_facebook_session).once.and_return(session).ordered
+      expired_cookie_hash_for_auth.each {|k,v| @request.cookies[ENV['FACEBOOK_API_KEY']+k] = CGI::Cookie.new(ENV['FACEBOOK_API_KEY']+k,v)} 
+      get :index, modified_params
+      assert_equal(321, @controller.facebook_session.user.id)
+  end
+          
+  def test_session_can_be_secured_with_cookies
+    cookie_hash_for_auth.each {|k,v| @request.cookies[ENV['FACEBOOK_API_KEY']+k] = CGI::Cookie.new(ENV['FACEBOOK_API_KEY']+k,v)} 
+    get :index, example_rails_params_for_fb_connect
+    assert_equal(77777, @controller.facebook_session.user.id)
+    end
+  
+  def test_session_does_NOT_secure_with_expired_cookies
+    expired_cookie_hash_for_auth.each {|k,v| @request.cookies[ENV['FACEBOOK_API_KEY']+k] = CGI::Cookie.new(ENV['FACEBOOK_API_KEY']+k,v)} 
+    get :index, example_rails_params_for_fb_connect
+    assert_nil(@controller.facebook_session)
+  end
+      
   def test_user_friends_can_be_populated_from_facebook_params_if_available
     get :index, example_rails_params_including_fb
     assert_not_nil(friends = @controller.facebook_session.user.friends)
@@ -436,6 +463,18 @@ class RailsIntegrationTest < Test::Unit::TestCase
   end
   
   private
+  def example_rails_params_for_fb_connect
+    {"action"=>"index", "controller"=>"controller_which_requires_facebook_authentication"}
+  end
+
+  def expired_cookie_hash_for_auth
+    {"_ss" => "not_used", "_session_key"=> "whatever", "_user"=>"77777", "_expires"=>"#{1.day.ago.to_i}"}
+  end
+
+  def cookie_hash_for_auth
+    {"_ss" => "not_used", "_session_key"=> "whatever", "_user"=>"77777", "_expires"=>"#{1.day.from_now.to_i}"}
+  end
+   
   def example_rails_params_including_fb_for_user_not_logged_into_application
     {"fb_sig_time"=>"1186588275.5988", "fb_sig"=>"7371a6400329b229f800a5ecafe03b0a", "action"=>"index", "fb_sig_in_canvas"=>"1", "controller"=>"controller_which_requires_facebook_authentication", "fb_sig_added"=>"0", "fb_sig_api_key"=>"b6c9c857ac543ca806f4d3187cd05e09"}
   end
@@ -490,6 +529,7 @@ class RailsHelperTest < Test::Unit::TestCase
     include ActionView::Helpers::CaptureHelper
     include ActionView::Helpers::TagHelper
     include ActionView::Helpers::AssetTagHelper
+    include ActionView::Helpers::JavaScriptHelper
     include Facebooker::Rails::Helpers
     attr_accessor :flash, :output_buffer
     def initialize
@@ -524,11 +564,11 @@ class RailsHelperTest < Test::Unit::TestCase
   end
   
   def test_fb_profile_pic
-    assert_equal "<fb:profile-pic uid=\"1234\" />", @h.fb_profile_pic("1234")
+    assert_equal "<fb:profile-pic uid=\"1234\"></fb:profile-pic>", @h.fb_profile_pic("1234")
   end
 
   def test_fb_profile_pic_with_valid_size
-    assert_equal "<fb:profile-pic size=\"small\" uid=\"1234\" />", @h.fb_profile_pic("1234", :size => :small)
+    assert_equal "<fb:profile-pic size=\"small\" uid=\"1234\"></fb:profile-pic>", @h.fb_profile_pic("1234", :size => :small)
   end
 
   def test_fb_profile_pic_with_invalid_size
@@ -536,12 +576,12 @@ class RailsHelperTest < Test::Unit::TestCase
   end
 
   def test_fb_photo
-    assert_equal "<fb:photo pid=\"1234\" />",@h.fb_photo("1234")
+    assert_equal "<fb:photo pid=\"1234\"></fb:photo>",@h.fb_photo("1234")
   end
 
   def test_fb_photo_with_object_responding_to_photo_id
     photo = flexmock("photo", :photo_id => "5678")
-    assert_equal "<fb:photo pid=\"5678\" />", @h.fb_photo(photo)
+    assert_equal "<fb:photo pid=\"5678\"></fb:photo>", @h.fb_photo(photo)
   end
 
   def test_fb_photo_with_invalid_size
@@ -557,14 +597,14 @@ class RailsHelperTest < Test::Unit::TestCase
   end
 
   def test_fb_photo_with_valid_align_value
-    assert_equal "<fb:photo align=\"right\" pid=\"1234\" />",@h.fb_photo("1234", :align => :right)
+    assert_equal "<fb:photo align=\"right\" pid=\"1234\"></fb:photo>",@h.fb_photo("1234", :align => :right)
   end
 
   def test_fb_photo_with_class
-    assert_equal "<fb:photo class=\"picky\" pid=\"1234\" />",@h.fb_photo("1234", :class => :picky)
+    assert_equal "<fb:photo class=\"picky\" pid=\"1234\"></fb:photo>",@h.fb_photo("1234", :class => :picky)
   end
   def test_fb_photo_with_style
-    assert_equal "<fb:photo pid=\"1234\" style=\"some=css;put=here;\" />",@h.fb_photo("1234", :style => "some=css;put=here;")
+    assert_equal "<fb:photo pid=\"1234\" style=\"some=css;put=here;\"></fb:photo>",@h.fb_photo("1234", :style => "some=css;put=here;")
   end
   
   def test_fb_prompt_permission_valid_no_callback
@@ -593,16 +633,16 @@ class RailsHelperTest < Test::Unit::TestCase
   end
 
   def test_fb_name
-    assert_equal "<fb:name uid=\"1234\" />",@h.fb_name("1234")
+    assert_equal "<fb:name uid=\"1234\"></fb:name>",@h.fb_name("1234")
   end
     
   def test_fb_name_with_transformed_key
-    assert_equal "<fb:name uid=\"1234\" useyou=\"true\" />", @h.fb_name(1234, :use_you => true)
+    assert_equal "<fb:name uid=\"1234\" useyou=\"true\"></fb:name>", @h.fb_name(1234, :use_you => true)
   end
   
   def test_fb_name_with_user_responding_to_facebook_id
     user = flexmock("user", :facebook_id => "5678")
-    assert_equal "<fb:name uid=\"5678\" />", @h.fb_name(user)
+    assert_equal "<fb:name uid=\"5678\"></fb:name>", @h.fb_name(user)
   end
   
   def test_fb_name_with_invalid_key
@@ -698,16 +738,16 @@ class RailsHelperTest < Test::Unit::TestCase
   end
   
   def test_fb_pronoun
-    assert_equal "<fb:pronoun uid=\"1234\" />", @h.fb_pronoun(1234)
+    assert_equal "<fb:pronoun uid=\"1234\"></fb:pronoun>", @h.fb_pronoun(1234)
   end
   
   def test_fb_pronoun_with_transformed_key
-    assert_equal "<fb:pronoun uid=\"1234\" usethey=\"true\" />", @h.fb_pronoun(1234, :use_they => true)
+    assert_equal "<fb:pronoun uid=\"1234\" usethey=\"true\"></fb:pronoun>", @h.fb_pronoun(1234, :use_they => true)
   end
   
   def test_fb_pronoun_with_user_responding_to_facebook_id
     user = flexmock("user", :facebook_id => "5678")
-    assert_equal "<fb:pronoun uid=\"5678\" />", @h.fb_pronoun(user)
+    assert_equal "<fb:pronoun uid=\"5678\"></fb:pronoun>", @h.fb_pronoun(user)
   end
   
   def test_fb_pronoun_with_invalid_key
@@ -880,6 +920,58 @@ class RailsHelperTest < Test::Unit::TestCase
     end
     assert_equal "<fb:narrow>narrow profile content</fb:narrow>", @h.output_buffer
   end  
+  
+  def test_fb_login_button
+    assert_equal "<fb:login-button onlogin=\"somejs\"></fb:login-button>",@h.fb_login_button("somejs")
+  end
+  
+  def test_init_fb_connect_no_features
+    assert ! @h.init_fb_connect.match(/XFBML/)
+  end
+  
+  def test_init_fb_connect_with_features
+    assert @h.init_fb_connect("XFBML").match(/XFBML/)
+  end
+  
+  def test_fb_connect_javascript_tag
+    assert_equal "<script src=\"http://static.ak.connect.facebook.com/js/api_lib/v0.4/FeatureLoader.js.php\" type=\"text/javascript\"></script>",
+      @h.fb_connect_javascript_tag
+  end
+  
+  def test_fb_container
+    @h.expects(:capture).returns("Inner Stuff")
+    @h.fb_container(:condition=>"somejs") do
+    end
+    assert_equal "<fb:container condition=\"somejs\">Inner Stuff</fb:container>",@h.output_buffer
+  end
+  
+  def test_fb_eventlink
+    assert_equal '<fb:eventlink eid="21150032416"></fb:eventlink>',@h.fb_eventlink("21150032416")
+  end
+  
+  def test_fb_grouplink
+    assert_equal '<fb:grouplink gid="2541896821"></fb:grouplink>',@h.fb_grouplink("2541896821")
+  end
+  
+  def test_fb_serverfbml
+    @h.expects(:capture).returns("Inner Stuff")
+    @h.fb_serverfbml(:condition=>"somejs") do
+    end
+    assert_equal "<fb:serverfbml condition=\"somejs\">Inner Stuff</fb:serverfbml>",@h.output_buffer
+  end
+  
+  def test_fb_share_button
+    assert_equal "<fb:share-button class=\"url\" href=\"http://www.elevatedrails.com\"></fb:share-button>",@h.fb_share_button("http://www.elevatedrails.com")
+  end
+  
+  def test_fb_unconnected_friends_count_without_condition
+    assert_equal "<fb:unconnected-friends-count></fb:unconnected-friends-count>",@h.fb_unconnected_friends_count
+  end
+  
+  def test_fb_user_status
+    user=flexmock("user", :facebook_id => "5678")
+    assert_equal '<fb:user-status linked="false" uid="5678"></fb:user-status>',@h.fb_user_status(user,false)
+  end
 end
 class TestModel
   attr_accessor :name,:facebook_id
@@ -958,6 +1050,8 @@ class RailsFacebookFormbuilderTest < Test::Unit::TestCase
   def test_multi_friend_input
     assert_equal "<fb:editor-custom label=\"Friends\"><fb:multi-friend-input></fb:multi-friend-input></fb:editor-custom>",@form_builder.multi_friend_input
   end
+  
+
 end
 
 class RailsPrettyErrorsTest < Test::Unit::TestCase
@@ -1118,6 +1212,7 @@ class RailsUrlHelperExtensionsTest < Test::Unit::TestCase
   def test_link_to_if_with_false
        assert_equal @label, @u.link_to_if(false,@label,@url)
   end
+  
 end
 
 

@@ -6,6 +6,7 @@ require 'action_controller/test_process'
 require 'active_record'
 require File.dirname(__FILE__)+'/../init'
 require 'facebooker/rails/controller'
+require 'facebooker/rails/helpers/fb_connect'
 require 'facebooker/rails/helpers'
 require 'facebooker/rails/publisher'
 
@@ -116,6 +117,14 @@ class TestPublisher < Facebooker::Rails::Publisher
   def user_action(user)
     send_as :user_action
     from user
+    data :friend=>"Mike"
+  end
+  def user_action_with_story_size(user)
+    send_as :user_action
+    from user
+    story_size ONE_LINE
+    story_size FULL
+    story_size SHORT
     data :friend=>"Mike"
   end
   def user_action_no_data(user)
@@ -351,6 +360,19 @@ class PublisherTest < Test::Unit::TestCase
     # pseudo_template.expects(:matches_content?).returns(true)
     # Facebooker::Rails::Publisher::FacebookTemplate.expects(:for).returns(pseudo_template)
     TestPublisher.deliver_user_action(@from_user)
+  end
+  
+  def test_publish_user_action_with_story_size
+    @from_user = Facebooker::User.new
+    @session = Facebooker::Session.new("","")
+    @from_user.stubs(:session).returns(@session)
+    @session.expects(:publish_user_action).with(20309041537,{:friend=>"Mike", :story_size=>2},nil,nil)
+    
+    Facebooker::Rails::Publisher::FacebookTemplate.expects(:bundle_id_for_class_and_method).
+                                                   with(TestPublisher, 'user_action_with_story_size').
+                                                   returns(20309041537)
+    TestPublisher.deliver_user_action_with_story_size(@from_user)
+    
   end
   
   def test_publishing_user_data_no_action_gives_nil_hash
