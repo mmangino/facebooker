@@ -71,6 +71,21 @@ module Facebooker
           !session[:facebook_session].blank? &&  (params[:fb_sig_session_key].blank? || session[:facebook_session].session_key == facebook_params[:session_key])
         end
       end
+      
+      def clear_fb_cookies!
+        domain_cookie_tag = "base_domain_#{Facebooker.api_key}"
+        cookie_domain = ".#{cookies[domain_cookie_tag]}" if cookies[domain_cookie_tag]
+        fb_cookie_names.each {|name| cookies.delete(name, :domain=>cookie_domain)}
+        cookies.delete Facebooker.api_key
+      end
+ 
+      def fb_cookie_prefix
+        Facebooker.api_key+"_"
+      end
+
+      def fb_cookie_names
+        fb_cookie_names = cookies.keys.select{|k| k.starts_with?(fb_cookie_prefix)}
+      end
 
       def secure_with_cookies!
           api_key = ENV['FACEBOOK_API_KEY']
