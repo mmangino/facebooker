@@ -78,7 +78,7 @@ module Facebooker
         fb_cookie_names.each {|name| cookies.delete(name, :domain=>cookie_domain)}
         cookies.delete Facebooker.api_key
       end
- 
+
       def fb_cookie_prefix
         Facebooker.api_key+"_"
       end
@@ -88,21 +88,16 @@ module Facebooker
       end
 
       def secure_with_cookies!
-          api_key = ENV['FACEBOOK_API_KEY']
-          prefix = api_key+"_"
           parsed = {}
-
-          #find all str s.t. !cookies[key_str].nil, set param[str] = cookies[key_str]
-          cookies.keys.select{|k| k[0, prefix.size] == prefix}.each{ |k|
-             parsed[k[prefix.size,k.size]] = cookies[k]
-          }
+          
+          fb_cookie_names.each { |key| parsed[key[fb_cookie_prefix.size,key.size]] = cookies[key] }
  
           #returning gracefully if the cookies aren't set or have expired
           return unless parsed['session_key'] && parsed['user'] && parsed['expires'] && parsed['ss'] 
           return unless Time.at(parsed['expires'].to_f) > Time.now
           
           #if we have the unexpired cookies, we'll throw an exception if the sig doesn't verify
-          verify_signature(parsed,cookies[api_key])
+          verify_signature(parsed,cookies[Facebooker.api_key])
           
           @facebook_session = new_facebook_session
           @facebook_session.secure_with!(parsed['session_key'],parsed['user'],parsed['expires'],parsed['ss'])
