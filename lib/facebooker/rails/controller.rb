@@ -73,7 +73,8 @@ module Facebooker
       end
       
       def clear_fb_cookies!
-        fb_cookie_names.each {|name| cookies[name] = nil }
+        fb_cookie_names.each {|name| cookies.delete name}
+        cookies.delete Facebooker.api_key
       end
       
       def fb_cookie_prefix
