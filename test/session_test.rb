@@ -1,4 +1,4 @@
-recrerequire File.dirname(__FILE__) + '/test_helper.rb'
+require File.dirname(__FILE__) + '/test_helper.rb'
 
 class SessionTest < Test::Unit::TestCase
 
