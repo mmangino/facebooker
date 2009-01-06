@@ -78,7 +78,7 @@ module Facebooker
         fb_cookie_names.each {|name| cookies.delete(name, :domain=>cookie_domain)}
         cookies.delete Facebooker.api_key
       end
- 
+
       def fb_cookie_prefix
         Facebooker.api_key+"_"
       end
