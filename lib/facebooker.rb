@@ -67,7 +67,7 @@ module Facebooker
         ENV['FACEBOOKER_RELATIVE_URL_ROOT'] = facebooker['canvas_page_name']
         ENV['FACEBOOKER_API'] = facebooker['api']
         if Object.const_defined?("ActionController")
-          ActionController::Base.asset_host = facebooker['callback_url'] if(ActionController::Base.asset_host.blank?)
+          ActionController::Base.asset_host = facebooker['callback_url'] if(ActionController::Base.asset_host.blank?)  && facebooker['set_asset_host_to_callback_url']
         end
         @facebooker_configuration = facebooker
       end
