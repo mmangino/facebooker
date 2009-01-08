@@ -193,7 +193,11 @@ module Facebooker
       end
       
       def request_comes_from_facebook?
-        request_is_for_a_facebook_canvas? || request_is_facebook_ajax?
+        request_is_for_a_facebook_canvas? || request_is_facebook_ajax? || request_is_fb_ping?
+      end
+
+      def request_is_fb_ping?
+        !params['fb_sig'].blank?
       end
       
       def request_is_for_a_facebook_canvas?
