@@ -86,9 +86,9 @@ module Facebooker
       
      	#use __blank instead of nil so that this is cached
      	cache_key = flid||"__blank"
-     	params = {:uid => id}
-      params.merge! :flid => flid if flid
-      @friends_hash[cache_key] ||= @session.post('facebook.friends.get', params, false).map do |uid|
+     	options = {:uid=>@id}
+     	options[:flid] = flid unless flid.nil?
+     	@friends_hash[cache_key] ||= @session.post('facebook.friends.get', options,false).map do |uid|
           User.new(uid, @session)
       end
       @friends_hash[cache_key]
