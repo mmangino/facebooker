@@ -174,7 +174,11 @@ module Facebooker
           
           def hashed_content(klass, method)
             publisher = setup_publisher(klass,method)
-            Digest::MD5.hexdigest [publisher.one_line_story_templates, publisher.short_story_templates, publisher.full_story_template].to_json
+            # sort the Hash elements (in the short_story and full_story) before generating MD5
+            Digest::MD5.hexdigest [publisher.one_line_story_templates,
+               (publisher.short_story_templates and publisher.short_story_templates.collect{|ss| ss.to_a.sort_by{|e| e[0]}}),
+               (publisher.full_story_template and publisher.full_story_template.to_a.sort_by{|e| e[0]})
+               ].to_json
           end
           
           
