@@ -3,6 +3,7 @@ require File.dirname(__FILE__) + '/test_helper.rb'
 class FacebookCacheTest < Test::Unit::TestCase
   def setup
     @session = Facebooker::Session.create('apikey', 'secretkey')
+    Facebooker.use_curl=false
   end
   
   def test_can_ask_facebook_to_store_fbml_in_a_named_reference

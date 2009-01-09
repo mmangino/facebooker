@@ -19,37 +19,7 @@ end
 require 'zlib'
 require 'digest/md5'
 
-require 'facebooker/batch_request'
-require 'facebooker/feed'
-require 'facebooker/logging'
-require 'facebooker/model'
-require 'facebooker/parser'
-require 'facebooker/service'
-require 'facebooker/server_cache'
-require 'facebooker/data'
-require 'facebooker/admin'
-require 'facebooker/session'
-require 'facebooker/version'
-require 'facebooker/models/location'
-require 'facebooker/models/affiliation'
-require 'facebooker/models/album'
-require 'facebooker/models/education_info'
-require 'facebooker/models/work_info'
-require 'facebooker/models/event'
-require 'facebooker/models/group'
-require 'facebooker/models/notifications'
-require 'facebooker/models/page'
-require 'facebooker/models/photo'
-require 'facebooker/models/cookie'
-require 'facebooker/models/applicationproperties'
-require 'facebooker/models/tag'
-require 'facebooker/models/user'
-require 'facebooker/models/info_item'
-require 'facebooker/models/info_section'
-require 'facebooker/adapters/adapter_base'
-require 'facebooker/adapters/facebook_adapter'
-require 'facebooker/adapters/bebo_adapter'
-require 'facebooker/models/friend_list'
+
 
 module Facebooker
       
@@ -66,8 +36,9 @@ module Facebooker
         ENV['FACEBOOK_SECRET_KEY'] = facebooker['secret_key']
         ENV['FACEBOOKER_RELATIVE_URL_ROOT'] = facebooker['canvas_page_name']
         ENV['FACEBOOKER_API'] = facebooker['api']
+        Facebooker.timeout = facebooker['timeout']
         if Object.const_defined?("ActionController")
-          ActionController::Base.asset_host = facebooker['callback_url'] if(ActionController::Base.asset_host.blank?)
+          ActionController::Base.asset_host = facebooker['callback_url'] if(ActionController::Base.asset_host.blank?)  && facebooker['set_asset_host_to_callback_url']
         end
         @facebooker_configuration = facebooker
       end
@@ -102,7 +73,21 @@ module Facebooker
       current_adapter.is_for?(application_container)
     end
     
-   
+    def use_curl=(val)
+      @use_curl=val
+    end
+    
+    def use_curl?
+      @use_curl
+    end
+    
+    def timeout=(val)
+      @timeout = val.to_i
+    end
+    
+    def timeout
+      @timeout
+    end
    
     [:api_key,:secret_key, :www_server_base_url,:login_url_base,:install_url_base,:api_rest_path,:api_server_base,:api_server_base_url,:canvas_server_base].each do |delegated_method|
       define_method(delegated_method){ return current_adapter.send(delegated_method)}
@@ -141,3 +126,35 @@ module Facebooker
     end
   end
 end
+
+require 'facebooker/batch_request'
+require 'facebooker/feed'
+require 'facebooker/logging'
+require 'facebooker/model'
+require 'facebooker/parser'
+require 'facebooker/service'
+require 'facebooker/server_cache'
+require 'facebooker/data'
+require 'facebooker/admin'
+require 'facebooker/session'
+require 'facebooker/version'
+require 'facebooker/models/location'
+require 'facebooker/models/affiliation'
+require 'facebooker/models/album'
+require 'facebooker/models/education_info'
+require 'facebooker/models/work_info'
+require 'facebooker/models/event'
+require 'facebooker/models/group'
+require 'facebooker/models/notifications'
+require 'facebooker/models/page'
+require 'facebooker/models/photo'
+require 'facebooker/models/cookie'
+require 'facebooker/models/applicationproperties'
+require 'facebooker/models/tag'
+require 'facebooker/models/user'
+require 'facebooker/models/info_item'
+require 'facebooker/models/info_section'
+require 'facebooker/adapters/adapter_base'
+require 'facebooker/adapters/facebook_adapter'
+require 'facebooker/adapters/bebo_adapter'
+require 'facebooker/models/friend_list'

@@ -8,6 +8,7 @@ class SessionTest < Test::Unit::TestCase
     ENV['FACEBOOK_SECRET_KEY'] = '7654321'   
     Facebooker.current_adapter = nil 
     @session = Facebooker::Session.create('whatever', 'doesnotmatterintest')   
+    Facebooker.use_curl=false
   end
 
   def teardown
@@ -571,6 +572,31 @@ class SessionTest < Test::Unit::TestCase
       </standard_user_info>
     </users_getStandardInfo_response>
     XML
+  end
+end
+
+class PostMethodTest < Test::Unit::TestCase
+  
+  def setup
+    Facebooker.use_curl = true
+    Facebooker::Parser.stubs(:parse)
+    @uri = URI.parse("http://api.facebook.com/api")
+    @service = Facebooker::Service.new("a","b","c")
+    @service.stubs("url").returns(@uri)
+  end
+  
+  def teardown
+    Facebooker.use_curl = false
+  end
+  
+  def test_use_curl_makes_post_with_curl
+    @service.expects(:post_form_with_curl).with(@uri,{:method=>"a"})
+    @service.post(:method=>"a")
+  end
+  
+  def test_use_curl_makes_post_file_use_curl_with_multipart
+    @service.expects(:post_form_with_curl).with(@uri,{:method=>"a"},true)
+    @service.post_file(:method=>"a")    
   end
 end
 
