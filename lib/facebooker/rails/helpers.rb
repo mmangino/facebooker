@@ -589,10 +589,20 @@ module Facebooker
       
       #
       # Embed a discussion board named xid on the current page
-      # 
+      # <em>See</em http://wiki.developers.facebook.com/index.php/Fb:board for more details
+      # Options are:
+      #   * canpost
+      #   * candelete
+      #   * canmark
+      #   * cancreatet
+      #   * numtopics
+      #   * callbackurl
+      #   * returnurl
+      #
       def fb_board(xid,options={})
         options = options.dup
-        tag("fb:board",stringify_vals(options.merge(:xid=>xid)))
+        title = (title = options.delete(:title)) ? fb_title(title) : nil
+        content_tag("fb:board", title, stringify_vals(options.merge(:xid=>xid)))
       end
       
       def fb_add_profile_section
