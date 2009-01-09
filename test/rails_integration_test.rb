@@ -894,7 +894,10 @@ class RailsHelperTest < Test::Unit::TestCase
     assert_equal "<fb:comments candelete=\"false\" canpost=\"true\" numposts=\"4\" optional=\"false\" xid=\"xxx\"><fb:title>TITLE</fb:title></fb:comments>", @h.fb_comments("xxx",true,false,4,:optional=>false, :title => "TITLE") 
   end
   def test_fb_board
-    assert_equal "<fb:board optional=\"false\" xid=\"xxx\" />", @h.fb_board("xxx",:optional => false) 
+    assert_equal "<fb:board optional=\"false\" xid=\"xxx\"></fb:board>", @h.fb_board("xxx",:optional => false) 
+  end
+  def test_fb_board_with_title
+    assert_equal "<fb:board optional=\"false\" xid=\"xxx\"><fb:title>TITLE</fb:title></fb:board>", @h.fb_board("xxx",:optional=>false, :title => "TITLE") 
   end
   
   def test_fb_dashboard
