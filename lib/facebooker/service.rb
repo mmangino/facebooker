@@ -66,6 +66,7 @@ module Facebooker
       URI.parse('http://'+ @api_base + @api_path)
     end
     
+    # Net::HTTP::MultipartPostFile
     def multipart_post_file?(object)
       object.respond_to?(:content_type) &&
       object.respond_to?(:data) &&
@@ -75,7 +76,15 @@ module Facebooker
     def to_curb_params(params)
       parray = []
       params.each_pair do |k,v|
-        parray << (multipart_post_file?(v) ? Curl::PostField.file((k.nil? ? nil : k.to_s), v.filename.to_s) : Curl::PostField.content(k.to_s, v.to_s).to_s)
+        if multipart_post_file?(v)
+          # Curl doesn't like blank field names
+          field = Curl::PostField.file((k.blank? ? 'xxx' : k.to_s), nil, File.basename(v.filename))
+          field.content_type = v.content_type
+          field.content = v.data
+          parray << field
+        else
+          parray << Curl::PostField.content(k.to_s, v.to_s)
+        end
       end
       parray
     end

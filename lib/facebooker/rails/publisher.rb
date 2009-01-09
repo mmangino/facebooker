@@ -181,7 +181,6 @@ module Facebooker
                ].to_json
           end
           
-          
           def template_name(klass,method)
             "#{klass.name}::#{method}"
           end
