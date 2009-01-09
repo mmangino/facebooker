@@ -36,9 +36,12 @@ module Facebooker
         ENV['FACEBOOK_SECRET_KEY'] = facebooker['secret_key']
         ENV['FACEBOOKER_RELATIVE_URL_ROOT'] = facebooker['canvas_page_name']
         ENV['FACEBOOKER_API'] = facebooker['api']
+        if facebooker.has_key?('set_asset_host_to_callback_url')
+          Facebooker.set_asset_host_to_callback_url = facebooker['set_asset_host_to_callback_url'] 
+        end
         Facebooker.timeout = facebooker['timeout']
         if Object.const_defined?("ActionController")
-          ActionController::Base.asset_host = facebooker['callback_url'] if(ActionController::Base.asset_host.blank?)  && facebooker['set_asset_host_to_callback_url']
+          ActionController::Base.asset_host = facebooker['callback_url'] if(ActionController::Base.asset_host.blank?)  && Facebooker.set_asset_host_to_callback_url
         end
         @facebooker_configuration = facebooker
       end
@@ -71,6 +74,14 @@ module Facebooker
     
     def is_for?(application_container)
       current_adapter.is_for?(application_container)
+    end
+    
+    def set_asset_host_to_callback_url=(val)
+      @set_asset_host_to_callback_url=val
+    end
+    
+    def set_asset_host_to_callback_url
+      @set_asset_host_to_callback_url.nil? ? true : @set_asset_host_to_callback_url
     end
     
     def use_curl=(val)

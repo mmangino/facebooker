@@ -171,8 +171,35 @@ module Facebooker
       session.get_photos(nil, nil, profile_pic_album_id)
     end
     
-    def upload_photo(multipart_post_file)
-      Photo.from_hash(session.post_file('facebook.photos.upload', {nil => multipart_post_file}))
+    # Upload a photo to the user's profile.
+    #
+    # In your view, create a multipart form that posts directly to your application (not through canvas):
+    #
+    #   <% form_tag photos_url(:canvas => false), :html => {:multipart => true, :promptpermission => 'photo_upload'} do %>
+    #     Photo: <%= file_field_tag 'photo' %>
+    #     Caption: <%= text_area_tag 'caption' %>
+    #     <%= submit_tag 'Upload Photo', :class => 'inputsubmit' %>
+    #   <% end %>
+    # 
+    # And in your controller: 
+    #
+    #   class PhotosController < ApplicationController
+    #     def create
+    #       file = Net::HTTP::MultipartPostFile.new(
+    #         params[:photo].original_filename,
+    #         params[:photo].content_type,
+    #         params[:photo].read
+    #       )
+    #     
+    #       @photo = facebook_session.user.upload_photo(file, :caption => params[:caption])
+    #       redirect_to photos_url(:canvas => true)
+    #     end
+    #   end
+    #
+    # Options correspond to http://wiki.developers.facebook.com/index.php/Photos.upload
+    def upload_photo(multipart_post_file, options = {})
+      Photo.from_hash(session.post_file('facebook.photos.upload',
+        options.merge(nil => multipart_post_file)))
     end
     
     def profile_fbml
