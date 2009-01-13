@@ -55,6 +55,22 @@ Your application users will need to have added the application in facebook to ac
 
 to your application controller.
 
+== using MemCache session
+
+Facebook uses some non alphanum characters in the session identifier which interfere with memcache stored sessions. If you want to use MemCache for storing sessions, you can override the valid session id method on memcache by placing the following code in an initializer:
+
+# add - as an okay key
+class CGI
+  class Session
+    class MemCacheStore
+      def check_id(id) #:nodoc:#
+        /[^0-9a-zA-Z\-\._]+/ =~ id.to_s ? false : true
+      end
+    end
+  end
+end
+
+
 == LICENSE:
 
 (The MIT License)
