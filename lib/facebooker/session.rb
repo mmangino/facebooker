@@ -211,13 +211,13 @@ module Facebooker
     end
 
     def users_standard(user_ids, fields=[])
-      post("facebook.users.getStandardInfo",:uids=>user_ids.join(","),:fields=>User.user_fields(fields)) do |users|
+      post("facebook.users.getStandardInfo",:uids=>user_ids.join(","),:fields=>User.standard_fields(fields)) do |users|
         users.map { |u| User.new(u)}
       end
     end
 
     def users(user_ids, fields=[])
-      post("facebook.users.getInfo",:uids=>user_ids.join(","),:fields=>User.standard_fields(fields)) do |users|
+      post("facebook.users.getInfo",:uids=>user_ids.join(","),:fields=>User.user_fields(fields)) do |users|
         users.map { |u| User.new(u)}
       end
     end
