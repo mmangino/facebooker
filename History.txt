@@ -1,5 +1,6 @@
-=== x.x.x / 2008-xx-xx
+=== x.x.x / 2009-xx-xx
 
+* Modified fql_query to return results as Hashes as a last resort [Alan Larkin]
 * fixed typo in set app properties parser [Andrew Grim, shane]
 * Removed actor_id param from templatized feed [shane]
 * Added admin.get_allocation [shane]

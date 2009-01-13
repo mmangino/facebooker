@@ -178,8 +178,10 @@ module Facebooker
             Photo.from_hash(hash)
           when 'event_member'
             Event::Attendance.from_hash(hash)
+          else
+            hash
           end
-        end        
+        end
       end
     end
     
