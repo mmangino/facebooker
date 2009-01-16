@@ -1140,6 +1140,8 @@ class RailsUrlHelperExtensionsTest < Test::Unit::TestCase
     @title = "Confirm Request"
     @style = {:color => 'black', :background => 'white'}
     @verbose_style = "{background: 'white', color: 'black'}"
+    @default_okay = "Okay"
+    @default_cancel = "Cancel"
     @default_style = "" #"'width','200px'"
   end
 
@@ -1152,19 +1154,19 @@ class RailsUrlHelperExtensionsTest < Test::Unit::TestCase
   end
 
   def test_link_to_with_confirm
-    assert_dom_equal( "<a href=\"#{@url}\" onclick=\"var dlg = new Dialog().showChoice(\'#{@default_title}\',\'#{@prompt}\').setStyle(#{@default_style});"+
+    assert_dom_equal( "<a href=\"#{@url}\" onclick=\"var dlg = new Dialog().showChoice(\'#{@default_title}\',\'#{@prompt}\',\'#{@default_okay}\',\'#{@default_cancel}\').setStyle(#{@default_style});"+
                  "var a=this;dlg.onconfirm = function() { " + 
                  "document.setLocation(a.getHref()); };return false;\">#{@label}</a>",
                   @u.link_to(@label, @url, :confirm => @prompt) )
   end
   def test_link_to_with_confirm_with_title
-    assert_dom_equal( "<a href=\"#{@url}\" onclick=\"var dlg = new Dialog().showChoice(\'#{@title}\',\'#{@prompt}\').setStyle(#{@default_style});"+
+    assert_dom_equal( "<a href=\"#{@url}\" onclick=\"var dlg = new Dialog().showChoice(\'#{@title}\',\'#{@prompt}\',\'#{@default_okay}\',\'#{@default_cancel}\').setStyle(#{@default_style});"+
                  "var a=this;dlg.onconfirm = function() { " + 
                  "document.setLocation(a.getHref()); };return false;\">#{@label}</a>",
                   @u.link_to(@label, @url, :confirm => {:title=>@title,:content=>@prompt}) )
   end
   def test_link_to_with_confirm_with_title_and_style
-    assert_dom_equal( "<a href=\"#{@url}\" onclick=\"var dlg = new Dialog().showChoice(\'#{@title}\',\'#{@prompt}\').setStyle(#{@verbose_style});"+
+    assert_dom_equal( "<a href=\"#{@url}\" onclick=\"var dlg = new Dialog().showChoice(\'#{@title}\',\'#{@prompt}\',\'#{@default_okay}\',\'#{@default_cancel}\').setStyle(#{@verbose_style});"+
                  "var a=this;dlg.onconfirm = function() { " + 
                  "document.setLocation(a.getHref()); };return false;\">#{@label}</a>",
                   @u.link_to(@label, @url, :confirm => {:title=>@title,:content=>@prompt}.merge!(@style)) )
@@ -1179,7 +1181,7 @@ class RailsUrlHelperExtensionsTest < Test::Unit::TestCase
   end
 
   def test_link_to_with_confirm_and_method
-    assert_dom_equal( "<a href=\"#{@url}\" onclick=\"var dlg = new Dialog().showChoice(\'#{@default_title}\',\'#{@prompt}\').setStyle(#{@default_style});"+
+    assert_dom_equal( "<a href=\"#{@url}\" onclick=\"var dlg = new Dialog().showChoice(\'#{@default_title}\',\'#{@prompt}\',\'#{@default_okay}\',\'#{@default_cancel}\').setStyle(#{@default_style});"+
                  "var a=this;dlg.onconfirm = function() { " + 
                  "var f = document.createElement('form'); f.setStyle('display','none'); "+
                  "a.getParentNode().appendChild(f); f.setMethod('POST'); f.setAction(a.getHref());" +
@@ -1202,7 +1204,7 @@ class RailsUrlHelperExtensionsTest < Test::Unit::TestCase
 
   def test_button_to_with_confirm
     assert_equal "<form method=\"post\" action=\"#{@url}\" class=\"button-to\"><div>" +
-                 "<input onclick=\"var dlg = new Dialog().showChoice(\'#{@default_title}\',\'#{@prompt}\').setStyle(#{@default_style});"+
+                 "<input onclick=\"var dlg = new Dialog().showChoice(\'#{@default_title}\',\'#{@prompt}\',\'#{@default_okay}\',\'#{@default_cancel}\').setStyle(#{@default_style});"+
                  "var a=this;dlg.onconfirm = function() { "+
                  "a.getForm().submit(); };return false;\" type=\"submit\" value=\"#{@label}\" /></div></form>", 
                  @u.button_to(@label,@url, :confirm=>@prompt)
