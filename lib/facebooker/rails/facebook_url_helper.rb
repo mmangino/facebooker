@@ -124,23 +124,24 @@ module ActionView
 	# link_to("Facebooker", "http://rubyforge.org/projects/facebooker", :confirm=>"Go to Facebooker?")
 	# link_to("Facebooker", "http://rubyforge.org/projects/facebooker", :confirm=>{:title=>"the page says:, :content=>"Go to Facebooker?"})
 	# link_to("Facebooker", "http://rubyforge.org/projects/facebooker", :confirm=>{:title=>"the page says:, :content=>"Go to Facebooker?", :color=>"pink"})
-        def confirm_javascript_function_with_facebooker(confirm, fun = nil)
-          if !request_comes_from_facebook?
-            confirm_javascript_function_without_facebooker(confirm)
- 	  else
-  	    if(confirm.is_a?(Hash))
-                confirm_options = confirm.stringify_keys
-		title = confirm_options.delete("title") || "Please Confirm"
-		content = confirm_options.delete("content") || "Are you sure?"
-		style = confirm_options.empty? ? "" : convert_options_to_css(confirm_options)
-  	    else
-	      title,content,style = 'Please Confirm', confirm, ""
+  def confirm_javascript_function_with_facebooker(confirm, fun = nil)
+    if !request_comes_from_facebook?
+      confirm_javascript_function_without_facebooker(confirm)
+    else
+      if(confirm.is_a?(Hash))
+        confirm_options = confirm.stringify_keys
+		    title = confirm_options.delete("title") || "Please Confirm"
+		    content = confirm_options.delete("content") || "Are you sure?"
+		    button_confirm = confirm_options.delete("button_confirm") || "Okay"
+		    button_cancel = confirm_options.delete("button_cancel") || "Cancel"
+		    style = confirm_options.empty? ? "" : convert_options_to_css(confirm_options)
+	    else
+	      title,content,style,button_confirm,button_cancel = 'Please Confirm', confirm, "", "Okay", "Cancel"
 	    end
-
-            "var dlg = new Dialog().showChoice('#{escape_javascript(title.to_s)}','#{escape_javascript(content.to_s)}').setStyle(#{style});"+
+      "var dlg = new Dialog().showChoice('#{escape_javascript(title.to_s)}','#{escape_javascript(content.to_s)}','#{escape_javascript(button_confirm.to_s)}','#{escape_javascript(button_cancel.to_s)}').setStyle(#{style});"+
 	    "var a=this;dlg.onconfirm = function() { #{fun ? fun : 'document.setLocation(a.getHref());'} };"
 	  end
-        end
+  end
 
 	alias_method_chain :confirm_javascript_function, :facebooker
 
