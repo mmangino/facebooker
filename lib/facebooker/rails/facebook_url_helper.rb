@@ -90,9 +90,9 @@ module ActionView
 	# Altered to throw an error on :popup and sanitize the javascript
 	# for Facebook.
         def convert_options_to_javascript_with_facebooker!(html_options, url ='')
-          if !respond_to?(:request_comes_from_facebooker?) || !request_comes_from_facebook?
+          if !respond_to?(:request_comes_from_facebook?) || !request_comes_from_facebook?
             convert_options_to_javascript_without_facebooker!(html_options,url)
-   	  else
+   	      else
             confirm, popup = html_options.delete("confirm"), html_options.delete("popup")
 
             method, href = html_options.delete("method"), html_options['href']

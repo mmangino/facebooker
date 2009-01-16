@@ -542,6 +542,9 @@ class RailsHelperTest < Test::Unit::TestCase
     def url_for(arg)
       arg
     end
+    def request
+      ActionController::TestRequest.new
+    end
     def fields_for(*args)
       ""
     end
@@ -1097,6 +1100,14 @@ class RailsUrlHelperExtensionsTest < Test::Unit::TestCase
     def protect_against_forgery?
        false
     end
+    
+    def request_comes_from_facebook?
+      @request_comes_from_facebook
+    end
+    
+    def request_comes_from_facebook=(val)
+      @request_comes_from_facebook = val
+    end
 
   end 
   class UrlHelperExtensionsController < NoisyController    
@@ -1117,10 +1128,10 @@ class RailsUrlHelperExtensionsTest < Test::Unit::TestCase
     @response   = ActionController::TestResponse.new
 
     @u = UrlHelperExtensionsClass.new(@controller)
-    @u.stubs(:request_comes_from_facebook?).returns(true)
+    @u.request_comes_from_facebook = true
     
     @non_canvas_u = UrlHelperExtensionsClass.new(@controller)
-    @non_canvas_u.stubs(:request_comes_from_facebook?).returns(false)
+    @non_canvas_u.request_comes_from_facebook = false
     
     @label = "Testing"
     @url = "test.host"
