@@ -396,6 +396,9 @@ module Facebooker
         returning ActionView::Base.new([template_root,controller_root], assigns, self) do |template|
           template.controller=self
           template.extend(self.class.master_helper_module)
+          def template.request_comes_from_facebook?
+            true
+          end
         end
       end
   
