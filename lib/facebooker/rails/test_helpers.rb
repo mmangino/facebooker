@@ -34,11 +34,6 @@ module Facebooker
         send verb, path, params
       end
       
-      def facebook_post(path, params={}, fb_params=facebook_parameters)
-        params = fb_params.merge(:canvas => true).merge(params)
-        post path, params    
-      end
-      
       def facebook_parameters(overrides=nil)
         overrides ||= {}
         params = default_facebook_parameters.merge(overrides)
