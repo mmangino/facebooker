@@ -39,6 +39,10 @@ module Facebooker
       end     
     end
 
+    def uid
+      @id
+    end
+
     # Returns a user's events, params correspond to API call parameters (except UID):
     # http://wiki.developers.facebook.com/index.php/Events.get
     # E.g:

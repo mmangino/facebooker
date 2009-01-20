@@ -27,6 +27,11 @@ class UserTest < Test::Unit::TestCase
   def test_can_ask_user_if_he_or_she_is_friends_with_another_user_by_user_id
     assert(@user.friends_with?(@other_user.id))
   end
+
+  def test_does_not_query_facebook_for_uid
+    @session.expects(:post).never
+    assert_equal 1234, Facebooker::User.new(1234, @session).uid
+  end
   
   def test_cast_to_friend_list_id_with_nil
     assert_nil @user.cast_to_friend_list_id(nil)
