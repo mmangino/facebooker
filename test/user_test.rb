@@ -32,6 +32,17 @@ class UserTest < Test::Unit::TestCase
     @session.expects(:post).never
     assert_equal 1234, Facebooker::User.new(1234, @session).uid
   end
+
+  def test_uid_is_always_an_integer
+    assert_equal 1234, Facebooker::User.new(:uid => "1234").uid
+    assert_equal 1234, Facebooker::User.new(:id  => "1234").uid
+    
+    assert_equal 1234, Facebooker::User.new(:uid => "1234").id
+    assert_equal 1234, Facebooker::User.new(:id  => "1234").id
+    
+    assert_equal 1234, Facebooker::User.new(:uid => "1234").facebook_id
+    assert_equal 1234, Facebooker::User.new(:id  => "1234").facebook_id
+  end
   
   def test_cast_to_friend_list_id_with_nil
     assert_nil @user.cast_to_friend_list_id(nil)
