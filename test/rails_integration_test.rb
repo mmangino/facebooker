@@ -542,6 +542,9 @@ class RailsHelperTest < Test::Unit::TestCase
     def url_for(arg)
       arg
     end
+    def request
+      ActionController::TestRequest.new
+    end
     def fields_for(*args)
       ""
     end
@@ -894,7 +897,10 @@ class RailsHelperTest < Test::Unit::TestCase
     assert_equal "<fb:comments candelete=\"false\" canpost=\"true\" numposts=\"4\" optional=\"false\" xid=\"xxx\"><fb:title>TITLE</fb:title></fb:comments>", @h.fb_comments("xxx",true,false,4,:optional=>false, :title => "TITLE") 
   end
   def test_fb_board
-    assert_equal "<fb:board optional=\"false\" xid=\"xxx\" />", @h.fb_board("xxx",:optional => false) 
+    assert_equal "<fb:board optional=\"false\" xid=\"xxx\"></fb:board>", @h.fb_board("xxx",:optional => false) 
+  end
+  def test_fb_board_with_title
+    assert_equal "<fb:board optional=\"false\" xid=\"xxx\"><fb:title>TITLE</fb:title></fb:board>", @h.fb_board("xxx",:optional=>false, :title => "TITLE") 
   end
   
   def test_fb_dashboard
@@ -1094,6 +1100,14 @@ class RailsUrlHelperExtensionsTest < Test::Unit::TestCase
     def protect_against_forgery?
        false
     end
+    
+    def request_comes_from_facebook?
+      @request_comes_from_facebook
+    end
+    
+    def request_comes_from_facebook=(val)
+      @request_comes_from_facebook = val
+    end
 
   end 
   class UrlHelperExtensionsController < NoisyController    
@@ -1114,10 +1128,10 @@ class RailsUrlHelperExtensionsTest < Test::Unit::TestCase
     @response   = ActionController::TestResponse.new
 
     @u = UrlHelperExtensionsClass.new(@controller)
-    @u.stubs(:request_comes_from_facebook?).returns(true)
+    @u.request_comes_from_facebook = true
     
     @non_canvas_u = UrlHelperExtensionsClass.new(@controller)
-    @non_canvas_u.stubs(:request_comes_from_facebook?).returns(false)
+    @non_canvas_u.request_comes_from_facebook = false
     
     @label = "Testing"
     @url = "test.host"
@@ -1126,6 +1140,8 @@ class RailsUrlHelperExtensionsTest < Test::Unit::TestCase
     @title = "Confirm Request"
     @style = {:color => 'black', :background => 'white'}
     @verbose_style = "{background: 'white', color: 'black'}"
+    @default_okay = "Okay"
+    @default_cancel = "Cancel"
     @default_style = "" #"'width','200px'"
   end
 
@@ -1138,19 +1154,19 @@ class RailsUrlHelperExtensionsTest < Test::Unit::TestCase
   end
 
   def test_link_to_with_confirm
-    assert_dom_equal( "<a href=\"#{@url}\" onclick=\"var dlg = new Dialog().showChoice(\'#{@default_title}\',\'#{@prompt}\').setStyle(#{@default_style});"+
+    assert_dom_equal( "<a href=\"#{@url}\" onclick=\"var dlg = new Dialog().showChoice(\'#{@default_title}\',\'#{@prompt}\',\'#{@default_okay}\',\'#{@default_cancel}\').setStyle(#{@default_style});"+
                  "var a=this;dlg.onconfirm = function() { " + 
                  "document.setLocation(a.getHref()); };return false;\">#{@label}</a>",
                   @u.link_to(@label, @url, :confirm => @prompt) )
   end
   def test_link_to_with_confirm_with_title
-    assert_dom_equal( "<a href=\"#{@url}\" onclick=\"var dlg = new Dialog().showChoice(\'#{@title}\',\'#{@prompt}\').setStyle(#{@default_style});"+
+    assert_dom_equal( "<a href=\"#{@url}\" onclick=\"var dlg = new Dialog().showChoice(\'#{@title}\',\'#{@prompt}\',\'#{@default_okay}\',\'#{@default_cancel}\').setStyle(#{@default_style});"+
                  "var a=this;dlg.onconfirm = function() { " + 
                  "document.setLocation(a.getHref()); };return false;\">#{@label}</a>",
                   @u.link_to(@label, @url, :confirm => {:title=>@title,:content=>@prompt}) )
   end
   def test_link_to_with_confirm_with_title_and_style
-    assert_dom_equal( "<a href=\"#{@url}\" onclick=\"var dlg = new Dialog().showChoice(\'#{@title}\',\'#{@prompt}\').setStyle(#{@verbose_style});"+
+    assert_dom_equal( "<a href=\"#{@url}\" onclick=\"var dlg = new Dialog().showChoice(\'#{@title}\',\'#{@prompt}\',\'#{@default_okay}\',\'#{@default_cancel}\').setStyle(#{@verbose_style});"+
                  "var a=this;dlg.onconfirm = function() { " + 
                  "document.setLocation(a.getHref()); };return false;\">#{@label}</a>",
                   @u.link_to(@label, @url, :confirm => {:title=>@title,:content=>@prompt}.merge!(@style)) )
@@ -1165,7 +1181,7 @@ class RailsUrlHelperExtensionsTest < Test::Unit::TestCase
   end
 
   def test_link_to_with_confirm_and_method
-    assert_dom_equal( "<a href=\"#{@url}\" onclick=\"var dlg = new Dialog().showChoice(\'#{@default_title}\',\'#{@prompt}\').setStyle(#{@default_style});"+
+    assert_dom_equal( "<a href=\"#{@url}\" onclick=\"var dlg = new Dialog().showChoice(\'#{@default_title}\',\'#{@prompt}\',\'#{@default_okay}\',\'#{@default_cancel}\').setStyle(#{@default_style});"+
                  "var a=this;dlg.onconfirm = function() { " + 
                  "var f = document.createElement('form'); f.setStyle('display','none'); "+
                  "a.getParentNode().appendChild(f); f.setMethod('POST'); f.setAction(a.getHref());" +
@@ -1188,7 +1204,7 @@ class RailsUrlHelperExtensionsTest < Test::Unit::TestCase
 
   def test_button_to_with_confirm
     assert_equal "<form method=\"post\" action=\"#{@url}\" class=\"button-to\"><div>" +
-                 "<input onclick=\"var dlg = new Dialog().showChoice(\'#{@default_title}\',\'#{@prompt}\').setStyle(#{@default_style});"+
+                 "<input onclick=\"var dlg = new Dialog().showChoice(\'#{@default_title}\',\'#{@prompt}\',\'#{@default_okay}\',\'#{@default_cancel}\').setStyle(#{@default_style});"+
                  "var a=this;dlg.onconfirm = function() { "+
                  "a.getForm().submit(); };return false;\" type=\"submit\" value=\"#{@label}\" /></div></form>", 
                  @u.button_to(@label,@url, :confirm=>@prompt)

@@ -524,20 +524,52 @@ module Facebooker
       
       #
       # Embed a discussion board named xid on the current page
-      # 
+      # <em>See</em http://wiki.developers.facebook.com/index.php/Fb:board for more details
+      # Options are:
+      #   * canpost
+      #   * candelete
+      #   * canmark
+      #   * cancreatet
+      #   * numtopics
+      #   * callbackurl
+      #   * returnurl
+      #
       def fb_board(xid,options={})
         options = options.dup
-        tag("fb:board",stringify_vals(options.merge(:xid=>xid)))
+        title = (title = options.delete(:title)) ? fb_title(title) : nil
+        content_tag("fb:board", title, stringify_vals(options.merge(:xid=>xid)))
       end
       
+      # Renders an 'Add to Profile' button
+      # The button allows a user to add condensed profile box to the main profile
       def fb_add_profile_section
         tag "fb:add-section-button",:section=>"profile"
       end
       
+      # Renders an 'Add to Info' button
+      # The button allows a user to add an application info section to her Info tab
       def fb_add_info_section
         tag "fb:add-section-button",:section=>"info"
       end
       
+      # Renders a link that, when clicked, initiates a dialog requesting the specified extended permission from the user.
+      # 
+      # You can prompt a user with the following permissions:
+      #   * email
+      #   * offline_access
+      #   * status_update
+      #   * photo_upload
+      #   * create_listing
+      #   * create_event
+      #   * rsvp_event
+      #   * sms
+      # 
+      # Example:
+      # <%= fb_prompt_permission('email', "Would you like to receive email from our application?" ) %>
+      #
+      # See http://wiki.developers.facebook.com/index.php/Fb:prompt-permission for 
+      # more details
+      #
       def fb_prompt_permission(permission,message,callback=nil)
         raise(ArgumentError, "Unknown value for permission: #{permission}") unless VALID_PERMISSIONS.include?(permission.to_sym)
         args={:perms=>permission}
@@ -545,22 +577,29 @@ module Facebooker
         content_tag("fb:prompt-permission",message,args)
       end
       
+      # Renders an <fb:eventlink /> tag that displays the event name and links to the event's page. 
       def fb_eventlink(eid)
         content_tag "fb:eventlink",nil,:eid=>eid
       end
       
+      # Renders an <fb:grouplink /> tag that displays the group name and links to the group's page. 
       def fb_grouplink(gid)
         content_tag "fb:grouplink",nil,:gid=>gid
       end
       
+      # Returns the status of the user
       def fb_user_status(user,linked=true)
         content_tag "fb:user-status",nil,stringify_vals(:uid=>cast_to_facebook_id(user), :linked=>linked)
       end
       
+      # Renders a standard 'Share' button for the specified URL.
       def fb_share_button(url)
         content_tag "fb:share-button",nil,:class=>"url",:href=>url
       end
       
+      # Renders the FBML on a Facebook server inside an iframe.
+      #
+      # Meant to be used for a Facebook Connect site or an iframe application
       def fb_serverfbml(options={},&proc)
         inner = capture(&proc)
         concat(content_tag("fb:serverfbml",inner,options),&proc.binding)

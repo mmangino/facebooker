@@ -31,7 +31,7 @@ class CGI
       def initialize(request, option={})
         @request = request
         @initialization_options = option
-        option['session_id'] = set_session_id
+        option['session_id'] ||= set_session_id
         initialize_aliased_by_facebooker(request, option)
       end
       
