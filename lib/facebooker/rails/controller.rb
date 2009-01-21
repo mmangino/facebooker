@@ -101,6 +101,7 @@ module Facebooker
           
           @facebook_session = new_facebook_session
           @facebook_session.secure_with!(parsed['session_key'],parsed['user'],parsed['expires'],parsed['ss'])
+          session[:facebook_session] = @facebook_session
       end
     
       def secure_with_token!
