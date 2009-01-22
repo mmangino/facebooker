@@ -78,11 +78,11 @@ module Facebooker
     end
     
     def self.current
-      @current_session
+      Thread.current['facebook_session']
     end
     
     def self.current=(session)
-      @current_session=session
+      Thread.current['facebook_session'] = session
     end
     
     def login_url(options={})
