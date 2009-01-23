@@ -71,6 +71,10 @@ class UserTest < Test::Unit::TestCase
     user=Facebooker::User.new(1)
     assert_equal("current",user.session)
   end
+
+  def test_raises_when_no_session_bound
+    assert_raises(Facebooker::Model::UnboundSessionException) { Facebooker::User.new(1, nil).populate }
+  end
   
   def test_can_set_mobile_fbml
     @user.expects(:set_profile_fbml).with(nil,"test",nil)
