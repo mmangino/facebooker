@@ -38,17 +38,8 @@ module Facebooker
       end     
     end
 
-    def uid
-      @uid
-    end
-
-    def uid=(uid)
-      @uid = uid.to_i
-    end
-
-    alias :id :uid
-    alias :id= :uid=
-    alias :facebook_id :uid
+    id_is :uid
+    alias :facebook_id :id
 
     # Returns a user's events, params correspond to API call parameters (except UID):
     # http://wiki.developers.facebook.com/index.php/Events.get

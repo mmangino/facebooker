@@ -6,6 +6,8 @@ module Facebooker
     include Model
     attr_accessor :flid, :name
     
+    id_is :flid
+
     # We need this to be an integer, so do the conversion
     def flid=(f)
       @flid= ( f.nil? ? nil : f.to_i)
