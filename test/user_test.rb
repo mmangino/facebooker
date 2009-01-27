@@ -147,7 +147,7 @@ class UserTest < Test::Unit::TestCase
     @user = Facebooker::User.new(9507801, @session)
     expect_http_posts_with_responses(example_events_get_xml)
     events = @user.events
-    assert_equal "29511517904", events.first.eid
+    assert_equal 29511517904, events.first.eid
   end
 
   def test_events_caching_honors_params
