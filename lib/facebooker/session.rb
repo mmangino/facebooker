@@ -537,7 +537,7 @@ module Facebooker
       end
       
       def uid?
-        !! uid
+        !! @uid
       end
       
       def signature_for(params)
