@@ -4,7 +4,11 @@ module Facebooker
       module FbConnect
         
         def fb_connect_javascript_tag
-          javascript_include_tag "http://static.ak.connect.facebook.com/js/api_lib/v0.4/FeatureLoader.js.php"
+          if request.ssl?
+            javascript_include_tag "https://www.connect.facebook.com/js/api_lib/v0.4/FeatureLoader.js.php"
+          else
+            javascript_include_tag "http://static.ak.connect.facebook.com/js/api_lib/v0.4/FeatureLoader.js.php"
+          end
         end
         
         def init_fb_connect(*required_features)

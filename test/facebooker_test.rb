@@ -97,7 +97,14 @@ class TestFacebooker < Test::Unit::TestCase
     assert_equal('I rule', friend.status.message)
     assert_equal(nil, friend.hometown_location)
   end
-
+  
+  def test_can_handle_nil_data
+    friends = populate_session_friends_with_nil_data
+    friend = friends.detect{|f| f.id ==  222333}
+    assert_equal(nil,friend.current_location)
+    assert_equal(nil,friend.pic) 
+  end
+  
   def test_session_can_expire_on_server_and_client_handles_appropriately
     expect_http_posts_with_responses(example_session_expired_error_response)
     assert_raises(Facebooker::Session::SessionExpired) {
@@ -217,6 +224,7 @@ class TestFacebooker < Test::Unit::TestCase
     photos = @session.get_photos([97503428461115590, 97503428461115573])
     assert_equal 2, photos.size
     assert_equal "Rooftop barbecues make me act funny", photos.first.caption
+    assert_equal 97503428461115590, photos[0].id
   end
   
   def test_can_get_photos_by_subject_and_album
@@ -355,7 +363,12 @@ class TestFacebooker < Test::Unit::TestCase
     expect_http_posts_with_responses(example_friends_xml, example_limited_user_info_xml)
     @session.user.friends!(:affiliations, :status, :meeting_for)
   end
-  
+     
+  def populate_session_friends_with_nil_data
+    expect_http_posts_with_responses(example_friends_xml, example_nil_user_info_xml)
+    @session.user.friends!(:name, :current_location, :pic)
+  end
+    
   def sample_args_to_post
     {:method=>"facebook.auth.createToken", :sig=>"18b3dc4f5258a63c0ad641eebd3e3930"}
   end
@@ -631,6 +644,21 @@ class TestFacebooker < Test::Unit::TestCase
          <uid>1240079</uid>
          <activities>Party.</activities>       
        </user>
+    </users_getInfo_response>    
+    XML
+  end
+
+  
+  def example_nil_user_info_xml
+    <<-XML
+    <?xml version="1.0" encoding="UTF-8"?>
+    <users_getInfo_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd" list="true">
+      <user>
+        <uid>222333</uid>
+        <name>Kevin Lochner</name>
+        <current_location xsi:nil="true"/>
+        <pic xsi:nil="true"/>
+      </user>
     </users_getInfo_response>    
     XML
   end

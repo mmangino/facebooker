@@ -58,23 +58,23 @@ module Facebooker
     
     def self.hashinate(response_element)
       response_element.children.reject{|c| c.kind_of? REXML::Text}.inject({}) do |hash, child|
-        # If the node hasn't any child, and is not a list, we want empty strings, not empty hashes.
-        hash[child.name] = if (child.children.size == 1 && child.children.first.kind_of?(REXML::Text)) || (child.children.size == 0 && child.attributes['list'] != 'true')
+        # If the node hasn't any child, and is not a list, we want empty strings, not empty hashes,
+        #   except if attributes['nil'] == true
+        hash[child.name] = 
+        if (child.attributes['nil'] == 'true')
+          nil 
+        elsif (child.children.size == 1 && child.children.first.kind_of?(REXML::Text)) || (child.children.size == 0 && child.attributes['list'] != 'true')
           anonymous_field_from(child, hash) || child.text_value
+        elsif child.attributes['list'] == 'true'
+          child.children.reject{|c| c.kind_of? REXML::Text}.map { |subchild| hash_or_value_for(subchild)}    
         else
-          if child.attributes['list'] == 'true'
-            child.children.reject{|c| c.kind_of? REXML::Text}.map do |subchild| 
-                hash_or_value_for(subchild)
-            end     
-          else
-            child.children.reject{|c| c.kind_of? REXML::Text}.inject({}) do |subhash, subchild|
-              subhash[subchild.name] = hash_or_value_for(subchild)
-              subhash
-            end
+          child.children.reject{|c| c.kind_of? REXML::Text}.inject({}) do |subhash, subchild|
+            subhash[subchild.name] = hash_or_value_for(subchild)
+            subhash
           end
-        end
+        end #if (child.attributes)
         hash
-      end      
+      end #do |hash, child|      
     end
     
     def self.anonymous_field_from(child, hash)

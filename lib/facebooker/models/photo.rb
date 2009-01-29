@@ -6,5 +6,7 @@ module Facebooker
                   :link, :caption, :created,
                   :src, :src_big, :src_small,
                   :story_fbid
+
+    id_is :pid
   end
 end

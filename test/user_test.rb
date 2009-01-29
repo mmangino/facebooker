@@ -27,6 +27,22 @@ class UserTest < Test::Unit::TestCase
   def test_can_ask_user_if_he_or_she_is_friends_with_another_user_by_user_id
     assert(@user.friends_with?(@other_user.id))
   end
+
+  def test_does_not_query_facebook_for_uid
+    @session.expects(:post).never
+    assert_equal 1234, Facebooker::User.new(1234, @session).uid
+  end
+
+  def test_uid_is_always_an_integer
+    assert_equal 1234, Facebooker::User.new(:uid => "1234").uid
+    assert_equal 1234, Facebooker::User.new(:id  => "1234").uid
+    
+    assert_equal 1234, Facebooker::User.new(:uid => "1234").id
+    assert_equal 1234, Facebooker::User.new(:id  => "1234").id
+    
+    assert_equal 1234, Facebooker::User.new(:uid => "1234").facebook_id
+    assert_equal 1234, Facebooker::User.new(:id  => "1234").facebook_id
+  end
   
   def test_cast_to_friend_list_id_with_nil
     assert_nil @user.cast_to_friend_list_id(nil)
@@ -54,6 +70,10 @@ class UserTest < Test::Unit::TestCase
     Facebooker::Session.expects(:current).returns("current")
     user=Facebooker::User.new(1)
     assert_equal("current",user.session)
+  end
+
+  def test_raises_when_no_session_bound
+    assert_raises(Facebooker::Model::UnboundSessionException) { Facebooker::User.new(1, nil).populate }
   end
   
   def test_can_set_mobile_fbml
@@ -127,7 +147,7 @@ class UserTest < Test::Unit::TestCase
     @user = Facebooker::User.new(9507801, @session)
     expect_http_posts_with_responses(example_events_get_xml)
     events = @user.events
-    assert_equal "29511517904", events.first.eid
+    assert_equal 29511517904, events.first.eid
   end
 
   def test_events_caching_honors_params

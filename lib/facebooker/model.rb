@@ -77,6 +77,18 @@ module Facebooker
           end)
         end
       end      
+
+      def id_is(attribute)
+        class_eval <<-EOS
+        def #{attribute}=(value)
+          @#{attribute} = value.to_i
+        end
+
+        attr_reader #{attribute.inspect}
+        alias :id #{attribute.inspect}
+        alias :id= #{"#{attribute}=".to_sym.inspect}
+        EOS
+      end
     end
     
     ##

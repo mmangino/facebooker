@@ -10,6 +10,7 @@ module Facebooker
     include Model
     attr_accessor :pic, :pic_small, :pic_big, :name, :creator, :recent_news, :gid, :update_time, :group_subtype, :group_type, :website, :office, :description, :venue, :nid
     
+    id_is :gid
     
     ##
     # Get the full list of members as populated User objects.  First time fetches group members via Facebook API call.  

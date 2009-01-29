@@ -78,11 +78,11 @@ module Facebooker
     end
     
     def self.current
-      @current_session
+      Thread.current['facebook_session']
     end
     
     def self.current=(session)
-      @current_session=session
+      Thread.current['facebook_session'] = session
     end
     
     def login_url(options={})
@@ -194,8 +194,10 @@ module Facebooker
             Page.from_hash(hash)
           when 'event_member'
             Event::Attendance.from_hash(hash)
+          else
+            hash
           end
-        end        
+        end
       end
     end
     
@@ -227,13 +229,13 @@ module Facebooker
     end
 
     def users_standard(user_ids, fields=[])
-      post("facebook.users.getStandardInfo",:uids=>user_ids.join(","),:fields=>User.user_fields(fields)) do |users|
+      post("facebook.users.getStandardInfo",:uids=>user_ids.join(","),:fields=>User.standard_fields(fields)) do |users|
         users.map { |u| User.new(u)}
       end
     end
 
     def users(user_ids, fields=[])
-      post("facebook.users.getInfo",:uids=>user_ids.join(","),:fields=>User.standard_fields(fields)) do |users|
+      post("facebook.users.getInfo",:uids=>user_ids.join(","),:fields=>User.user_fields(fields)) do |users|
         users.map { |u| User.new(u)}
       end
     end
@@ -333,24 +335,15 @@ module Facebooker
     # Register a template bundle with Facebook.
     # returns the template id to use to send using this template
     def register_template_bundle(one_line_story_templates,short_story_templates=nil,full_story_template=nil, action_links=nil)
-      if !one_line_story_templates.is_a?(Array)
-        one_line_story_templates = [one_line_story_templates]
-      end
-      parameters = {:one_line_story_templates=>one_line_story_templates.to_json}
+      parameters = {:one_line_story_templates => Array(one_line_story_templates).to_json}
       
-      if !action_links.blank?
-        parameters[:action_links] = action_links.to_json
-      end
+      parameters[:action_links] = action_links.to_json unless action_links.blank?
       
-      if !short_story_templates.blank?
-        short_story_templates = [short_story_templates] unless short_story_templates.is_a?(Array)
-        parameters[:short_story_templates]= short_story_templates.to_json
-      end
+      parameters[:short_story_templates] = Array(short_story_templates).to_json unless short_story_templates.blank?
 
-      if !full_story_template.blank?
-        parameters[:full_story_template]= full_story_template.to_json
-      end
-      post("facebook.feed.registerTemplateBundle", parameters,false)
+      parameters[:full_story_template] = full_story_template.to_json unless full_story_template.blank?
+
+      post("facebook.feed.registerTemplateBundle", parameters, false)
     end
     
     ##
@@ -560,7 +553,7 @@ module Facebooker
       end
       
       def uid?
-        ! @uid.nil?
+        !! @uid
       end
       
       def signature_for(params)
