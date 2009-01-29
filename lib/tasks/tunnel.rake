@@ -7,13 +7,13 @@ namespace :facebooker do
     desc "Create a reverse ssh tunnel from a public server to a private development server." 
     task :start => [ :environment, :config ] do  
       puts @notification 
-      exec @ssh_command
+      system @ssh_command
     end 
 
     desc "Create a reverse ssh tunnel in the background. Requires ssh keys to be setup." 
     task :background_start => [ :environment, :config ] do  
       puts @notification 
-      exec "#{@ssh_command} > /dev/null 2>&1 &" 
+      system "#{@ssh_command} > /dev/null 2>&1 &" 
     end 
     
     # Adapted from Evan Weaver: http://blog.evanweaver.com/articles/2007/07/13/developing-a-facebook-app-locally/ 
