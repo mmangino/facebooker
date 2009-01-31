@@ -675,6 +675,17 @@ module Facebooker
         concat(content_tag("fb:container",inner,options),&proc.binding)
       end
       
+      # Renders an fb:time element
+      # 
+      # Example:
+      # <%= fb_time(Time.now, :tz => 'America/New York', :preposition => true) %>
+      #
+      # See http://wiki.developers.facebook.com/index.php/Fb:time for 
+      # more details
+      def fb_time(time, options={})
+        tag "fb:time",stringify_vals({:t => time.to_i}.merge(options))
+      end
+      
       protected
       
       def cast_to_facebook_id(object)

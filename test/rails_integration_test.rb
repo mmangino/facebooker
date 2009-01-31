@@ -978,6 +978,16 @@ class RailsHelperTest < Test::Unit::TestCase
     user=flexmock("user", :facebook_id => "5678")
     assert_equal '<fb:user-status linked="false" uid="5678"></fb:user-status>',@h.fb_user_status(user,false)
   end
+  
+  def test_fb_time
+    time = Time.now
+    assert_equal %Q{<fb:time preposition="true" t="#{time.to_i}" tz="America/New York" />}, @h.fb_time(time, :tz => 'America/New York', :preposition => true)
+  end
+  
+  def test_fb_time_defaults
+    time = Time.now
+    assert_equal %Q{<fb:time t="#{time.to_i}" />}, @h.fb_time(time)
+  end
 end
 class TestModel
   attr_accessor :name,:facebook_id
