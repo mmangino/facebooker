@@ -87,5 +87,18 @@ class TestFacebooker < Test::Unit::TestCase
       t.first_name
     }
   end
+
+  def test_populate_from_hash_e_should_call_a_setter_for_a_key
+    t = PopulatingThing.new
+    flexmock(t).should_receive('mykey=').with('a value')
+    t.populate_from_hash!({ :mykey => 'a value' })
+  end
+
+  def test_populate_from_hash_e_should_call_not_a_setter_for_a_key_if_the_value_is_nil
+    t = PopulatingThing.new
+    flexmock(t).should_receive('mykey=').never
+    t.populate_from_hash!({ :mykey => nil })
+  end
+
 end
 

@@ -122,7 +122,7 @@ module Facebooker
       unless hash.empty?
         hash.each do |key, value|
           set_attr_method = "#{key}="
-          if respond_to?(set_attr_method)
+          if value && respond_to?(set_attr_method)
             self.__send__(set_attr_method, value) 
           else
             Facebooker::Logging.log_info("**Warning**, Attempt to set non-attribute: #{key}",hash)
