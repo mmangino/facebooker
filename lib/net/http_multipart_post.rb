@@ -28,7 +28,6 @@ module Net
       end
   
       def post
-        puts "requesting #{url.inspect}"
         req = Post.new(url.path)
         req.body = body
         req.content_type = content_type
