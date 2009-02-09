@@ -102,6 +102,7 @@ module Facebooker
     # * offline_access
     # * status_update
     # * photo_upload
+    # * video_upload
     # * create_listing
     # * create_event
     # * rsvp_event
