@@ -228,6 +228,9 @@ module Facebooker
       def ensure_has_photo_upload
         has_extended_permission?("photo_upload") || application_needs_permission("photo_upload")
       end
+      def ensure_has_video_upload
+        has_extended_permission?("video_upload") || application_needs_permission("video_upload")
+      end
       def ensure_has_create_listing
         has_extended_permission?("create_listing") || application_needs_permission("create_listing")
       end
