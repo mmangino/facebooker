@@ -11,6 +11,10 @@ module Facebooker
        "api.facebook.com"
     end
     
+    def video_server_base
+      "api-video.facebook.com"
+    end
+    
     def www_server_base_url
       "www.facebook.com"
     end

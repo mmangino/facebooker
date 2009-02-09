@@ -287,6 +287,12 @@ module Facebooker
       hashinate(element('photos_upload_response', data))
     end
   end
+
+  class UploadVideo < Parser#:nodoc:
+    def self.process(data)
+      hashinate(element('video_upload_response', data))
+    end
+  end
   
   class SendRequest < Parser#:nodoc:
     def self.process(data)
@@ -541,7 +547,8 @@ module Facebooker
       'facebook.groups.getMembers' => GroupGetMembers,
       'facebook.notifications.sendEmail' => NotificationsSendEmail,
       'facebook.data.getUserPreference' => GetPreference,
-      'facebook.data.setUserPreference' => SetPreference
+      'facebook.data.setUserPreference' => SetPreference,
+      'facebook.video.upload' => UploadVideo
     }
   end
 end

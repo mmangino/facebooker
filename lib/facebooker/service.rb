@@ -58,12 +58,16 @@ module Facebooker
     end
     
     def post_file(params)
-      Parser.parse(params[:method], post_multipart_form(url, params))
+      service_url = url(params.delete(:base))
+      result = post_multipart_form(service_url, params)
+      puts result.body
+      Parser.parse(params[:method], result)
     end
     
     private
-    def url
-      URI.parse('http://'+ @api_base + @api_path)
+    def url(base = nil)
+      base ||= @api_base
+      URI.parse('http://'+ base + @api_path)
     end
     
     # Net::HTTP::MultipartPostFile

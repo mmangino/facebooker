@@ -204,6 +204,38 @@ module Facebooker
         options.merge(nil => multipart_post_file)))
     end
     
+    # Upload a video to the user's profile.
+    #
+    # In your view, create a multipart form that posts directly to your application (not through canvas):
+    #
+    #   <% form_tag videos_url(:canvas => false), :html => {:multipart => true, :promptpermission => 'video_upload'} do %>
+    #     Video: <%= file_field_tag 'video' %>
+    #     Title: <%= text_area_tag 'title' %>
+    #     Description: <%= text_area_tag 'description' %>
+    #     <%= submit_tag 'Upload Video', :class => 'inputsubmit' %>
+    #   <% end %>
+    # 
+    # And in your controller: 
+    #
+    #   class VideosController < ApplicationController
+    #     def create
+    #       file = Net::HTTP::MultipartPostFile.new(
+    #         params[:photo].original_filename,
+    #         params[:photo].content_type,
+    #         params[:photo].read
+    #       )
+    #     
+    #       @video = facebook_session.user.upload_video(file, :description => params[:description])
+    #       redirect_to videos_url(:canvas => true)
+    #     end
+    #   end
+    #
+    # Options correspond to http://wiki.developers.facebook.com/index.php/Video.upload
+    def upload_video(multipart_post_file, options = {})
+      Video.from_hash(session.post_file('facebook.video.upload',
+        options.merge(nil => multipart_post_file, :base => Facebooker.video_server_base)))
+    end
+    
     def profile_fbml
       session.post('facebook.profile.getFBML', :uid => id)  
     end    

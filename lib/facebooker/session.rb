@@ -503,10 +503,11 @@ module Facebooker
     end
     
     def post_file(method, params = {})
+      base = params.delete(:base)
       Logging.log_fb_api(method, params) do
         add_facebook_params(params, method)
         @session_key && params[:session_key] ||= @session_key
-        service.post_file(params.merge(:sig => signature_for(params.reject{|key, value| key.nil?})))
+        service.post_file(params.merge(:base => base, :sig => signature_for(params.reject{|key, value| key.nil?})))
       end
     end
     
