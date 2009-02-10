@@ -484,7 +484,7 @@ module Facebooker
       if response_element
         hash = hashinate(response_element)
         exception = EXCEPTIONS[Integer(hash['error_code'])] || StandardError
-        raise exception.new(hash['error_msg'])
+        raise exception, hash['error_msg']
       end
     end
   end
