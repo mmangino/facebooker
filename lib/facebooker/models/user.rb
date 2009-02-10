@@ -12,7 +12,6 @@ module Facebooker
     end
     FIELDS = [:status, :political, :pic_small, :name, :quotes, :is_app_user, :tv, :profile_update_time, :meeting_sex, :hs_info, :timezone, :relationship_status, :hometown_location, :about_me, :wall_count, :significant_other_id, :pic_big, :music, :uid, :work_history, :sex, :religion, :notes_count, :activities, :pic_square, :movies, :has_added_app, :education_history, :birthday, :first_name, :meeting_for, :last_name, :interests, :current_location, :pic, :books, :affiliations, :locale, :profile_url, :proxied_email,:email_hashes]
     STANDARD_FIELDS = [:uid, :first_name, :last_name, :name, :timezone, :birthday, :sex, :affiliations, :locale, :profile_url]
-    attr_accessor :session
     populating_attr_accessor *FIELDS
     attr_reader :affiliations
     populating_hash_settable_accessor :current_location, Location
@@ -39,17 +38,8 @@ module Facebooker
       end     
     end
 
-    def uid
-      @uid
-    end
-
-    def uid=(uid)
-      @uid = uid.to_i
-    end
-
-    alias :id :uid
-    alias :id= :uid=
-    alias :facebook_id :uid
+    id_is :uid
+    alias :facebook_id :id
 
     # Returns a user's events, params correspond to API call parameters (except UID):
     # http://wiki.developers.facebook.com/index.php/Events.get
@@ -282,7 +272,7 @@ module Facebooker
     # requires extended permission. 
     def set_status(message)
       self.status=message
-      session.post('facebook.users.setStatus',:status=>message,:status_includes_verb=>1) do |ret|
+      session.post('facebook.users.setStatus',{:status=>message,:status_includes_verb=>1,:uid => uid}, false) do |ret|
         ret
       end
     end

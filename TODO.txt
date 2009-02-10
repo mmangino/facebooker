@@ -1,10 +1,4 @@
-[ ] Refactor facebook form builder so erbout won't be deeply nested, causing erubis to break
-[ ] Support missing parameters on methods---most notably authentication-related parameters such as next and canvas
-[ ] Finish FQL Querying
-[ ] Refactor FQL Querying
-[ ] Transform incoming data into appropriate classes (Integers, Dates, etc.)
+[ ] Document session handling. Come up with different cases and paths for the flow and create tests for each
+[ ] Verify that sessions are used only where required. Raise exceptions on User methods that require a session when none is available
+[ ] Refactor setup / Adapter loading code
 
-[x] Specify fields wanted when getting user info (defaults to all now) [shane]
-[x] Create facebooker.yml config file and merge with tunnel.yml [shane]
-[X] Remove facebook prefix from resource routes, making them worth with facebook and regular Rails controllers [mike]
-[X] Use fb_sig_request_method to make facebook routes more Rails-like [mike]

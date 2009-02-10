@@ -252,7 +252,8 @@ module Facebooker
       end
       
       def application_is_not_installed_by_facebook_user
-        redirect_to session[:facebook_session].install_url
+        url_params = after_facebook_login_url.nil? ? {} : { :next => after_facebook_login_url }
+        redirect_to session[:facebook_session].install_url(url_params)
       end
       
       def set_fbml_format
