@@ -60,7 +60,6 @@ module Facebooker
     def post_file(params)
       service_url = url(params.delete(:base))
       result = post_multipart_form(service_url, params)
-      puts result.body
       Parser.parse(params[:method], result)
     end
     

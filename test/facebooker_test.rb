@@ -283,6 +283,13 @@ class TestFacebooker < Test::Unit::TestCase
     assert_equal ['65.4248', '16.8627'], tag.coordinates
   end
   
+  def test_can_upload_video
+    mock_http = establish_session
+    mock_http.should_receive(:post_multipart_form).and_return(example_upload_video_xml).once
+    f = Net::HTTP::MultipartPostFile.new("party.mp4", "video/mpeg", "RAW DATA")
+    assert_equal "Some Epic", @session.user.upload_video(f).title
+  end
+  
   def test_can_get_app_profile_fbml_for_user
     expect_http_posts_with_responses(example_get_fbml_xml)
     assert_match(/My profile!/, @session.user.profile_fbml)
@@ -880,4 +887,15 @@ class TestFacebooker < Test::Unit::TestCase
     XML
   end
   
+  def example_upload_video_xml
+    <<-XML
+<?xml version="1.0" encoding="UTF-8"?> 
+<video_upload_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd">
+    <vid>15943367753</vid>
+    <title>Some Epic</title>
+    <description>Check it out</description>
+    <link>http://www.facebook.com/video/video.php?v=15943367753</link>
+  </video_upload_response>
+    XML
+  end
 end

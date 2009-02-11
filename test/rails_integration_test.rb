@@ -26,6 +26,7 @@ begin
     ensure_authenticated_to_facebook
     before_filter :ensure_has_status_update
     before_filter :ensure_has_photo_upload
+    before_filter :ensure_has_video_upload
     before_filter :ensure_has_create_listing
     def index
       render :text => 'score!'
@@ -202,14 +203,19 @@ class RailsIntegrationTestForExtendedPermissions < Test::Unit::TestCase
     assert_response :success
     assert_equal("<fb:redirect url=\"http://www.facebook.com/authorize.php?api_key=1234567&v=1.0&ext_perm=photo_upload\" />", @response.body)
   end
-  def test_redirects_without_create_listing
+  def test_redirects_without_video_upload
     post :index,example_rails_params_including_fb.merge(:fb_sig_ext_perms=>"status_update,photo_upload")
+    assert_response :success
+    assert_equal("<fb:redirect url=\"http://www.facebook.com/authorize.php?api_key=1234567&v=1.0&ext_perm=video_upload\" />", @response.body)
+  end
+  def test_redirects_without_create_listing
+    post :index,example_rails_params_including_fb.merge(:fb_sig_ext_perms=>"status_update,photo_upload,video_upload")
     assert_response :success
     assert_equal("<fb:redirect url=\"http://www.facebook.com/authorize.php?api_key=1234567&v=1.0&ext_perm=create_listing\" />", @response.body)
   end
   
   def test_renders_with_permission
-    post :index,example_rails_params_including_fb.merge(:fb_sig_ext_perms=>"status_update,photo_upload,create_listing")
+    post :index,example_rails_params_including_fb.merge(:fb_sig_ext_perms=>"status_update,photo_upload,create_listing,video_upload")
     assert_response :success
     assert_equal("score!", @response.body)
     
