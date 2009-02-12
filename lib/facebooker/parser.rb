@@ -144,6 +144,12 @@ module Facebooker
       array_of_hashes(element('pages_getInfo_response', data), 'page')
     end
   end
+  
+  class PagesIsFan < Parser#:nodoc:
+    def self.process(data)
+      element('pages_isFan_response', data).text_value == '1'
+    end
+  end  
 
   class PublishStoryToUser < Parser#:nodoc:
     def self.process(data)
@@ -501,6 +507,7 @@ module Facebooker
       'facebook.users.hasAppPermission' => UserHasPermission,
       'facebook.pages.isAdmin' => PagesIsAdmin,
       'facebook.pages.getInfo' => PagesGetInfo,
+      'facebook.pages.isFan' => PagesIsFan,      
       'facebook.friends.get' => GetFriends,
       'facebook.friends.getLists' => FriendListsGet,
       'facebook.friends.areFriends' => AreFriends,
