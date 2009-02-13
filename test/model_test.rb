@@ -106,5 +106,20 @@ class TestFacebooker < Test::Unit::TestCase
     t.populate_from_hash!({ :mykey => nil })
   end
 
+  def test_populate_from_hash_should_check_for_an_empty_hash
+    t = PopulatingThing.new
+    hash = {}
+    flexmock(hash).should_receive('empty?')
+    t.populate_from_hash!(hash)
+  end
+
+  def test_populate_from_hash_should_check_for_a_nil_param
+    t = PopulatingThing.new
+    hash = nil
+    assert_nothing_raised do
+      t.populate_from_hash!(hash)
+    end
+  end
+
 end
 

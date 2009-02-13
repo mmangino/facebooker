@@ -119,7 +119,7 @@ module Facebooker
     ##
     # Set model's attributes via Hash.  Keys should map directly to the model's attribute names.
     def populate_from_hash!(hash)
-      unless hash.empty?
+      unless hash.nil? || hash.empty?
         hash.each do |key, value|
           set_attr_method = "#{key}="
           if !value.nil? && respond_to?(set_attr_method)
