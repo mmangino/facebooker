@@ -321,6 +321,16 @@ class TestFacebooker < Test::Unit::TestCase
     assert_equal false, @session.post('facebook.pages.isAdmin', :page_id => 123)
   end
 
+  def test_pages_is_fan_true
+    expect_http_posts_with_responses(example_pages_is_fan_true_xml)
+    assert_equal true, @session.post('facebook.pages.isFan', :page_id => 123)
+  end
+
+  def test_pages_is_fan_false
+    expect_http_posts_with_responses(example_pages_is_fan_false_xml)
+    assert_equal false, @session.post('facebook.pages.isFan', :page_id => 123)
+  end
+
   def test_users_set_status_true
     expect_http_posts_with_responses(example_users_set_status_true_xml)
     assert_equal true, @session.post('facebook.users.setStatus', :uid => 123, :status => 'message')
@@ -398,6 +408,20 @@ class TestFacebooker < Test::Unit::TestCase
     <<-XML
     <?xml version="1.0" encoding="UTF-8"?>
       <pages_isAdmin_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd">0</pages_isAdmin_response>
+    XML
+  end
+
+  def example_pages_is_fan_true_xml
+    <<-XML
+    <?xml version="1.0" encoding="UTF-8"?>
+      <pages_isFan_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd">1</pages_isFan_response>
+    XML
+  end
+
+  def example_pages_is_fan_false_xml
+    <<-XML
+    <?xml version="1.0" encoding="UTF-8"?>
+      <pages_isFan_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd">0</pages_isFan_response>
     XML
   end
 

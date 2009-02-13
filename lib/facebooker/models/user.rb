@@ -272,7 +272,7 @@ module Facebooker
     # requires extended permission. 
     def set_status(message)
       self.status=message
-      session.post('facebook.users.setStatus',:status=>message,:status_includes_verb=>1) do |ret|
+      session.post('facebook.users.setStatus',{:status=>message,:status_includes_verb=>1,:uid => uid}, false) do |ret|
         ret
       end
     end
