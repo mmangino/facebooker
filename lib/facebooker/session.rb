@@ -251,6 +251,11 @@ module Facebooker
       end
     end
 
+    # Takes page_id and uid, returns true if uid is a fan of the page_id
+    def is_fan(page_id, uid)
+      post('facebook.pages.isFan', :page_id=>page_id, :uid=>uid)
+    end    
+
     #
     # Returns a proxy object for handling calls to Facebook cached items
     # such as images and FBML ref handles
