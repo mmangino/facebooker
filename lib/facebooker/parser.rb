@@ -205,6 +205,18 @@ module Facebooker
     end
   end
   
+  class SetRestrictionInfo < Parser#:nodoc:
+    def self.process(data)
+      element('admin_setRestrictionInfo_response', data).text_value
+    end
+  end  
+  
+  class GetRestrictionInfo < Parser#:nodoc:
+    def self.process(data)
+      element('admin_getRestrictionInfo_response', data).text_value
+    end
+  end
+  
   class GetAllocation < Parser#:nodoc:
     def self.process(data)
       element('admin_getAllocation_response', data).text_value
@@ -533,6 +545,8 @@ module Facebooker
       'facebook.data.getCookies' => GetCookies,
       'facebook.admin.setAppProperties' => SetAppProperties,
       'facebook.admin.getAppProperties' => GetAppProperties,
+      'facebook.admin.setRestrictionInfo' => SetRestrictionInfo,
+      'facebook.admin.getRestrictionInfo' => GetRestrictionInfo,
       'facebook.admin.getAllocation' => GetAllocation,
       'facebook.batch.run' => BatchRun,
       'facebook.fql.query' => FqlQuery,
