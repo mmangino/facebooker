@@ -18,7 +18,7 @@ module Facebooker
       end
       
       def facebook_session_parameters
-        {:fb_sig_session_key=>facebook_params[:session_key]}
+        {:fb_sig_session_key=>params[:fb_sig_session_key]}
       end
       
       
@@ -32,7 +32,7 @@ module Facebooker
       end
       
       def facebook_params
-        @facebook_params ||= extract_facebook_params
+        @facebook_params ||= verified_facebook_params
       end      
       
       def redirect_to(*args)
@@ -53,7 +53,7 @@ module Facebooker
         # if we're inside the facebook session and there is no session key,
         # that means the user revoked our access
         # we don't want to keep using the old expired key from the cookie. 
-        request_comes_from_facebook? and facebook_params[:session_key].blank?
+        request_comes_from_facebook? and params[:fb_sig_session_key].blank?
       end
       
       def clear_facebook_session_information
@@ -68,7 +68,7 @@ module Facebooker
           clear_facebook_session_information
           false
         else
-          !session[:facebook_session].blank? &&  (facebook_params[:session_key].blank? || session[:facebook_session].session_key == facebook_params[:session_key])
+          !session[:facebook_session].blank? &&  (params[:fb_sig_session_key].blank? || session[:facebook_session].session_key == facebook_params[:session_key])
         end
       end
       
@@ -115,7 +115,6 @@ module Facebooker
       
       def secure_with_facebook_params!
         return unless request_comes_from_facebook?
-        verify_facebook_params
         
         if ['user', 'session_key'].all? {|element| facebook_params[element]}
           @facebook_session = new_facebook_session
@@ -153,17 +152,16 @@ module Facebooker
         (value == '0' || value.nil? || value == '')        
       end
 
-      def extract_facebook_params
-        params.inject(HashWithIndifferentAccess.new) do |collection, (param, value)|
-          collection[param.sub(/^fb_sig_/, '')] = params.delete(param) if param.start_with?('fb_sig_')
+      def verified_facebook_params
+        facebook_sig_params = params.inject({}) do |collection, pair|
+          collection[pair.first.sub(/^fb_sig_/, '')] = pair.last if pair.first[0,7] == 'fb_sig_'
           collection
         end
-      end
+        verify_signature(facebook_sig_params,params['fb_sig'])
 
-      def verify_facebook_params
-        verify_signature(facebook_params, params['fb_sig'])
-        facebook_params.each do |param, value| 
-          facebook_params[param] = facebook_parameter_conversions[param].call(value)
+        facebook_sig_params.inject(HashWithIndifferentAccess.new) do |collection, pair| 
+          collection[pair.first] = facebook_parameter_conversions[pair.first].call(pair.last)
+          collection
         end
       end
       
@@ -204,17 +202,16 @@ module Facebooker
       end
       
       def request_is_for_a_facebook_canvas?
-        !facebook_params['in_canvas'].blank?
+        !params['fb_sig_in_canvas'].blank?
       end
       
       def request_is_facebook_tab?
-        !facebook_params["in_profile_tab"].blank?
+        !params["fb_sig_in_profile_tab"].blank?
       end
       
       def request_is_facebook_ajax?
-        facebook_params["is_mockajax"] =="1" || facebook_params["is_ajax"] == "1"
+        params["fb_sig_is_mockajax"]=="1" || params["fb_sig_is_ajax"]=="1"
       end
-      
       def xml_http_request?
         request_is_facebook_ajax? || super
       end
@@ -243,7 +240,7 @@ module Facebooker
       end
       
       def has_extended_permission?(perm)
-        facebook_params["ext_perms"] && facebook_params["ext_perms"].include?(perm)
+        params["fb_sig_ext_perms"] and params["fb_sig_ext_perms"].include?(perm)
       end
       
       def ensure_authenticated_to_facebook
@@ -266,7 +263,7 @@ module Facebooker
         params[:format]="fbml" if request_comes_from_facebook?
       end
       def set_adapter
-        Facebooker.load_adapter(params) if facebook_params[:api_key]
+        Facebooker.load_adapter(params) if(params[:fb_sig_api_key])
       end
 
       
