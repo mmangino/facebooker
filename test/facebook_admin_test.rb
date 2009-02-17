@@ -83,7 +83,7 @@ class FacebookAdminTest < Test::Unit::TestCase
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:schemaLocation="http://api.facebook.com/1.0/http://api.facebook.com/1.0/facebook.xsd">
         {&quot;age&quot;:&quot;21&quot;,&quot;location&quot;:&quot;&quot;,&quot;age_distribution&quot;:&quot;&quot;,&quot;type&quot;:&quot;alcohol&quot;}
-    </admin_getAppProperties_response>
+    </admin_getRestrictionInfo_response>
     XML
   end
   
