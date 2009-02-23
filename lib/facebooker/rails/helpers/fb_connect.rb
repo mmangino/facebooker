@@ -24,9 +24,31 @@ module Facebooker
           end
           javascript_tag init_string
         end
-        
-        def fb_login_button(callback=nil)
-          content_tag("fb:login-button",nil,(callback.nil? ? {} : {:onlogin=>callback}))
+  
+        # Render an <fb:login-button> element
+        # 
+        # ==== Examples
+        #
+        # <%= fb_login_button%>
+        # => <fb:login-button></fb:login-button>
+        #
+        # Specifying a javascript callback
+        #
+        # <%= fb_login_button 'update_something();'%>
+        # => <fb:login-button onlogin='update_something();'></fb:login-button>
+        #
+        # Adding options <em>See:</em> http://wiki.developers.facebook.com/index.php/Fb:login-button
+        #
+        # <%= fb_login_button 'update_something();', :size => :small, :background => :dark%>
+        # => <fb:login-button background='dark' onlogin='update_something();' size='small'></fb:login-button>
+        #
+        def fb_login_button(*args)
+
+          callback = args.first
+          options = args.second || {}
+          options.merge!(:onlogin=>callback)if callback
+
+          content_tag("fb:login-button",nil, options)
         end
         
         def fb_unconnected_friends_count
