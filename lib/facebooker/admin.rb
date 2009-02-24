@@ -18,6 +18,20 @@ module Facebooker
       hash = JSON.parse(CGI.unescapeHTML(json))
       @properties = ApplicationProperties.from_hash(hash)
     end
+    
+    # ** BETA ***
+    # +restrictions+: Hash of restrictions you want to set.
+    def set_restriction_info(restrictions)
+      restrictions = restrictions.respond_to?(:to_json) ? restrictions.to_json : restrictions
+      (@session.post 'facebook.admin.setRestrictionInfo', :restriction_str => restrictions) == '1'
+    end
+    
+    # ** BETA ***
+    def get_restriction_info(*restrictions)
+      json = @session.post('facebook.admin.getRestrictionInfo')
+      hash = JSON.parse(CGI.unescapeHTML(json))
+      @restrictions = ApplicationRestrictions.from_hash(hash)
+    end
   
     # Integration points include..
     #   :notifications_per_day, :requests_per_day, :emails_per_day, :email_disable_message_location

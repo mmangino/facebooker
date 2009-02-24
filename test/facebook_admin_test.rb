@@ -32,6 +32,20 @@ class FacebookAdminTest < Test::Unit::TestCase
     assert_equal 0, p.dev_mode
     assert_equal 'my_canvas', p.canvas_name
   end
+  
+  def test_can_set_restriction_info
+    restrictions = {:age => '21', :type => 'alcohol'}
+    flexmock(@session).should_receive(:post).with('facebook.admin.setRestrictionInfo', :restriction_str => restrictions.to_json).and_return('1').once
+    assert(@session.admin.set_restriction_info(restrictions))
+  end
+  
+  def test_can_get_restriction_info
+    mock_http = establish_session
+    mock_http.should_receive(:post_form).and_return(example_get_restriction_info_xml).once.ordered(:posts)
+    r = @session.admin.get_restriction_info
+    assert_equal 'alcohol', r.type
+    assert_equal '21', r.age
+  end
 
   def test_can_get_allocation
     mock_http = establish_session
@@ -58,6 +72,18 @@ class FacebookAdminTest < Test::Unit::TestCase
       xsi:schemaLocation="http://api.facebook.com/1.0/http://api.facebook.com/1.0/facebook.xsd">
         {&quot;application_name&quot;:&quot;Video Jukebox&quot;,&quot;callback_url&quot;:&quot;http:\/\/67.207.144.245\/&quot;,&quot;dev_mode&quot;:0,&quot;canvas_name&quot;:&quot;my_canvas&quot;}
     </admin_getAppProperties_response>
+    XML
+  end
+  
+  def example_get_restriction_info_xml
+    <<-XML
+    <?xml version="1.0" encoding="UTF-8"?>
+    <admin_getRestrictionInfo_response
+      xmlns="http://api.facebook.com/1.0/"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://api.facebook.com/1.0/http://api.facebook.com/1.0/facebook.xsd">
+        {&quot;age&quot;:&quot;21&quot;,&quot;location&quot;:&quot;&quot;,&quot;age_distribution&quot;:&quot;&quot;,&quot;type&quot;:&quot;alcohol&quot;}
+    </admin_getRestrictionInfo_response>
     XML
   end
   
