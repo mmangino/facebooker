@@ -19,13 +19,17 @@ class Rack::FacebookTest < Test::Unit::TestCase
     p.map{|*args| args.join('=') }.join('&')
   end
   
+  def app
+    Rack::MockRequest.new(Rack::Lint.new(@facebook))
+  end
+  
   def test_without_fb_params
-    response = Rack::MockRequest.new(@facebook).post("/")
+    response = app.post("/")
     assert_equal 200, response.status
   end
   
   def test_converts_request_method
-    response = Rack::MockRequest.new(@facebook).post("/",
+    response = app.post("/",
       :input => params(:fb_sig_request_method => 'GET', :fb_sig => '4d2a700e90b0bcbe54b9e627d2cc1417'))
     assert_equal 200, response.status
     assert_equal 'GET', @env['REQUEST_METHOD']
@@ -38,20 +42,20 @@ class Rack::FacebookTest < Test::Unit::TestCase
   end
 
   def test_renders_400_with_invalid_signature
-    response = Rack::MockRequest.new(@facebook).post("/",
+    response = app.post("/",
       :input => params(:fb_sig => 'wrong', :fb_sig_user => 1))
     assert_equal 400, response.status
   end
   
   def test_skips_with_false_condition
     @facebook = Rack::Facebook.new(@app, @secret_key) { false }
-    response = Rack::MockRequest.new(@facebook).post("/", :input => params(:fb_sig_user => 'ignored'))
+    response = app.post("/", :input => params(:fb_sig_user => 'ignored'))
     assert_equal 200, response.status
   end
   
   def test_verifies_with_true_condition
     @facebook = Rack::Facebook.new(@app, @secret_key) { true }
-    response = Rack::MockRequest.new(@facebook).post("/", :input => params(:fb_sig_user => 'ignored'))
+    response = app.post("/", :input => params(:fb_sig_user => 'ignored'))
     assert_equal 400, response.status
   end
 

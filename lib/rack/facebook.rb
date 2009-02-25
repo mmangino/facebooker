@@ -36,7 +36,7 @@ module Rack
         fb_params = extract_fb_sig_params(request.POST)
         unless fb_params.empty?
           unless signature_is_valid?(fb_params, request.POST['fb_sig'])
-            return [400, {"Content-Type" => "text/html"}, ["Invalid Facebook signature"]]
+            return Rack::Response.new(["Invalid Facebook signature"], 400).finish
           end
           env['REQUEST_METHOD'] = fb_params["request_method"] if fb_params["request_method"]
           convert_parameters!(request.POST)
