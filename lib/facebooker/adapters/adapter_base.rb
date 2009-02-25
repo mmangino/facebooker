@@ -68,6 +68,9 @@ module Facebooker
         end
         return adapter_class.new(adapter_config)
       end
+
+      return self.default_adapter(params)
+
     end
 
     def self.default_adapter(params = {})
