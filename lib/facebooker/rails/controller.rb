@@ -21,15 +21,25 @@ module Facebooker
         {:fb_sig_session_key=>params[:fb_sig_session_key]}
       end
       
+      def create_facebook_session
+        secure_with_facebook_params! || secure_with_cookies! || secure_with_token!
+      end
       
       def set_facebook_session
-        returning session_set = session_already_secured? ||  secure_with_facebook_params! || secure_with_cookies! || secure_with_token!  do
-          if session_set
-            capture_facebook_friends_if_available! 
-            Session.current = facebook_session
-          end
+        # first, see if we already have a session
+        session_set = session_already_secured?
+        # if not, see if we can load it from the environment
+        unless session_set
+          session_set = create_facebook_session
+          session[:facebook_session] = @facebook_session if session_set
         end
+        if session_set
+          capture_facebook_friends_if_available! 
+          Session.current = facebook_session
+        end
+        return session_set
       end
+      
       
       def facebook_params
         @facebook_params ||= verified_facebook_params
@@ -101,7 +111,7 @@ module Facebooker
           
           @facebook_session = new_facebook_session
           @facebook_session.secure_with!(parsed['session_key'],parsed['user'],parsed['expires'],parsed['ss'])
-          session[:facebook_session] = @facebook_session
+          @facebook_session
       end
     
       def secure_with_token!
@@ -109,7 +119,7 @@ module Facebooker
           @facebook_session = new_facebook_session
           @facebook_session.auth_token = params['auth_token']
           @facebook_session.secure!
-          session[:facebook_session] = @facebook_session
+          @facebook_session
         end
       end
       
@@ -119,7 +129,7 @@ module Facebooker
         if ['user', 'session_key'].all? {|element| facebook_params[element]}
           @facebook_session = new_facebook_session
           @facebook_session.secure_with!(facebook_params['session_key'], facebook_params['user'], facebook_params['expires'])
-          session[:facebook_session] = @facebook_session
+          @facebook_session
         end
       end
       
