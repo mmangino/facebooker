@@ -39,7 +39,7 @@ module Facebooker
         end
         def fb_login_and_redirect(url)
           js = update_page do |page|
-            page.call "FB.Connect.logoutAndRedirect",url
+            page.redirect_to url
           end
           content_tag("fb:login-button",nil,:onlogin=>js)
         end

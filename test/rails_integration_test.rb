@@ -993,7 +993,7 @@ class RailsHelperTest < Test::Unit::TestCase
   end
   
   def test_fb_login_and_redirect
-    assert_equal @h.fb_login_and_redirect("/path"),"<fb:login-button onlogin=\"FB.Connect.logoutAndRedirect(&quot;/path&quot;);\"></fb:login-button>"
+    assert_equal @h.fb_login_and_redirect("/path"),"<fb:login-button onlogin=\"window.location.href = &quot;/path&quot;;\"></fb:login-button>"
   end
   
   def test_fb_logout_link
