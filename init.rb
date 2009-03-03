@@ -68,3 +68,6 @@ end
 # pull :canvas=> into env in routing to allow for conditions
 ActionController::Routing::RouteSet.send :include,  Facebooker::Rails::Routing::RouteSetExtensions
 ActionController::Routing::RouteSet::Mapper.send :include, Facebooker::Rails::Routing::MapperExtensions
+
+Mime::Type.register_alias "text/html", :fbml
+Mime::Type.register_alias "text/javascript", :fbjs

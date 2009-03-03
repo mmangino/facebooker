@@ -1215,6 +1215,41 @@ class RailsUrlHelperExtensionsTest < Test::Unit::TestCase
   
 end
 
+class RailsRequestFormatTest < Test::Unit::TestCase
+  class FacebookController < NoisyController
+    def index
+      respond_to do |format|
+        format.html { render :text => 'html' }
+        format.fbml { render :text => 'fbml' }
+        format.fbjs { render :text => 'fbjs' }
+      end
+    end
+  end
+  
+  def setup
+    @controller = FacebookController.new
+    @request    = ActionController::TestRequest.new
+    @response   = ActionController::TestResponse.new
+    @controller.stubs(:verify_signature).returns(true)
+  end
+  
+  def test_responds_to_html_without_canvas
+    get :index
+    assert_equal 'html', @response.body
+  end
+
+  def test_responds_to_fbml_in_canvas
+    get :index, facebook_params(:fb_sig_in_canvas => '1')
+    assert_equal 'fbml', @response.body
+  end
+
+  def test_responds_to_fbjs_when_is_ajax
+    get :index, facebook_params(:fb_sig_is_ajax => '1')
+    assert_equal 'fbjs', @response.body
+  end
+  
+end
+
 # rescue LoadError
 #   $stderr.puts "Couldn't find action controller.  That's OK.  We'll skip it."
 end

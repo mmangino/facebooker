@@ -7,7 +7,7 @@ module Facebooker
       def self.included(controller)
         controller.extend(ClassMethods)
         #controller.before_filter :set_adapter <-- security hole noted by vchu
-        controller.before_filter :set_fbml_format
+        controller.before_filter :set_facebook_request_format
         controller.helper_attr :facebook_session_parameters
         controller.helper_method :request_comes_from_facebook?
       end
@@ -259,9 +259,14 @@ module Facebooker
         redirect_to session[:facebook_session].install_url(url_params)
       end
       
-      def set_fbml_format
-        params[:format]="fbml" if request_comes_from_facebook?
+      def set_facebook_request_format
+        if request_is_facebook_ajax?
+          params[:format] = 'fbjs'
+        elsif request_comes_from_facebook?
+          params[:format] = 'fbml'
+        end
       end
+      
       def set_adapter
         Facebooker.load_adapter(params) if(params[:fb_sig_api_key])
       end
