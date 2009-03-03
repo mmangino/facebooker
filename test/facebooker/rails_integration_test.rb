@@ -127,15 +127,6 @@ class PlainOldRailsController < ActionController::Base
   end
 end
 
-class ControllerWhichFails < ActionController::Base
-  def pass
-    render :text=>''
-  end
-  def fail
-    raise "I'm failing"
-  end
-end
-
 class Test::Unit::TestCase
   include Facebooker::Rails::TestHelpers
 end
@@ -1104,26 +1095,42 @@ class RailsFacebookFormbuilderTest < Test::Unit::TestCase
 end
 
 class RailsPrettyErrorsTest < Test::Unit::TestCase
+  class ControllerWhichFails < ActionController::Base
+    def pass
+      render :text=>''
+    end
+    def fail
+      raise "I'm failing"
+    end
+  end
+  
   def setup
-    ENV['FACEBOOK_API_KEY'] = '1234567'
-    ENV['FACEBOOK_SECRET_KEY'] = '7654321'
     @controller = ControllerWhichFails.new
     @request    = ActionController::TestRequest.new
     @response   = ActionController::TestResponse.new
-    @controller.stubs(:verify_signature).returns(true)
   end
   
-  def test_pretty_errors
-    Facebooker.facebooker_config.stubs(:pretty_errors).returns(false)
+  def test_pretty_errors_disabled_success
+    Facebooker.facebooker_config.stubs(:[]).with('pretty_errors').returns(false)
     post :pass, facebook_params
-    assert_response :success    
+    assert_response 200
+  end
+  
+  def test_pretty_errors_disabled_error
+    Facebooker.facebooker_config.stubs(:[]).with('pretty_errors').returns(false)
     post :fail, facebook_params
     assert_response :error
-    Facebooker.facebooker_config.stubs(:pretty_errors).returns(true)
+  end
+  
+  def test_pretty_errors_enabled_success
+    Facebooker.facebooker_config.stubs(:[]).with('pretty_errors').returns(true)
     post :pass, facebook_params
-    assert_response :success    
+    assert_response 200
+  end
+  def test_pretty_errors_enabled_error
+    Facebooker.facebooker_config.stubs(:[]).with('pretty_errors').returns(true)
     post :fail, facebook_params
-    assert_response :error
+    assert_response 200
   end
 end
 
