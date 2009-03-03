@@ -9,16 +9,38 @@ begin
     map.connect ':controller/:action/:id', :controller => "plain_old_rails"
   end  
   
+  module FBConnectTestHelpers
+    def setup_fb_connect_cookies(params=cookie_hash_for_auth)
+      params.each {|k,v| @request.cookies[ENV['FACEBOOK_API_KEY']+k] = CGI::Cookie.new(ENV['FACEBOOK_API_KEY']+k,v)} 
+    end
+  
+    def expired_cookie_hash_for_auth
+      {"_ss" => "not_used", "_session_key"=> "whatever", "_user"=>"77777", "_expires"=>"#{1.day.ago.to_i}"}
+    end
+
+    def cookie_hash_for_auth
+      {"_ss" => "not_used", "_session_key"=> "whatever", "_user"=>"77777", "_expires"=>"#{1.day.from_now.to_i}"}
+    end
+  end
   class NoisyController < ActionController::Base
     include Facebooker::Rails::Controller
     def rescue_action(e) raise e end
   end
+  
+  
   class ControllerWhichRequiresExtendedPermissions< NoisyController
     ensure_authenticated_to_facebook
     before_filter :ensure_has_status_update
     before_filter :ensure_has_photo_upload
     before_filter :ensure_has_video_upload
     before_filter :ensure_has_create_listing
+    def index
+      render :text => 'score!'
+    end
+  end
+  
+  class FBConnectController < NoisyController
+    before_filter :create_facebook_session
     def index
       render :text => 'score!'
     end
@@ -136,6 +158,29 @@ begin
     end
   end
   
+  class RailsIntegrationTestForFBConnect < Test::Unit::TestCase
+    include FBConnectTestHelpers
+    
+    def setup
+      ENV['FACEBOOK_CANVAS_PATH'] ='facebook_app_name'
+      ENV['FACEBOOK_API_KEY'] = '1234567'
+      ENV['FACEBOOK_SECRET_KEY'] = '7654321'
+      @controller = FBConnectController.new
+      @request    = ActionController::TestRequest.new
+      @response   = ActionController::TestResponse.new
+      @controller.stubs(:verify_signature).returns(true)
+              
+    end
+    
+    def test_doesnt_set_cookie_but_facebook_session_is_available
+      setup_fb_connect_cookies
+      get :index
+      assert_not_nil @controller.facebook_session
+      assert_nil @response.cookies[:facebook_session] 
+      
+    end
+  end
+  
   class RailsIntegrationTestForNonFacebookControllers < Test::Unit::TestCase
     def setup
       ENV['FACEBOOK_CANVAS_PATH'] ='facebook_app_name'
@@ -240,6 +285,7 @@ class RailsIntegrationTestForApplicationInstallation < Test::Unit::TestCase
 end
   
 class RailsIntegrationTest < Test::Unit::TestCase
+  include FBConnectTestHelpers
   def setup
     ENV['FACEBOOK_CANVAS_PATH'] ='root'
     ENV['FACEBOOK_API_KEY'] = '1234567'
@@ -356,19 +402,19 @@ class RailsIntegrationTest < Test::Unit::TestCase
       session_params = { 'session_key' => '123', 'uid' => '321' }
       session_mock.should_receive(:post).with('facebook.auth.getSession', :auth_token => auth_token).once.and_return(session_params).ordered
       flexmock(@controller).should_receive(:new_facebook_session).once.and_return(session).ordered
-      expired_cookie_hash_for_auth.each {|k,v| @request.cookies[ENV['FACEBOOK_API_KEY']+k] = CGI::Cookie.new(ENV['FACEBOOK_API_KEY']+k,v)} 
+      setup_fb_connect_cookies(expired_cookie_hash_for_auth)
       get :index, modified_params
       assert_equal(321, @controller.facebook_session.user.id)
   end
           
   def test_session_can_be_secured_with_cookies
-    cookie_hash_for_auth.each {|k,v| @request.cookies[ENV['FACEBOOK_API_KEY']+k] = CGI::Cookie.new(ENV['FACEBOOK_API_KEY']+k,v)} 
+    setup_fb_connect_cookies
     get :index
     assert_equal(77777, @controller.facebook_session.user.id)
     end
   
   def test_session_does_NOT_secure_with_expired_cookies
-    expired_cookie_hash_for_auth.each {|k,v| @request.cookies[ENV['FACEBOOK_API_KEY']+k] = CGI::Cookie.new(ENV['FACEBOOK_API_KEY']+k,v)} 
+    setup_fb_connect_cookies(expired_cookie_hash_for_auth)
     get :index
     assert_nil(@controller.facebook_session)
   end
@@ -908,6 +954,23 @@ class RailsHelperTest < Test::Unit::TestCase
   def test_init_fb_connect_with_features
     assert @h.init_fb_connect("XFBML").match(/XFBML/)
   end
+  
+  def test_init_fb_connect_with_features_and_body
+    @h.expects(:capture).returns("Body Content")
+    
+    @h.init_fb_connect("XFBML") do
+    end
+    assert @h.output_buffer =~ /Body Content/
+  end
+  
+  def test_fb_login_and_redirect
+    assert_equal @h.fb_login_and_redirect("/path"),"<fb:login-button onlogin=\"window.location.href = &quot;/path&quot;;\"></fb:login-button>"
+  end
+  
+  def test_fb_logout_link
+    assert_equal @h.fb_logout_link("Logout","My URL"),"<a href=\"#\" onclick=\"FB.Connect.logoutAndRedirect(&quot;My URL&quot;);; return false;\">Logout</a>"
+  end
+  
   
   def test_fb_connect_javascript_tag
     assert_equal "<script src=\"http://static.ak.connect.facebook.com/js/api_lib/v0.4/FeatureLoader.js.php\" type=\"text/javascript\"></script>",

@@ -1,4 +1,4 @@
-=== x.x.x / 2009-xx-xx
+=== 1.0.13 / 2009-02-26
 
 * Modified fql_query to return results as Hashes as a last resort [Alan Larkin]
 * fixed typo in set app properties parser [Andrew Grim, shane]
