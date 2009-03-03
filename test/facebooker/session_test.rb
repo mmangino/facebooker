@@ -1,6 +1,7 @@
-require File.dirname(__FILE__) + '/test_helper.rb'
+require File.expand_path(File.dirname(__FILE__) + '/../test_helper')
+require 'active_support'
 
-class SessionTest < Test::Unit::TestCase
+class Facebooker::SessionTest < Test::Unit::TestCase
 
 
   def setup

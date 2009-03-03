@@ -1,5 +1,6 @@
-require File.dirname(__FILE__) + '/test_helper.rb'
-class BatchRequestTest < Test::Unit::TestCase
+require File.expand_path(File.dirname(__FILE__) + '/../test_helper.rb')
+
+class Facebooker::BatchRequestTest < Test::Unit::TestCase
   
   def setup
     @proc_called=false

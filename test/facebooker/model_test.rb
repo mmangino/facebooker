@@ -1,8 +1,6 @@
-require File.dirname(__FILE__) + '/test_helper.rb'
-require 'rubygems'
-require 'flexmock/test_unit'
+require File.expand_path(File.dirname(__FILE__) + '/../test_helper.rb')
 
-class TestFacebooker < Test::Unit::TestCase
+class Facebooker::ModelTest < Test::Unit::TestCase
   
   class ComplexThing
     include Facebooker::Model

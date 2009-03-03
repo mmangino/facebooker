@@ -1,7 +1,7 @@
-require File.dirname(__FILE__) + '/test_helper.rb'
+require File.expand_path(File.dirname(__FILE__) + '/../test_helper.rb')
+require 'logger'
 
-
-class LoggingTest < Test::Unit::TestCase
+class Facebooker::LoggingTest < Test::Unit::TestCase
   def setup
     super
     Facebooker.logger = Logger.new(STDERR)

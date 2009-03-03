@@ -1,6 +1,6 @@
-require File.dirname(__FILE__) + '/test_helper.rb'
+require File.expand_path(File.dirname(__FILE__) + '/../../test_helper.rb')
 
-class EventTest< Test::Unit::TestCase
+class Facebooker::EventTest < Test::Unit::TestCase
   def test_attendance_will_query_for_event_when_asked_for_full_event_object
     session = flexmock("a session object")
     eid = 123

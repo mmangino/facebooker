@@ -3,8 +3,6 @@ require 'rubygems'
 require 'flexmock/test_unit'
 require 'mocha'
 
-require File.dirname(__FILE__)+'/../lib/facebooker/rails/test_helpers'
-
 $: << File.join(File.dirname(__FILE__), '..', 'lib')
 
 rails_root = File.join(File.dirname(__FILE__),'..','..')
@@ -15,6 +13,8 @@ else
 end
 
 require 'facebooker'
+require 'facebooker/rails/test_helpers'
+
 
 class Test::Unit::TestCase
   include Facebooker::Rails::TestHelpers

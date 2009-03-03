@@ -1,14 +1,5 @@
-require File.dirname(__FILE__) + '/test_helper.rb'
+require File.expand_path(File.dirname(__FILE__) + '/../rails_test_helper')
 begin
-  require 'action_controller'
-  require 'action_controller/test_process'
-  require 'facebooker/rails/controller'
-  require 'facebooker/rails/helpers/fb_connect'
-  require 'facebooker/rails/helpers'
-  require 'facebooker/rails/facebook_form_builder'
-  require File.dirname(__FILE__)+'/../init'
-  require 'mocha'
-  
   ActionController::Routing::Routes.draw do |map|
     map.connect '', :controller=>"facebook",:conditions=>{:canvas=>true}
     map.connect '', :controller=>"plain_old_rails"

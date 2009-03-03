@@ -1,8 +1,6 @@
-require File.dirname(__FILE__) + '/test_helper.rb'
-require 'facebooker'
-class SessionTest < Test::Unit::TestCase
+require File.expand_path(File.dirname(__FILE__) + '/../test_helper.rb')
 
-
+class Facebooker::SessionTest < Test::Unit::TestCase
   def setup
     ENV['FACEBOOK_API_KEY'] = '1234567'
     ENV['FACEBOOK_SECRET_KEY'] = '7654321'   

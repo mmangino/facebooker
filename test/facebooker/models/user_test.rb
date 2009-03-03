@@ -1,8 +1,7 @@
-require File.dirname(__FILE__) + '/test_helper.rb'
-require 'rubygems'
-require 'flexmock/test_unit'
+require File.expand_path(File.dirname(__FILE__) + '/../../test_helper')
+require 'active_support'
 
-class UserTest < Test::Unit::TestCase
+class Facebooker::UserTest < Test::Unit::TestCase
   
   def setup
     @session = Facebooker::Session.create('apikey', 'secretkey')

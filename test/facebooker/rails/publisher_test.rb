@@ -1,15 +1,4 @@
-require File.dirname(__FILE__) + '/test_helper.rb'
-require 'rubygems'
-require 'flexmock/test_unit'
-require 'action_controller'
-require 'action_controller/test_process'
-require 'active_record'
-require File.dirname(__FILE__)+'/../init'
-require 'facebooker/rails/controller'
-require 'facebooker/rails/helpers/fb_connect'
-require 'facebooker/rails/helpers'
-require 'facebooker/rails/publisher'
-
+require File.expand_path(File.dirname(__FILE__) + '/../../rails_test_helper')
 
 module SymbolHelper
   def symbol_helper_loaded
@@ -143,7 +132,7 @@ class TestPublisher < Facebooker::Rails::Publisher
   
 end
 
-class FacebookTemplateTest < Test::Unit::TestCase
+class Facebooker::Rails::Publisher::FacebookTemplateTest < Test::Unit::TestCase
   FacebookTemplate = Facebooker::Rails::Publisher::FacebookTemplate
   
   def setup
@@ -207,7 +196,7 @@ class FacebookTemplateTest < Test::Unit::TestCase
   end
 end
 
-class PublisherTest < Test::Unit::TestCase
+class Facebooker::Rails::Publisher::PublisherTest < Test::Unit::TestCase
   FacebookTemplate = Facebooker::Rails::Publisher::FacebookTemplate
   
   def setup
