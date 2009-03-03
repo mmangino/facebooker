@@ -1,4 +1,4 @@
-require File.expand_path(File.dirname(__FILE__) + '/../test_helper.rb')
+require File.expand_path(File.dirname(__FILE__) + '/../test_helper')
 require 'net/http_multipart_post'
 
 class HttpMulitpartPostTest < Test::Unit::TestCase

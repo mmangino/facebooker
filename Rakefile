@@ -15,7 +15,7 @@ Hoe.new('facebooker', Facebooker::VERSION::STRING) do |p|
   p.url = p.paragraphs_of('README.txt', 0).first.split(/\n/)[1..-1]
   p.changes = p.paragraphs_of('History.txt', 0..1).join("\n\n")
   p.remote_rdoc_dir = '' # Release to root
-  p.test_globs = 'test/*.rb'
+  p.test_globs = 'test/**/*_test.rb'
   p.extra_deps << ['json', '>= 1.0.0'] 
 end
 
