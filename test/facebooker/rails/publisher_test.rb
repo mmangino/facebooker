@@ -399,12 +399,17 @@ class Facebooker::Rails::Publisher::PublisherTest < Test::Unit::TestCase
   
   def test_image_urls
     Facebooker.expects(:facebook_path_prefix).returns("/mike")
-    assert_equal({:src => '/images/image.png', :href => 'raw_string' },
-        TestPublisher.new.image('image.png', 'raw_string'))
-    assert_equal({:src => '/images/image.png', :href => 'http://apps.facebook.com/mike/pokes/do/1' },
-        TestPublisher.new.image('image.png', {:controller => :pokes, :action => :do, :id => 1}))
+    string_image = TestPublisher.new.image('image.png', 'raw_string')
+    assert_equal('/images/image.png',string_image.src)
+    assert_equal('raw_string',string_image.href)
+    route_image = TestPublisher.new.image('image.png', {:controller => :pokes, :action => :do, :id => 1})
+    assert_equal('http://apps.facebook.com/mike/pokes/do/1',route_image.href)
   end
   
+  def test_image_to_json_puts_src_first
+    string_image = TestPublisher.new.image('image.png', 'raw_string')
+    assert_equal "{\"src\":\"/images/image.png\", \"href\":\"raw_string\"}",string_image.to_json
+  end
   def test_action_link
     assert_equal({:text=>"text", :href=>"href"}, TestPublisher.new.action_link("text","href"))
   end

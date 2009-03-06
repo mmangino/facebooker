@@ -312,10 +312,23 @@ module Facebooker
         end
       end
       
-      def image(src,target)
-        {:src=>image_path(src),:href=> target.respond_to?(:to_str) ? target : url_for(target)}
+      # work around the fact that facebook cares about the order of the keys in the hash
+      class ImageHolder
+        attr_accessor :src,:href
+        def initialize(src,href)
+          self.src=src
+          self.href=href
+        end
+
+        def to_json
+          "{\"src\":#{src.to_json}, \"href\":#{href.to_json}}"
+        end
       end
       
+      def image(src,target)
+        ImageHolder.new(image_path(src),target.respond_to?(:to_str) ? target : url_for(target))
+      end
+           
       def action_link(text,target)
         {:text=>text, :href=>target}
       end
