@@ -10,7 +10,8 @@ module Facebooker
     end
     
     # Send the given message to the user.
-    def send(user, message, session_id = nil, request_session = false)
+    # See http://wiki.developers.facebook.com/index.php/Mobile
+    def send(user, message)
       @session.post('facebook.sms.send', 
         {:uid => User.cast_to_facebook_id(user), 
         :message => message}, false)
