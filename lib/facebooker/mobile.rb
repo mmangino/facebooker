@@ -12,8 +12,8 @@ module Facebooker
     # Send the given message to the user.
     def send(user, message, session_id = nil, request_session = false)
       @session.post('facebook.sms.send', 
-        :uid => User.cast_to_facebook_id(user), 
-        :message => message)
+        {:uid => User.cast_to_facebook_id(user), 
+        :message => message}, false)
     end
   end
 end
