@@ -29,9 +29,10 @@ namespace :test do
   desc 'Aggregate code coverage for unit, functional and integration tests'
   Rcov::RcovTask.new(:coverage) do |t|
     t.libs << "test"
-    t.test_files = FileList["test/*.rb"]
+    t.test_files = FileList["test/**/*_test.rb"]
     t.output_dir = "coverage/"
     t.verbose = true
+    t.rcov_opts = ['--exclude', 'test,/usr/lib/ruby,/Library/Ruby,/System/Library', '--sort', 'coverage']
   end
 end
 
