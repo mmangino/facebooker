@@ -3,7 +3,11 @@
 require 'rubygems'
 ENV['RUBY_FLAGS']="-I#{%w(lib ext bin test).join(File::PATH_SEPARATOR)}"
 require 'hoe'
-require 'load_multi_rails_rake_tasks' rescue nil
+begin
+  require 'load_multi_rails_rake_tasks'
+rescue LoadError
+  $stderr.puts "Install the multi_rails gem to run tests against multiple versions of Rails"
+end
 
  $: << File.dirname(__FILE__) + '/lib'
 require './lib/facebooker.rb'
