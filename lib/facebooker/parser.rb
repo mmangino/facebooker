@@ -462,6 +462,18 @@ module Facebooker
     end
   end  
 
+  class SmsSend < Parser#:nodoc:
+    def self.process(data)
+      element('sms_send_response', data).text_value
+    end
+  end
+  
+  class SmsCanSend < Parser#:nodoc:
+    def self.process(data)
+      element('sms_canSend_response', data).text_value
+    end
+  end
+
   class Errors < Parser#:nodoc:
     EXCEPTIONS = {
       1 	=> Facebooker::Session::UnknownError,
@@ -569,7 +581,9 @@ module Facebooker
       'facebook.notifications.sendEmail' => NotificationsSendEmail,
       'facebook.data.getUserPreference' => GetPreference,
       'facebook.data.setUserPreference' => SetPreference,
-      'facebook.video.upload' => UploadVideo
+      'facebook.video.upload' => UploadVideo,
+      'facebook.sms.send' => SmsSend,
+      'facebook.sms.canSend' => SmsCanSend
     }
   end
 end

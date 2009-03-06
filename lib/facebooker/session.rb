@@ -273,6 +273,10 @@ module Facebooker
       Facebooker::Admin.new(self)
     end
     
+    def mobile
+      Facebooker::Mobile.new(self)
+    end
+    
     #
     # Given an array like:
     # [[userid, otheruserid], [yetanotherid, andanotherid]]
