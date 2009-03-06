@@ -1,220 +1,220 @@
 require File.expand_path(File.dirname(__FILE__) + '/../rails_test_helper')
-begin
-  ActionController::Routing::Routes.draw do |map|
-    map.connect '', :controller=>"facebook",:conditions=>{:canvas=>true}
-    map.connect '', :controller=>"plain_old_rails"
-    map.resources :comments, :controller=>"plain_old_rails"
-    map.connect 'require_auth/:action', :controller => "controller_which_requires_facebook_authentication"
-    map.connect 'require_install/:action', :controller => "controller_which_requires_application_installation"
-    map.connect ':controller/:action/:id', :controller => "plain_old_rails"
-  end  
-  
-  module FBConnectTestHelpers
-    def setup_fb_connect_cookies(params=cookie_hash_for_auth)
-      params.each {|k,v| @request.cookies[ENV['FACEBOOK_API_KEY']+k] = CGI::Cookie.new(ENV['FACEBOOK_API_KEY']+k,v)} 
-    end
-  
-    def expired_cookie_hash_for_auth
-      {"_ss" => "not_used", "_session_key"=> "whatever", "_user"=>"77777", "_expires"=>"#{1.day.ago.to_i}"}
-    end
 
-    def cookie_hash_for_auth
-      {"_ss" => "not_used", "_session_key"=> "whatever", "_user"=>"77777", "_expires"=>"#{1.day.from_now.to_i}"}
-    end
-  end
-  class NoisyController < ActionController::Base
-    include Facebooker::Rails::Controller
-    def rescue_action(e) raise e end
-  end
-  
-  
-  class ControllerWhichRequiresExtendedPermissions< NoisyController
-    ensure_authenticated_to_facebook
-    before_filter :ensure_has_status_update
-    before_filter :ensure_has_photo_upload
-    before_filter :ensure_has_video_upload
-    before_filter :ensure_has_create_listing
-    def index
-      render :text => 'score!'
-    end
-  end
-  
-  class FBConnectController < NoisyController
-    before_filter :create_facebook_session
-    def index
-      render :text => 'score!'
-    end
-  end
-  
-  class ControllerWhichRequiresFacebookAuthentication < NoisyController
-    ensure_authenticated_to_facebook
-    def index
-      render :text => 'score!'
-    end
-    def link_test
-      options = {}
-      options[:canvas] = true if params[:canvas] == true
-      options[:canvas] = false if params[:canvas] == false
-      render :text=>url_for(options)
-    end
-    
-     def named_route_test
-      render :text=>comments_url()
-    end
-    
-    def image_test
-      render :inline=>"<%=image_tag 'image.png'%>"
-    end
-    
-    def fb_params_test
-      render :text=>facebook_params['user']
-    end
-    
-    def publisher_test
-      if wants_interface?
-        render :text=>"interface"
-      else
-        render :text=>"not interface"
-      end
-    end
-    
-    def publisher_test_interface
-      render_publisher_interface("This is a test",false,true)
-    end
-    
-    def publisher_test_response
-      ua=Facebooker::Rails::Publisher::UserAction.new
-      ua.data = {:params=>true}
-      ua.template_name = "template_name"
-      ua.template_id =  1234
-      render_publisher_response(ua)
-    end
-    
-    def publisher_test_error
-      render_publisher_error("Title","Body")
-    end
-    
-  end
-  class ControllerWhichRequiresApplicationInstallation < NoisyController
-    ensure_application_is_installed_by_facebook_user
-    def index
-      render :text => 'installed!'
-    end    
-  end
-  class FacebookController < ActionController::Base
-    def index
-    end
-  end
-  
-  class PlainOldRailsController < ActionController::Base
-    def index
-    end
-    def link_test
-      options = {}
-      options[:canvas] = true if params[:canvas] == true
-      options[:canvas] = false if params[:canvas] == false
-      render :text => url_for(options)
-    end
-    
-    def named_route_test
-      render :text=>comments_url()
-    end
-    def canvas_false_test
-      render :text=>comments_url(:canvas=>false)
-    end
-    def canvas_true_test
-      render :text=>comments_url(:canvas=>true)
-    end
-  end
-  
-  class ControllerWhichFails < ActionController::Base
-    def pass
-      render :text=>''
-    end
-    def fail
-      raise "I'm failing"
-    end
-  end
-  
-  class Test::Unit::TestCase
-    include Facebooker::Rails::TestHelpers
-  end
-  
-  
-  # you can't use asset_recognize, because it can't pass parameters in to the requests
-  class UrlRecognitionTests < Test::Unit::TestCase
-    def test_detects_in_canvas
-      request = ActionController::TestRequest.new({"fb_sig_in_canvas"=>"1"}, {}, nil)
-      request.path   = "/"
-      ActionController::Routing::Routes.recognize(request)
-      assert_equal({"controller"=>"facebook","action"=>"index"},request.path_parameters)
-    end
-    
-    def test_routes_when_not_in_canvas
-      request = ActionController::TestRequest.new({}, {}, nil)
-      request.path   = "/"
-      ActionController::Routing::Routes.recognize(request)
-      assert_equal({"controller"=>"plain_old_rails","action"=>"index"},request.path_parameters)
-    end
-  end
-  
-  class RailsIntegrationTestForFBConnect < Test::Unit::TestCase
-    include FBConnectTestHelpers
-    
-    def setup
-      ENV['FACEBOOK_CANVAS_PATH'] ='facebook_app_name'
-      ENV['FACEBOOK_API_KEY'] = '1234567'
-      ENV['FACEBOOK_SECRET_KEY'] = '7654321'
-      @controller = FBConnectController.new
-      @request    = ActionController::TestRequest.new
-      @response   = ActionController::TestResponse.new
-      @controller.stubs(:verify_signature).returns(true)
-              
-    end
-    
-    def test_doesnt_set_cookie_but_facebook_session_is_available
-      setup_fb_connect_cookies
-      get :index
-      assert_not_nil @controller.facebook_session
-      assert_nil @response.cookies[:facebook_session] 
-      
-    end
-  end
-  
-  class RailsIntegrationTestForNonFacebookControllers < Test::Unit::TestCase
-    def setup
-      ENV['FACEBOOK_CANVAS_PATH'] ='facebook_app_name'
-      ENV['FACEBOOK_API_KEY'] = '1234567'
-      ENV['FACEBOOK_SECRET_KEY'] = '7654321'
-      @controller = PlainOldRailsController.new
-      @request    = ActionController::TestRequest.new
-      @response   = ActionController::TestResponse.new        
-    end
+ActionController::Routing::Routes.draw do |map|
+  map.connect '', :controller=>"facebook",:conditions=>{:canvas=>true}
+  map.connect '', :controller=>"plain_old_rails"
+  map.resources :comments, :controller=>"plain_old_rails"
+  map.connect 'require_auth/:action', :controller => "controller_which_requires_facebook_authentication"
+  map.connect 'require_install/:action', :controller => "controller_which_requires_application_installation"
+  map.connect ':controller/:action/:id', :controller => "plain_old_rails"
+end  
 
-    def test_url_for_links_to_callback_if_canvas_is_false_and_in_canvas
-      get :link_test
-      assert_match /test.host/,@response.body
+module FBConnectTestHelpers
+  def setup_fb_connect_cookies(params=cookie_hash_for_auth)
+    params.each {|k,v| @request.cookies[ENV['FACEBOOK_API_KEY']+k] = CGI::Cookie.new(ENV['FACEBOOK_API_KEY']+k,v)} 
+  end
+
+  def expired_cookie_hash_for_auth
+    {"_ss" => "not_used", "_session_key"=> "whatever", "_user"=>"77777", "_expires"=>"#{1.day.ago.to_i}"}
+  end
+
+  def cookie_hash_for_auth
+    {"_ss" => "not_used", "_session_key"=> "whatever", "_user"=>"77777", "_expires"=>"#{1.day.from_now.to_i}"}
+  end
+end
+class NoisyController < ActionController::Base
+  include Facebooker::Rails::Controller
+  def rescue_action(e) raise e end
+end
+
+
+class ControllerWhichRequiresExtendedPermissions< NoisyController
+  ensure_authenticated_to_facebook
+  before_filter :ensure_has_status_update
+  before_filter :ensure_has_photo_upload
+  before_filter :ensure_has_video_upload
+  before_filter :ensure_has_create_listing
+  def index
+    render :text => 'score!'
+  end
+end
+
+class FBConnectController < NoisyController
+  before_filter :create_facebook_session
+  def index
+    render :text => 'score!'
+  end
+end
+
+class ControllerWhichRequiresFacebookAuthentication < NoisyController
+  ensure_authenticated_to_facebook
+  def index
+    render :text => 'score!'
+  end
+  def link_test
+    options = {}
+    options[:canvas] = true if params[:canvas] == true
+    options[:canvas] = false if params[:canvas] == false
+    render :text=>url_for(options)
+  end
+  
+   def named_route_test
+    render :text=>comments_url()
+  end
+  
+  def image_test
+    render :inline=>"<%=image_tag 'image.png'%>"
+  end
+  
+  def fb_params_test
+    render :text=>facebook_params['user']
+  end
+  
+  def publisher_test
+    if wants_interface?
+      render :text=>"interface"
+    else
+      render :text=>"not interface"
     end
-    
-    def test_named_route_doesnt_include_canvas_path_when_not_in_canvas
-      get :named_route_test
-      assert_equal "http://test.host/comments",@response.body
-    end
-    def test_named_route_includes_canvas_path_when_in_canvas
-      get :named_route_test, facebook_params
-      assert_equal "http://apps.facebook.com/facebook_app_name/comments",@response.body
-    end
-   
-    def test_named_route_doesnt_include_canvas_path_when_in_canvas_with_canvas_equals_false
-      get :canvas_false_test, facebook_params
-      assert_equal "http://test.host/comments",@response.body
-    end
-    def test_named_route_does_include_canvas_path_when_not_in_canvas_with_canvas_equals_true
-      get :canvas_true_test
-      assert_equal "http://apps.facebook.com/facebook_app_name/comments",@response.body
-    end
+  end
+  
+  def publisher_test_interface
+    render_publisher_interface("This is a test",false,true)
+  end
+  
+  def publisher_test_response
+    ua=Facebooker::Rails::Publisher::UserAction.new
+    ua.data = {:params=>true}
+    ua.template_name = "template_name"
+    ua.template_id =  1234
+    render_publisher_response(ua)
+  end
+  
+  def publisher_test_error
+    render_publisher_error("Title","Body")
+  end
+  
+end
+class ControllerWhichRequiresApplicationInstallation < NoisyController
+  ensure_application_is_installed_by_facebook_user
+  def index
+    render :text => 'installed!'
+  end    
+end
+class FacebookController < ActionController::Base
+  def index
+  end
+end
+
+class PlainOldRailsController < ActionController::Base
+  def index
+  end
+  def link_test
+    options = {}
+    options[:canvas] = true if params[:canvas] == true
+    options[:canvas] = false if params[:canvas] == false
+    render :text => url_for(options)
+  end
+  
+  def named_route_test
+    render :text=>comments_url()
+  end
+  def canvas_false_test
+    render :text=>comments_url(:canvas=>false)
+  end
+  def canvas_true_test
+    render :text=>comments_url(:canvas=>true)
+  end
+end
+
+class ControllerWhichFails < ActionController::Base
+  def pass
+    render :text=>''
+  end
+  def fail
+    raise "I'm failing"
+  end
+end
+
+class Test::Unit::TestCase
+  include Facebooker::Rails::TestHelpers
+end
+
+
+# you can't use asset_recognize, because it can't pass parameters in to the requests
+class UrlRecognitionTests < Test::Unit::TestCase
+  def test_detects_in_canvas
+    request = ActionController::TestRequest.new({"fb_sig_in_canvas"=>"1"}, {}, nil)
+    request.path   = "/"
+    ActionController::Routing::Routes.recognize(request)
+    assert_equal({"controller"=>"facebook","action"=>"index"},request.path_parameters)
+  end
+  
+  def test_routes_when_not_in_canvas
+    request = ActionController::TestRequest.new({}, {}, nil)
+    request.path   = "/"
+    ActionController::Routing::Routes.recognize(request)
+    assert_equal({"controller"=>"plain_old_rails","action"=>"index"},request.path_parameters)
+  end
+end
+
+class RailsIntegrationTestForFBConnect < Test::Unit::TestCase
+  include FBConnectTestHelpers
+  
+  def setup
+    ENV['FACEBOOK_CANVAS_PATH'] ='facebook_app_name'
+    ENV['FACEBOOK_API_KEY'] = '1234567'
+    ENV['FACEBOOK_SECRET_KEY'] = '7654321'
+    @controller = FBConnectController.new
+    @request    = ActionController::TestRequest.new
+    @response   = ActionController::TestResponse.new
+    @controller.stubs(:verify_signature).returns(true)
+            
+  end
+  
+  def test_doesnt_set_cookie_but_facebook_session_is_available
+    setup_fb_connect_cookies
+    get :index
+    assert_not_nil @controller.facebook_session
+    assert_nil @response.cookies[:facebook_session] 
     
   end
+end
+
+class RailsIntegrationTestForNonFacebookControllers < Test::Unit::TestCase
+  def setup
+    ENV['FACEBOOK_CANVAS_PATH'] ='facebook_app_name'
+    ENV['FACEBOOK_API_KEY'] = '1234567'
+    ENV['FACEBOOK_SECRET_KEY'] = '7654321'
+    @controller = PlainOldRailsController.new
+    @request    = ActionController::TestRequest.new
+    @response   = ActionController::TestResponse.new        
+  end
+
+  def test_url_for_links_to_callback_if_canvas_is_false_and_in_canvas
+    get :link_test
+    assert_match /test.host/,@response.body
+  end
+  
+  def test_named_route_doesnt_include_canvas_path_when_not_in_canvas
+    get :named_route_test
+    assert_equal "http://test.host/comments",@response.body
+  end
+  def test_named_route_includes_canvas_path_when_in_canvas
+    get :named_route_test, facebook_params
+    assert_equal "http://apps.facebook.com/facebook_app_name/comments",@response.body
+  end
+ 
+  def test_named_route_doesnt_include_canvas_path_when_in_canvas_with_canvas_equals_false
+    get :canvas_false_test, facebook_params
+    assert_equal "http://test.host/comments",@response.body
+  end
+  def test_named_route_does_include_canvas_path_when_not_in_canvas_with_canvas_equals_true
+    get :canvas_true_test
+    assert_equal "http://apps.facebook.com/facebook_app_name/comments",@response.body
+  end
+  
+end
   
 class RailsIntegrationTestForExtendedPermissions < Test::Unit::TestCase
   def setup
@@ -478,17 +478,17 @@ class RailsIntegrationTest < Test::Unit::TestCase
   
   def test_publisher_test_error
     get :publisher_test_error, facebook_params
-    assert_equal JSON.parse("{\"errorCode\": 1, \"errorTitle\": \"Title\", \"errorMessage\": \"Body\"}"), JSON.parse(@response.body)
+    assert_equal Facebooker.json_decode("{\"errorCode\": 1, \"errorTitle\": \"Title\", \"errorMessage\": \"Body\"}"), Facebooker.json_decode(@response.body)
   end
   
   def test_publisher_test_interface
     get :publisher_test_interface, facebook_params
-    assert_equal JSON.parse("{\"method\": \"publisher_getInterface\", \"content\": {\"fbml\": \"This is a test\", \"publishEnabled\": false, \"commentEnabled\": true}}"), JSON.parse(@response.body)
+    assert_equal Facebooker.json_decode("{\"method\": \"publisher_getInterface\", \"content\": {\"fbml\": \"This is a test\", \"publishEnabled\": false, \"commentEnabled\": true}}"), Facebooker.json_decode(@response.body)
   end
   
   def test_publisher_test_reponse
     get :publisher_test_response, facebook_params
-    assert_equal JSON.parse("{\"method\": \"publisher_getFeedStory\", \"content\": {\"feed\": {\"template_data\": {\"params\": true}, \"template_id\": 1234}}}"), JSON.parse(@response.body)
+    assert_equal Facebooker.json_decode("{\"method\": \"publisher_getFeedStory\", \"content\": {\"feed\": {\"template_data\": {\"params\": true}, \"template_id\": 1234}}}"), Facebooker.json_decode(@response.body)
     
   end
   
@@ -1303,8 +1303,3 @@ class RailsRequestFormatTest < Test::Unit::TestCase
   end
   
 end
-
-# rescue LoadError
-#   $stderr.puts "Couldn't find action controller.  That's OK.  We'll skip it."
-end
-
