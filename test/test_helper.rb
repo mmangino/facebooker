@@ -1,5 +1,6 @@
 require 'test/unit'
 require 'rubygems'
+require 'multi_rails_init' rescue nil
 require 'flexmock/test_unit'
 require 'mocha'
 

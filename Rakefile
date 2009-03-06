@@ -3,6 +3,8 @@
 require 'rubygems'
 ENV['RUBY_FLAGS']="-I#{%w(lib ext bin test).join(File::PATH_SEPARATOR)}"
 require 'hoe'
+require 'load_multi_rails_rake_tasks' rescue nil
+
  $: << File.dirname(__FILE__) + '/lib'
 require './lib/facebooker.rb'
 
