@@ -464,7 +464,7 @@ module Facebooker
 
   class SmsSend < Parser#:nodoc:
     def self.process(data)
-      element('sms_send_response', data).text_value
+      element('sms_send_response', data).text_value == '0'
     end
   end
   
