@@ -17,24 +17,22 @@ class Facebooker::Rails::IntegrationSession < ActionController::Integration::Ses
     super
   end
   
-  def get_with_canvas(path, parameters = nil, headers = nil)
+  def get(path, parameters = nil, headers = nil)
     if canvas
       post path, (parameters || {}).merge('fb_sig_request_method' => 'GET'), headers
     else
-      get_without_canvas path, parameters, headers
+      super path, parameters, headers
     end
   end
-  alias_method_chain :get, :canvas
   
   %w(put delete).each do |method|
-    define_method "#{method}_with_canvas" do |*args|
+    define_method method do |*args|
       if canvas
         path, parameters, headers = *args
         post path, (parameters || {}).merge('_method' => method.upcase), headers
       else
-        send "#{method}_without_canvas", *args
+        super *args
       end
     end
-    alias_method_chain method, :canvas
   end
 end
