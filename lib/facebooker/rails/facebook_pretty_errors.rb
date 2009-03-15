@@ -1,10 +1,11 @@
 class ActionController::Base
   def rescues_path_with_facebooker(template_name)
-    if pretty_facebook_errors?
-      t = "#{RAILS_ROOT}/vendor/plugins/facebooker/templates/#{template_name}.erb"
-      template_name = t if File.exist?(t)
+    t = "#{RAILS_ROOT}/vendor/plugins/facebooker/templates/#{template_name}.erb"
+    if pretty_facebook_errors? && File.exist?(t)
+      t
+    else
+      rescues_path_without_facebooker(template_name)
     end
-    rescues_path_without_facebooker(template_name)
   end
   alias_method_chain :rescues_path, :facebooker
 
