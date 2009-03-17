@@ -516,7 +516,7 @@ module Facebooker
       base = params.delete(:base)
       Logging.log_fb_api(method, params) do
         add_facebook_params(params, method)
-        @session_key && params[:session_key] ||= @session_key
+        @session_key && params[:session_key] ||= @session_key unless params[:uid]
         service.post_file(params.merge(:base => base, :sig => signature_for(params.reject{|key, value| key.nil?})))
       end
     end
