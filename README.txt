@@ -76,7 +76,13 @@ end
 
 (The MIT License)
 
-Copyright (c) 2008 FIX
+Copyright (c) 2008-2009:
+
+ * Chad Fowler
+ * Patrick Ewing
+ * Mike Mangino
+ * Shane Vitarana
+ * Corey Innis
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
