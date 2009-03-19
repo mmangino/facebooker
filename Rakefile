@@ -9,20 +9,19 @@ rescue LoadError
   $stderr.puts "Install the multi_rails gem to run tests against multiple versions of Rails"
 end
 
- $: << File.dirname(__FILE__) + '/lib'
+$: << File.dirname(__FILE__) + '/lib'
 require './lib/facebooker.rb'
 
-Hoe.new('facebooker', Facebooker::VERSION::STRING) do |p|
+HOE = Hoe.new('facebooker', Facebooker::VERSION::STRING) do |p|
   p.rubyforge_name = 'facebooker'
   p.author = ['Chad Fowler', 'Patrick Ewing', 'Mike Mangino', 'Shane Vitarana', 'Corey Innis']
   p.email = 'mmangino@elevatedrails.com'
-  p.summary = 'Pure, idiomatic Ruby wrapper for the Facebook REST API.'
-  p.description = p.paragraphs_of('README.rdoc', 2..5).join("\n\n")
-  p.url = p.paragraphs_of('README.rdoc', 0).first.split(/\n/)[1..-1]
-  p.changes = p.paragraphs_of('History.rdoc', 0..1).join("\n\n")
+  p.readme_file   = 'README.rdoc'
+  p.history_file  = 'CHANGELOG.rdoc'
   p.remote_rdoc_dir = '' # Release to root
   p.test_globs = 'test/**/*_test.rb'
   p.extra_deps << ['json', '>= 1.0.0'] 
+  p.extra_rdoc_files  = FileList['*.rdoc']
 end
 
 require 'rcov/rcovtask'
@@ -42,16 +41,20 @@ namespace :test do
   end
 end
 
-gem_spec_file = 'facebooker.gemspec'
+namespace :gem do
+  task :spec do
+    File.open("#{HOE.name}.gemspec", 'w') do |f|
+      f.write(HOE.spec.to_ruby)
+    end
+  end
 
-gem_spec = eval(File.read(gem_spec_file)) rescue nil
-
-desc "Generate the gemspec file."
-task :gemspec do
-  require 'erb'
-
-  File.open(gem_spec_file, 'w') do |f|
-    f.write ERB.new(File.read("#{gem_spec_file}.erb")).result(binding)
+  namespace :spec do
+    task :dev do
+      File.open("#{HOE.name}.gemspec", 'w') do |f|
+        HOE.spec.version = "#{HOE.version}.#{Time.now.strftime("%Y%m%d%H%M%S")}"
+        f.write(HOE.spec.to_ruby)
+      end
+    end
   end
 end
 

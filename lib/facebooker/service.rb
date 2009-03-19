@@ -2,7 +2,6 @@ begin
   require 'curb'
   Facebooker.use_curl = true
 rescue LoadError
-  $stderr.puts "Curb not found. Using Net::HTTP."
   require 'net/http'
 end
 require 'facebooker/parser'
