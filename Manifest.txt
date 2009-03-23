@@ -124,5 +124,4 @@ test/fixtures/multipart_post_body_with_single_file_that_has_nil_key.txt
 test/net/http_multipart_post_test.rb
 test/rails_test_helper.rb
 test/test_helper.rb
-test/user_test.rb
 test/facebooker/mobile_test.rb
