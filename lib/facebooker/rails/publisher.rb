@@ -320,7 +320,7 @@ module Facebooker
           self.href=href
         end
 
-        def to_json
+        def to_json(*args)
           "{\"src\":#{src.to_json}, \"href\":#{href.to_json}}"
         end
       end
