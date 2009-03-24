@@ -245,17 +245,17 @@ module Facebooker
     #
     # This does not set profile actions, that should be done with profile_action=
     def profile_fbml=(markup)
-      set_profile_fbml(markup, nil, nil)
+      set_profile_fbml(markup, nil, nil, nil)
     end
     
     ##
     # Set the mobile profile FBML
     def mobile_fbml=(markup)
-      set_profile_fbml(nil, markup, nil)
+      set_profile_fbml(nil, markup, nil,nil)
     end
     
     def profile_action=(markup)
-      set_profile_fbml(nil, nil, markup)
+      set_profile_fbml(nil, nil, markup,nil)
     end
     
     def profile_main=(markup)

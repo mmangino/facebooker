@@ -76,15 +76,15 @@ class Facebooker::UserTest < Test::Unit::TestCase
   end
   
   def test_can_set_mobile_fbml
-    @user.expects(:set_profile_fbml).with(nil,"test",nil)
+    @user.expects(:set_profile_fbml).with(nil,"test",nil,nil)
     @user.mobile_fbml="test"
   end
   def test_can_set_profile_action
-    @user.expects(:set_profile_fbml).with(nil,nil,"test")
+    @user.expects(:set_profile_fbml).with(nil,nil,"test",nil)
     @user.profile_action="test"
   end
   def test_can_set_profile_fbml
-    @user.expects(:set_profile_fbml).with("test",nil,nil)
+    @user.expects(:set_profile_fbml).with("test",nil,nil,nil)
     @user.profile_fbml="test"
   end
   
