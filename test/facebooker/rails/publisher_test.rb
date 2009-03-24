@@ -108,6 +108,13 @@ class TestPublisher < Facebooker::Rails::Publisher
     from user
     data :friend=>"Mike"
   end
+  
+  def user_action_with_template_id(user)
+    send_as :user_action
+    from user
+    data :friend=>"Mike"  
+    template_id 4
+  end
   def user_action_with_story_size(user)
     send_as :user_action
     from user
@@ -334,6 +341,15 @@ class Facebooker::Rails::Publisher::PublisherTest < Test::Unit::TestCase
                                                    returns(20309041537)
     ua = TestPublisher.create_user_action(@from_user)
     assert_equal "user_action", ua.template_name
+  end
+  def test_create_user_action_with_template_id
+    @from_user = Facebooker::User.new
+    @session = Facebooker::Session.new("","")
+    @from_user.stubs(:session).returns(@session)
+    Facebooker::Rails::Publisher::FacebookTemplate.expects(:bundle_id_for_class_and_method).
+                                                   with(TestPublisher,'user_action').never
+    ua = TestPublisher.create_user_action_with_template_id(@from_user)
+    assert_equal 4,ua.template_id
   end
   
   def test_publisher_user_action

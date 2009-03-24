@@ -224,6 +224,7 @@ module Facebooker
         attr_accessor :template_id
         attr_accessor :template_name
         attr_accessor :story_size
+        
         def target_ids=(val)
           @target_ids = val.is_a?(Array) ? val.join(",") : val
         end
@@ -471,7 +472,7 @@ module Facebooker
           case publisher._body
           when UserAction
             publisher._body.template_name = method
-            publisher._body.template_id = FacebookTemplate.bundle_id_for_class_and_method(self,method)
+            publisher._body.template_id ||= FacebookTemplate.bundle_id_for_class_and_method(self,method)
           end
           
           should_send ? publisher.send_message(method) : publisher._body
