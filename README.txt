@@ -22,6 +22,7 @@ Facebooker is a Ruby wrapper over the Facebook[http://facebook.com] {REST API}[h
 == SYNOPSIS:
 
 View David Clements' {excellent tutorial}[http://apps.facebook.com/facebooker_tutorial] at {http://apps.facebook.com/facebooker_tutorial/}[http://apps.facebook.com/facebooker_tutorial] or check out {Developing Facebook Platform Applications with Rails}[http://www.pragprog.com/titles/mmfacer].
+{Join the Mailing List}:[groups.google.com/group/facebooker]
 
 == REQUIREMENTS:
 

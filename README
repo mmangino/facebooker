@@ -42,5 +42,5 @@ I'm not saying it meets its goals fully yet.  Please help.  I'm especially inter
 
 == Contribute
 
-Please visit the {RubyForge project page}[http://rubyforge.org/projects/facebooker] to get the latest source via svn, write some tests, add/fix features, and submit a patch via the tracker.  If you submit a good patch, it's likely that I'll add you to the project for commit access if you want to be added.
+Please visit the {GitHub page}[http://github.com/mmangino/facebooker/tree/] to get the latest source via svn, write some tests, add/fix features, and submit a patch via the tracker.  If you submit a good patch, it's likely that I'll add you to the project for commit access if you want to be added. 
 
