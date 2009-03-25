@@ -405,7 +405,10 @@ module Facebooker
         #only do this on Rails 2.1
 	      if ActionController::Base.respond_to?(:append_view_path)
   	      # only add the view path once
-	        ActionController::Base.append_view_path(controller_root) unless ActionController::Base.view_paths.include?(controller_root)
+  	      unless ActionController::Base.view_paths.include?(controller_root)
+	          ActionController::Base.append_view_path(controller_root) 
+	          ActionController::Base.append_view_path(controller_root+"/..") 
+	        end
 	      end
         returning ActionView::Base.new([template_root,controller_root], assigns, self) do |template|
           template.controller=self
