@@ -33,7 +33,7 @@ module Rack
     def call(env)
       if @condition.nil? || @condition.call(env)
         request = Rack::Request.new(env)
-        request.parameters
+        request.params
         fb_params = extract_fb_sig_params(request.POST)
         unless fb_params.empty?
           unless signature_is_valid?(fb_params, request.POST['fb_sig'])
