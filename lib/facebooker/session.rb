@@ -6,7 +6,15 @@ module Facebooker
   # other than the logged in user (if that's unallowed)
   class NonSessionUser < StandardError;  end
   class Session
+    
+    #
+    # Raised when a facebook session has expired.  This 
+    # happens when the timeout is reached, or when the
+    # user logs out of facebook
+    # can be handled with:
+    # rescue_from Facebooker::Session::SessionExpired, :with => :some_method_name
     class SessionExpired < StandardError; end
+
     class UnknownError < StandardError; end
     class ServiceUnavailable < StandardError; end
     class MaxRequestsDepleted < StandardError; end

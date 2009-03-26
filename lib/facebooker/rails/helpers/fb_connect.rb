@@ -59,6 +59,7 @@ module Facebooker
 
           content_tag("fb:login-button",nil, options)
         end
+
         def fb_login_and_redirect(url)
           js = update_page do |page|
             page.redirect_to url
@@ -70,16 +71,16 @@ module Facebooker
           content_tag "fb:unconnected-friends-count",nil
         end
         
-        def fb_logout_link(text,url)
+        def fb_logout_link(text,url,*args)
           js = update_page do |page|
             page.call "FB.Connect.logoutAndRedirect",url
           end
-          link_to_function text, js
+          link_to_function text, js, *args
         end
         
-        def fb_user_action(action)
+        def fb_user_action(action, user_message = "", prompt = "", callback = nil)
           update_page do |page|
-            page.call "FB.Connect.showFeedDialog",action.template_id,action.data,action.target_ids,action.body_general,nil,"FB.RequireConnect.promptConnect"
+            page.call "FB.Connect.showFeedDialog",action.template_id,action.data,action.target_ids,action.body_general,nil,"FB.RequireConnect.promptConnect",callback,prompt,user_message
           end
         end
         
