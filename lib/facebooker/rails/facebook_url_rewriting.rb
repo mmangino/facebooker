@@ -1,8 +1,16 @@
 module ::ActionController
-  class AbstractRequest                         
-    def relative_url_root
-      Facebooker.path_prefix
-    end                                         
+  if Rails.version < '2.3'
+    class AbstractRequest                         
+      def relative_url_root
+        Facebooker.path_prefix
+      end                                         
+    end
+  else
+    class Request                         
+      def relative_url_root
+        Facebooker.path_prefix
+      end                                         
+    end
   end
   
   class Base
