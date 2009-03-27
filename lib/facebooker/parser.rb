@@ -96,6 +96,18 @@ module Facebooker
       array_of_text_values(element("connect_registerUsers_response", data), "connect_registerUsers_response_elt")
     end
   end
+  
+  class UnregisterUsers < Parser
+    def self.process(data)
+      array_of_text_values(element("connect_unregisterUsers_response", data), "connect_unregisterUsers_response_elt")
+    end
+  end
+
+  class GetUnconnectedFriendsCount < Parser
+    def self.process(data)
+      hash_or_value_for(element("connect_getUnconnectedFriendsCount_response",data)).to_i 
+    end
+  end
 
   class GetSession < Parser#:nodoc:
     def self.process(data)      
@@ -530,6 +542,8 @@ module Facebooker
       'facebook.auth.createToken' => CreateToken,
       'facebook.auth.getSession' => GetSession,
       'facebook.connect.registerUsers' => RegisterUsers,
+      'facebook.connect.unregisterUsers' => UnregisterUsers,
+      'facebook.connect.getUnconnectedFriendsCount' => GetUnconnectedFriendsCount,
       'facebook.users.getInfo' => UserInfo,
       'facebook.users.getStandardInfo' => UserStandardInfo,
       'facebook.users.setStatus' => SetStatus,
