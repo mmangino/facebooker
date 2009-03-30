@@ -19,7 +19,7 @@ class Facebooker::LoggingTest < Test::Unit::TestCase
   end
 
   def test_does_not_crash_outside_rails
-    flexmock(Facebooker.logger, :logger).should_receive(:debug).once.with(String)
+    flexmock(Facebooker.logger, :logger).should_receive(:info).once.with(String)
     Facebooker::Logging.log_fb_api('sample.api.call',
                           {'param1' => true, 'param2' => 'value2'})
   end
@@ -32,7 +32,7 @@ class Facebooker::LoggingTest < Test::Unit::TestCase
   end 
   
   def test_plain_format
-    flexmock(Facebooker.logger, :logger).should_receive(:debug).once.with(
+    flexmock(Facebooker.logger, :logger).should_receive(:info).once.with(
         'sample.api.call (0) param1 = true')
     Facebooker::Logging.log_fb_api('sample.api.call',
                           {'param1' => true})
