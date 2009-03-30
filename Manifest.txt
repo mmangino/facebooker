@@ -1,5 +1,5 @@
 COPYING.rdoc
-History.rdoc
+CHANGELOG.rdoc
 README.rdoc
 Rakefile
 TODO.rdoc
