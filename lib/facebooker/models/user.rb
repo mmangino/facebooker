@@ -377,6 +377,28 @@ module Facebooker
         ret
       end
     end
+
+    # Get a count of unconnected friends
+    def getUnconnectedFriendsCount
+      session.post("facebook.connect.getUnconnectedFriendsCount")
+    end
+
+
+    # Unregister a bunch of users
+    def self.unregister(emails)
+      emails = emails.collect {|e| hash_email(e)}
+      Facebooker::Session.create.post("facebook.connect.unregisterUsers",:email_hashes=>emails.to_json) do |ret|
+        ret.each do |hash|
+          emails.delete(hash)
+        end
+        unless emails.empty?
+          e=Facebooker::Session::UserUnRegistrationFailed.new
+          e.failed_users = emails
+          raise e
+        end
+        ret
+      end      
+    end
     
     def self.hash_email(email)
       email = email.downcase.strip

@@ -56,6 +56,9 @@ module Facebooker
     class TooManyUnapprovedPhotosPending < StandardError; end
     class ExtendedPermissionRequired < StandardError; end
     class InvalidFriendList < StandardError; end
+    class UserUnRegistrationFailed < StandardError
+      attr_accessor :failed_users
+    end
     class UserRegistrationFailed < StandardError
       attr_accessor :failed_users
     end

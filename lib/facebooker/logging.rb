@@ -44,7 +44,7 @@ module Facebooker
     def self.log_info(message, dump, seconds = 0)
       return unless Facebooker.logger
       log_message = "#{message} (#{seconds}) #{dump}"
-      Facebooker.logger.debug(log_message)
+      Facebooker.logger.info(log_message)
     end
     
   end  
