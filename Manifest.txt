@@ -1,4 +1,3 @@
-CHANGELOG.rdoc
 COPYING.rdoc
 History.rdoc
 README.rdoc
