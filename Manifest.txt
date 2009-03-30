@@ -1,11 +1,9 @@
-CHANGELOG.txt
-COPYING
-History.txt
-Manifest.txt
-README
-README.txt
+CHANGELOG.rdoc
+COPYING.rdoc
+History.rdoc
+README.rdoc
 Rakefile
-TODO.txt
+TODO.rdoc
 generators/publisher/publisher_generator.rb
 generators/facebook/facebook_generator.rb
 generators/facebook/templates/config/facebooker.yml
