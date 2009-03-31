@@ -60,11 +60,11 @@ module Facebooker
           content_tag("fb:login-button",nil, options)
         end
 
-        def fb_login_and_redirect(url)
+        def fb_login_and_redirect(url, options = {})
           js = update_page do |page|
             page.redirect_to url
           end
-          content_tag("fb:login-button",nil,:onlogin=>js)
+          content_tag("fb:login-button",nil,options.merge(:onlogin=>js))
         end
         
         def fb_unconnected_friends_count
