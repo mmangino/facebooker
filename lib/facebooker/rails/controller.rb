@@ -219,7 +219,7 @@ module Facebooker
       end
       
       def request_is_facebook_ajax?
-        params["fb_sig_is_mockajax"]=="1" || params["fb_sig_is_ajax"]=="1"
+        params["fb_sig_is_mockajax"]=="1" || params["fb_sig_is_ajax"]=="1" || params["fb_sig_is_ajax"]==true || params["fb_sig_is_mockajax"]==true
       end
       def xml_http_request?
         request_is_facebook_ajax? || super
@@ -270,9 +270,9 @@ module Facebooker
       
       def set_facebook_request_format
         if request_is_facebook_ajax?
-          params[:format] = 'fbjs'
+          request.format = :fbjs
         elsif request_comes_from_facebook?
-          params[:format] = 'fbml'
+          request.format = :fbml
         end
       end
       
