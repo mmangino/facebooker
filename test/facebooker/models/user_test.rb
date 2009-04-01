@@ -189,6 +189,11 @@ class Facebooker::UserTest < Test::Unit::TestCase
     expect_http_posts_with_responses(unregister_response_xml)
     assert_equal ["4228600737_c96da02bba97aedfd26136e980ae3761"],Facebooker::User.unregister(["4228600737_c96da02bba97aedfd26136e980ae3761"])
   end
+
+  def test_unregister_emails_with_array
+    expect_http_posts_with_responses(unregister_response_xml)
+    assert_equal ["mary@example.com"],Facebooker::User.unregister_emails(["mary@example.com"])
+  end
   
   def test_register_with_array_raises_if_not_all_success
     expect_http_posts_with_responses(register_response_xml)
@@ -205,6 +210,15 @@ class Facebooker::UserTest < Test::Unit::TestCase
   rescue Facebooker::Session::UserUnRegistrationFailed => e
     assert_equal("3587916587_791214eb452bf4de30e957d65a0234d4",e.failed_users.first)
   end
+
+  def test_unregister_emails_with_array_raises_if_not_all_success
+    expect_http_posts_with_responses(unregister_response_xml)
+    assert_equal ["mary@example.com"],Facebooker::User.unregister_emails(["mary@example.com","mike@example.com"])
+    fail "Should have raised Facebooker::Session::UserUnRegistrationFailed"
+  rescue Facebooker::Session::UserUnRegistrationFailed => e
+    assert_equal("mike@example.com",e.failed_users.first)
+  end
+
   
   def test_get_locale
     @user = Facebooker::User.new(9507801, @session)

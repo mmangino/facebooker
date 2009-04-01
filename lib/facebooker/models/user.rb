@@ -384,7 +384,7 @@ module Facebooker
     end
 
 
-    # Unregister a bunch of users
+    # Unregister an array of email hashes
     def self.unregister(email_hashes)
       Facebooker::Session.create.post("facebook.connect.unregisterUsers",:email_hashes=>email_hashes.to_json) do |ret|
         ret.each do |hash|
@@ -397,6 +397,20 @@ module Facebooker
         end
         ret
       end      
+    end
+    
+    # unregister an array of email addresses
+    def self.unregister_emails(emails)
+      emails_hash  = {}
+      emails.each {|e| emails_hash[hash_email(e)] = e}
+      begin 
+        unregister(emails_hash.keys).collect {|r| emails_hash[r]}
+      rescue
+        # re-raise with emails instead of hashes.
+        e = Facebooker::Session::UserUnRegistrationFailed.new
+        e.failed_users = $!.failed_users.collect { |f| emails_hash[f] }
+        raise e
+      end
     end
     
     def self.hash_email(email)
