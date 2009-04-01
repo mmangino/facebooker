@@ -185,12 +185,25 @@ class Facebooker::UserTest < Test::Unit::TestCase
     assert_equal ["4228600737_c96da02bba97aedfd26136e980ae3761"],Facebooker::User.register([{:email=>"mary@example.com",:account_id=>1}])
   end
   
+  def test_unregister_with_array
+    expect_http_posts_with_responses(unregister_response_xml)
+    assert_equal ["4228600737_c96da02bba97aedfd26136e980ae3761"],Facebooker::User.unregister(["4228600737_c96da02bba97aedfd26136e980ae3761"])
+  end
+  
   def test_register_with_array_raises_if_not_all_success
     expect_http_posts_with_responses(register_response_xml)
     assert_equal ["4228600737_c96da02bba97aedfd26136e980ae3761"],Facebooker::User.register([{:email=>"mary@example.com",:account_id=>1},{:email=>"mike@example.com",:account_id=>2}])
     fail "Should have raised Facebooker::Session::UserRegistrationFailed"
   rescue Facebooker::Session::UserRegistrationFailed => e
     assert_equal({:email=>"mike@example.com",:account_id=>2},e.failed_users.first)
+  end
+  
+  def test_unregister_with_array_raises_if_not_all_success
+    expect_http_posts_with_responses(unregister_response_xml)
+    assert_equal ["4228600737_c96da02bba97aedfd26136e980ae3761"],Facebooker::User.unregister(["4228600737_c96da02bba97aedfd26136e980ae3761","3587916587_791214eb452bf4de30e957d65a0234d4"])
+    fail "Should have raised Facebooker::Session::UserUnRegistrationFailed"
+  rescue Facebooker::Session::UserUnRegistrationFailed => e
+    assert_equal("3587916587_791214eb452bf4de30e957d65a0234d4",e.failed_users.first)
   end
   
   def test_get_locale
@@ -282,6 +295,15 @@ class Facebooker::UserTest < Test::Unit::TestCase
     </connect_registerUsers_response>
     XML
   end
+  
+  def unregister_response_xml
+    <<-XML
+    <?xml version="1.0" encoding="UTF-8"?> 
+    <connect_unregisterUsers_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/facebook.xsd" list="true"> 
+      <connect_unregisterUsers_response_elt>4228600737_c96da02bba97aedfd26136e980ae3761</connect_unregisterUsers_response_elt> 
+    </connect_unregisterUsers_response>
+    XML
+  end  
   
   def has_app_permission_response_xml
     <<-XML

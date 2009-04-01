@@ -385,15 +385,14 @@ module Facebooker
 
 
     # Unregister a bunch of users
-    def self.unregister(emails)
-      emails = emails.collect {|e| hash_email(e)}
-      Facebooker::Session.create.post("facebook.connect.unregisterUsers",:email_hashes=>emails.to_json) do |ret|
+    def self.unregister(email_hashes)
+      Facebooker::Session.create.post("facebook.connect.unregisterUsers",:email_hashes=>email_hashes.to_json) do |ret|
         ret.each do |hash|
-          emails.delete(hash)
+          email_hashes.delete(hash)
         end
-        unless emails.empty?
+        unless email_hashes.empty?
           e=Facebooker::Session::UserUnRegistrationFailed.new
-          e.failed_users = emails
+          e.failed_users = email_hashes
           raise e
         end
         ret
