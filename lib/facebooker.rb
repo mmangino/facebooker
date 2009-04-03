@@ -48,14 +48,14 @@ module Facebooker
         Facebooker.set_asset_host_to_callback_url = config['set_asset_host_to_callback_url'] 
       end
       if Object.const_defined?("ActionController") and Facebooker.set_asset_host_to_callback_url
-        ActionController::Base.asset_host ||= config['callback_url'] 
+        ActionController::Base.asset_host = config['callback_url'] 
       end
       Facebooker.timeout = config['timeout']
       @facebooker_configuration = config
     end
     
     def facebooker_config
-      @facebooker_configuration 
+      @facebooker_configuration || {} # to prevent pretty_errors error if the config hasn't been set yet
     end
     
      def current_adapter=(adapter_class)
