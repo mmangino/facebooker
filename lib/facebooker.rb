@@ -28,23 +28,30 @@ module Facebooker
     def load_configuration(facebooker_yaml_file)
       if File.exist?(facebooker_yaml_file)
         if defined? RAILS_ENV
-          facebooker = YAML.load_file(facebooker_yaml_file)[RAILS_ENV] 
+          config = YAML.load_file(facebooker_yaml_file)[RAILS_ENV] 
         else
-          facebooker = YAML.load_file(facebooker_yaml_file)           
+          config = YAML.load_file(facebooker_yaml_file)           
         end
-        ENV['FACEBOOK_API_KEY'] = facebooker['api_key']
-        ENV['FACEBOOK_SECRET_KEY'] = facebooker['secret_key']
-        ENV['FACEBOOKER_RELATIVE_URL_ROOT'] = facebooker['canvas_page_name']
-        ENV['FACEBOOKER_API'] = facebooker['api']
-        if facebooker.has_key?('set_asset_host_to_callback_url')
-          Facebooker.set_asset_host_to_callback_url = facebooker['set_asset_host_to_callback_url'] 
-        end
-        Facebooker.timeout = facebooker['timeout']
-        if Object.const_defined?("ActionController")
-          ActionController::Base.asset_host = facebooker['callback_url'] if(ActionController::Base.asset_host.blank?)  && Facebooker.set_asset_host_to_callback_url
-        end
-        @facebooker_configuration = facebooker
+        apply_configuration(config)
       end
+    end
+    
+    # Sets the Facebook environment based on a hash of options. 
+    # By default the hash passed in is loaded from facebooker.yml, but it can also be passed in
+    # manually every request to run multiple Facebook apps off one Rails app. 
+    def apply_configuration(config)
+      ENV['FACEBOOK_API_KEY']             = config['api_key']
+      ENV['FACEBOOK_SECRET_KEY']          = config['secret_key']
+      ENV['FACEBOOKER_RELATIVE_URL_ROOT'] = config['canvas_page_name']
+      ENV['FACEBOOKER_API']               = config['api']
+      if config.has_key?('set_asset_host_to_callback_url')
+        Facebooker.set_asset_host_to_callback_url = config['set_asset_host_to_callback_url'] 
+      end
+      if Object.const_defined?("ActionController") and Facebooker.set_asset_host_to_callback_url
+        ActionController::Base.asset_host ||= config['callback_url'] 
+      end
+      Facebooker.timeout = config['timeout']
+      @facebooker_configuration = config
     end
     
     def facebooker_config
