@@ -54,7 +54,7 @@ module Facebooker
         def fb_login_button(*args)
 
           callback = args.first
-          options = args.second || {}
+          options = args[1] || {}
           options.merge!(:onlogin=>callback)if callback
 
           content_tag("fb:login-button",nil, options)
