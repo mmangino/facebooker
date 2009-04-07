@@ -371,10 +371,11 @@ module Facebooker
     # publish a previously rendered template bundle
     # see http://wiki.developers.facebook.com/index.php/Feed.publishUserAction
     #
-    def publish_user_action(bundle_id,data={},target_ids=nil,body_general=nil)
+    def publish_user_action(bundle_id,data={},target_ids=nil,body_general=nil,story_size=nil)
       parameters={:template_bundle_id=>bundle_id,:template_data=>data.to_json}
       parameters[:target_ids] = target_ids unless target_ids.blank?
       parameters[:body_general] = body_general unless body_general.blank?
+      parameters[:story_size] = story_size unless story_size.nil?
       post("facebook.feed.publishUserAction", parameters)
     end
     

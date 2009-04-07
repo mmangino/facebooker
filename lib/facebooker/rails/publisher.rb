@@ -229,8 +229,7 @@ module Facebooker
           @target_ids = val.is_a?(Array) ? val.join(",") : val
         end
         def data_hash
-          default_data = story_size.nil? ? {} : {:story_size=>story_size}
-          default_data.merge(data||{})
+          data||{}
         end
       end
       
@@ -378,7 +377,7 @@ module Facebooker
         when Ref
           Facebooker::Session.create.server_cache.set_ref_handle(_body.handle,_body.fbml)
         when UserAction
-          @from.session.publish_user_action(_body.template_id,_body.data_hash,_body.target_ids,_body.body_general)
+          @from.session.publish_user_action(_body.template_id,_body.data_hash,_body.target_ids,_body.body_general,_body.story_size)
         else
           raise UnspecifiedBodyType.new("You must specify a valid send_as")
         end

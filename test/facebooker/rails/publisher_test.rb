@@ -356,7 +356,7 @@ class Facebooker::Rails::Publisher::PublisherTest < Test::Unit::TestCase
     @from_user = Facebooker::User.new
     @session = Facebooker::Session.new("","")
     @from_user.stubs(:session).returns(@session)
-    @session.expects(:publish_user_action).with(20309041537,{:friend=>"Mike"},nil,nil)
+    @session.expects(:publish_user_action).with(20309041537,{:friend=>"Mike"},nil,nil,nil)
     
     Facebooker::Rails::Publisher::FacebookTemplate.expects(:bundle_id_for_class_and_method).
                                                    with(TestPublisher, 'user_action').
@@ -371,7 +371,7 @@ class Facebooker::Rails::Publisher::PublisherTest < Test::Unit::TestCase
     @from_user = Facebooker::User.new
     @session = Facebooker::Session.new("","")
     @from_user.stubs(:session).returns(@session)
-    @session.expects(:publish_user_action).with(20309041537,{:friend=>"Mike", :story_size=>2},nil,nil)
+    @session.expects(:publish_user_action).with(20309041537,{:friend=>"Mike"},nil,nil,2)
     
     Facebooker::Rails::Publisher::FacebookTemplate.expects(:bundle_id_for_class_and_method).
                                                    with(TestPublisher, 'user_action_with_story_size').
@@ -384,7 +384,7 @@ class Facebooker::Rails::Publisher::PublisherTest < Test::Unit::TestCase
     @from_user = Facebooker::User.new
     @session = Facebooker::Session.new("","")
     @from_user.stubs(:session).returns(@session)
-    @session.expects(:publish_user_action).with(20309041537,{},nil,nil)
+    @session.expects(:publish_user_action).with(20309041537,{},nil,nil,nil)
     
     Facebooker::Rails::Publisher::FacebookTemplate.stubs(:bundle_id_for_class_and_method).returns(20309041537)
     TestPublisher.deliver_user_action_no_data(@from_user)
