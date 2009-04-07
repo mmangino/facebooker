@@ -1118,30 +1118,28 @@ class RailsPrettyErrorsTest < Test::Unit::TestCase
   end
   
   def setup
+    Facebooker.apply_configuration('api_key'=>"1234", 'secret_key'=>"34278",'canvas_page_name'=>'mike','pretty_errors'=>true)
     @controller = ControllerWhichFails.new
     @request    = ActionController::TestRequest.new
     @response   = ActionController::TestResponse.new
   end
   
   def test_pretty_errors_disabled_success
-    Facebooker.facebooker_config.stubs(:[]).with('pretty_errors').returns(false)
     post :pass, facebook_params
     assert_response 200
   end
   
   def test_pretty_errors_disabled_error
-    Facebooker.facebooker_config.stubs(:[]).with('pretty_errors').returns(false)
+    Facebooker.apply_configuration('api_key'=>"1234", 'secret_key'=>"34278",'canvas_page_name'=>'mike','pretty_errors'=>false)
     post :fail, facebook_params
     assert_response :error
   end
   
   def test_pretty_errors_enabled_success
-    Facebooker.facebooker_config.stubs(:[]).with('pretty_errors').returns(true)
     post :pass, facebook_params
     assert_response 200
   end
   def test_pretty_errors_enabled_error
-    Facebooker.facebooker_config.stubs(:[]).with('pretty_errors').returns(true)
     post :fail, facebook_params
     assert_response 200
   end
@@ -1301,6 +1299,9 @@ class RailsRequestFormatTest < Test::Unit::TestCase
   end
   
   def setup
+    ENV['FACEBOOK_CANVAS_PATH'] ='facebook_app_name'
+    ENV['FACEBOOK_API_KEY'] = '1234567'
+    ENV['FACEBOOK_SECRET_KEY'] = '7654321'
     @controller = FacebookController.new
     @request    = ActionController::TestRequest.new
     @response   = ActionController::TestResponse.new
