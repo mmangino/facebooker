@@ -122,10 +122,12 @@ module Facebooker
       unless hash.nil? || hash.empty?
         hash.each do |key, value|
           set_attr_method = "#{key}="
-          if !value.nil? && respond_to?(set_attr_method)
-            self.__send__(set_attr_method, value) 
-          else
-            Facebooker::Logging.log_info("**Warning**, Attempt to set non-attribute: #{key}",hash)
+          if !value.nil?
+            if respond_to?(set_attr_method)
+              self.__send__(set_attr_method, value) 
+            else
+              Facebooker::Logging.log_info("**Warning**, Attempt to set non-attribute: #{key}",hash)
+            end
           end
         end
         @populated = true
