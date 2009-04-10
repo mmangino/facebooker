@@ -282,8 +282,9 @@ module Facebooker
       
       # Render an <fb:profile-pic> for the specified user.
       #
-      # You can optionally specify the size using the :size=> option.
-      # Valid sizes are :thumb, :small, :normal and :square
+      # You can optionally specify the size using the :size=> option.  Valid
+      # sizes are :thumb, :small, :normal and :square.  Or, you can specify
+      # width and height settings instead, just like an img tag.
       #
       # You can optionally specify whether or not to include the facebook icon
       # overlay using the :facebook_logo => true option. Default is false.
@@ -298,7 +299,7 @@ module Facebooker
       end
 
       FB_PROFILE_PIC_OPTION_KEYS_TO_TRANSFORM = {:facebook_logo => 'facebook-logo'}
-      FB_PROFILE_PIC_VALID_OPTION_KEYS = [:size, :linked, 'facebook-logo']
+      FB_PROFILE_PIC_VALID_OPTION_KEYS = [:size, :linked, 'facebook-logo', :width, :height]
             
       
       # Render an fb:photo tag.
