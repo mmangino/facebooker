@@ -591,7 +591,7 @@ class RailsHelperTest < Test::Unit::TestCase
   end
 
   def test_fb_profile_pic_with_width_and_height
-    assert_equal "<fb:profile-pic width=\"100\" height=\"200\" uid=\"1234\"></fb:profile-pic>", @h.fb_profile_pic("1234", :width => 100, :height => 200)
+    assert_equal "<fb:profile-pic height=\"200\" uid=\"1234\" width=\"100\"></fb:profile-pic>", @h.fb_profile_pic("1234", :width => 100, :height => 200)
   end
 
   def test_fb_profile_pic_with_invalid_size
