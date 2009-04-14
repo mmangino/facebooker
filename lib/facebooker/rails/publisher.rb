@@ -430,6 +430,7 @@ module Facebooker
         include ActionView::Helpers::FormHelper
         include ActionView::Helpers::FormTagHelper
         include ActionView::Helpers::AssetTagHelper
+        include ActionView::Helpers::NumberHelper
         include Facebooker::Rails::Helpers
         
         #define this for the publisher views
