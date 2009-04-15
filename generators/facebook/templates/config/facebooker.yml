@@ -20,6 +20,7 @@ development:
     public_host: 
     public_port: 4007
     local_port: 3000
+    server_alive_interval: 0
 
 test:
   api_key: 
@@ -32,6 +33,7 @@ test:
     public_host: 
     public_port: 4007
     local_port: 3000
+    server_alive_interval: 0
 
 production:
   api_key: 
@@ -44,3 +46,4 @@ production:
     public_host: 
     public_port: 4007
     local_port: 3000
+    server_alive_interval: 0
