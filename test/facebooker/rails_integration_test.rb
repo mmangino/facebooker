@@ -966,6 +966,20 @@ class RailsHelperTest < Test::Unit::TestCase
     end
     assert @h.output_buffer =~ /Body Content/
   end
+
+  def test_init_fb_connect_no_options
+    assert ! @h.init_fb_connect.match(/Element.observe\(window,'load',/)
+  end
+  
+  def test_init_fb_connect_with_options_js_jquery
+    assert ! @h.init_fb_connect(:js => :jquery).match(/\$\(document\).ready\(/)
+  end
+  
+  def test_init_fb_connect_with_features_and_options_js_jquery
+    assert @h.init_fb_connect("XFBML", :js => :jquery).match(/XFBML.*/)
+    assert @h.init_fb_connect("XFBML", :js => :jquery).match(/\$\(document\).ready\(/)
+  end
+
   
   def test_fb_login_and_redirect
     assert_equal @h.fb_login_and_redirect("/path"),"<fb:login-button onlogin=\"window.location.href = &quot;/path&quot;;\"></fb:login-button>"

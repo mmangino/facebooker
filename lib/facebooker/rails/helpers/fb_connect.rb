@@ -16,10 +16,19 @@ module Facebooker
           if block_given?
             additions = capture(&proc)
           end
+
+          options = {:js => :prototype}
+          if required_features.last.is_a?(Hash)
+            options.merge!(required_features.pop.symbolize_keys)
+          end
+
           init_string = "FB.Facebook.init('#{Facebooker.api_key}','/xd_receiver.html');"
           unless required_features.blank?
              init_string = <<-FBML
-              Element.observe(window,'load', function() {
+             #{case options[:js]
+               when :jquery then "$(document).ready("
+               else "Element.observe(window,'load',"
+               end} function() {
                 FB_RequireFeatures(#{required_features.to_json}, function() {
                   #{init_string}
                   #{additions}
