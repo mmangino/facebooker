@@ -1341,4 +1341,9 @@ class RailsRequestFormatTest < Test::Unit::TestCase
     assert_equal 'fbjs', @response.body
   end
   
+  def test_responds_to_html_when_iframe
+    get :index, facebook_params(:fb_sig_in_iframe => '1')
+    assert_equal 'html', @response.body
+  end
+  
 end

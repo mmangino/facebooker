@@ -218,6 +218,10 @@ module Facebooker
         !params["fb_sig_in_profile_tab"].blank?
       end
       
+      def request_is_facebook_iframe?
+        !params["fb_sig_in_iframe"].blank?
+      end
+      
       def request_is_facebook_ajax?
         params["fb_sig_is_mockajax"]=="1" || params["fb_sig_is_ajax"]=="1" || params["fb_sig_is_ajax"]==true || params["fb_sig_is_mockajax"]==true
       end
@@ -271,7 +275,7 @@ module Facebooker
       def set_facebook_request_format
         if request_is_facebook_ajax?
           request.format = :fbjs
-        elsif request_comes_from_facebook?
+        elsif request_comes_from_facebook? && !request_is_facebook_iframe?
           request.format = :fbml
         end
       end
