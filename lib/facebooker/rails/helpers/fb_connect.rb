@@ -36,8 +36,8 @@ module Facebooker
               });
               FBML
           end
-          if block_given?
-            concat javascript_tag(init_string)
+          if block_given? && block_is_within_action_view?(proc)
+            concat(javascript_tag(init_string), proc.binding)
           else
             javascript_tag init_string
           end
