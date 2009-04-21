@@ -44,6 +44,13 @@ module Facebooker
       
       FB_DIALOG_BUTTON_VALID_OPTION_KEYS = [:close_dialog, :href, :form_id, :clickrewriteurl, :clickrewriteid, :clickrewriteform]
       
+      def fb_show_feed_dialog(action, user_message = "", prompt = "", callback = nil)
+        update_page do |page|
+          page.call "Facebook.showFeedDialog",action.template_id,action.data,action.body_general,action.target_ids,callback,prompt,user_message
+        end
+      end
+      
+      
       # Create an fb:request-form without a selector
       #
       # The block passed to this tag is used as the content of the form
