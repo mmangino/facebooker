@@ -45,6 +45,27 @@ module Facebooker
         @facebook_params ||= verified_facebook_params
       end      
       
+      # Redirects the top window to the given url if the content is in an iframe, otherwise performs
+      # a normal redirect_to call.
+      def top_redirect_to(*args)
+        if request_is_facebook_iframe?
+          @redirect_url = url_for(*args)
+          render :layout => false, :inline => <<-HTML
+            <html><head>
+              <script type="text/javascript">  
+                window.top.location.href = <%= @redirect_url.to_json -%>;
+              </script>
+              <noscript>
+                <meta http-equiv="refresh" content="0;url=<%=h @redirect_url %>" />
+                <meta http-equiv="window-target" content="_top" />
+              </noscript>                
+            </head></html>
+          HTML
+        else
+          redirect_to(*args)
+        end
+      end
+      
       def redirect_to(*args)
         if request_is_for_a_facebook_canvas? and !request_is_facebook_tab?
           render :text => fbml_redirect_tag(*args)
@@ -140,7 +161,7 @@ module Facebooker
       def create_new_facebook_session_and_redirect!
         session[:facebook_session] = new_facebook_session
         url_params = after_facebook_login_url.nil? ? {} : {:next=>after_facebook_login_url}
-        redirect_to session[:facebook_session].login_url(url_params) unless @installation_required
+        top_redirect_to session[:facebook_session].login_url(url_params) unless @installation_required
         false
       end
       
@@ -249,7 +270,7 @@ module Facebooker
       end
       
       def application_needs_permission(perm)
-        redirect_to(facebook_session.permission_url(perm))
+        top_redirect_to(facebook_session.permission_url(perm))
       end
       
       def has_extended_permission?(perm)
@@ -269,7 +290,7 @@ module Facebooker
       
       def application_is_not_installed_by_facebook_user
         url_params = after_facebook_login_url.nil? ? {} : { :next => after_facebook_login_url }
-        redirect_to session[:facebook_session].install_url(url_params)
+        top_redirect_to session[:facebook_session].install_url(url_params)
       end
       
       def set_facebook_request_format

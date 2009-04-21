@@ -437,6 +437,15 @@ class RailsIntegrationTest < Test::Unit::TestCase
     assert_equal("<fb:redirect url=\"http://www.facebook.com/login.php?api_key=1234567&v=1.0\" />", @response.body)
   end
   
+  def test_redirect_to_renders_javascript_redirect_if_request_is_for_a_facebook_iframe
+    get :index, facebook_params(:fb_sig_user => nil, :fb_sig_in_iframe => 1)
+    assert_response :success
+    assert_match "javascript", @response.body
+    assert_match "http-equiv", @response.body
+    assert_match "http://www.facebook.com/login.php?api_key=1234567&v=1.0".to_json, @response.body
+    assert_match "http://www.facebook.com/login.php?api_key=1234567&amp;v=1.0", @response.body
+  end  
+  
   def test_url_for_links_to_canvas_if_canvas_is_true_and_not_in_canvas
     get :link_test, facebook_params(:fb_sig_in_canvas=>0,:canvas=>true)
     assert_match /apps.facebook.com/,@response.body
