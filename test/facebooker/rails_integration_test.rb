@@ -971,6 +971,8 @@ class RailsHelperTest < Test::Unit::TestCase
   def test_init_fb_connect_with_features_and_body
     @h.expects(:capture).returns("Body Content")
     
+    __in_erb_template = true
+
     @h.init_fb_connect("XFBML") do
     end
     assert @h.output_buffer =~ /Body Content/

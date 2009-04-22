@@ -36,8 +36,14 @@ module Facebooker
               });
               FBML
           end
-          if block_given? && block_is_within_action_view?(proc)
-            concat(javascript_tag(init_string), proc.binding)
+
+          # block_is_within_action_view? is rails 2.1.x and has been
+          # deprecated.  rails >= 2.2.x uses block_called_from_erb?
+          block_tester = respond_to?(:block_is_within_action_view?) ?
+            :block_is_within_action_view? : :block_called_from_erb?
+
+          if block_given? && send(block_tester, proc)
+            concat(javascript_tag(init_string))
           else
             javascript_tag init_string
           end
