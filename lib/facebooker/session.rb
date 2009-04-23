@@ -153,6 +153,8 @@ module Facebooker
     def initialize(api_key, secret_key)
       @api_key = api_key
       @secret_key = secret_key
+      @batch_request = nil
+      @session_key = nil
     end
     
     def secret_for_method(method_name)
