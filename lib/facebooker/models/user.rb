@@ -26,6 +26,7 @@ module Facebooker
     # id, session, (optional) attribute_hash
     # attribute_hash
     def initialize(*args)
+      @friends = nil
       if (args.first.kind_of?(String) || args.first.kind_of?(Integer)) && args.size==1
         self.uid = args.shift
         @session = Session.current

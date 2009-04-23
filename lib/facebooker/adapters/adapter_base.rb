@@ -26,6 +26,7 @@ module Facebooker
 
     def initialize(config)
       @config = config
+      @facebook_path_prefix = nil
     end
 
     def  self.facebooker_config
