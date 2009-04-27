@@ -705,6 +705,26 @@ module Facebooker
         tag "fb:time",stringify_vals({:t => time.to_i}.merge(options))
       end
       
+      # Constructs a form to reload the current page, and auto-submits the form.
+      #
+      # Put a call to this method in your application layout file after you open the body tag.
+      #
+      # Some browsers will not let an iframe set cookies.  However, cookies set by submitting a form in the
+      # iframe are allowed through, but only on some browsers (e.g. Safari 4.)  This trick does not work
+      # with Firefox 3 when third party cookies are disabled, and cannot be relied upon to work forever in 
+      # other browsers.
+      def fb_iframe_reload
+        return unless request.get? && cookies.empty? && params["facebooker_resubmitted"].nil? && params["fb_sig"]
+        
+        output = form_tag(request.url.gsub(/\?.*/, ""), :id => 'facebooker_resubmit_form', :style => "display: none;")
+        params.select {|k, v| !%w(controller action).include?(k)}.collect do |k, v|
+          output << hidden_field_tag(k, v)
+        end
+        output << hidden_field_tag("facebooker_resubmitted", "yes")
+        output << "</form>"        
+        output << javascript_tag('$("facebooker_resubmit_form").submit();')        
+      end
+      
       protected
       
       def cast_to_facebook_id(object)

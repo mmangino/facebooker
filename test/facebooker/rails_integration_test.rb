@@ -1081,6 +1081,52 @@ class RailsHelperTest < Test::Unit::TestCase
     assert_equal %Q{<fb:time t="#{time.to_i}" />}, @h.fb_time(time)
   end
 end
+
+class RailsFacebookIframeReloadTest < Test::Unit::TestCase
+  class Controller < ActionController::Base
+    include ActionView::Helpers::FormTagHelper
+    include ActionView::Helpers::UrlHelper
+    include ActionView::Helpers::TagHelper
+    include Facebooker::Rails::Helpers
+
+    def request
+      ActionController::TestRequest.new
+    end  
+  end
+    
+  def setup
+    @controller = Controller.new
+  end
+
+  def test_fb_iframe_reload
+    @controller.expects(:cookies).at_least_once.returns({})
+    @controller.expects(:params).at_least_once.returns({"test" => "param", "another" => "testparam", "fb_sig" => "signature"})
+    html = @controller.fb_iframe_reload
+    assert_match '<form action="http://test.host/" id="facebooker_resubmit_form" method="post" style="display: none;">', html
+    assert_match '<input id="another" name="another" type="hidden" value="testparam" />', html
+    assert_match '<input id="test" name="test" type="hidden" value="param" />', html
+    assert_match '<input id="facebooker_resubmitted" name="facebooker_resubmitted" type="hidden" value="yes" /></form>', html
+    assert_match '$("facebooker_resubmit_form").submit();', html
+  end
+  
+  def test_fb_iframe_reload_when_cookies_present
+    @controller.expects(:cookies).at_least_once.returns({"somecookie" => "here"})
+    assert_nil @controller.fb_iframe_reload
+  end
+  
+  def test_fb_iframe_reload_when_resubmit_param_present
+    @controller.expects(:cookies).at_least_once.returns({})
+    @controller.expects(:params).at_least_once.returns({"test" => "param", "another" => "testparam", "fb_sig" => "signature", "facebooker_resubmitted" => "yes"})
+    assert_nil @controller.fb_iframe_reload
+  end
+
+  def test_fb_iframe_reload_when_fb_sig_not_present
+    @controller.expects(:cookies).at_least_once.returns({})
+    @controller.expects(:params).at_least_once.returns({"test" => "param", "another" => "testparam"})
+    assert_nil @controller.fb_iframe_reload
+  end
+end  
+
 class TestModel
   attr_accessor :name,:facebook_id
 end
