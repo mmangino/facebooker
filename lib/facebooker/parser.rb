@@ -85,6 +85,12 @@ module Facebooker
     
   end  
   
+  class RevokeAuthorization < Parser#:nodoc:
+    def self.process(data)
+      element('auth_revokeAuthorization_response', data).text_value
+    end
+  end
+  
   class CreateToken < Parser#:nodoc:
     def self.process(data)
       element('auth_createToken_response', data).text_value
@@ -539,6 +545,7 @@ module Facebooker
   
   class Parser
     PARSERS = {
+      'facebook.auth.revokeAuthorization' => RevokeAuthorization,
       'facebook.auth.createToken' => CreateToken,
       'facebook.auth.getSession' => GetSession,
       'facebook.connect.registerUsers' => RegisterUsers,
