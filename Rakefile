@@ -1,7 +1,6 @@
 # -*- ruby -*-
 # 
 require 'rubygems'
-ENV['RUBY_FLAGS']="-I#{%w(lib ext bin test).join(File::PATH_SEPARATOR)}"
 require 'hoe'
 begin
   require 'load_multi_rails_rake_tasks'

@@ -1,16 +1,17 @@
 require 'action_pack'
+
 module Facebooker
   module Rails
-    
+
     # Facebook specific helpers for creating FBML
     # 
     # All helpers that take a user as a parameter will get the Facebook UID from the facebook_id attribute if it exists.
     # It will use to_s if the facebook_id attribute is not present.
     #
     module Helpers
-      
+
       include Facebooker::Rails::Helpers::FbConnect
-      
+
       # Create an fb:dialog
       # id must be a unique name e.g. "my_dialog"
       # cancel_button is true or false

@@ -1,6 +1,6 @@
 module Facebooker
   ##
-  # helper methods primarily supporting the management of Ruby objects which are populatable via Hashes.  
+  # helper methods primarily supporting the management of Ruby objects which are populatable via Hashes.
   # Since most Facebook API calls accept and return hashes of data (as XML), the Model module allows us to
   # directly populate a model's attributes given a Hash with matching key names.
   module Model
@@ -19,15 +19,15 @@ module Facebooker
         yield instance if block_given?
         instance
       end
-      
+
       ##
-      # Create a standard attr_writer and a populating_attr_reader      
+      # Create a standard attr_writer and a populating_attr_reader
       def populating_attr_accessor(*symbols)
-        attr_writer *symbols
-        populating_attr_reader *symbols
+        attr_writer(*symbols)
+        populating_attr_reader(*symbols)
       end
 
-      ## 
+      ##
       # Create a reader that will attempt to populate the model if it has not already been populated
       def populating_attr_reader(*symbols)
         symbols.each do |symbol|
@@ -59,27 +59,29 @@ module Facebooker
       def hash_settable_writer(symbol, klass)
         define_method("#{symbol}=") do |value|
           instance_variable_set("@#{symbol}", value.kind_of?(Hash) ? klass.from_hash(value) : value)
-        end        
+        end
       end
       
       #
       # Declares an attribute named ::symbol:: which can be set with either a list of instances of ::klass::
-      # or a list of Hashes which will be used to populate a new instance of ::klass::.      
+      # or a list of Hashes which will be used to populate a new instance of ::klass::.
       def hash_settable_list_accessor(symbol, klass)
         attr_reader symbol
         hash_settable_list_writer(symbol, klass)
       end
-      
+
       def hash_settable_list_writer(symbol, klass)
         define_method("#{symbol}=") do |list|
           instance_variable_set("@#{symbol}", list.map do |item|
             item.kind_of?(Hash) ? klass.from_hash(item) : item
           end)
         end
-      end      
+      end
 
       def id_is(attribute)
-        class_eval <<-EOS
+        (file, line) = caller.first.split(':')
+
+        class_eval(<<-EOS, file, line.to_i)
         def #{attribute}=(value)
           @#{attribute} = value.to_i
         end
@@ -90,7 +92,7 @@ module Facebooker
         EOS
       end
     end
-    
+
     ##
     # Centralized, error-checked place for a model to get the session to which it is bound.
     # Any Facebook API queries require a Session instance.
@@ -113,7 +115,7 @@ module Facebooker
     end
 
     def populated?
-      !@populated.nil?
+      @populated
     end
     
     ##

@@ -1,0 +1,15 @@
+Autotest.add_hook(:initialize) do |at|
+  at.clear_mappings
+  at.find_directories = %w(lib test)
+
+  at.add_exception("test/test_helper.rb")
+  at.add_exception("test/rails_test_helper.rb")
+
+  at.add_mapping(/^lib\/.*\.rb$/) do |file, _|
+    at.files_matching(/^test\/.*_test\.rb$/)
+  end
+
+  at.add_mapping(/^test\/.*_test\.rb$/) do |file, _|
+    file
+  end
+end

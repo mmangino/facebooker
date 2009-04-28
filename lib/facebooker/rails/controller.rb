@@ -12,7 +12,12 @@ module Facebooker
         controller.helper_method :request_comes_from_facebook?
       end
 
-    
+      def initialize *args
+        @facebook_session       = nil
+        @installation_required  = nil
+        super
+      end
+
       def facebook_session
         @facebook_session
       end

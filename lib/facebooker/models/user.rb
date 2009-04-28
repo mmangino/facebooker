@@ -10,23 +10,30 @@ module Facebooker
       include Model
       attr_accessor :message, :time, :status_id
     end
-    FIELDS = [:status, :political, :pic_small, :name, :quotes, :is_app_user, :tv, :profile_update_time, :meeting_sex, :hs_info, :timezone, :relationship_status, :hometown_location, :about_me, :wall_count, :significant_other_id, :pic_big, :music, :uid, :work_history, :sex, :religion, :notes_count, :activities, :pic_square, :movies, :has_added_app, :education_history, :birthday, :first_name, :meeting_for, :last_name, :interests, :current_location, :pic, :books, :affiliations, :locale, :profile_url, :proxied_email, :email_hashes, :allowed_restrictions, :pic_with_logo, :pic_big_with_logo, :pic_small_with_logo, :pic_square_with_logo]
+    FIELDS = [:political, :pic_small, :name, :quotes, :is_app_user, :tv, :profile_update_time, :meeting_sex, :hs_info, :timezone, :relationship_status, :hometown_location, :about_me, :wall_count, :significant_other_id, :pic_big, :music, :work_history, :sex, :religion, :notes_count, :activities, :pic_square, :movies, :has_added_app, :education_history, :birthday, :first_name, :meeting_for, :last_name, :interests, :current_location, :pic, :books, :affiliations, :locale, :profile_url, :proxied_email, :email_hashes, :allowed_restrictions, :pic_with_logo, :pic_big_with_logo, :pic_small_with_logo, :pic_square_with_logo]
     STANDARD_FIELDS = [:uid, :first_name, :last_name, :name, :timezone, :birthday, :sex, :affiliations, :locale, :profile_url, :pic_square]
-    populating_attr_accessor *FIELDS
+    populating_attr_accessor(*FIELDS)
     attr_reader :affiliations
     populating_hash_settable_accessor :current_location, Location
     populating_hash_settable_accessor :hometown_location, Location
     populating_hash_settable_accessor :hs_info, EducationInfo::HighschoolInfo
-    populating_hash_settable_accessor :status, Status
     populating_hash_settable_list_accessor :affiliations, Affiliation
     populating_hash_settable_list_accessor :education_history, EducationInfo
     populating_hash_settable_list_accessor :work_history, WorkInfo
-    
+
+    populating_attr_reader :status
+
     # Can pass in these two forms:
     # id, session, (optional) attribute_hash
     # attribute_hash
     def initialize(*args)
-      @friends = nil
+      @friends            = nil
+      @current_location   = nil
+      @pic                = nil
+      @hometown_location  = nil
+      @populated          = false
+      @session            = nil
+      @id                 = nil
       if (args.first.kind_of?(String) || args.first.kind_of?(Integer)) && args.size==1
         self.uid = args.shift
         @session = Session.current
@@ -36,7 +43,7 @@ module Facebooker
       end
       if args.last.kind_of?(Hash)
         populate_from_hash!(args.pop)
-      end     
+      end
     end
 
     id_is :uid
