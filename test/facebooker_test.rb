@@ -3,8 +3,8 @@ require 'net/http_multipart_post'
 class TestFacebooker < Test::Unit::TestCase
 
   def setup
-    @api_key = "95a71599e8293s66f1f0a6f4aeab3df7"
-    @secret_key = "3e4du8eea435d8e205a6c9b5d095bed1"
+    @api_key = "cd3e0af4e524c5c5ed5c2c79250251c0"
+    @secret_key = "d95b294063cc4aa54492306407877cde"
     ENV["FACEBOOK_API_KEY"] = @api_key
     ENV["FACEBOOK_SECRET_KEY"] = @secret_key
     @session = Facebooker::Session.create(@api_key, @secret_key)
@@ -357,6 +357,16 @@ class TestFacebooker < Test::Unit::TestCase
     assert_raises(Facebooker::NonSessionUser) {
       @desktop_session.user.friends.first.profile_fbml = "O rly"
     }
+  end
+  
+  def test_revoke_authorization_true
+    expect_http_posts_with_responses(example_revoke_authorization_true)
+    assert_equal true, @session.post('facebook.auth.revokeAuthorization', :uid => 123)
+  end
+  
+  def test_revoke_authorization_false
+    expect_http_posts_with_responses(example_revoke_authorization_false)
+    assert_equal false, @session.post('facebook.auth.revokeAuthorization', :uid => 123)
   end
   
   private
@@ -921,5 +931,13 @@ class TestFacebooker < Test::Unit::TestCase
     <link>http://www.facebook.com/video/video.php?v=15943367753</link>
   </video_upload_response>
     XML
+  end
+  
+  def example_revoke_authorization_true
+    "1"
+  end
+  
+  def example_revoke_authorization_false
+    "0"
   end
 end
