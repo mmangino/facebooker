@@ -3,8 +3,8 @@ require 'net/http_multipart_post'
 class TestFacebooker < Test::Unit::TestCase
 
   def setup
-    @api_key = "cd3e0af4e524c5c5ed5c2c79250251c0"
-    @secret_key = "d95b294063cc4aa54492306407877cde"
+    @api_key = "95a71599e8293s66f1f0a6f4aeab3df7"
+    @secret_key = "3e4du8eea435d8e205a6c9b5d095bed1"
     ENV["FACEBOOK_API_KEY"] = @api_key
     ENV["FACEBOOK_SECRET_KEY"] = @secret_key
     @session = Facebooker::Session.create(@api_key, @secret_key)
