@@ -22,7 +22,11 @@ module Facebooker
             options.merge!(required_features.pop.symbolize_keys)
           end
 
-          init_string = "FB.Facebook.init('#{Facebooker.api_key}','/xd_receiver.html');"
+          if request.ssl?
+            init_string = "FB.Facebook.init('#{Facebooker.api_key}','/xd_receiver_ssl.html');"
+          else
+            init_string = "FB.Facebook.init('#{Facebooker.api_key}','/xd_receiver.html');"
+          end
           unless required_features.blank?
              init_string = <<-FBML
              #{case options[:js]

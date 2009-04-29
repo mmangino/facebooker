@@ -960,7 +960,23 @@ class RailsHelperTest < Test::Unit::TestCase
   def test_init_fb_connect_with_features
     assert @h.init_fb_connect("XFBML").match(/XFBML/)
   end
-  
+
+  def test_init_fb_connect_receiver_path
+    assert @h.init_fb_connect.match(/xd_receiver.html/)
+  end
+
+  def test_init_fb_connect_receiver_path_ssl
+    @h.instance_eval do
+      def request
+        ssl_request = ActionController::TestRequest.new
+        ssl_request.stubs(:ssl?).returns(true)
+        ssl_request
+      end
+    end
+
+    assert @h.init_fb_connect.match(/xd_receiver_ssl.html/)
+  end
+
   def test_init_fb_connect_with_features_and_body
     @h.expects(:capture).returns("Body Content")
     
@@ -1001,6 +1017,21 @@ class RailsHelperTest < Test::Unit::TestCase
   def test_fb_connect_javascript_tag
     silence_warnings do
       assert_equal "<script src=\"http://static.ak.connect.facebook.com/js/api_lib/v0.4/FeatureLoader.js.php\" type=\"text/javascript\"></script>",
+        @h.fb_connect_javascript_tag
+    end
+  end
+
+  def test_fb_connect_javascript_tag_ssl
+    @h.instance_eval do
+      def request
+        ssl_request = ActionController::TestRequest.new
+        ssl_request.stubs(:ssl?).returns(true)
+        ssl_request
+      end
+    end
+
+    silence_warnings do
+      assert_equal "<script src=\"https://www.connect.facebook.com/js/api_lib/v0.4/FeatureLoader.js.php\" type=\"text/javascript\"></script>",
         @h.fb_connect_javascript_tag
     end
   end
