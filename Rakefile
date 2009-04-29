@@ -19,13 +19,13 @@ HOE = Hoe.new('facebooker', Facebooker::VERSION::STRING) do |p|
   p.history_file  = 'CHANGELOG.rdoc'
   p.remote_rdoc_dir = '' # Release to root
   p.test_globs = 'test/**/*_test.rb'
-  p.extra_deps << ['json', '>= 1.0.0'] 
+  p.extra_deps << ['json', '>= 1.0.0']
   p.extra_rdoc_files  = FileList['*.rdoc']
 end
 
 require 'rcov/rcovtask'
 
-namespace :test do 
+namespace :test do
   namespace :coverage do
     desc "Delete aggregate coverage data."
     task(:clean) { rm_f "coverage.data" }

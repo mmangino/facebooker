@@ -1,9 +1,12 @@
-COPYING.rdoc
+.autotest
 CHANGELOG.rdoc
+COPYING.rdoc
+Manifest.txt
 README.rdoc
 Rakefile
 TODO.rdoc
-generators/publisher/publisher_generator.rb
+examples/desktop_login.rb
+facebooker.gemspec
 generators/facebook/facebook_generator.rb
 generators/facebook/templates/config/facebooker.yml
 generators/facebook/templates/public/javascripts/facebooker.js
@@ -34,10 +37,12 @@ generators/facebook_scaffold/templates/view_new.fbml.erb
 generators/facebook_scaffold/templates/view_new.html.erb
 generators/facebook_scaffold/templates/view_show.fbml.erb
 generators/facebook_scaffold/templates/view_show.html.erb
-generators/xd_receiver/xd_receiver_generator.rb
+generators/publisher/publisher_generator.rb
 generators/xd_receiver/templates/xd_receiver.html
+generators/xd_receiver/xd_receiver_generator.rb
 init.rb
 install.rb
+lib/facebooker.rb
 lib/facebooker/adapters/adapter_base.rb
 lib/facebooker/adapters/bebo_adapter.rb
 lib/facebooker/adapters/facebook_adapter.rb
@@ -71,8 +76,8 @@ lib/facebooker/models/video.rb
 lib/facebooker/models/work_info.rb
 lib/facebooker/parser.rb
 lib/facebooker/rails/controller.rb
-lib/facebooker/rails/cucumber/world.rb
 lib/facebooker/rails/cucumber.rb
+lib/facebooker/rails/cucumber/world.rb
 lib/facebooker/rails/extensions/action_controller.rb
 lib/facebooker/rails/extensions/rack_setup.rb
 lib/facebooker/rails/extensions/routing.rb
@@ -82,8 +87,8 @@ lib/facebooker/rails/facebook_request_fix.rb
 lib/facebooker/rails/facebook_session_handling.rb
 lib/facebooker/rails/facebook_url_helper.rb
 lib/facebooker/rails/facebook_url_rewriting.rb
-lib/facebooker/rails/helpers/fb_connect.rb
 lib/facebooker/rails/helpers.rb
+lib/facebooker/rails/helpers/fb_connect.rb
 lib/facebooker/rails/integration_session.rb
 lib/facebooker/rails/profile_publisher_extensions.rb
 lib/facebooker/rails/publisher.rb
@@ -94,7 +99,6 @@ lib/facebooker/server_cache.rb
 lib/facebooker/service.rb
 lib/facebooker/session.rb
 lib/facebooker/version.rb
-lib/facebooker.rb
 lib/net/http_multipart_post.rb
 lib/rack/facebook.rb
 lib/tasks/facebooker.rake
@@ -107,6 +111,7 @@ test/facebooker/admin_test.rb
 test/facebooker/batch_request_test.rb
 test/facebooker/data_test.rb
 test/facebooker/logging_test.rb
+test/facebooker/mobile_test.rb
 test/facebooker/model_test.rb
 test/facebooker/models/event_test.rb
 test/facebooker/models/user_test.rb
@@ -119,6 +124,6 @@ test/fixtures/multipart_post_body_with_only_parameters.txt
 test/fixtures/multipart_post_body_with_single_file.txt
 test/fixtures/multipart_post_body_with_single_file_that_has_nil_key.txt
 test/net/http_multipart_post_test.rb
+test/rack/facebook_test.rb
 test/rails_test_helper.rb
 test/test_helper.rb
-test/facebooker/mobile_test.rb
