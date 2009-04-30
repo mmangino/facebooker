@@ -77,6 +77,10 @@ module Facebooker
       end #do |hash, child|      
     end
     
+    def self.booleanize(response)
+      response == "1" ? true : false
+    end
+    
     def self.anonymous_field_from(child, hash)
       if child.name == 'anon'
         (hash[child.name] || []) << child.text_value
@@ -84,6 +88,12 @@ module Facebooker
     end
     
   end  
+  
+  class RevokeAuthorization < Parser#:nodoc:
+    def self.process(data)
+      booleanize(data)
+    end
+  end
   
   class CreateToken < Parser#:nodoc:
     def self.process(data)
@@ -539,6 +549,7 @@ module Facebooker
   
   class Parser
     PARSERS = {
+      'facebook.auth.revokeAuthorization' => RevokeAuthorization,
       'facebook.auth.createToken' => CreateToken,
       'facebook.auth.getSession' => GetSession,
       'facebook.connect.registerUsers' => RegisterUsers,

@@ -367,6 +367,16 @@ class TestFacebooker < Test::Unit::TestCase
     }
   end
 
+  def test_revoke_authorization_true
+    expect_http_posts_with_responses(example_revoke_authorization_true)
+    assert_equal true, @session.post('facebook.auth.revokeAuthorization', :uid => 123)
+  end
+  
+  def test_revoke_authorization_false
+    expect_http_posts_with_responses(example_revoke_authorization_false)
+    assert_equal false, @session.post('facebook.auth.revokeAuthorization', :uid => 123)
+  end
+  
   private
   def populate_user_info
     mock_http = establish_session
@@ -929,5 +939,13 @@ class TestFacebooker < Test::Unit::TestCase
     <link>http://www.facebook.com/video/video.php?v=15943367753</link>
   </video_upload_response>
     XML
+  end
+  
+  def example_revoke_authorization_true
+    "1"
+  end
+  
+  def example_revoke_authorization_false
+    "0"
   end
 end
