@@ -25,7 +25,7 @@ module Facebooker
 
     @facebooker_configuration = {}
     @current_adapter = nil
-    @set_asset_host_to_callback_url = nil
+    @set_asset_host_to_callback_url = true
     @path_prefix = nil
     @use_curl    = false
 
@@ -92,14 +92,7 @@ module Facebooker
       current_adapter.is_for?(application_container)
     end
 
-    def set_asset_host_to_callback_url=(val)
-      @set_asset_host_to_callback_url=val
-    end
-
-    def set_asset_host_to_callback_url
-      @set_asset_host_to_callback_url || true
-    end
-
+    attr_accessor :set_asset_host_to_callback_url
     attr_accessor :use_curl
     alias :use_curl? :use_curl
 
