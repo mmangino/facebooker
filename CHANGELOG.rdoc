@@ -3,6 +3,7 @@
 * New Features
 
   * Facebooker::User#publish_to for publishing to a Wall or News Stream
+  * Optionally parses with Nokogiri.  Just require 'nokogiri' in your app.
 
 === 1.0.13 / 2009-02-26
 

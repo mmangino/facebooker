@@ -3,26 +3,41 @@ require 'facebooker/session'
 module Facebooker
   class Parser
 
-    module REXMLElementExtensions
-      def text_value
-        self.children.first.to_s.strip
+    module REXMLElementExtensions # :nodoc:
+      def content
+        self.text || ''
+      end
+
+      def [] key
+        attributes[key]
+      end
+
+      def text?
+        false
+      end
+    end
+
+    module REXMLTextExtensions # :nodoc:
+      def text?
+        true
       end
     end
 
     ::REXML::Element.__send__(:include, REXMLElementExtensions)
+    ::REXML::Text.__send__(:include, REXMLTextExtensions)
 
     def self.parse(method, data)
       Errors.process(data)
       parser = Parser::PARSERS[method]
       raise "Can't find a parser for '#{method}'" unless parser
-      parser.process(
-        data
-      )
+      parser.process(data)
     end
 
     def self.array_of(response_element, element_name)
       values_to_return = []
-      response_element.elements.each(element_name) do |element|
+      response_element.children.each do |element|
+        next if element.text?
+        next unless element.name == element_name
         values_to_return << yield(element)
       end
       values_to_return
@@ -30,7 +45,7 @@ module Facebooker
 
     def self.array_of_text_values(response_element, element_name)
       array_of(response_element, element_name) do |element|
-        element.text_value
+        element.content.strip
       end
     end
 
@@ -42,34 +57,39 @@ module Facebooker
 
     def self.element(name, data)
       data = data.body rescue data # either data or an HTTP response
-      doc = REXML::Document.new(data)
-      doc.elements.each(name) do |element|
-        return element
+      begin
+        node = Nokogiri::XML(data.strip).at(name)
+        return node if node
+      rescue # Can't parse with Nokogiri
+        doc = REXML::Document.new(data)
+        doc.elements.each(name) do |element|
+          return element
+        end
       end
       raise "Element #{name} not found in #{data}"
     end
 
     def self.hash_or_value_for(element)
-      if element.children.size == 1 && element.children.first.kind_of?(REXML::Text)
-        element.text_value
+      if element.children.size == 1 && element.children.first.text?
+        element.content.strip
       else
         hashinate(element)
       end
     end
 
     def self.hashinate(response_element)
-      response_element.children.reject{|c| c.kind_of? REXML::Text}.inject({}) do |hash, child|
+      response_element.children.reject{|c| c.text? }.inject({}) do |hash, child|
         # If the node hasn't any child, and is not a list, we want empty strings, not empty hashes,
         #   except if attributes['nil'] == true
         hash[child.name] =
-        if (child.attributes['nil'] == 'true')
+        if (child['nil'] == 'true')
           nil
-        elsif (child.children.size == 1 && child.children.first.kind_of?(REXML::Text)) || (child.children.size == 0 && child.attributes['list'] != 'true')
-          anonymous_field_from(child, hash) || child.text_value
-        elsif child.attributes['list'] == 'true'
-          child.children.reject{|c| c.kind_of? REXML::Text}.map { |subchild| hash_or_value_for(subchild)}
+        elsif (child.children.size == 1 && child.children.first.text?) || (child.children.size == 0 && child['list'] != 'true')
+          anonymous_field_from(child, hash) || child.content.strip
+        elsif child['list'] == 'true'
+          child.children.reject{|c| c.text? }.map { |subchild| hash_or_value_for(subchild)}
         else
-          child.children.reject{|c| c.kind_of? REXML::Text}.inject({}) do |subhash, subchild|
+          child.children.reject{|c| c.text? }.inject({}) do |subhash, subchild|
             subhash[subchild.name] = hash_or_value_for(subchild)
             subhash
           end
@@ -84,7 +104,7 @@ module Facebooker
 
     def self.anonymous_field_from(child, hash)
       if child.name == 'anon'
-        (hash[child.name] || []) << child.text_value
+        (hash[child.name] || []) << child.content.strip
       end
     end
 
@@ -98,7 +118,7 @@ module Facebooker
 
   class CreateToken < Parser#:nodoc:
     def self.process(data)
-      element('auth_createToken_response', data).text_value
+      element('auth_createToken_response', data).content.strip
     end
   end
 
@@ -152,13 +172,13 @@ module Facebooker
 
   class GetLoggedInUser < Parser#:nodoc:
     def self.process(data)
-      Integer(element('users_getLoggedInUser_response', data).text_value)
+      Integer(element('users_getLoggedInUser_response', data).content.strip)
     end
   end
 
   class PagesIsAdmin < Parser#:nodoc:
     def self.process(data)
-      element('pages_isAdmin_response', data).text_value == '1'
+      element('pages_isAdmin_response', data).content.strip == '1'
     end
   end
 
@@ -170,25 +190,25 @@ module Facebooker
 
   class PagesIsFan < Parser#:nodoc:
     def self.process(data)
-      element('pages_isFan_response', data).text_value == '1'
+      element('pages_isFan_response', data).content.strip == '1'
     end
   end
 
   class PublishStoryToUser < Parser#:nodoc:
     def self.process(data)
-      element('feed_publishStoryToUser_response', data).text_value
+      element('feed_publishStoryToUser_response', data).content.strip
     end
   end
 
   class StreamPublish < Parser#:nodoc:
     def self.process(data)
-      element('stream_publish_response', data).text_value
+      element('stream_publish_response', data).content.strip
     end
   end
 
   class RegisterTemplateBundle < Parser#:nodoc:
     def self.process(data)
-      element('feed_registerTemplateBundle_response', data).text_value.to_i
+      element('feed_registerTemplateBundle_response', data).content.to_i
     end
   end
 
@@ -200,55 +220,55 @@ module Facebooker
 
   class DeactivateTemplateBundleByID < Parser#:nodoc:
     def self.process(data)
-      element('feed_deactivateTemplateBundleByID_response', data).text_value == '1'
+      element('feed_deactivateTemplateBundleByID_response', data).content.strip == '1'
     end
   end
 
   class PublishUserAction < Parser#:nodoc:
     def self.process(data)
-      element('feed_publishUserAction_response', data).children[1].text_value == "1"
+      element('feed_publishUserAction_response', data).children[1].content.strip == "1"
     end
   end
 
   class PublishActionOfUser < Parser#:nodoc:
     def self.process(data)
-      element('feed_publishActionOfUser_response', data).text_value
+      element('feed_publishActionOfUser_response', data).content.strip
     end
   end
 
   class PublishTemplatizedAction < Parser#:nodoc:
     def self.process(data)
-      element('feed_publishTemplatizedAction_response', data).children[1].text_value
+      element('feed_publishTemplatizedAction_response', data).children[1].content.strip
     end
   end
 
   class SetAppProperties < Parser#:nodoc:
     def self.process(data)
-      element('admin_setAppProperties_response', data).text_value
+      element('admin_setAppProperties_response', data).content.strip
     end
   end
 
   class GetAppProperties < Parser#:nodoc:
     def self.process(data)
-      element('admin_getAppProperties_response', data).text_value
+      element('admin_getAppProperties_response', data).content.strip
     end
   end
 
   class SetRestrictionInfo < Parser#:nodoc:
     def self.process(data)
-      element('admin_setRestrictionInfo_response', data).text_value
+      element('admin_setRestrictionInfo_response', data).content.strip
     end
   end
 
   class GetRestrictionInfo < Parser#:nodoc:
     def self.process(data)
-      element('admin_getRestrictionInfo_response', data).text_value
+      element('admin_getRestrictionInfo_response', data).content.strip
     end
   end
 
   class GetAllocation < Parser#:nodoc:
     def self.process(data)
-      element('admin_getAllocation_response', data).text_value
+      element('admin_getAllocation_response', data).content.strip
     end
   end
 
@@ -289,13 +309,13 @@ module Facebooker
 
   class NotificationsSend < Parser#:nodoc:
     def self.process(data)
-      element('notifications_send_response', data).text_value
+      element('notifications_send_response', data).content.strip
     end
   end
 
   class NotificationsSendEmail < Parser#:nodoc:
     def self.process(data)
-      element('notifications_sendEmail_response', data).text_value
+      element('notifications_sendEmail_response', data).content.strip
     end
   end
 
@@ -343,19 +363,19 @@ module Facebooker
 
   class SendRequest < Parser#:nodoc:
     def self.process(data)
-      element('notifications_sendRequest_response', data).text_value
+      element('notifications_sendRequest_response', data).content.strip
     end
   end
 
   class ProfileFBML < Parser#:nodoc:
     def self.process(data)
-      element('profile_getFBML_response', data).text_value
+      element('profile_getFBML_response', data).content.strip
     end
   end
 
   class ProfileFBMLSet < Parser#:nodoc:
     def self.process(data)
-      element('profile_setFBML_response', data).text_value
+      element('profile_setFBML_response', data).content.strip
     end
   end
 
@@ -367,39 +387,39 @@ module Facebooker
 
   class ProfileInfoSet < Parser#:nodoc:
     def self.process(data)
-      element('profile_setInfo_response', data).text_value
+      element('profile_setInfo_response', data).content.strip
     end
   end
 
   class FqlQuery < Parser#nodoc
     def self.process(data)
       root = element('fql_query_response', data)
-      first_child = root.children.reject{|c| c.kind_of?(REXML::Text)}.first
+      first_child = root.children.reject{|c| c.text? }.first
       first_child.nil? ? [] : [first_child.name, array_of_hashes(root, first_child.name)]
     end
   end
 
   class SetRefHandle < Parser#:nodoc:
     def self.process(data)
-      element('fbml_setRefHandle_response', data).text_value
+      element('fbml_setRefHandle_response', data).content.strip
     end
   end
 
   class RefreshRefURL < Parser#:nodoc:
     def self.process(data)
-      element('fbml_refreshRefUrl_response', data).text_value
+      element('fbml_refreshRefUrl_response', data).content.strip
     end
   end
 
   class RefreshImgSrc < Parser#:nodoc:
     def self.process(data)
-      element('fbml_refreshImgSrc_response', data).text_value
+      element('fbml_refreshImgSrc_response', data).content.strip
     end
   end
 
   class SetCookie < Parser#:nodoc:
     def self.process(data)
-      element('data_setCookie_response', data).text_value
+      element('data_setCookie_response', data).content.strip
     end
   end
 
@@ -469,37 +489,37 @@ module Facebooker
 
   class SetStatus < Parser
     def self.process(data)
-      element('users_setStatus_response',data).text_value == '1'
+      element('users_setStatus_response',data).content.strip == '1'
     end
   end
 
   class GetPreference < Parser#:nodoc:
     def self.process(data)
-      element('data_getUserPreference_response', data).text_value
+      element('data_getUserPreference_response', data).content.strip
     end
   end
 
   class SetPreference < Parser#:nodoc:
     def self.process(data)
-      element('data_setUserPreference_response', data).text_value
+      element('data_setUserPreference_response', data).content.strip
     end
   end
 
   class UserHasPermission < Parser
     def self.process(data)
-      element('users_hasAppPermission_response', data).text_value
+      element('users_hasAppPermission_response', data).content.strip
     end
   end
 
   class SmsSend < Parser#:nodoc:
     def self.process(data)
-      element('sms_send_response', data).text_value == '0'
+      element('sms_send_response', data).content.strip == '0'
     end
   end
 
   class SmsCanSend < Parser#:nodoc:
     def self.process(data)
-      element('sms_canSend_response', data).text_value
+      element('sms_canSend_response', data).content.strip
     end
   end
 

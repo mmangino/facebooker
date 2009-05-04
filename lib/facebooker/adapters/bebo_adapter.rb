@@ -1,14 +1,14 @@
 module Facebooker
   class BeboAdapter < AdapterBase
-      
+
     def canvas_server_base
       "apps.bebo.com"
     end
-      
+
     def api_server_base
       'apps.bebo.com'
     end
-    
+
     def api_rest_path
       "/restserver.php"
     end
@@ -44,9 +44,9 @@ module Facebooker
     end
     alias_method :set_profile_fbml_without_bebo_adapter, :set_profile_fbml
     alias_method :set_profile_fbml, :set_profile_fbml_with_bebo_adapter
-    
+
     private
-    
+
     BEBO_FIELDS = FIELDS - [:meeting_sex, :wall_count, :meeting_for]
 
     remove_method :collect
@@ -57,15 +57,15 @@ module Facebooker
       else
          FIELDS.reject{|field_name| !fields.empty? && !fields.include?(field_name)}.join(',')
       end
-    end   
+    end
   end
-  
-  
+
+
    class PublishTemplatizedAction < Parser#:nodoc:
     class <<self
      def process_with_bebo_adapter(data)
        if(Facebooker.is_for?(:bebo))
-       element('feed_publishTemplatizedAction_response', data).text_value
+       element('feed_publishTemplatizedAction_response', data).content
        else
          process_without_bebo_adapter(data)
        end

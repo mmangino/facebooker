@@ -485,7 +485,7 @@ class TestFacebooker < Test::Unit::TestCase
   def example_notifications_send_xml
     <<-XML
 <?xml version="1.0" encoding="UTF-8"?>
-<notifications_send_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd">http://www.facebook.com/send_email.php?from=211031&id=52</notifications_send_response>
+<notifications_send_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd">http://www.facebook.com/send_email.php?from=211031&amp;id=52</notifications_send_response>
     XML
   end
 

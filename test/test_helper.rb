@@ -2,6 +2,12 @@ require 'test/unit'
 require 'rubygems'
 
 begin
+  require 'nokogiri'
+rescue LoadError
+  # Should work without nokogiri
+end
+
+begin
   require 'multi_rails_init'
 rescue LoadError
   # multi rails not installed, test against newest supported version of Rails
@@ -39,10 +45,10 @@ class Test::Unit::TestCase
   def establish_session(session = @session)
     mock = flexmock(Net::HTTP).should_receive(:post_form).and_return(example_auth_token_xml).once.ordered(:posts)
     mock.should_receive(:post_form).and_return(example_get_session_xml).once.ordered(:posts)
-    session.secure!    
+    session.secure!
     mock
   end
-  
+
   def example_auth_token_xml
     <<-XML
     <?xml version="1.0" encoding="UTF-8"?>
@@ -53,7 +59,7 @@ class Test::Unit::TestCase
         </auth_createToken_response>    
     XML
   end
-  
+
   def example_get_session_xml
     <<-XML
     <?xml version="1.0" encoding="UTF-8"?>
