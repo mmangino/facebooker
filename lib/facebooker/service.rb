@@ -12,7 +12,7 @@ module Facebooker
       @api_path = api_path
       @api_key = api_key
     end
-    
+
     # TODO: support ssl 
     def post(params)
       attempt = 0
@@ -23,7 +23,7 @@ module Facebooker
         retry
       end
     end
-    
+
     def post_form(url,params)
       if Facebooker.use_curl?
         post_form_with_curl(url,params)
@@ -31,15 +31,20 @@ module Facebooker
         post_form_with_net_http(url,params)
       end
     end
-    
+
     def post_form_with_net_http(url,params)
-      Net::HTTP.post_form(url, params)
+      post_params = {}
+      params.each do |k,v|
+        post_params[k] = v
+        post_params[k] = Facebooker.json_encode(v) if Array === v
+      end
+      Net::HTTP.post_form(url, post_params)
     end
-    
+
     def post_form_with_curl(url,params,multipart=false)
       response = Curl::Easy.http_post(url.to_s, *to_curb_params(params)) do |c|
         c.multipart_form_post = multipart
-        c.timeout = Facebooker.timeout 
+        c.timeout = Facebooker.timeout
       end
       response.body_str
     end
@@ -67,14 +72,14 @@ module Facebooker
       base ||= @api_base
       URI.parse('http://'+ base + @api_path)
     end
-    
+
     # Net::HTTP::MultipartPostFile
     def multipart_post_file?(object)
       object.respond_to?(:content_type) &&
       object.respond_to?(:data) &&
       object.respond_to?(:filename)
     end
-    
+
     def to_curb_params(params)
       parray = []
       params.each_pair do |k,v|
@@ -85,7 +90,10 @@ module Facebooker
           field.content = v.data
           parray << field
         else
-          parray << Curl::PostField.content(k.to_s, v.to_s)
+          parray << Curl::PostField.content(
+            k.to_s,
+            Array === v ? Facebooker.json_encode(v) : v.to_s
+          )
         end
       end
       parray

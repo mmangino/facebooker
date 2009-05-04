@@ -69,47 +69,75 @@ module Facebooker
     # Set the list of friends, given an array of User objects.  If the list has been retrieved previously, will not set
     def friends=(list_of_friends,flid=nil)
       @friends_hash ||= {}
-     	flid=cast_to_friend_list_id(flid)
-     	#use __blank instead of nil so that this is cached
-     	cache_key = flid||"__blank"
-     	
+       flid=cast_to_friend_list_id(flid)
+       #use __blank instead of nil so that this is cached
+       cache_key = flid||"__blank"
+
       @friends_hash[cache_key] ||= list_of_friends
     end
     
     def cast_to_friend_list_id(flid)
       case flid
- 	    when String
- 	      list=friend_lists.detect {|f| f.name==flid}
- 	      raise Facebooker::Session::InvalidFriendList unless list
- 	      list.flid
- 	    when FriendList
- 	      flid.flid
- 	    else
- 	      flid
- 	    end
- 	  end
+       when String
+         list=friend_lists.detect {|f| f.name==flid}
+         raise Facebooker::Session::InvalidFriendList unless list
+         list.flid
+       when FriendList
+         flid.flid
+       else
+         flid
+       end
+     end
     ##
     # Retrieve friends
     def friends(flid = nil)
-     	@friends_hash ||= {}
-     	flid=cast_to_friend_list_id(flid)
-      
-     	#use __blank instead of nil so that this is cached
-     	cache_key = flid||"__blank"
-     	options = {:uid=>self.id}
-     	options[:flid] = flid unless flid.nil?
-     	@friends_hash[cache_key] ||= @session.post('facebook.friends.get', options,false).map do |uid|
+       @friends_hash ||= {}
+       flid=cast_to_friend_list_id(flid)
+
+       #use __blank instead of nil so that this is cached
+       cache_key = flid||"__blank"
+       options = {:uid=>self.id}
+       options[:flid] = flid unless flid.nil?
+       @friends_hash[cache_key] ||= @session.post('facebook.friends.get', options,false).map do |uid|
           User.new(uid, @session)
       end
       @friends_hash[cache_key]
     end
-    
-     def friend_lists    
+
+    ###
+    # Publish a post into the stream on the user's Wall and News Feed.  This
+    # post also appears in the user's friend's streams.  The +publish_stream+
+    # extended permission must be granted in order to use this method.
+    #
+    # See: http://wiki.developers.facebook.com/index.php/Stream.publish
+    #
+    # +target+ can be the current user or some other user.
+    #
+    # Example:
+    #   # Publish a message to my own wall:
+    #   me.publish_to(me, :message => 'hello world')
+    #
+    #   # Publish to a friend's wall with an action link:
+    #   me.publish_to(my_friend,  :message => 'how are you?', :action_links => [
+    #     :text => 'my website',
+    #     :href => 'http://tenderlovemaking.com/'
+    #   ])
+    def publish_to target, options = {}
+      @session.post('facebook.stream.publish',
+                    :uid        => self.id,
+                    :target_id  => target.id,
+                    :message    => options[:message],
+                    :attachment => options[:attachment],
+                    :action_links => options[:action_links]
+                   )
+    end
+
+     def friend_lists
        @friend_lists ||= @session.post('facebook.friends.getLists').map do |hash|
-         friend_list = FriendList.from_hash(hash)                               
-         friend_list.session = session                                          
-         friend_list                                                            
-       end                                                                      
+         friend_list = FriendList.from_hash(hash)
+         friend_list.session = session
+         friend_list
+       end
      end
     ###
     # Retrieve friends with user info populated

@@ -1,25 +1,28 @@
-begin
-  unless Object.const_defined?("ActiveSupport") and ActiveSupport.const_defined?("JSON")
-    require 'json'
-    module Facebooker
-      def self.json_decode(str)
-        JSON.parse(str)
-      end
+unless defined?(ActiveSupport) and defined?(ActiveSupport::JSON)
+  require 'json'
+  module Facebooker
+    def self.json_decode(str)
+      JSON.parse(str)
     end
-  else
-    module Facebooker
-      def self.json_decode(str)
-        ActiveSupport::JSON.decode(str)
-      end
+
+    def self.json_encode(o)
+      JSON.dump(o)
     end
   end
-rescue
-  require 'json'
+else
+  module Facebooker
+    def self.json_decode(str)
+      ActiveSupport::JSON.decode(str)
+    end
+
+    def self.json_encode(o)
+      ActiveSupport::JSON.encode(o)
+    end
+  end
 end
+
 require 'zlib'
 require 'digest/md5'
-
-
 
 module Facebooker
 

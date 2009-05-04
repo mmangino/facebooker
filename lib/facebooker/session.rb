@@ -589,7 +589,9 @@ module Facebooker
 
       def signature_for(params)
         raw_string = params.inject([]) do |collection, pair|
-          collection << pair.join("=")
+          collection << pair.map { |x|
+            Array === x ? Facebooker.json_encode(x) : x
+          }.join("=")
           collection
         end.sort.join
         Digest::MD5.hexdigest([raw_string, secret_for_method(params[:method])].join)
