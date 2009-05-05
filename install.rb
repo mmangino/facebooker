@@ -9,4 +9,4 @@ script = File.join('public', 'javascripts', 'facebooker.js')
 [config, script].each do |path| 
   FileUtils.cp File.join(templates, path), File.join(RAILS_ROOT, path) unless File.exist?(File.join(RAILS_ROOT, path))
 end
-puts IO.read(File.join(dir, 'README'))
+puts IO.read(File.join(dir, 'README.rdoc'))
