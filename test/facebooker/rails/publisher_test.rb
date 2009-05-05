@@ -427,6 +427,10 @@ class Facebooker::Rails::Publisher::PublisherTest < Test::Unit::TestCase
     assert_equal('http://apps.facebook.com/mike/pokes/do/1',route_image.href)
   end
 
+  def test_image_holder_equality
+    assert_equal TestPublisher::ImageHolder.new('image.png', 'raw_string'), TestPublisher::ImageHolder.new('image.png', 'raw_string')
+  end
+
   def test_image_to_json_puts_src_first
     string_image = TestPublisher.new.image('image.png', 'raw_string')
     assert_equal "{\"src\":\"/images/image.png\", \"href\":\"raw_string\"}",string_image.to_json
