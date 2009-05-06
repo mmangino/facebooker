@@ -192,6 +192,10 @@ module Facebooker
       @expires = Integer(expires)
       @secret_from_session = secret_from_session
     end
+    
+    def stream_get
+      post('facebook.stream.get')
+    end
 
     def fql_query(query, format = 'XML')
       post('facebook.fql.query', :query => query, :format => format) do |response|

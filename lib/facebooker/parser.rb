@@ -522,6 +522,31 @@ module Facebooker
       element('sms_canSend_response', data).content.strip
     end
   end
+  
+  class StreamGet < Parser#:nodoc:
+    
+    def self.populate_user_cache(data)
+      users = array_of_hashes(element('profiles', data), 'profile').map do |hash|
+        user = Facebooker::User.new(hash["id"])
+        user.profile_url = hash["url"]
+        user.name = hash["name"]
+        user.pic_square = hash["pic_square"]
+        user
+      end
+      @user_cache = users.index_by(&:uid)
+    end
+    
+    def self.process(data)
+      populate_user_cache(data)
+      array_of_hashes(element('posts', data), 'stream_post').map do |hash|
+        post = Facebooker::StreamPost.new(hash)
+        post.actor = @user_cache[hash["actor_id"].to_i]
+        post.viewer = @user_cache[hash["viewer_id"].to_i]
+        post
+      end
+      
+    end
+  end
 
   class Errors < Parser#:nodoc:
     EXCEPTIONS = {
@@ -636,7 +661,8 @@ module Facebooker
       'facebook.data.setUserPreference' => SetPreference,
       'facebook.video.upload' => UploadVideo,
       'facebook.sms.send' => SmsSend,
-      'facebook.sms.canSend' => SmsCanSend
+      'facebook.sms.canSend' => SmsCanSend,
+      'facebook.stream.get' => StreamGet
     }
   end
 end

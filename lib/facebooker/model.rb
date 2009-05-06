@@ -1,3 +1,4 @@
+require 'ruby-debug'
 module Facebooker
   ##
   # helper methods primarily supporting the management of Ruby objects which are populatable via Hashes.
@@ -32,7 +33,8 @@ module Facebooker
       def populating_attr_reader(*symbols)
         symbols.each do |symbol|
           define_method(symbol) do
-            populate unless populated?
+            val = instance_variable_get("@#{symbol}")
+            populate if (val.nil? || val == "") and !populated?
             instance_variable_get("@#{symbol}")
           end
         end

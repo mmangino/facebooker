@@ -28,7 +28,7 @@ end
 
 require 'facebooker'
 require 'facebooker/rails/test_helpers'
-
+require 'net/http'
 
 class Test::Unit::TestCase
   include Facebooker::Rails::TestHelpers
@@ -43,6 +43,7 @@ class Test::Unit::TestCase
   end
 
   def establish_session(session = @session)
+    Facebooker.use_curl = false
     mock = flexmock(Net::HTTP).should_receive(:post_form).and_return(example_auth_token_xml).once.ordered(:posts)
     mock.should_receive(:post_form).and_return(example_get_session_xml).once.ordered(:posts)
     session.secure!
