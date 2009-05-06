@@ -1,16 +1,18 @@
 module ::ActionController
   class AbstractRequest
     def request_method_with_facebooker
-      if parameters[:fb_sig_request_method]=="GET" and parameters[:_method].blank?
-        parameters[:_method]="GET"
+      if parameters[:_method].blank?
+        if %w{GET HEAD}.include?(parameters[:fb_sig_request_method])
+          parameters[:_method] = parameters[:fb_sig_request_method]
+        end
       end
       request_method_without_facebooker
     end
-    
+
     if new.methods.include?("request_method")
-      alias_method_chain :request_method, :facebooker 
+      alias_method_chain :request_method, :facebooker
     end
-    
+
     def xml_http_request_with_facebooker?
       parameters["fb_sig_is_mockajax"] == "1"  ||
       parameters["fb_sig_is_ajax"] == "1" ||
@@ -18,7 +20,9 @@ module ::ActionController
     end
     alias_method_chain :xml_http_request?, :facebooker
     # we have to re-alias xhr? since it was pointing to the old method
-    alias xhr? :xml_http_request?
-    
+    unless defined? :xhr?
+      alias xhr? :xml_http_request?
+    end
+
   end
 end

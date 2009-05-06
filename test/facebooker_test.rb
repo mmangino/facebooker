@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/test_helper.rb'
+require File.expand_path(File.dirname(__FILE__) + '/test_helper')
 require 'net/http_multipart_post'
 class TestFacebooker < Test::Unit::TestCase
 
@@ -12,16 +12,24 @@ class TestFacebooker < Test::Unit::TestCase
     @service = Facebooker::Service.new('http://apibase.com', '/api/path', @api_key)
     @desktop_session.instance_variable_set("@service", @service)
   end
-  
+
+  def test_asset_host_callback_url
+    Facebooker.set_asset_host_to_callback_url = true
+    assert_equal true, Facebooker.set_asset_host_to_callback_url
+
+    Facebooker.set_asset_host_to_callback_url = false
+    assert_equal false, Facebooker.set_asset_host_to_callback_url
+  end
+
   def test_session_must_be_created_from_api_key_and_secret_key
     assert_kind_of(Facebooker::Session, @session)
   end
-  
+
   def test_session_can_tell_you_its_login_url
     assert_not_nil(@session.login_url)
     assert_equal("http://www.facebook.com/login.php?api_key=#{@api_key}&v=1.0", @session.login_url)
   end
-  
+
   def test_desktop_session_returns_auth_toke_as_part_of_login_url
     @service = flexmock(@service).should_receive(:post).at_least.once.and_return(123)
     assert_kind_of(Facebooker::Session::Desktop, @desktop_session)
@@ -36,10 +44,10 @@ class TestFacebooker < Test::Unit::TestCase
   # def test_serivce_post_file_delegates_to_post_multipart_form
   #   # flexmock(@service).should_receive(:url).and_return('url')
   #   # flexmock(Net::HTTP).expects(:post_multipart_form).with('url', {:method => 'facebook.auth.createToken'}).returns(example_auth_token_xml)
-  #   
+  #
   #   res = mock(:content_type => 'text/html', :code => '200', :body => '<html><body>my blog</body></html>')
   #   Net::HTTP.stubs(:get_response).once.with(uri).returns res
-  #   
+  #
   #   @service.post_file(:method => 'facebook.auth.createToken')
   # end
 
@@ -64,22 +72,22 @@ class TestFacebooker < Test::Unit::TestCase
     expect_http_posts_with_responses(example_friends_xml)
     assert_equal([222333, 1240079], @session.user.friends.map{|friend| friend.id})
   end
-  
+
   def test_can_get_current_users_friend_lists
     expect_http_posts_with_responses(example_friend_lists_xml)
     assert_equal([12089150545, 16361710545], @session.user.friend_lists.map{|friend_list| friend_list.flid})
   end
-  
+
   def test_can_get_info_for_instance_of_user
     populate_user_info
     @session.user.first_name = "Dave"
   end
-  
+
   def test_can_get_info_for_one_or_more_users
     friends = populate_session_friends
     friend = friends.detect{|f| f.id == 222333}
     assert_equal('This field perpetuates the glorification of the ego.  Also, it has a character limit.',
-                 friend.about_me)  
+                 friend.about_me)
     assert_equal('Facebook Developers', friend.affiliations.first.name)
     assert_equal('Friendship', friend.meeting_for.first)
     assert_equal('94303', friend.current_location.zip)
@@ -97,14 +105,14 @@ class TestFacebooker < Test::Unit::TestCase
     assert_equal('I rule', friend.status.message)
     assert_equal(nil, friend.hometown_location)
   end
-  
+
   def test_can_handle_nil_data
     friends = populate_session_friends_with_nil_data
     friend = friends.detect{|f| f.id ==  222333}
     assert_equal(nil,friend.current_location)
-    assert_equal(nil,friend.pic) 
+    assert_equal(nil,friend.pic)
   end
-  
+
   def test_session_can_expire_on_server_and_client_handles_appropriately
     expect_http_posts_with_responses(example_session_expired_error_response)
     assert_raises(Facebooker::Session::SessionExpired) {
@@ -112,22 +120,22 @@ class TestFacebooker < Test::Unit::TestCase
     }
   end
 
-  
+
   def test_can_publish_story_to_users_feed
     expect_http_posts_with_responses(example_publish_story_xml)
     assert_nothing_raised {
       assert(@session.user.publish_story((s = Facebooker::Feed::Story.new; s.title = 'o hai'; s.body = '4srsly'; s)))
     }
   end
-  
-  
+
+
   def test_can_publish_action_to_users_feed
     expect_http_posts_with_responses(example_publish_action_xml)
     assert_nothing_raised {
       assert(@session.user.publish_action((s = Facebooker::Feed::Action.new; s.title = 'o hai'; s.body = '4srsly'; s)))
     }
   end
-  
+
   def test_can_publish_templatized_action_to_users_feed
     expect_http_posts_with_responses(example_publish_templatized_action_xml)
     assert_nothing_raised {
@@ -136,7 +144,7 @@ class TestFacebooker < Test::Unit::TestCase
       assert(@session.user.publish_templatized_action(action))
     }
   end
-  
+
   def test_can_publish_templatized_action_to_users_feed_with_params_as_string
     json_data="{\"move\": \"punch\"}"
     action = Facebooker::Feed::TemplatizedAction.new
@@ -144,7 +152,7 @@ class TestFacebooker < Test::Unit::TestCase
     action.title_data=json_data
     assert_equal action.to_params[:title_data],json_data
   end
-  
+
   def test_can_publish_templatized_action_to_users_feed_with_params_as_hash
     json_data="{\"move\": \"punch\"}"
     hash={:move=>"punch"}
@@ -166,7 +174,7 @@ class TestFacebooker < Test::Unit::TestCase
     assert_equal("0", @session.user.notifications.pokes.unread)
     assert_equal("1", @session.user.notifications.shares.unread)
   end
-  
+
   def test_can_send_notifications
     expect_http_posts_with_responses(example_notifications_send_xml)
     assert_nothing_raised {
@@ -187,13 +195,13 @@ class TestFacebooker < Test::Unit::TestCase
       assert_equal('123,321', @session.send_email(user_ids, subject,text,fbml ))
     }
   end
-  
+
   def test_can_find_friends_who_have_installed_app
     expect_http_posts_with_responses(example_app_users_xml)
     assert_equal(2, @session.user.friends_with_this_app.size)
     assert_equal([222333, 1240079], @session.user.friends_with_this_app.map{|f| f.id})
   end
-  
+
   def test_when_marshaling_a_session_object_only_enough_data_to_stay_authenticated_is_stored
     populate_session_friends
     assert_equal(2, @session.user.friends.size)
@@ -203,7 +211,7 @@ class TestFacebooker < Test::Unit::TestCase
     end
     assert_nil(reloaded_session.user.instance_variable_get("@friends"))
   end
-  
+
   def test_sessions_can_be_infinite_or_can_expire
     establish_session
     assert(@session.expired?, "Session with expiry time #{@session.instance_variable_get('@expires')} occurred in the past and should be expired.")
@@ -211,14 +219,14 @@ class TestFacebooker < Test::Unit::TestCase
     assert(@session.infinite?)
     assert(!@session.expired?)
   end
-  
+
   def test_session_can_tell_you_if_it_has_been_secured
     mock = flexmock(Net::HTTP).should_receive(:post_form).and_return(example_auth_token_xml).once.ordered(:posts)
     mock.should_receive(:post_form).and_return(example_get_session_xml.sub(/1173309298/, (Time.now + 60).to_i.to_s)).once.ordered(:posts)
     @session.secure!
     assert(@session.secured?)
   end
-  
+
   def test_can_get_photos_by_pids
     expect_http_posts_with_responses(example_get_photo_xml)
     photos = @session.get_photos([97503428461115590, 97503428461115573])
@@ -226,75 +234,82 @@ class TestFacebooker < Test::Unit::TestCase
     assert_equal "Rooftop barbecues make me act funny", photos.first.caption
     assert_equal 97503428461115590, photos[0].id
   end
-  
+
   def test_can_get_photos_by_subject_and_album
     expect_http_posts_with_responses(example_get_photo_xml)
     photos = @session.get_photos(nil, 22701786, 97503428432802022 )
     assert_equal '97503428432802022', photos.first.aid
   end
-  
+
   def test_getting_photos_requires_arguments
     mock_http = establish_session
     assert_raise(ArgumentError) { @session.get_photos() }
   end
-  
+
   def test_can_get_albums_for_user
     expect_http_posts_with_responses(example_user_albums_xml)
     assert_equal('Summertime is Best', @session.user.albums.first.name)
     assert_equal(2, @session.user.albums.size)
   end
-  
+
   def test_can_get_albums_by_album_ids
     expect_http_posts_with_responses(example_user_albums_xml)
     albums = @session.get_albums([97503428432802022, 97503428432797817] )
     assert_equal('Summertime is Best', albums[0].name)
     assert_equal('Bonofon\'s Recital', albums[1].name)
   end
-  
+
   def test_can_create_album
     expect_http_posts_with_responses(example_new_album_xml)
     assert_equal "My Empty Album", @session.user.create_album(:name => "My Empty Album", :location => "Limboland").name
   end
-  
+
   def test_can_upload_photo
     mock_http = establish_session
     mock_http.should_receive(:post_multipart_form).and_return(example_upload_photo_xml).once.ordered(:posts)
     f = Net::HTTP::MultipartPostFile.new("image.jpg", "image/jpeg", "RAW DATA")
     assert_equal "Under the sunset", @session.user.upload_photo(f).caption
   end
-  
+
   def test_can_get_photo_tags
     expect_http_posts_with_responses(example_photo_tags_xml)
     assert_instance_of Facebooker::Tag, @session.get_tags(:pids => 97503428461115571 ).first
   end
-  
+
   # TODO: how to test that tags were created properly? Response doesn't contain much
   def test_can_tag_a_user_in_a_photo
     expect_http_posts_with_responses(example_add_tag_xml)
     assert !@session.add_tags(pid = 97503428461115571, x= 30.0, y = 62.5, tag_uid = 1234567890).nil?
   end
-  
+
   def test_can_add_multiple_tags_to_photos
   end
-  
+
   def test_can_get_coordinates_for_photo_tags
     expect_http_posts_with_responses(example_photo_tags_xml)
     tag = @session.get_tags([97503428461115571]).first
     assert_equal ['65.4248', '16.8627'], tag.coordinates
   end
-  
+
+  def test_can_upload_video
+    mock_http = establish_session
+    mock_http.should_receive(:post_multipart_form).and_return(example_upload_video_xml).once
+    f = Net::HTTP::MultipartPostFile.new("party.mp4", "video/mpeg", "RAW DATA")
+    assert_equal "Some Epic", @session.user.upload_video(f).title
+  end
+
   def test_can_get_app_profile_fbml_for_user
     expect_http_posts_with_responses(example_get_fbml_xml)
     assert_match(/My profile!/, @session.user.profile_fbml)
   end
-  
+
   def test_can_set_app_profile_fbml_for_user
     expect_http_posts_with_responses(example_set_fbml_xml)
     assert_nothing_raised {
       @session.user.profile_fbml = 'aha!'
     }
   end
-  
+
   def test_get_logged_in_user
     expect_http_posts_with_responses(example_get_logged_in_user_xml)
     assert_equal 1240077, @session.post('facebook.users.getLoggedInUser', :session_key => @session.session_key)
@@ -351,6 +366,16 @@ class TestFacebooker < Test::Unit::TestCase
       @desktop_session.user.friends.first.profile_fbml = "O rly"
     }
   end
+
+  def test_revoke_authorization_true
+    expect_http_posts_with_responses(example_revoke_authorization_true)
+    assert_equal true, @session.post('facebook.auth.revokeAuthorization', :uid => 123)
+  end
+  
+  def test_revoke_authorization_false
+    expect_http_posts_with_responses(example_revoke_authorization_false)
+    assert_equal false, @session.post('facebook.auth.revokeAuthorization', :uid => 123)
+  end
   
   private
   def populate_user_info
@@ -363,22 +388,22 @@ class TestFacebooker < Test::Unit::TestCase
     expect_http_posts_with_responses(example_limited_user_info_xml)
     @session.user.populate(:affiliations, :status, :meeting_for)
   end
-  
+
   def populate_session_friends
     expect_http_posts_with_responses(example_friends_xml, example_user_info_xml)
     @session.user.friends!
   end
-  
+
   def populate_session_friends_with_limited_fields
     expect_http_posts_with_responses(example_friends_xml, example_limited_user_info_xml)
     @session.user.friends!(:affiliations, :status, :meeting_for)
   end
-     
+
   def populate_session_friends_with_nil_data
     expect_http_posts_with_responses(example_friends_xml, example_nil_user_info_xml)
     @session.user.friends!(:name, :current_location, :pic)
   end
-    
+
   def sample_args_to_post
     {:method=>"facebook.auth.createToken", :sig=>"18b3dc4f5258a63c0ad641eebd3e3930"}
   end
@@ -396,7 +421,7 @@ class TestFacebooker < Test::Unit::TestCase
     </pages_getInfo_response>
     XML
   end
-  
+
   def example_pages_is_admin_true_xml
     <<-XML
     <?xml version="1.0" encoding="UTF-8"?>
@@ -442,10 +467,10 @@ class TestFacebooker < Test::Unit::TestCase
   def example_set_fbml_xml
     <<-XML
     <?xml version="1.0" encoding="UTF-8"?>
-      <profile_setFBML_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd">1</profile_setFBML_response>    
+      <profile_setFBML_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd">1</profile_setFBML_response>
     XML
   end
-  
+
   def example_get_fbml_xml
     <<-XML
     <?xml version="1.0" encoding="UTF-8"?>
@@ -453,17 +478,17 @@ class TestFacebooker < Test::Unit::TestCase
     &lt;fb:if-is-own-profile&gt;My profile!
     &lt;fb:else&gt; Not my profile!&lt;/fb:else&gt;
     &lt;/fb:if-is-own-profile&gt;
-    </profile_getFBML_response>    
+    </profile_getFBML_response>
     XML
   end
-  
+
   def example_notifications_send_xml
     <<-XML
 <?xml version="1.0" encoding="UTF-8"?>
-<notifications_send_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd">http://www.facebook.com/send_email.php?from=211031&id=52</notifications_send_response>
+<notifications_send_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd">http://www.facebook.com/send_email.php?from=211031&amp;id=52</notifications_send_response>
     XML
-  end     
-  
+  end
+
 	  def example_notifications_send_email_xml
 	    <<-XML
 	    <?xml version="1.0" encoding="UTF-8"?>
@@ -474,10 +499,10 @@ class TestFacebooker < Test::Unit::TestCase
   def example_request_send_xml
     <<-XML
     <?xml version="1.0" encoding="UTF-8"?>
-    <notifications_sendRequest_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd">http://www.facebook.com/send_req.php?from=211031&id=6</notifications_sendRequest_response>    
+    <notifications_sendRequest_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd">http://www.facebook.com/send_req.php?from=211031&id=6</notifications_sendRequest_response>
     XML
-  end  
-  
+  end
+
   def example_notifications_get_xml
     <<-XML
     <?xml version="1.0" encoding="UTF-8"?>
@@ -501,24 +526,24 @@ class TestFacebooker < Test::Unit::TestCase
       </friend_requests>
       <group_invites list="true"/>
       <event_invites list="true"/>
-    </notifications_get_response>    
+    </notifications_get_response>
     XML
   end
-  
+
   def example_publish_story_xml
     <<-XML
     <?xml version="1.0" encoding="UTF-8"?>
-    <feed_publishStoryToUser_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd">1</feed_publishStoryToUser_response>    
+    <feed_publishStoryToUser_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd">1</feed_publishStoryToUser_response>
     XML
   end
-  
+
   def example_publish_action_xml
     <<-XML
     <?xml version="1.0" encoding="UTF-8"?>
-    <feed_publishActionOfUser_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd">1</feed_publishActionOfUser_response>    
+    <feed_publishActionOfUser_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd">1</feed_publishActionOfUser_response>
     XML
   end
-    
+
   def example_publish_templatized_action_xml
     <<-XML
     <?xml version="1.0" encoding="UTF-8"?>
@@ -551,7 +576,7 @@ class TestFacebooker < Test::Unit::TestCase
             <status/>
             <year/>
           </affiliation>
-        </affiliations> 
+        </affiliations>
         <birthday>November 3</birthday>
         <books>The Brothers K, GEB, Ken Wilber, Zen and the Art, Fitzgerald, The Emporer's New Mind, The Wonderful Story of Henry Sugar</books>
         <current_location>
@@ -635,9 +660,9 @@ class TestFacebooker < Test::Unit::TestCase
        <user>
          <uid>1240079</uid>
          <about_me>I am here.</about_me>
-         <activities>Party.</activities>       
+         <activities>Party.</activities>
        </user>
-    </users_getInfo_response>    
+    </users_getInfo_response>
     XML
   end
 
@@ -655,7 +680,7 @@ class TestFacebooker < Test::Unit::TestCase
             <status/>
             <year/>
           </affiliation>
-        </affiliations> 
+        </affiliations>
          <meeting_for list="true">
            <seeking>Friendship</seeking>
          </meeting_for>
@@ -666,13 +691,13 @@ class TestFacebooker < Test::Unit::TestCase
        </user>
        <user>
          <uid>1240079</uid>
-         <activities>Party.</activities>       
+         <activities>Party.</activities>
        </user>
-    </users_getInfo_response>    
+    </users_getInfo_response>
     XML
   end
 
-  
+
   def example_nil_user_info_xml
     <<-XML
     <?xml version="1.0" encoding="UTF-8"?>
@@ -683,11 +708,11 @@ class TestFacebooker < Test::Unit::TestCase
         <current_location xsi:nil="true"/>
         <pic xsi:nil="true"/>
       </user>
-    </users_getInfo_response>    
+    </users_getInfo_response>
     XML
   end
 
-  
+
   def example_friends_xml
     <<-XML
     <?xml version="1.0" encoding="UTF-8"?>
@@ -697,7 +722,7 @@ class TestFacebooker < Test::Unit::TestCase
     </friends_get_response>
     XML
   end
-  
+
   def example_friend_lists_xml
     <<-XML
     <?xml version="1.0" encoding="UTF-8"?>
@@ -713,14 +738,14 @@ class TestFacebooker < Test::Unit::TestCase
     </friends_getLists_response>
     XML
   end
-  
+
   def example_get_logged_in_user_xml
     <<-XML
     <?xml version="1.0" encoding="UTF-8"?>
-    <users_getLoggedInUser_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd" list="true">1240077</users_getLoggedInUser_response>    
+    <users_getLoggedInUser_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd" list="true">1240077</users_getLoggedInUser_response>
     XML
   end
-  
+
   def example_invalid_api_key_error_response
     <<-XML
     <?xml version="1.0" encoding="UTF-8"?>
@@ -745,10 +770,10 @@ class TestFacebooker < Test::Unit::TestCase
           <value>1186088346.82142</value>
         </arg>
       </request_args>
-    </error_response>    
+    </error_response>
     XML
   end
-  
+
   def example_session_expired_error_response
     <<-XML
     <?xml version="1.0" encoding="UTF-8"?>
@@ -773,7 +798,7 @@ class TestFacebooker < Test::Unit::TestCase
           <value>1186088346.82142</value>
         </arg>
       </request_args>
-    </error_response>    
+    </error_response>
     XML
   end
 
@@ -783,10 +808,10 @@ class TestFacebooker < Test::Unit::TestCase
       <friends_getAppUsers_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd" list="true">
         <uid>222333</uid>
         <uid>1240079</uid>
-      </friends_getAppUsers_response> 
+      </friends_getAppUsers_response>
     XML
   end
-  
+
   def example_user_albums_xml
     <<-XML
     <?xml version="1.0" encoding="UTF-8"?>
@@ -818,7 +843,7 @@ class TestFacebooker < Test::Unit::TestCase
     </photos_getAlbums_response>
     XML
   end
-  
+
   def example_upload_photo_xml
     <<-XML
     <?xml version="1.0" encoding="UTF-8"?>
@@ -834,7 +859,7 @@ class TestFacebooker < Test::Unit::TestCase
     </photos_upload_response>
     XML
   end
-  
+
   def example_new_album_xml
     <<-XML
     <?xml version="1.0" encoding="UTF-8"?>
@@ -852,7 +877,7 @@ class TestFacebooker < Test::Unit::TestCase
     </photos_createAlbum_response>
     XML
   end
-  
+
   def example_photo_tags_xml
     <<-XML
     <?xml version="1.0" encoding="UTF-8"?>
@@ -866,14 +891,14 @@ class TestFacebooker < Test::Unit::TestCase
     </photos_getTags_response>
     XML
   end
-  
+
   def example_add_tag_xml
     <<-XML
     <?xml version="1.0" encoding="UTF-8"?>
     <photos_addTag_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd">1</photos_addTag_response>
     XML
   end
-  
+
   def example_get_photo_xml
     <<-XML
     <?xml version="1.0" encoding="UTF-8"?>
@@ -903,5 +928,24 @@ class TestFacebooker < Test::Unit::TestCase
     </photos_get_response>
     XML
   end
+
+  def example_upload_video_xml
+    <<-XML
+<?xml version="1.0" encoding="UTF-8"?>
+<video_upload_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd">
+    <vid>15943367753</vid>
+    <title>Some Epic</title>
+    <description>Check it out</description>
+    <link>http://www.facebook.com/video/video.php?v=15943367753</link>
+  </video_upload_response>
+    XML
+  end
   
+  def example_revoke_authorization_true
+    "1"
+  end
+  
+  def example_revoke_authorization_false
+    "0"
+  end
 end

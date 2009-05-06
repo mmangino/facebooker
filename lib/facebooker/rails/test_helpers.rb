@@ -22,25 +22,22 @@ module Facebooker
       def facebook_put(path,params={})
         facebook_verb(:put,path,params)
       end
+      
       def facebook_delete(path,params={})
         facebook_verb(:delete,path,params)
       end
       
       def facebook_verb(verb,path, params={})
-        params = default_facebook_parameters.update(params)
-        params.merge!(:fb_sig => generate_signature(facebook_params(params).stringify_keys))
-
-        params = params.update(:canvas => true).update(params)
-        send verb, path, params
+        send verb, path, facebook_params(params).reverse_merge(:canvas => true)
       end
       
-      def facebook_parameters(overrides=nil)
-        overrides ||= {}
-        params = default_facebook_parameters.merge(overrides)
-        params.merge(:fb_sig => generate_signature(params.stringify_keys))
+      def facebook_params(params = {})
+        params = default_facebook_parameters.with_indifferent_access.merge(params || {})
+        sig = generate_signature params
+        params.merge(:fb_sig => sig)
       end
 
-      private
+    private
 
       def default_facebook_parameters
         {
@@ -53,28 +50,16 @@ module Facebooker
         }
       end
 
-      def facebook_params(params)
-        params.inject({}) do |fb_params, pair| 
-          unless pair.first.to_s.match(/^fb_sig_/).nil?
-            fb_params[pair.first] = pair.last
-          end
-          fb_params
-        end
-      end
-
       def facebook_redirect_url
         match = @response.body.match(/<fb:redirect url="([^"]+)"/)
         match.nil? ? nil : match.captures[0]
       end
 
-      def generate_signature(facebook_params)
-        facebook_sig_params = facebook_params.inject({}) do |collection, pair|
-          collection[pair.first.sub(/^fb_sig_/, '')] = pair.last
-          collection
+      def generate_signature(params)
+        facebook_params = params.select { |param,_| param =~ /^fb_sig_/ }.map do |param, value|
+          [param.sub(/^fb_sig_/, ''), value].join('=')
         end
-
-        raw_string = facebook_sig_params.map{ |*args| args.join('=') }.sort.join
-        Digest::MD5.hexdigest([raw_string, Facebooker::Session.secret_key].join)
+        Digest::MD5.hexdigest([facebook_params.sort.join, Facebooker::Session.secret_key].join)
       end
       
     end

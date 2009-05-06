@@ -48,14 +48,7 @@ function encodeURIComponent(str) {
 
 var Form = {};
 Form.serialize = function(form_element) {
-  elements=$(form_element).serialize();
-  param_string="";
-  for (var name in elements) {
-    if (param_string) 
-      param_string += "&";
-    param_string += encodeURIComponent(name)+"="+encodeURIComponent(elements[name]);
-  }
-  return param_string;
+  return $(form_element).serialize();
 };
 
 Ajax.Updater = function (container,url,options) {

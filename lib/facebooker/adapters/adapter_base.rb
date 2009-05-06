@@ -26,6 +26,7 @@ module Facebooker
 
     def initialize(config)
       @config = config
+      @facebook_path_prefix = nil
     end
 
     def  self.facebooker_config
@@ -36,7 +37,7 @@ module Facebooker
     def self.load_adapter(params)
 
       config_key_base = params[:config_key_base] # This allows for loading of a aspecific adapter
-      config_key_base += "_" unless config_key_base.blank?
+      config_key_base += "_" if config_key_base && config_key_base.length > 0
 
       unless api_key = (params[:fb_sig_api_key] || facebooker_config["#{config_key_base}api_key"])
         raise Facebooker::AdapterBase::UnableToLoadAdapter
@@ -51,7 +52,7 @@ module Facebooker
 
         key_base = key.match(/(.*)[_]?api_key/)[1]
 
-        adapter_class_name = if key_base.blank?
+        adapter_class_name = if !key_base || key_base.length == 0
            "FacebookAdapter"
         else
           facebooker_config[key_base + "adapter"]
@@ -68,6 +69,9 @@ module Facebooker
         end
         return adapter_class.new(adapter_config)
       end
+
+      return self.default_adapter(params)
+
     end
 
     def self.default_adapter(params = {})

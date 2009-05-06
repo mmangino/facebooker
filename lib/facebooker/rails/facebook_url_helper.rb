@@ -50,7 +50,7 @@ module ActionView
     module UrlHelper
       # Alters one and only one line of the Rails button_to.  See below.
       def button_to_with_facebooker(name, options={}, html_options = {})
-        if !request_comes_from_facebook?
+        if !respond_to?(:request_comes_from_facebook?) || !request_comes_from_facebook?
            button_to_without_facebooker(name,options,html_options)
         else
           html_options = html_options.stringify_keys
@@ -125,7 +125,7 @@ module ActionView
 	# link_to("Facebooker", "http://rubyforge.org/projects/facebooker", :confirm=>{:title=>"the page says:, :content=>"Go to Facebooker?"})
 	# link_to("Facebooker", "http://rubyforge.org/projects/facebooker", :confirm=>{:title=>"the page says:, :content=>"Go to Facebooker?", :color=>"pink"})
   def confirm_javascript_function_with_facebooker(confirm, fun = nil)
-    if !request_comes_from_facebook?
+    if !respond_to?(:request_comes_from_facebook?) || !request_comes_from_facebook?
       confirm_javascript_function_without_facebooker(confirm)
     else
       if(confirm.is_a?(Hash))
@@ -157,7 +157,7 @@ module ActionView
 	# Dynamically creates a form for link_to with method.  Calls confirm_javascript_function if and 
 	# only if (confirm && method) for link_to
         def method_javascript_function_with_facebooker(method, url = '', href = nil, confirm = nil)
-          if !request_comes_from_facebook?
+          if !respond_to?(:request_comes_from_facebook?) || !request_comes_from_facebook?
             method_javascript_function_without_facebooker(method,url,href)
  	  else
             action = (href && url.size > 0) ? "'#{url}'" : 'a.getHref()'

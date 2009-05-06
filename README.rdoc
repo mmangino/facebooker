@@ -1,4 +1,4 @@
-= facebooker
+= Facebooker
 
 * http://facebooker.rubyforge.org
 
@@ -22,6 +22,7 @@ Facebooker is a Ruby wrapper over the Facebook[http://facebook.com] {REST API}[h
 == SYNOPSIS:
 
 View David Clements' {excellent tutorial}[http://apps.facebook.com/facebooker_tutorial] at {http://apps.facebook.com/facebooker_tutorial/}[http://apps.facebook.com/facebooker_tutorial] or check out {Developing Facebook Platform Applications with Rails}[http://www.pragprog.com/titles/mmfacer].
+{Join the Mailing List}:[groups.google.com/group/facebooker]
 
 == REQUIREMENTS:
 
@@ -29,7 +30,7 @@ None
 
 == INSTALL:
 
- * Non Rails
+=== Non Rails
 
 The best way is:
 
@@ -39,7 +40,7 @@ If, for some reason, you can't/won't use RubyGems, you can do:
 
   (sudo) ruby setup.rb
 
-  * Rails
+=== Rails
 
 Facebooker can be installed as a Rails plugin by:
 
@@ -75,7 +76,13 @@ end
 
 (The MIT License)
 
-Copyright (c) 2008 FIX
+Copyright (c) 2008-2009:
+
+* Chad Fowler
+* Patrick Ewing
+* Mike Mangino
+* Shane Vitarana
+* Corey Innis
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the

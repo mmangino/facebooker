@@ -24,7 +24,6 @@ end
 
 class CGI  
   class Session
-    private
       alias :initialize_aliased_by_facebooker :initialize
       attr_reader :request, :initialization_options
 

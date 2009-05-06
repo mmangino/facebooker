@@ -88,31 +88,32 @@ module Facebooker
     #
     # Publisher makes many helpers available, including the linking and asset helpers
     class Publisher
-      
+
       #story sizes from the Facebooker API
       ONE_LINE=1
       SHORT=2
       FULL=4
-      
+
       def initialize
-        @controller = PublisherController.new        
+        @from                 = nil
+        @full_story_template  = nil
+        @recipients           = nil
+        @controller           = PublisherController.new
       end
-      
+
       # use facebook options everywhere
       def request_comes_from_facebook?
         true
       end
-      
+
       class FacebookTemplate < ::ActiveRecord::Base
-        
-        
         cattr_accessor :template_cache
         self.template_cache = {}
-        
+
         def self.inspect(*args)
           "FacebookTemplate"
         end
-        
+
         def template_changed?(hash)
           if respond_to?(:content_hash)
             content_hash != hash 
@@ -180,20 +181,21 @@ module Facebooker
                (publisher.full_story_template and publisher.full_story_template.to_a.sort_by{|e| e[0].to_s})
                ].to_json
           end
-          
+
           def template_name(klass,method)
             "#{klass.name}::#{method}"
           end
         end
       end
-      
+
       class_inheritable_accessor :master_helper_module
-      attr_accessor :one_line_story_templates, :short_story_templates, :action_links
-      
+      attr_accessor :one_line_story_templates, :short_story_templates
+      attr_writer :action_links
+
       cattr_accessor :skip_registry
       self.skip_registry = false
-      
-      
+
+
       class InvalidSender < StandardError; end
       class UnknownBodyType < StandardError; end
       class UnspecifiedBodyType < StandardError; end
@@ -219,20 +221,21 @@ module Facebooker
       end
       class UserAction
         attr_accessor :data
-        attr_accessor :target_ids
+        attr_reader   :target_ids
         attr_accessor :body_general
         attr_accessor :template_id
         attr_accessor :template_name
         attr_accessor :story_size
+
         def target_ids=(val)
           @target_ids = val.is_a?(Array) ? val.join(",") : val
         end
+
         def data_hash
-          default_data = story_size.nil? ? {} : {:story_size=>story_size}
-          default_data.merge(data||{})
+          data||{}
         end
       end
-      
+
       cattr_accessor :ignore_errors
       attr_accessor :_body
 
@@ -288,12 +291,12 @@ module Facebooker
         @one_line_story_templates ||= []
         @one_line_story_templates << str
       end
-      
+
       def short_story_template(title,body,params={})
         @short_story_templates ||= []
         @short_story_templates << params.merge(:template_title=>title, :template_body=>body)
       end
-      
+
       def action_links(*links)
         if links.blank?
           @action_links
@@ -312,10 +315,27 @@ module Facebooker
         end
       end
       
-      def image(src,target)
-        {:src=>image_path(src),:href=> target.respond_to?(:to_str) ? target : url_for(target)}
+      # work around the fact that facebook cares about the order of the keys in the hash
+      class ImageHolder
+        attr_accessor :src,:href
+        def initialize(src,href)
+          self.src=src
+          self.href=href
+        end
+
+        def ==(other)
+          self.src == other.src && self.href == other.href
+        end
+
+        def to_json(*args)
+          "{\"src\":#{src.to_json}, \"href\":#{href.to_json}}"
+        end
       end
       
+      def image(src,target)
+        ImageHolder.new(image_path(src),target.respond_to?(:to_str) ? target : url_for(target))
+      end
+           
       def action_link(text,target)
         {:text=>text, :href=>target}
       end
@@ -364,7 +384,7 @@ module Facebooker
         when Ref
           Facebooker::Session.create.server_cache.set_ref_handle(_body.handle,_body.fbml)
         when UserAction
-          @from.session.publish_user_action(_body.template_id,_body.data_hash,_body.target_ids,_body.body_general)
+          @from.session.publish_user_action(_body.template_id,_body.data_hash,_body.target_ids,_body.body_general,_body.story_size)
         else
           raise UnspecifiedBodyType.new("You must specify a valid send_as")
         end
@@ -391,7 +411,10 @@ module Facebooker
         #only do this on Rails 2.1
 	      if ActionController::Base.respond_to?(:append_view_path)
   	      # only add the view path once
-	        ActionController::Base.append_view_path(controller_root) unless ActionController::Base.view_paths.include?(controller_root)
+  	      unless ActionController::Base.view_paths.include?(controller_root)
+	          ActionController::Base.append_view_path(controller_root) 
+	          ActionController::Base.append_view_path(controller_root+"/..") 
+	        end
 	      end
         returning ActionView::Base.new([template_root,controller_root], assigns, self) do |template|
           template.controller=self
@@ -414,6 +437,7 @@ module Facebooker
         include ActionView::Helpers::FormHelper
         include ActionView::Helpers::FormTagHelper
         include ActionView::Helpers::AssetTagHelper
+        include ActionView::Helpers::NumberHelper
         include Facebooker::Rails::Helpers
         
         #define this for the publisher views
@@ -458,7 +482,7 @@ module Facebooker
           case publisher._body
           when UserAction
             publisher._body.template_name = method
-            publisher._body.template_id = FacebookTemplate.bundle_id_for_class_and_method(self,method)
+            publisher._body.template_id ||= FacebookTemplate.bundle_id_for_class_and_method(self,method)
           end
           
           should_send ? publisher.send_message(method) : publisher._body
@@ -476,38 +500,41 @@ module Facebooker
           args.each do |arg|
             case arg
             when Symbol,String
-              add_template_helper("#{arg.to_s.classify}Helper".constantize)              
+              add_template_helper("#{arg.to_s.classify}Helper".constantize)
             when Module
               add_template_helper(arg)
             end
           end
         end
-        
+
         def add_template_helper(helper_module) #:nodoc:
           master_helper_module.send :include,helper_module
           include master_helper_module
         end
 
-    
+
         def inherited(child)
-          super          
+          super
           child.master_helper_module=Module.new
           child.master_helper_module.__send__(:include,self.master_helper_module)
           child.send(:include, child.master_helper_module)
           FacebookTemplate.clear_cache!
         end
-    
+
       end
       class PublisherController
         include Facebooker::Rails::Publisher.master_helper_module
         include ActionController::UrlWriter
-        
-        def self.default_url_options(*args)
-          Facebooker::Rails::Publisher.default_url_options(*args)
+
+        class << self
+          alias :old_default_url_options :default_url_options
+          def default_url_options(*args)
+            Facebooker::Rails::Publisher.default_url_options(*args)
+          end
         end
-        
+
       end
-      
+
     end
   end
 end

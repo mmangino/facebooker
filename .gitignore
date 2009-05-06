@@ -1,2 +1,5 @@
 pkg
 coverage
+doc
+tags
+.*.swp

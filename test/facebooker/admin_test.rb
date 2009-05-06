@@ -1,6 +1,6 @@
-require File.dirname(__FILE__) + '/test_helper.rb'
+require File.expand_path(File.dirname(__FILE__) + '/../test_helper')
 
-class FacebookAdminTest < Test::Unit::TestCase
+class Facebooker::AdminTest < Test::Unit::TestCase
   def setup
     @session = Facebooker::Session.create('apikey', 'secretkey')
     Facebooker.use_curl=false

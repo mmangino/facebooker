@@ -1,6 +1,4 @@
-require File.dirname(__FILE__) + '/test_helper.rb'
-require 'rubygems'
-require 'flexmock/test_unit'
+require File.expand_path(File.dirname(__FILE__) + '/../test_helper')
 require 'net/http_multipart_post'
 
 class HttpMulitpartPostTest < Test::Unit::TestCase
@@ -9,7 +7,7 @@ class HttpMulitpartPostTest < Test::Unit::TestCase
   end
   
   def fixture(string)
-    File.open(File.dirname(__FILE__) + "/fixtures/#{string}.txt").read
+    File.open(File.dirname(__FILE__) + "/../fixtures/#{string}.txt").read
   end
   
   def test_multipart_post_with_only_parameters

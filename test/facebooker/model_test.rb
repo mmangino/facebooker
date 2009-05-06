@@ -1,8 +1,6 @@
-require File.dirname(__FILE__) + '/test_helper.rb'
-require 'rubygems'
-require 'flexmock/test_unit'
+require File.expand_path(File.dirname(__FILE__) + '/../test_helper')
 
-class TestFacebooker < Test::Unit::TestCase
+class Facebooker::ModelTest < Test::Unit::TestCase
   
   class ComplexThing
     include Facebooker::Model
@@ -14,11 +12,21 @@ class TestFacebooker < Test::Unit::TestCase
     attr_accessor :name, :job
     hash_settable_accessor :complex_thing, ComplexThing
     hash_settable_list_accessor :list_of_complex_things, ComplexThing
+
+    def initialize *args
+      @session = nil
+      super
+    end
   end
 
   class PopulatingThing
     include Facebooker::Model
     populating_attr_accessor :first_name
+
+    def initialize
+      @first_name = nil
+      @populated  = false
+    end
   end
   
   def test_can_instantiate_an_object_with_a_hash

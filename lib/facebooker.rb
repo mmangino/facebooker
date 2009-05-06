@@ -1,115 +1,120 @@
-begin
-  unless Object.const_defined?("ActiveSupport") and ActiveSupport.const_defined?("JSON")
-    require 'json' 
-    module Facebooker
-      def self.json_decode(str)
-        JSON.parse(str)
-      end
+unless defined?(ActiveSupport) and defined?(ActiveSupport::JSON)
+  require 'json'
+  module Facebooker
+    def self.json_decode(str)
+      JSON.parse(str)
     end
-  else
-    module Facebooker
-      def self.json_decode(str)
-        ActiveSupport::JSON.decode(str)
-      end
+
+    def self.json_encode(o)
+      JSON.dump(o)
     end
-  end 
-rescue
-  require 'json' 
+  end
+else
+  module Facebooker
+    def self.json_decode(str)
+      ActiveSupport::JSON.decode(str)
+    end
+
+    def self.json_encode(o)
+      ActiveSupport::JSON.encode(o)
+    end
+  end
 end
+
 require 'zlib'
 require 'digest/md5'
 
-
-
 module Facebooker
-      
+
+    @facebooker_configuration = {}
+    @current_adapter = nil
+    @set_asset_host_to_callback_url = true
+    @path_prefix = nil
+    @use_curl    = false
+
     class << self
-    
+
     def load_configuration(facebooker_yaml_file)
       if File.exist?(facebooker_yaml_file)
         if defined? RAILS_ENV
-          facebooker = YAML.load_file(facebooker_yaml_file)[RAILS_ENV] 
+          config = YAML.load_file(facebooker_yaml_file)[RAILS_ENV] 
         else
-          facebooker = YAML.load_file(facebooker_yaml_file)           
+          config = YAML.load_file(facebooker_yaml_file)           
         end
-        ENV['FACEBOOK_API_KEY'] = facebooker['api_key']
-        ENV['FACEBOOK_SECRET_KEY'] = facebooker['secret_key']
-        ENV['FACEBOOKER_RELATIVE_URL_ROOT'] = facebooker['canvas_page_name']
-        ENV['FACEBOOKER_API'] = facebooker['api']
-        if facebooker.has_key?('set_asset_host_to_callback_url')
-          Facebooker.set_asset_host_to_callback_url = facebooker['set_asset_host_to_callback_url'] 
-        end
-        Facebooker.timeout = facebooker['timeout']
-        if Object.const_defined?("ActionController")
-          ActionController::Base.asset_host = facebooker['callback_url'] if(ActionController::Base.asset_host.blank?)  && Facebooker.set_asset_host_to_callback_url
-        end
-        @facebooker_configuration = facebooker
+        apply_configuration(config)
       end
     end
-    
+
+    # Sets the Facebook environment based on a hash of options. 
+    # By default the hash passed in is loaded from facebooker.yml, but it can also be passed in
+    # manually every request to run multiple Facebook apps off one Rails app. 
+    def apply_configuration(config)
+      ENV['FACEBOOK_API_KEY']             = config['api_key']
+      ENV['FACEBOOK_SECRET_KEY']          = config['secret_key']
+      ENV['FACEBOOKER_RELATIVE_URL_ROOT'] = config['canvas_page_name']
+      ENV['FACEBOOKER_API']               = config['api']
+      if config.has_key?('set_asset_host_to_callback_url')
+        Facebooker.set_asset_host_to_callback_url = config['set_asset_host_to_callback_url'] 
+      end
+      if Object.const_defined?("ActionController") and Facebooker.set_asset_host_to_callback_url
+        ActionController::Base.asset_host = config['callback_url'] 
+      end
+      Facebooker.timeout = config['timeout']
+      @facebooker_configuration = config
+    end
+
     def facebooker_config
-      @facebooker_configuration 
+      @facebooker_configuration
     end
-    
-     def current_adapter=(adapter_class)
-      @current_adapter = adapter_class
-    end
-    
+
+    # TODO: This should be converted to attr_accessor, but we need to
+    # get all the require statements at the top of the file to work.
+
+    # Set the current adapter
+    attr_writer :current_adapter
+
+    # Get the current adapter
     def current_adapter
       @current_adapter || Facebooker::AdapterBase.default_adapter
     end
-    
+
     def load_adapter(params)
       self.current_adapter = Facebooker::AdapterBase.load_adapter(params)
     end
-      
+
     def facebook_path_prefix=(path)
       current_adapter.facebook_path_prefix = path
     end
-  
+
     # Default is canvas_page_name in yml file
     def facebook_path_prefix
       current_adapter.facebook_path_prefix
     end
-    
+
     def is_for?(application_container)
       current_adapter.is_for?(application_container)
     end
-    
-    def set_asset_host_to_callback_url=(val)
-      @set_asset_host_to_callback_url=val
-    end
-    
-    def set_asset_host_to_callback_url
-      @set_asset_host_to_callback_url.nil? ? true : @set_asset_host_to_callback_url
-    end
-    
-    def use_curl=(val)
-      @use_curl=val
-    end
-    
-    def use_curl?
-      @use_curl
-    end
-    
+
+    attr_accessor :set_asset_host_to_callback_url
+    attr_accessor :use_curl
+    alias :use_curl? :use_curl
+
     def timeout=(val)
       @timeout = val.to_i
     end
-    
+
     def timeout
       @timeout
     end
-   
-    [:api_key,:secret_key, :www_server_base_url,:login_url_base,:install_url_base,:api_rest_path,:api_server_base,:api_server_base_url,:canvas_server_base].each do |delegated_method|
+
+    [:api_key,:secret_key, :www_server_base_url,:login_url_base,:install_url_base,:api_rest_path,:api_server_base,:api_server_base_url,:canvas_server_base, :video_server_base].each do |delegated_method|
       define_method(delegated_method){ return current_adapter.send(delegated_method)}
     end
-    
-    
-       def path_prefix
-      @path_prefix
-      end
-    
-    
+
+
+    attr_reader :path_prefix
+
+
     # Set the asset path to the canvas path for just this one request
     # by definition, we will make this a canvas request
     def with_asset_path_for_canvas
@@ -123,7 +128,7 @@ module Facebooker
         ActionController::Base.asset_host = original_asset_host
       end
     end
-  
+
     # If this request is_canvas_request
     # then use the application name as the url root
     def request_for_canvas(is_canvas_request)
@@ -147,6 +152,7 @@ require 'facebooker/service'
 require 'facebooker/server_cache'
 require 'facebooker/data'
 require 'facebooker/admin'
+require 'facebooker/mobile'
 require 'facebooker/session'
 require 'facebooker/version'
 require 'facebooker/models/location'
@@ -166,7 +172,8 @@ require 'facebooker/models/tag'
 require 'facebooker/models/user'
 require 'facebooker/models/info_item'
 require 'facebooker/models/info_section'
+require 'facebooker/models/friend_list'
+require 'facebooker/models/video'
 require 'facebooker/adapters/adapter_base'
 require 'facebooker/adapters/facebook_adapter'
 require 'facebooker/adapters/bebo_adapter'
-require 'facebooker/models/friend_list'
