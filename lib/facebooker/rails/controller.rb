@@ -206,6 +206,8 @@ module Facebooker
       end
       
       def verify_signature(facebook_sig_params,expected_signature)
+        # Don't verify the signature if rack has already done so.
+        return if ActionController::Dispatcher.middleware.include? Rack::Facebook
         raw_string = facebook_sig_params.map{ |*args| args.join('=') }.sort.join
         actual_sig = Digest::MD5.hexdigest([raw_string, Facebooker::Session.secret_key].join)
         raise Facebooker::Session::IncorrectSignature if actual_sig != expected_signature
