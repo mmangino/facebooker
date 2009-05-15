@@ -23,6 +23,7 @@ module ::ActionController
   end
 
   class UrlRewriter
+    include Facebooker::Rails::BackwardsCompatibleParamChecks
 
     RESERVED_OPTIONS << :canvas
 
@@ -53,19 +54,6 @@ module ::ActionController
       end
     end
     
-    def one_or_true( value )
-      case value
-        when String then
-          value == "1"
-        when Numeric then
-          value.to_f == 1.0
-        when TrueClass then
-          true
-        else
-          false
-      end
-    end
-
     alias_method_chain :rewrite_url, :facebooker
 
   end

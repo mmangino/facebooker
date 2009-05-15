@@ -10,6 +10,7 @@ Facebooker.logger = RAILS_DEFAULT_LOGGER if Object.const_defined? :RAILS_DEFAULT
 
 require 'net/http_multipart_post'
 if defined? Rails
+  require 'facebooker/rails/backwards_compatible_param_checks'
   require 'facebooker/rails/controller'
   require 'facebooker/rails/facebook_url_rewriting'
   require 'facebooker/rails/facebook_session_handling' if Rails.version < '2.3'

@@ -3,6 +3,7 @@ require 'facebooker/rails/profile_publisher_extensions'
 module Facebooker
   module Rails
     module Controller
+      include Facebooker::Rails::BackwardsCompatibleParamChecks
       include Facebooker::Rails::ProfilePublisherExtensions
       def self.included(controller)
         controller.extend(ClassMethods)
@@ -251,13 +252,12 @@ module Facebooker
       end
       
       def request_is_facebook_ajax?
-        params["fb_sig_is_mockajax"]=="1" || params["fb_sig_is_ajax"]=="1" || params["fb_sig_is_ajax"]==true || params["fb_sig_is_mockajax"]==true
+        one_or_true(params["fb_sig_is_mockajax"]) || one_or_true(params["fb_sig_is_ajax"])
       end
+
       def xml_http_request?
         request_is_facebook_ajax? || super
       end
-      
-      
       
       def application_is_installed?
         facebook_params['added']
