@@ -31,6 +31,7 @@ module Facebooker
              init_string = <<-FBML
              #{case options[:js]
                when :jquery then "$(document).ready("
+               when :dojo then "dojo.addOnLoad("
                else "Element.observe(window,'load',"
                end} function() {
                 FB_RequireFeatures(#{required_features.to_json}, function() {
