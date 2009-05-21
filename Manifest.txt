@@ -85,6 +85,7 @@ lib/facebooker/rails/extensions/routing.rb
 lib/facebooker/rails/facebook_form_builder.rb
 lib/facebooker/rails/facebook_pretty_errors.rb
 lib/facebooker/rails/facebook_request_fix.rb
+lib/facebooker/rails/facebook_request_fix_2-3.rb
 lib/facebooker/rails/facebook_session_handling.rb
 lib/facebooker/rails/facebook_url_helper.rb
 lib/facebooker/rails/facebook_url_rewriting.rb
@@ -118,6 +119,7 @@ test/facebooker/models/event_test.rb
 test/facebooker/models/user_test.rb
 test/facebooker/rails/publisher_test.rb
 test/facebooker/rails_integration_test.rb
+test/facebooker/rails/facebook_request_fix_2-3_test.rb
 test/facebooker/server_cache_test.rb
 test/facebooker/session_test.rb
 test/facebooker_test.rb
