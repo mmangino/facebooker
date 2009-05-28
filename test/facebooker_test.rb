@@ -232,7 +232,7 @@ class TestFacebooker < Test::Unit::TestCase
     photos = @session.get_photos([97503428461115590, 97503428461115573])
     assert_equal 2, photos.size
     assert_equal "Rooftop barbecues make me act funny", photos.first.caption
-    assert_equal 97503428461115590, photos[0].id
+    assert_equal "97503428461115590", photos[0].id
   end
 
   def test_can_get_photos_by_subject_and_album

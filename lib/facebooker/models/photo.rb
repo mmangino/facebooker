@@ -8,5 +8,12 @@ module Facebooker
                   :story_fbid
 
     id_is :pid
+    
+    #override the generated method for id_is to use a string
+    def pid=(val)
+      @pid = val
+    end
+    
+    alias :id= :pid=
   end
 end
