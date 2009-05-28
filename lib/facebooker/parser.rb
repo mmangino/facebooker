@@ -118,31 +118,31 @@ module Facebooker
 
   class CreateToken < Parser#:nodoc:
     def self.process(data)
-      element('auth_createtoken_response', data).content.strip
+      element('auth_createToken_response', data).content.strip
     end
   end
 
   class RegisterUsers < Parser
     def self.process(data)
-      array_of_text_values(element("connect_registerusers_response", data), "connect_registerusers_response_elt")
+      array_of_text_values(element("connect_registerUsers_response", data), "connect_registerUsers_response_elt")
     end
   end
 
   class UnregisterUsers < Parser
     def self.process(data)
-      array_of_text_values(element("connect_unregisterusers_response", data), "connect_unregisterusers_response_elt")
+      array_of_text_values(element("connect_unregisterUsers_response", data), "connect_unregisterUsers_response_elt")
     end
   end
 
   class GetUnconnectedFriendsCount < Parser
     def self.process(data)
-      hash_or_value_for(element("connect_getunconnectedfriendscount_response",data)).to_i
+      hash_or_value_for(element("connect_getUnconnectedFriendsCount_response",data)).to_i
     end
   end
 
   class GetSession < Parser#:nodoc:
     def self.process(data)
-      hashinate(element('auth_getsession_response', data))
+      hashinate(element('auth_getSession_response', data))
     end
   end
 
@@ -154,49 +154,49 @@ module Facebooker
 
   class FriendListsGet < Parser#:nodoc:
     def self.process(data)
-      array_of_hashes(element('friends_getlists_response', data), 'friendlist')
+      array_of_hashes(element('friends_getLists_response', data), 'friendlist')
     end
   end
 
   class UserInfo < Parser#:nodoc:
     def self.process(data)
-      array_of_hashes(element('users_getinfo_response', data), 'user')
+      array_of_hashes(element('users_getInfo_response', data), 'user')
     end
   end
 
   class UserStandardInfo < Parser#:nodoc:
     def self.process(data)
-      array_of_hashes(element('users_getstandardinfo_response', data), 'standard_user_info')
+      array_of_hashes(element('users_getStandardInfo_response', data), 'standard_user_info')
     end
   end
 
   class GetLoggedInUser < Parser#:nodoc:
     def self.process(data)
-      Integer(element('users_getloggedinuser_response', data).content.strip)
+      Integer(element('users_getLoggedInUser_response', data).content.strip)
     end
   end
 
   class PagesIsAdmin < Parser#:nodoc:
     def self.process(data)
-      element('pages_isadmin_response', data).content.strip == '1'
+      element('pages_isAdmin_response', data).content.strip == '1'
     end
   end
 
   class PagesGetInfo < Parser#:nodoc:
     def self.process(data)
-      array_of_hashes(element('pages_getinfo_response', data), 'page')
+      array_of_hashes(element('pages_getInfo_response', data), 'page')
     end
   end
 
   class PagesIsFan < Parser#:nodoc:
     def self.process(data)
-      element('pages_isfan_response', data).content.strip == '1'
+      element('pages_isFan_response', data).content.strip == '1'
     end
   end
 
   class PublishStoryToUser < Parser#:nodoc:
     def self.process(data)
-      element('feed_publishstorytouser_response', data).content.strip
+      element('feed_publishStoryToUser_response', data).content.strip
     end
   end
 
@@ -208,67 +208,67 @@ module Facebooker
 
   class RegisterTemplateBundle < Parser#:nodoc:
     def self.process(data)
-      element('feed_registertemplatebundle_response', data).content.to_i
+      element('feed_registerTemplateBundle_response', data).content.to_i
     end
   end
 
   class GetRegisteredTemplateBundles < Parser
     def self.process(data)
-      array_of_hashes(element('feed_getregisteredtemplatebundles_response',data), 'template_bundle')
+      array_of_hashes(element('feed_getRegisteredTemplateBundles_response',data), 'template_bundle')
     end
   end
 
   class DeactivateTemplateBundleByID < Parser#:nodoc:
     def self.process(data)
-      element('feed_deactivatetemplatebundlebyid_response', data).content.strip == '1'
+      element('feed_deactivateTemplateBundleByID_response', data).content.strip == '1'
     end
   end
 
   class PublishUserAction < Parser#:nodoc:
     def self.process(data)
-      element('feed_publishuseraction_response', data).children[1].content.strip == "1"
+      element('feed_publishUserAction_response', data).children[1].content.strip == "1"
     end
   end
 
   class PublishActionOfUser < Parser#:nodoc:
     def self.process(data)
-      element('feed_publishactionofuser_response', data).content.strip
+      element('feed_publishActionOfUser_response', data).content.strip
     end
   end
 
   class PublishTemplatizedAction < Parser#:nodoc:
     def self.process(data)
-      element('feed_publishtemplatizedaction_response', data).children[1].content.strip
+      element('feed_publishTemplatizedAction_response', data).children[1].content.strip
     end
   end
 
   class SetAppProperties < Parser#:nodoc:
     def self.process(data)
-      element('admin_setappproperties_response', data).content.strip
+      element('admin_setAppProperties_response', data).content.strip
     end
   end
 
   class GetAppProperties < Parser#:nodoc:
     def self.process(data)
-      element('admin_getappproperties_response', data).content.strip
+      element('admin_getAppProperties_response', data).content.strip
     end
   end
 
   class SetRestrictionInfo < Parser#:nodoc:
     def self.process(data)
-      element('admin_setrestrictioninfo_response', data).content.strip
+      element('admin_setRestrictionInfo_response', data).content.strip
     end
   end
 
   class GetRestrictionInfo < Parser#:nodoc:
     def self.process(data)
-      element('admin_getrestrictioninfo_response', data).content.strip
+      element('admin_getRestrictionInfo_response', data).content.strip
     end
   end
 
   class GetAllocation < Parser#:nodoc:
     def self.process(data)
-      element('admin_getallocation_response', data).content.strip
+      element('admin_getAllocation_response', data).content.strip
     end
   end
 
@@ -297,7 +297,7 @@ module Facebooker
 
   class GetAppUsers < Parser#:nodoc:
     def self.process(data)
-      array_of_text_values(element('friends_getappusers_response', data), 'uid')
+      array_of_text_values(element('friends_getAppUsers_response', data), 'uid')
     end
   end
 
@@ -315,19 +315,19 @@ module Facebooker
 
   class NotificationsSendEmail < Parser#:nodoc:
     def self.process(data)
-      element('notifications_sendemail_response', data).content.strip
+      element('notifications_sendEmail_response', data).content.strip
     end
   end
 
   class GetTags < Parser#nodoc:
     def self.process(data)
-      array_of_hashes(element('photos_gettags_response', data), 'photo_tag')
+      array_of_hashes(element('photos_getTags_response', data), 'photo_tag')
     end
   end
 
   class AddTags < Parser#nodoc:
     def self.process(data)
-      element('photos_addtag_response', data)
+      element('photos_addTag_response', data)
     end
   end
 
@@ -339,13 +339,13 @@ module Facebooker
 
   class GetAlbums < Parser#nodoc:
     def self.process(data)
-      array_of_hashes(element('photos_getalbums_response', data), 'album')
+      array_of_hashes(element('photos_getAlbums_response', data), 'album')
     end
   end
 
   class CreateAlbum < Parser#:nodoc:
     def self.process(data)
-      hashinate(element('photos_createalbum_response', data))
+      hashinate(element('photos_createAlbum_response', data))
     end
   end
 
@@ -363,31 +363,31 @@ module Facebooker
 
   class SendRequest < Parser#:nodoc:
     def self.process(data)
-      element('notifications_sendrequest_response', data).content.strip
+      element('notifications_sendRequest_response', data).content.strip
     end
   end
 
   class ProfileFBML < Parser#:nodoc:
     def self.process(data)
-      element('profile_getfbml_response', data).content.strip
+      element('profile_getFBML_response', data).content.strip
     end
   end
 
   class ProfileFBMLSet < Parser#:nodoc:
     def self.process(data)
-      element('profile_setfbml_response', data).content.strip
+      element('profile_setFBML_response', data).content.strip
     end
   end
 
   class ProfileInfo < Parser#:nodoc:
     def self.process(data)
-      hashinate(element('profile_getinfo_response info_fields', data))
+      hashinate(element('profile_getInfo_response info_fields', data))
     end
   end
 
   class ProfileInfoSet < Parser#:nodoc:
     def self.process(data)
-      element('profile_setinfo_response', data).content.strip
+      element('profile_setInfo_response', data).content.strip
     end
   end
 
@@ -401,31 +401,31 @@ module Facebooker
 
   class SetRefHandle < Parser#:nodoc:
     def self.process(data)
-      element('fbml_setrefhandle_response', data).content.strip
+      element('fbml_setRefHandle_response', data).content.strip
     end
   end
 
   class RefreshRefURL < Parser#:nodoc:
     def self.process(data)
-      element('fbml_refreshrefurl_response', data).content.strip
+      element('fbml_refreshRefUrl_response', data).content.strip
     end
   end
 
   class RefreshImgSrc < Parser#:nodoc:
     def self.process(data)
-      element('fbml_refreshimgsrc_response', data).content.strip
+      element('fbml_refreshImgSrc_response', data).content.strip
     end
   end
 
   class SetCookie < Parser#:nodoc:
     def self.process(data)
-      element('data_setcookie_response', data).content.strip
+      element('data_setCookie_response', data).content.strip
     end
   end
 
   class GetCookies < Parser#:nodoc:
     def self.process(data)
-      array_of_hashes(element('data_getcookie_response', data), 'cookies')
+      array_of_hashes(element('data_getCookie_response', data), 'cookies')
     end
   end
 
@@ -437,7 +437,7 @@ module Facebooker
 
   class GroupGetMembers < Parser#:nodoc:
     def self.process(data)
-      root = element('groups_getmembers_response', data)
+      root = element('groups_getMembers_response', data)
       result = ['members', 'admins', 'officers', 'not_replied'].map do |position|
         array_of(root, position) {|element| element}.map do |element|
           array_of_text_values(element, 'uid').map do |uid|
@@ -450,7 +450,7 @@ module Facebooker
 
   class EventMembersGet < Parser#:nodoc:
     def self.process(data)
-      root = element('events_getmembers_response', data)
+      root = element('events_getMembers_response', data)
       result = ['attending', 'declined', 'unsure', 'not_replied'].map do |rsvp_status|
         array_of(root, rsvp_status) {|element| element}.map do |element|
           array_of_text_values(element, 'uid').map do |uid|
@@ -469,7 +469,7 @@ module Facebooker
 
   class AreFriends < Parser#:nodoc:
     def self.process(data)
-      array_of_hashes(element('friends_arefriends_response', data), 'friend_info').inject({}) do |memo, hash|
+      array_of_hashes(element('friends_areFriends_response', data), 'friend_info').inject({}) do |memo, hash|
         memo[[Integer(hash['uid1']), Integer(hash['uid2'])].sort] = are_friends?(hash['are_friends'])
         memo
       end
@@ -489,25 +489,25 @@ module Facebooker
 
   class SetStatus < Parser
     def self.process(data)
-      element('users_setstatus_response',data).content.strip == '1'
+      element('users_setStatus_response',data).content.strip == '1'
     end
   end
 
   class GetPreference < Parser#:nodoc:
     def self.process(data)
-      element('data_getuserpreference_response', data).content.strip
+      element('data_getUserPreference_response', data).content.strip
     end
   end
 
   class SetPreference < Parser#:nodoc:
     def self.process(data)
-      element('data_setuserpreference_response', data).content.strip
+      element('data_setUserPreference_response', data).content.strip
     end
   end
 
   class UserHasPermission < Parser
     def self.process(data)
-      element('users_hasapppermission_response', data).content.strip
+      element('users_hasAppPermission_response', data).content.strip
     end
   end
 
@@ -519,7 +519,7 @@ module Facebooker
 
   class SmsCanSend < Parser#:nodoc:
     def self.process(data)
-      element('sms_cansend_response', data).content.strip
+      element('sms_canSend_response', data).content.strip
     end
   end
 
