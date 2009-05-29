@@ -11,21 +11,29 @@ module Facebooker
           end
         end
         
+        # 
+        # For information on the :app_settings argument see http://wiki.developers.facebook.com/index.php/JS_API_M_FB.Facebook.Init_2 
+        # While it would be nice to treat :app_settings as a hash, some of the arguments do different things if they are a string vs a javascript function
+        # and Rails' Hash#to_json always quotes strings so there is no way to indicate when the value should be a javascript function.
+        # For this reason :app_settings needs to be a string that is valid JSON (including the {}'s).
+        #
         def init_fb_connect(*required_features,&proc)
           additions = ""
           if block_given?
             additions = capture(&proc)
           end
 
-          options = {:js => :prototype}
+          # Yes, app_settings is set to a string of an empty JSON element. That's intentional.
+          options = {:js => :prototype, :app_settings => '{}'}
+
           if required_features.last.is_a?(Hash)
             options.merge!(required_features.pop.symbolize_keys)
           end
 
           if request.ssl?
-            init_string = "FB.Facebook.init('#{Facebooker.api_key}','/xd_receiver_ssl.html');"
+            init_string = "FB.Facebook.init('#{Facebooker.api_key}','/xd_receiver_ssl.html', #{options[:app_settings]});"
           else
-            init_string = "FB.Facebook.init('#{Facebooker.api_key}','/xd_receiver.html');"
+            init_string = "FB.Facebook.init('#{Facebooker.api_key}','/xd_receiver.html', #{options[:app_settings]});"
           end
           unless required_features.blank?
              init_string = <<-FBML
