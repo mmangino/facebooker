@@ -107,7 +107,9 @@ module Facebooker
         end
         
         def fb_user_action(action, user_message = "", prompt = "", callback = nil)
+          user_message = "{value: \"#{escape_javascript(user_message)}\"}" unless user_message.blank? || user_message =~ /^\{.*value:/ # already in json notation
           update_page do |page|
+            user_message = page.literal(user_message) unless user_message.blank?
             page.call "FB.Connect.showFeedDialog",action.template_id,action.data,action.target_ids,action.body_general,nil,page.literal("FB.RequireConnect.promptConnect"),callback,prompt,user_message
           end
         end
