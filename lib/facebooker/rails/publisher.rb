@@ -63,7 +63,7 @@ module Facebooker
     #     def profile_update(user_to_update,user_with_session_to_use)
     #       send_as :profile
     #       from user_with_session_to_use
-    #       to user_to_update
+    #       recipients user_to_update
     #       profile render(:action=>"/users/profile",:assigns=>{:user=>user_to_update})
     #       profile_action "A string"
     #       mobile_profile render(:partial=>"mobile",:assigns=>{:user=>user_to_update})
@@ -415,8 +415,11 @@ module Facebooker
 	          ActionController::Base.append_view_path(controller_root) 
 	          ActionController::Base.append_view_path(controller_root+"/..") 
 	        end
+          view_paths = ActionController::Base.view_paths
+        else
+          view_paths = [template_root, controller_root]
 	      end
-        returning ActionView::Base.new([template_root,controller_root], assigns, self) do |template|
+        returning ActionView::Base.new(view_paths, assigns, self) do |template|
           template.controller=self
           template.extend(self.class.master_helper_module)
           def template.request_comes_from_facebook?
