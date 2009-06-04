@@ -56,7 +56,7 @@ module Facebooker
     #       fbml 'text'
     #       text fbml
     #     end
-    #     # This will render the profile in /users/profile.erb
+    #     # This will render the profile in /users/profile.fbml.erb
     #     #   it will set @user to user_to_update in the template
     #     #  The mobile profile will be rendered from the app/views/test_publisher/_mobile.erb
     #     #   template
@@ -64,7 +64,7 @@ module Facebooker
     #       send_as :profile
     #       from user_with_session_to_use
     #       recipients user_to_update
-    #       profile render(:action=>"/users/profile",:assigns=>{:user=>user_to_update})
+    #       profile render(:file=>"users/profile.fbml.erb",:assigns=>{:user=>user_to_update})
     #       profile_action "A string"
     #       mobile_profile render(:partial=>"mobile",:assigns=>{:user=>user_to_update})
     #   end
@@ -74,7 +74,7 @@ module Facebooker
     #     def ref_update(user)
     #       send_as :ref
     #       from user
-    #       fbml render(:action=>"/users/profile",:assigns=>{:user=>user_to_update})
+    #       fbml render(:file=>"users/profile",:assigns=>{:user=>user_to_update})
     #       handle "a_ref_handle"
     #   end
     #
