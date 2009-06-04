@@ -98,7 +98,11 @@ module Facebooker
         @from                 = nil
         @full_story_template  = nil
         @recipients           = nil
-        @controller           = PublisherController.new
+        @controller           = PublisherController.new(self)
+      end
+
+      def default_url_options
+        {:host => Facebooker.canvas_server_base + Facebooker.facebook_path_prefix}
       end
 
       # use facebook options everywhere
@@ -121,6 +125,8 @@ module Facebooker
             false
           end
         end
+        
+        
         
         class << self
           
@@ -490,11 +496,7 @@ module Facebooker
           
           should_send ? publisher.send_message(method) : publisher._body
         end
-    
-        def default_url_options
-          {:host => Facebooker.canvas_server_base + Facebooker.facebook_path_prefix}
-        end
-    
+        
         def controller_path
           self.to_s.underscore
         end
@@ -528,11 +530,16 @@ module Facebooker
       class PublisherController
         include Facebooker::Rails::Publisher.master_helper_module
         include ActionController::UrlWriter
+        
+        def initialize(source)
+          self.class.url_option_source = source
+        end
 
         class << self
+          attr_accessor :url_option_source
           alias :old_default_url_options :default_url_options
           def default_url_options(*args)
-            Facebooker::Rails::Publisher.default_url_options(*args)
+            url_option_source.default_url_options(*args)
           end
         end
 
