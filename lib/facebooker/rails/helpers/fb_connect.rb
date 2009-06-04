@@ -106,9 +106,9 @@ module Facebooker
           link_to_function text, js, *args
         end
         
-        def fb_user_action(action, user_message = "", prompt = "", callback = nil)
+        def fb_user_action(action, user_message = nil, prompt = "", callback = nil)
           update_page do |page|
-            page.call "FB.Connect.showFeedDialog",action.template_id,action.data,action.target_ids,action.body_general,nil,page.literal("FB.RequireConnect.promptConnect"),callback,prompt,user_message
+            page.call("FB.Connect.showFeedDialog",action.template_id,action.data,action.target_ids,action.body_general,nil,page.literal("FB.RequireConnect.promptConnect"),callback,prompt,user_message.nil? ? nil : {:value=>user_message})
           end
         end
         
