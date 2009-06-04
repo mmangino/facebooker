@@ -1018,7 +1018,7 @@ class RailsHelperTest < Test::Unit::TestCase
   end
   def test_fb_user_action
     action = Facebooker::Rails::Publisher::UserAction.new
-    assert_equal @h.fb_user_action(action,"message","prompt"),"FB.Connect.showFeedDialog(null, null, null, null, null, FB.RequireConnect.promptConnect, null, \"prompt\", {value: \"message\"});"
+    assert_equal @h.fb_user_action(action,"message","prompt"),"FB.Connect.showFeedDialog(null, null, null, null, null, FB.RequireConnect.promptConnect, null, \"prompt\", {\"value\": \"message\"});"
   end
 
 
