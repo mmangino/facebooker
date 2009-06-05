@@ -2,5 +2,5 @@
 require 'rack/facebook'
 ActionController::Dispatcher.middleware.insert_before( 
   ActionController::ParamsParser,
-  Rack::Facebook,
-  Facebooker.secret_key )
+  Rack::Facebook
+)

@@ -24,9 +24,8 @@ module Rack
   #   end
   #
   class Facebook
-    def initialize(app, secret_key, &condition)
+    def initialize(app, &condition)
       @app = app
-      @secret_key = secret_key
       @condition = condition
     end
     
@@ -56,7 +55,7 @@ module Rack
     
     def signature_is_valid?(fb_params, actual_sig)
       raw_string = fb_params.map{ |*args| args.join('=') }.sort.join
-      expected_signature = Digest::MD5.hexdigest([raw_string, @secret_key].join)
+      expected_signature = Digest::MD5.hexdigest([raw_string, Facebooker.secret_key].join)
       actual_sig == expected_signature
     end
     
