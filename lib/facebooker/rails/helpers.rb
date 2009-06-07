@@ -331,7 +331,7 @@ module Facebooker
       VALID_FB_SHARED_PHOTO_SIZES = [:thumb, :small, :normal, :square]
       VALID_FB_PHOTO_SIZES = VALID_FB_SHARED_PHOTO_SIZES      
       VALID_FB_PROFILE_PIC_SIZES = VALID_FB_SHARED_PHOTO_SIZES
-      VALID_PERMISSIONS=[:email, :offline_access, :status_update, :photo_upload, :create_listing, :create_event, :rsvp_event, :sms, :video_upload]
+      VALID_PERMISSIONS=[:email, :read_stream, :publish_stream, :offline_access, :status_update, :photo_upload, :create_event, :rsvp_event, :sms, :video_upload, :create_note, :share_item]
       
       # Render an fb:tabs tag containing some number of fb:tab_item tags.
       # Example:
@@ -639,20 +639,23 @@ module Facebooker
       # 
       # You can prompt a user with the following permissions:
       #   * email
+      #   * read_stream
+      #   * publish_stream
       #   * offline_access
       #   * status_update
       #   * photo_upload
-      #   * video_upload
-      #   * create_listing
       #   * create_event
       #   * rsvp_event
       #   * sms
-      # 
+      #   * video_upload
+      #   * create_note
+      #   * share_item
+      #
       # Example:
       # <%= fb_prompt_permission('email', "Would you like to receive email from our application?" ) %>
       #
       # See http://wiki.developers.facebook.com/index.php/Fb:prompt-permission for 
-      # more details
+      # more details. Correct as of 7th June 2009.
       #
       def fb_prompt_permission(permission,message,callback=nil)
         raise(ArgumentError, "Unknown value for permission: #{permission}") unless VALID_PERMISSIONS.include?(permission.to_sym)
