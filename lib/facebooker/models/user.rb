@@ -131,6 +131,19 @@ module Facebooker
                     :action_links => options[:action_links]
                    )
     end
+    
+    
+    ###
+    # Publish a comment on a post
+    #
+    # See: http://wiki.developers.facebook.com/index.php/Stream.addComment
+    #
+    # +post_id+ the post_id for the post that is being commented on
+    # +comment+ the text of the comment
+    def comment_on(post_id, comment)
+      @session.post('facebook.stream.addComment', {:post_id=>post_id, :comment=>comment})
+    end
+    
 
      def friend_lists
        @friend_lists ||= @session.post('facebook.friends.getLists').map do |hash|
