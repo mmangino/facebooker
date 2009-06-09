@@ -24,6 +24,10 @@ module Facebooker
         end
       end
       
+      def fb_iframe(src, options = {})
+        content_tag "fb:iframe", '', options.merge({ :src => src })
+      end
+      
       def fb_dialog_title( title )
         content_tag "fb:dialog-title", title
       end
