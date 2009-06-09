@@ -163,11 +163,15 @@ module Facebooker
       def after_facebook_login_url
         nil
       end
+
+      def default_after_facebook_login_url
+        url_for(:only_path => false, :overwrite_params => {})
+      end
       
       def create_new_facebook_session_and_redirect!
         session[:facebook_session] = new_facebook_session
-        url_params = after_facebook_login_url.nil? ? {} : {:next=>after_facebook_login_url}
-        top_redirect_to session[:facebook_session].login_url(url_params) unless @installation_required
+        next_url = after_facebook_login_url || default_after_facebook_login_url
+        top_redirect_to session[:facebook_session].login_url({:next => next_url}) unless @installation_required
         false
       end
       
@@ -298,8 +302,8 @@ module Facebooker
       end
       
       def application_is_not_installed_by_facebook_user
-        url_params = after_facebook_login_url.nil? ? {} : { :next => after_facebook_login_url }
-        top_redirect_to session[:facebook_session].install_url(url_params)
+        next_url = after_facebook_login_url || default_after_facebook_login_url
+        top_redirect_to session[:facebook_session].install_url({:next => next_url})
       end
       
       def set_facebook_request_format
