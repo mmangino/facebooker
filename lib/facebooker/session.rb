@@ -72,6 +72,7 @@ module Facebooker
 
     attr_writer :auth_token
     attr_reader :session_key
+    attr_reader :secret_from_session
 
     def self.create(api_key=nil, secret_key=nil)
       api_key ||= self.api_key
@@ -417,7 +418,7 @@ module Facebooker
 
     ##
     # Send email to as many as 100 users at a time
-    def send_email(user_ids, subject, text, fbml = nil) 			
+    def send_email(user_ids, subject, text, fbml = nil)       
       user_ids = Array(user_ids)
       params = {:fbml => fbml, :recipients => user_ids.map{ |id| User.cast_to_facebook_id(id)}.join(','), :text => text, :subject => subject} 
       post 'facebook.notifications.sendEmail', params
