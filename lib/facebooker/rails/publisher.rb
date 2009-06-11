@@ -101,8 +101,12 @@ module Facebooker
         @controller           = PublisherController.new(self)
       end
 
-      def default_url_options
+      def self.default_url_options
         {:host => Facebooker.canvas_server_base + Facebooker.facebook_path_prefix}
+      end
+
+      def default_url_options
+        self.class.default_url_options
       end
 
       # use facebook options everywhere

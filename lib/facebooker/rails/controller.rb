@@ -207,12 +207,11 @@ module Facebooker
       
       def verify_signature(facebook_sig_params,expected_signature)
         # Don't verify the signature if rack has already done so.
-        if ::Rails.version >= "2.3"
-          return if ActionController::Dispatcher.middleware.include? Rack::Facebook
+        unless ::Rails.version >= "2.3" and ActionController::Dispatcher.middleware.include? Rack::Facebook
+          raw_string = facebook_sig_params.map{ |*args| args.join('=') }.sort.join
+          actual_sig = Digest::MD5.hexdigest([raw_string, Facebooker::Session.secret_key].join)
+          raise Facebooker::Session::IncorrectSignature if actual_sig != expected_signature
         end
-        raw_string = facebook_sig_params.map{ |*args| args.join('=') }.sort.join
-        actual_sig = Digest::MD5.hexdigest([raw_string, Facebooker::Session.secret_key].join)
-        raise Facebooker::Session::IncorrectSignature if actual_sig != expected_signature
         raise Facebooker::Session::SignatureTooOld if facebook_sig_params['time'] && Time.at(facebook_sig_params['time'].to_f) < earliest_valid_session
         true
       end

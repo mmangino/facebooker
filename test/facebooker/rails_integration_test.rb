@@ -402,7 +402,7 @@ class RailsIntegrationTest < Test::Unit::TestCase
     setup_fb_connect_cookies
     get :index
     assert_equal(77777, @controller.facebook_session.user.id)
-    end
+  end
   
   def test_session_does_NOT_secure_with_expired_cookies
     setup_fb_connect_cookies(expired_cookie_hash_for_auth)
@@ -515,6 +515,23 @@ class RailsSignatureTest < Test::Unit::TestCase
     @response   = ActionController::TestResponse.new    
 
   end
+
+  if Rails.version < '2.3'
+  
+    def test_should_raise_on_bad_sig
+      begin
+        get :fb_params_test, facebook_params.merge('fb_sig' => 'incorrect')
+        fail "No IncorrectSignature raised"
+      rescue Facebooker::Session::IncorrectSignature=>e
+      end
+    end
+
+    def test_valid_signature
+      @controller.expects(:earliest_valid_session).returns(Time.at(1186588275.5988)-1)
+      get :fb_params_test, facebook_params 
+    end
+
+  end
   
   def test_should_raise_too_old_for_replayed_session
     begin
@@ -522,20 +539,6 @@ class RailsSignatureTest < Test::Unit::TestCase
       fail "No SignatureTooOld raised"
     rescue Facebooker::Session::SignatureTooOld=>e
     end
-  end
-  
-  def test_should_raise_on_bad_sig
-    begin
-      get :fb_params_test, facebook_params.merge('fb_sig' => 'incorrect')
-      fail "No IncorrectSignature raised"
-    rescue Facebooker::Session::IncorrectSignature=>e
-    end
-  end
-  
-  def test_valid_signature
-    @controller.expects(:earliest_valid_session).returns(Time.at(1186588275.5988)-1)
-    get :fb_params_test, facebook_params
-    
   end
   
 end
