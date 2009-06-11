@@ -1000,6 +1000,14 @@ class RailsHelperTest < Test::Unit::TestCase
     assert @h.init_fb_connect("XFBML", :js => :jquery).match(/\$\(document\).ready\(/)
   end
 
+  def test_init_fb_connect_without_options_app_settings
+    assert @h.init_fb_connect().match(/, \{\}\)/)
+  end
+  
+  def test_init_fb_connect_with_options_app_settings
+    assert @h.init_fb_connect(:app_settings => "{foo: bar}").match(/, \{foo: bar\}\)/)
+  end
+  
   
   def test_fb_login_and_redirect
     assert_equal @h.fb_login_and_redirect("/path"),"<fb:login-button onlogin=\"window.location.href = &quot;/path&quot;;\"></fb:login-button>"
@@ -1010,7 +1018,7 @@ class RailsHelperTest < Test::Unit::TestCase
   end
   def test_fb_user_action
     action = Facebooker::Rails::Publisher::UserAction.new
-    assert_equal @h.fb_user_action(action,"message","prompt"),"FB.Connect.showFeedDialog(null, null, null, null, null, FB.RequireConnect.promptConnect, null, \"prompt\", \"message\");"
+    assert_equal @h.fb_user_action(action,"message","prompt"),"FB.Connect.showFeedDialog(null, null, null, null, null, FB.RequireConnect.promptConnect, null, \"prompt\", {\"value\": \"message\"});"
   end
 
 

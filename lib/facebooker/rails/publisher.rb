@@ -56,15 +56,15 @@ module Facebooker
     #       fbml 'text'
     #       text fbml
     #     end
-    #     # This will render the profile in /users/profile.erb
+    #     # This will render the profile in /users/profile.fbml.erb
     #     #   it will set @user to user_to_update in the template
     #     #  The mobile profile will be rendered from the app/views/test_publisher/_mobile.erb
     #     #   template
     #     def profile_update(user_to_update,user_with_session_to_use)
     #       send_as :profile
     #       from user_with_session_to_use
-    #       to user_to_update
-    #       profile render(:action=>"/users/profile",:assigns=>{:user=>user_to_update})
+    #       recipients user_to_update
+    #       profile render(:file=>"users/profile.fbml.erb",:assigns=>{:user=>user_to_update})
     #       profile_action "A string"
     #       mobile_profile render(:partial=>"mobile",:assigns=>{:user=>user_to_update})
     #   end
@@ -74,7 +74,7 @@ module Facebooker
     #     def ref_update(user)
     #       send_as :ref
     #       from user
-    #       fbml render(:action=>"/users/profile",:assigns=>{:user=>user_to_update})
+    #       fbml render(:file=>"users/profile",:assigns=>{:user=>user_to_update})
     #       handle "a_ref_handle"
     #   end
     #
@@ -98,7 +98,11 @@ module Facebooker
         @from                 = nil
         @full_story_template  = nil
         @recipients           = nil
-        @controller           = PublisherController.new
+        @controller           = PublisherController.new(self)
+      end
+
+      def default_url_options
+        {:host => Facebooker.canvas_server_base + Facebooker.facebook_path_prefix}
       end
 
       # use facebook options everywhere
@@ -121,6 +125,8 @@ module Facebooker
             false
           end
         end
+        
+        
         
         class << self
           
@@ -415,8 +421,11 @@ module Facebooker
 	          ActionController::Base.append_view_path(controller_root) 
 	          ActionController::Base.append_view_path(controller_root+"/..") 
 	        end
+          view_paths = ActionController::Base.view_paths
+        else
+          view_paths = [template_root, controller_root]
 	      end
-        returning ActionView::Base.new([template_root,controller_root], assigns, self) do |template|
+        returning ActionView::Base.new(view_paths, assigns, self) do |template|
           template.controller=self
           template.extend(self.class.master_helper_module)
           def template.request_comes_from_facebook?
@@ -487,11 +496,7 @@ module Facebooker
           
           should_send ? publisher.send_message(method) : publisher._body
         end
-    
-        def default_url_options
-          {:host => Facebooker.canvas_server_base + Facebooker.facebook_path_prefix}
-        end
-    
+        
         def controller_path
           self.to_s.underscore
         end
@@ -525,11 +530,16 @@ module Facebooker
       class PublisherController
         include Facebooker::Rails::Publisher.master_helper_module
         include ActionController::UrlWriter
+        
+        def initialize(source)
+          self.class.url_option_source = source
+        end
 
         class << self
+          attr_accessor :url_option_source
           alias :old_default_url_options :default_url_options
           def default_url_options(*args)
-            Facebooker::Rails::Publisher.default_url_options(*args)
+            url_option_source.default_url_options(*args)
           end
         end
 
