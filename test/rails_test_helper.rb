@@ -15,6 +15,12 @@ require 'facebooker/rails/helpers'
 require 'facebooker/rails/publisher'
 require 'facebooker/rails/facebook_form_builder'
 
+if Rails.version > '2.3'
+  include Test::Unit::Assertions
+  include ActionController::TestCase::Assertions
+  include ActionController::TestProcess
+end
+
 ActionController::Routing::Routes.draw do |map|
   map.connect '', :controller=>"facebook",:conditions=>{:canvas=>true}
   map.connect '', :controller=>"plain_old_rails"
