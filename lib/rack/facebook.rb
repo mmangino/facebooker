@@ -24,9 +24,8 @@ module Rack
   #   end
   #
   class Facebook
-    def initialize(app, secret_key, &condition)
+    def initialize(app, &condition)
       @app = app
-      @secret_key = secret_key
       @condition = condition
     end
     
@@ -35,14 +34,20 @@ module Rack
         request = Rack::Request.new(env)
         fb_params = extract_fb_sig_params(request.POST)
         unless fb_params.empty?
-          unless signature_is_valid?(fb_params, request.POST['fb_sig'])
-            return Rack::Response.new(["Invalid Facebook signature"], 400).finish
+          Facebooker.with_application(fb_params['api_key']) do
+            unless signature_is_valid?(fb_params, request.POST['fb_sig'])
+              return Rack::Response.new(["Invalid Facebook signature"], 400).finish
+            end
+            env['REQUEST_METHOD'] = fb_params["request_method"] if fb_params["request_method"]
+            convert_parameters!(request.POST)
+            @app.call(env)
           end
-          env['REQUEST_METHOD'] = fb_params["request_method"] if fb_params["request_method"]
-          convert_parameters!(request.POST)
+        else
+          @app.call(env)
         end
+      else
+        @app.call(env)
       end
-      @app.call(env)
     end
     
     private
@@ -56,7 +61,7 @@ module Rack
     
     def signature_is_valid?(fb_params, actual_sig)
       raw_string = fb_params.map{ |*args| args.join('=') }.sort.join
-      expected_signature = Digest::MD5.hexdigest([raw_string, @secret_key].join)
+      expected_signature = Digest::MD5.hexdigest([raw_string, Facebooker.secret_key].join)
       actual_sig == expected_signature
     end
     

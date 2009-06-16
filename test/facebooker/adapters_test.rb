@@ -93,4 +93,82 @@ class Facebooker::AdaptersTest < Test::Unit::TestCase
   def test_bebo_process_data
 
   end
+
+  def test_fetch_config_for_can_find_top_level_api_key
+    old = Facebooker.instance_variable_get('@raw_facebooker_configuration')
+    # Now that we've backed up the old value...
+    raw_fb_config = { 'api_key' => 'a key' }
+    Facebooker.instance_variable_set('@raw_facebooker_configuration', raw_fb_config)
+    assert_equal Facebooker.fetch_config_for( 'a key' ), raw_fb_config
+  ensure
+    # Put the old value back
+    Facebooker.instance_variable_set('@raw_facebooker_configuration', old)
+  end
+
+  def test_fetch_config_for_can_find_deep_api_key
+    old = Facebooker.instance_variable_get('@raw_facebooker_configuration')
+    # Now that we've backed up the old value...
+    raw_fb_config = { 'api_key' => 'a key',
+                      'alternative_keys' => {
+                        'another key'     => { 'secret_key' => 'sdfsd' },
+                        'yet another key' => { 'secret_key' => '9ho2h' } } }
+    Facebooker.instance_variable_set('@raw_facebooker_configuration', raw_fb_config)
+    assert_equal raw_fb_config['alternative_keys']['another key'].merge( 'api_key' => 'another key' ),
+                 Facebooker.fetch_config_for( 'another key' )
+  ensure
+    # Put the old value back
+    Facebooker.instance_variable_set('@raw_facebooker_configuration', old)
+  end
+
+  def test_fetch_config_for_returns_false_if_no_apikey_found
+    old = Facebooker.instance_variable_get('@raw_facebooker_configuration')
+    # Now that we've backed up the old value...
+    raw_fb_config = { 'api_key' => 'a key' }
+    Facebooker.instance_variable_set('@raw_facebooker_configuration', raw_fb_config)
+    assert ! Facebooker.fetch_config_for( 'another key' )
+  ensure
+    # Put the old value back
+    Facebooker.instance_variable_set('@raw_facebooker_configuration', old)
+  end
+
+  def test_with_application_yields_if_no_config_is_found
+    flexmock( Facebooker ).
+      should_receive( :fetch_config_for ).
+      and_return( false )
+    # Is there a better way to assert the block is yielded?
+    @changes_to_true = false
+    Facebooker.with_application('somekey not found') do
+      @changes_to_true = true
+    end
+    assert @changes_to_true
+  end
+
+  def test_with_application_changes_config_inside_block
+    flexmock( Facebooker ).
+      should_receive( :fetch_config_for ).
+      and_return({ 'api_key'    => 'a key',
+                   'secret_key' => 'my secret key' })
+    Facebooker.with_application('a key') do
+      @secret_in_block = Facebooker.secret_key
+    end
+    # Check outside the block, assures the assertion gets run
+    assert_equal 'my secret key', @secret_in_block
+  end
+
+  def test_with_application_restores_last_config_outside_block
+    flexmock( Facebooker ).
+      should_receive( :fetch_config_for ).
+      and_return( { 'api_key'    => 'a key',
+                    'secret_key' => 'my secret key' },
+                  { 'api_key'    => 'another key',
+                    'secret_key' => 'my other secret key' } )
+    Facebooker.with_application('a key') do
+      Facebooker.with_application('another key') do
+      end
+      @secret_in_outer_block = Facebooker.secret_key
+    end
+    # Check outside the block, assures the assertion gets run
+    assert_equal 'my secret key', @secret_in_outer_block
+  end
+
 end

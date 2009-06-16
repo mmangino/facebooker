@@ -27,6 +27,7 @@ require 'digest/md5'
 module Facebooker
 
     @facebooker_configuration = {}
+    @raw_facebooker_configuration = {}
     @current_adapter = nil
     @set_asset_host_to_callback_url = true
     @path_prefix = nil
@@ -37,11 +38,12 @@ module Facebooker
     def load_configuration(facebooker_yaml_file)
       if File.exist?(facebooker_yaml_file)
         if defined? RAILS_ENV
-          config = YAML.load_file(facebooker_yaml_file)[RAILS_ENV] 
+          @raw_facebooker_configuration = YAML.load_file(facebooker_yaml_file)[RAILS_ENV]
         else
-          config = YAML.load_file(facebooker_yaml_file)           
+          @raw_facebooker_configuration = YAML.load_file(facebooker_yaml_file)
         end
-        apply_configuration(config)
+        Thread.current[:fb_api_config] = @raw_facebooker_configuration unless Thread.current[:fb_api_config]
+        apply_configuration(@raw_facebooker_configuration)
       end
     end
 
@@ -65,6 +67,41 @@ module Facebooker
 
     def facebooker_config
       @facebooker_configuration
+    end
+
+    def with_application(api_key, &block)
+      config = fetch_config_for( api_key )
+
+      unless config
+        self.logger.info "Can't find facebooker config: '#{api_key}'" if self.logger
+        yield if block_given?
+        return
+      end
+
+      # Save the old config to handle nested activation
+      old = Thread.current[:fb_api_config].dup rescue false
+
+      if block_given?
+        begin
+          self.logger.info "Swapping facebooker config: '#{api_key}'" if self.logger
+          Thread.current[:fb_api_config] = apply_configuration(config)
+          yield
+        ensure
+          Thread.current[:fb_api_config] = old if old
+          apply_configuration(Thread.current[:fb_api_config])
+        end
+      end
+    end
+
+    def fetch_config_for(api_key)
+      if @raw_facebooker_configuration['api_key'] == api_key
+        return @raw_facebooker_configuration
+      elsif @raw_facebooker_configuration['alternative_keys'] and
+            @raw_facebooker_configuration['alternative_keys'].keys.include?(api_key)
+        return @raw_facebooker_configuration['alternative_keys'][api_key].merge(
+                'api_key' => api_key )
+      end
+      return false
     end
 
     # TODO: This should be converted to attr_accessor, but we need to
