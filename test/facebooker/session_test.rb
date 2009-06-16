@@ -29,12 +29,14 @@ class Facebooker::SessionTest < Test::Unit::TestCase
 
   def test_if_keys_are_not_available_via_environment_then_they_are_gotten_from_a_file
     ENV['FACEBOOK_API_KEY'], ENV['FACEBOOK_SECRET_KEY'] = nil
+    Facebooker.instance_variable_set('@facebooker_configuration', nil)
     flexmock(File).should_receive(:read).with(File.expand_path("~/.facebookerrc")).once.and_return('{:api => "foo"}')
     assert_equal('foo', Facebooker::Session.api_key)
   end
 
   def test_if_environment_and_file_fail_to_match_then_an_exception_is_raised
     ENV['FACEBOOK_API_KEY'], ENV['FACEBOOK_SECRET_KEY'] = nil
+    Facebooker.instance_variable_set('@facebooker_configuration', nil)
     flexmock(File).should_receive(:read).with(File.expand_path("~/.facebookerrc")).once.and_return {raise Errno::ENOENT, "No such file"}
     assert_raises(Facebooker::Session::ConfigurationMissing) {
       Facebooker::Session.api_key
