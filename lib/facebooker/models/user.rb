@@ -365,6 +365,12 @@ module Facebooker
     end    
     
     ##
+    # Convenience method to check multiple permissions at once
+    def has_permissions?(ext_perms)
+      ext_perms.all?{|p| has_permission?(p)}
+    end            
+    
+    ##
     # Convenience method to send email to the current user
     def send_email(subject, text=nil, fbml=nil)
       session.send_email([id], subject, text, fbml)

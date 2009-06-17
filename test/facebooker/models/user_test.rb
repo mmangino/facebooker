@@ -16,9 +16,14 @@ class Facebooker::UserTest < Test::Unit::TestCase
 
   def test_has_permission
     expect_http_posts_with_responses(has_app_permission_response_xml)
-    assert @user.has_permission?("status_update")
+    assert @user.has_permission?("status_update")    
   end
 
+  def test_has_permissions
+    expect_http_posts_with_responses(has_app_permission_response_xml, has_app_permission_response_xml)    
+    assert @user.has_permissions?(["status_update", "read_stream"])    
+  end 
+ 
   def test_can_ask_user_if_he_or_she_is_friends_with_another_user
     assert(@user.friends_with?(@other_user))
   end
@@ -131,6 +136,12 @@ class Facebooker::UserTest < Test::Unit::TestCase
     @user.publish_to(@other_user, :message => 'i love you man')
   end
 
+  def test_comment_on
+    @user = Facebooker::User.new(548871286, @session)
+    expect_http_posts_with_responses(example_comment_on_response)
+    assert_equal('703826862_78463536863', @user.comment_on('703826862_78463536862', :message => 'that was hilarious!'))
+  end
+  
   def test_can_send_email
     @user.expects(:send_email).with("subject", "body text")
     @user.send_email("subject", "body text")
@@ -340,4 +351,11 @@ class Facebooker::UserTest < Test::Unit::TestCase
 <stream_publish_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd">703826862_78463536862</stream_publish_response>
     eoxml
   end
+  
+  def example_comment_on_response
+    <<-eoxml
+<?xml version="1.0" encoding="UTF-8"?>
+<stream_addComment_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd">703826862_78463536863</stream_addComment_response>
+    eoxml
+  end  
 end

@@ -643,6 +643,22 @@ class RailsHelperTest < Test::Unit::TestCase
     
   end
   
+  def test_fb_prompt_permissions_valid_no_callback
+    assert_equal "<fb:prompt-permission perms=\"publish_stream,read_stream\">Can I read and write your streams?</fb:prompt-permission>",
+                 @h.fb_prompt_permissions(['publish_stream', 'read_stream'],"Can I read and write your streams?")    
+  end
+  
+  def test_fb_prompt_permissions_valid_with_callback
+    assert_equal "<fb:prompt-permission next_fbjs=\"do_stuff()\" perms=\"publish_stream,read_stream\">Can I read and write your streams?</fb:prompt-permission>",
+                 @h.fb_prompt_permissions(['publish_stream', 'read_stream'],"Can I read and write your streams?", "do_stuff()")    
+  end
+  
+  def test_fb_prompt_permissions_invalid_option
+    assert_raises(ArgumentError) {@h.fb_prompt_permissions(["invliad", "read_stream"], "a message")}
+    
+  end  
+ 
+  
   def test_fb_add_profile_section
     assert_equal "<fb:add-section-button section=\"profile\" />",@h.fb_add_profile_section
   end
