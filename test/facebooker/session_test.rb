@@ -160,6 +160,15 @@ class Facebooker::SessionTest < Test::Unit::TestCase
     assert_equal "Ari Steinberg", response.first.name
   end
 
+  def test_can_fql_multiquery_for_users_and_pictures
+    @session = Facebooker::Session.create(ENV['FACEBOOK_API_KEY'], ENV['FACEBOOK_SECRET_KEY'])
+    mock_http = establish_session
+    mock_http.should_receive(:post).and_return(example_fql_multiquery_xml).once.ordered(:posts)
+    response = @session.fql_multiquery({:query => 'SELECT name, pic FROM user WHERE uid=211031 OR uid=4801660'})
+    assert_kind_of Array, response
+    assert_kind_of Facebooker::User, response.first
+    assert_equal "Ari Steinberg", response.first.name
+  end
 
   def test_can_send_notification_with_object
     @session = Facebooker::Session.create(ENV['FACEBOOK_API_KEY'], ENV['FACEBOOK_SECRET_KEY'])
@@ -281,6 +290,32 @@ class Facebooker::SessionTest < Test::Unit::TestCase
   end
 
   private
+
+  def example_fql_multiquery_xml
+    <<-XML
+<?xml version="1.0" encoding="UTF-8"?>
+<fql_multiquery_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd" list="true">
+  <fql_result>
+    <name>query1</name>
+    <results list="true">
+      <user>
+        <uid>46903192</uid>
+        <rsvp_status xsi:nil="true"/>
+      </user>
+    </results>
+  </fql_result>
+  <fql_result>
+    <name>query2</name>
+    <results list="true">
+      <user>
+        <name>Lisa Petrovskaia</name>
+        <pic xsi:nil="true"/>
+      </user>
+    </results>
+  </fql_result>
+</fql_multiquery_response>
+XML
+  end
 
   def example_groups_get_xml
     <<-XML

@@ -399,6 +399,26 @@ module Facebooker
     end
   end
 
+  class FqlMultiquery < Parser#nodoc
+    def self.process(data)
+      print "#{data}\n"
+      root = element('fql_multiquery_response', data)
+      root.elements.collect do |elm|
+        [
+         elm.elements[1].text,
+          if elm.elements[2].elements[1].nil?
+            [] 
+          else
+            [
+             elm.elements[2].elements[1].name,
+             array_of_hashes(elm.elements[2], elm.elements[2].elements[1].name)
+            ]
+          end
+        ]
+      end
+    end
+  end
+
   class SetRefHandle < Parser#:nodoc:
     def self.process(data)
       element('fbml_setRefHandle_response', data).content.strip
@@ -620,6 +640,7 @@ module Facebooker
       'facebook.admin.getAllocation' => GetAllocation,
       'facebook.batch.run' => BatchRun,
       'facebook.fql.query' => FqlQuery,
+      'facebook.fql.multiquery' => FqlMultiquery,
       'facebook.photos.get' => GetPhotos,
       'facebook.photos.getAlbums' => GetAlbums,
       'facebook.photos.createAlbum' => CreateAlbum,

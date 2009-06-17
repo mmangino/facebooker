@@ -193,30 +193,55 @@ module Facebooker
       @secret_from_session = secret_from_session
     end
 
+    def fql_build_object(type, hash)
+      case type
+      when 'user'
+        user = User.new
+        user.session = self
+        user.populate_from_hash!(hash)
+        user
+      when 'photo'
+        Photo.from_hash(hash)
+      when 'page'
+        Page.from_hash(hash)
+      when 'page_admin'
+        Page.from_hash(hash)
+      when 'group'
+        Group.from_hash(hash)
+      when 'event_member'
+        Event::Attendance.from_hash(hash)
+      else
+        hash
+      end
+    end
+
     def fql_query(query, format = 'XML')
       post('facebook.fql.query', :query => query, :format => format) do |response|
         type = response.shift
         return [] if type.nil?
         response.shift.map do |hash|
-          case type
-          when 'user'
-            user = User.new
-            user.session = self
-            user.populate_from_hash!(hash)
-            user
-          when 'photo'
-            Photo.from_hash(hash)
-          when 'page'
-            Page.from_hash(hash)
-          when 'page_admin'
-            Page.from_hash(hash)
-          when 'event_member'
-            Event::Attendance.from_hash(hash)
-          else
-            hash
-          end
+          fql_build_object(type, hash)
         end
       end
+    end
+
+    def fql_multiquery(queries, format = 'XML')
+      results = {}
+      post('facebook.fql.multiquery', :queries => queries.to_json, :format => format) do |responses|
+        responses.each do |response|
+          name = response.shift
+          response = response.shift
+          type = response.shift
+          value = [] 
+          unless type.nil?
+            value = response.shift.map do |hash|
+              fql_build_object(type, hash)
+            end
+          end
+          results[name] = value
+        end
+      end
+      results
     end
 
     def user
