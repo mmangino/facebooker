@@ -58,8 +58,13 @@ module Facebooker
     def self.element(name, data)
       data = data.body rescue data # either data or an HTTP response
       begin
-        node = Nokogiri::XML(data.strip).at(name)
-        return node if node
+        xml = Nokogiri::XML(data.strip).at(name)
+        if node = xml.at(name)
+          return node
+        end
+        if xml.root.name == name
+          return xml.root
+        end
       rescue # Can't parse with Nokogiri
         doc = REXML::Document.new(data)
         doc.elements.each(name) do |element|
