@@ -319,6 +319,16 @@ class RailsIntegrationTest < Test::Unit::TestCase
     get :index, facebook_params('fb_sig_added' => "1")
     assert_equal(true, @controller.facebook_params['added'])
   end
+
+  def test_facebook_params_convert_added_to_boolean_false_when_already_false
+    get :index, facebook_params('fb_sig_added' => false)
+    assert_equal(false, @controller.facebook_params['added'])
+  end
+
+  def test_facebook_params_convert_added_to_boolean_true_when_already_true
+    get :index, facebook_params('fb_sig_added' => true)
+    assert_equal(true, @controller.facebook_params['added'])
+  end
   
   def test_facebook_params_convert_expirey_into_nil
     get :index, facebook_params(:fb_sig_expires => '0')

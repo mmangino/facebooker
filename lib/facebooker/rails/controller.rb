@@ -183,10 +183,6 @@ module Facebooker
           end
         end
       end
-            
-      def blank?(value)
-        (value == '0' || value.nil? || value == '')        
-      end
 
       def verified_facebook_params
         facebook_sig_params = params.inject({}) do |collection, pair|
@@ -220,11 +216,11 @@ module Facebooker
         @facebook_parameter_conversions ||= Hash.new do |hash, key| 
           lambda{|value| value}
         end.merge(
-          'time' => lambda{|value| Time.at(value.to_f)},
-          'in_canvas' => lambda{|value| !blank?(value)},
-          'added' => lambda{|value| !blank?(value)},
-          'expires' => lambda{|value| blank?(value) ? nil : Time.at(value.to_f)},
-          'friends' => lambda{|value| value.split(/,/)}
+          'time'      => lambda{|value| Time.at(value.to_f)},
+          'in_canvas' => lambda{|value| one_or_true(value)},
+          'added'     => lambda{|value| one_or_true(value)},
+          'expires'   => lambda{|value| zero_or_false(value) ? nil : Time.at(value.to_f)},
+          'friends'   => lambda{|value| value.split(/,/)}
         )
       end
       
