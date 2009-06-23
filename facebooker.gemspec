@@ -2,11 +2,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{facebooker}
-  s.version = "1.0.37"
+  s.version = "1.0.38"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Chad Fowler", "Patrick Ewing", "Mike Mangino", "Shane Vitarana", "Corey Innis"]
-  s.date = %q{2009-06-04}
+  s.date = %q{2009-06-23}
   s.description = %q{Facebooker is a Ruby wrapper over the Facebook[http://facebook.com] {REST API}[http://wiki.developers.facebook.com/index.php/API].  Its goals are:  * Idiomatic Ruby * No dependencies outside of the Ruby standard library (This is true with Rails 2.1. Previous Rails versions require the JSON gem) * Concrete classes and methods modeling the Facebook data, so it's easy for a Rubyist to understand what's available * Well tested}
   s.email = %q{mmangino@elevatedrails.com}
   s.extra_rdoc_files = ["Manifest.txt", "CHANGELOG.rdoc", "COPYING.rdoc", "README.rdoc", "TODO.rdoc"]
