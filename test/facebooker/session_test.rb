@@ -165,11 +165,11 @@ class Facebooker::SessionTest < Test::Unit::TestCase
   def test_can_fql_multiquery_for_users_and_pictures
     @session = Facebooker::Session.create(ENV['FACEBOOK_API_KEY'], ENV['FACEBOOK_SECRET_KEY'])
     mock_http = establish_session
-    mock_http.should_receive(:post).and_return(example_fql_multiquery_xml).once.ordered(:posts)
+    mock_http.should_receive(:post_form).and_return(example_fql_multiquery_xml).once.ordered(:posts)
     response = @session.fql_multiquery({:query => 'SELECT name, pic FROM user WHERE uid=211031 OR uid=4801660'})
-    assert_kind_of Array, response
-    assert_kind_of Facebooker::User, response.first
-    assert_equal "Ari Steinberg", response.first.name
+    assert_kind_of Array, response["query1"]
+    assert_kind_of Facebooker::User, response["query1"].first
+    assert_equal "Ari Steinberg", response["query1"].first.name
   end
 
   def test_can_send_notification_with_object
@@ -301,6 +301,7 @@ class Facebooker::SessionTest < Test::Unit::TestCase
     <name>query1</name>
     <results list="true">
       <user>
+        <name>Ari Steinberg</name>
         <uid>46903192</uid>
         <rsvp_status xsi:nil="true"/>
       </user>

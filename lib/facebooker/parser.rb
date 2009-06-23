@@ -412,7 +412,6 @@ module Facebooker
 
   class FqlMultiquery < Parser#nodoc
     def self.process(data)
-      print "#{data}\n"
       root = element('fql_multiquery_response', data)
       root.elements.collect do |elm|
         [
