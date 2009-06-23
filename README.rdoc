@@ -56,6 +56,12 @@ Your application users will need to have added the application in facebook to ac
 
 to your application controller.
 
+To prevent a violation of Facebook Terms of Service while reducing log bloat, you should also add 
+
+  filter_parameter_logging :fb_sig_friends
+
+to your application controller.
+
 == using MemCache session
 
 Facebook uses some non alphanum characters in the session identifier which interfere with memcache stored sessions. If you want to use MemCache for storing sessions, you can override the valid session id method on memcache by placing the following code in an initializer:

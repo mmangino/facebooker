@@ -2,4 +2,5 @@
 require 'rack/facebook'
 ActionController::Dispatcher.middleware.insert_before( 
   ActionController::ParamsParser,
-  Rack::Facebook )
+  Rack::Facebook
+)

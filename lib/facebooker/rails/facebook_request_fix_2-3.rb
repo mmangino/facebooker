@@ -25,7 +25,7 @@ module ::ActionController
     alias_method_chain :xml_http_request?, :facebooker
 
     # we have to re-alias xhr? since it was pointing to the old method
-    alias xhr? :xml_http_request?
+    alias :xhr? :xml_http_request?
 
   end
 end

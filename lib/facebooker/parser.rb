@@ -58,8 +58,13 @@ module Facebooker
     def self.element(name, data)
       data = data.body rescue data # either data or an HTTP response
       begin
-        node = Nokogiri::XML(data.strip).at(name)
-        return node if node
+        xml = Nokogiri::XML(data.strip).at(name)
+        if node = xml.at(name)
+          return node
+        end
+        if xml.root.name == name
+          return xml.root
+        end
       rescue # Can't parse with Nokogiri
         doc = REXML::Document.new(data)
         doc.elements.each(name) do |element|
@@ -205,6 +210,12 @@ module Facebooker
       element('stream_publish_response', data).content.strip
     end
   end
+  
+  class StreamAddComment < Parser#:nodoc:
+    def self.process(data)
+      element('stream_addComment_response', data).content.strip
+    end
+  end  
 
   class RegisterTemplateBundle < Parser#:nodoc:
     def self.process(data)
@@ -396,6 +407,25 @@ module Facebooker
       root = element('fql_query_response', data)
       first_child = root.children.reject{|c| c.text? }.first
       first_child.nil? ? [] : [first_child.name, array_of_hashes(root, first_child.name)]
+    end
+  end
+
+  class FqlMultiquery < Parser#nodoc
+    def self.process(data)
+      root = element('fql_multiquery_response', data)
+      root.elements.collect do |elm|
+        [
+         elm.elements[1].text,
+          if elm.elements[2].elements[1].nil?
+            [] 
+          else
+            [
+             elm.elements[2].elements[1].name,
+             array_of_hashes(elm.elements[2], elm.elements[2].elements[1].name)
+            ]
+          end
+        ]
+      end
     end
   end
 
@@ -620,6 +650,7 @@ module Facebooker
       'facebook.admin.getAllocation' => GetAllocation,
       'facebook.batch.run' => BatchRun,
       'facebook.fql.query' => FqlQuery,
+      'facebook.fql.multiquery' => FqlMultiquery,
       'facebook.photos.get' => GetPhotos,
       'facebook.photos.getAlbums' => GetAlbums,
       'facebook.photos.createAlbum' => CreateAlbum,
@@ -627,6 +658,7 @@ module Facebooker
       'facebook.photos.addTag' => AddTags,
       'facebook.photos.upload' => UploadPhoto,
       'facebook.stream.publish' => StreamPublish,
+      'facebook.stream.addComment' => StreamAddComment,      
       'facebook.events.get' => EventsGet,
       'facebook.groups.get' => GroupsGet,
       'facebook.events.getMembers' => EventMembersGet,
