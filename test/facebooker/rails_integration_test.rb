@@ -37,6 +37,13 @@ class FBConnectController < NoisyController
   end
 end
 
+class FBConnectControllerProxy < NoisyController
+  before_filter :create_facebook_session_with_secret
+  def index
+    render :text => 'score!'
+  end
+end
+
 class ControllerWhichRequiresFacebookAuthentication < NoisyController
   ensure_authenticated_to_facebook
   def index
@@ -372,6 +379,20 @@ class RailsIntegrationTest < Test::Unit::TestCase
     assert_equal(1111111, @controller.facebook_session.user.id)
   end
 
+  def test_session_can_be_secured_with_secret
+    @controller = FBConnectControllerProxy.new
+    auth_token = 'ohaiauthtokenhere111'
+    modified_params = facebook_params
+    modified_params.delete('fb_sig_session_key')
+    modified_params['auth_token'] = auth_token
+    modified_params['generate_session_secret'] = true
+    session_mock = flexmock(session = Facebooker::Session.create(ENV['FACEBOOK_API_KEY'], ENV['FACEBOOK_SECRET_KEY']))
+    session_params = { 'session_key' => '123', 'uid' => '321' }
+    session_mock.should_receive(:post).with('facebook.auth.getSession', :auth_token => auth_token, :generate_session_secret => "1").once.and_return(session_params).ordered
+    flexmock(@controller).should_receive(:new_facebook_session).once.and_return(session).ordered
+    get :index, modified_params
+  end
+
   def test_session_can_be_secured_with_auth_token
     auth_token = 'ohaiauthtokenhere111'
     modified_params = facebook_params
@@ -379,7 +400,7 @@ class RailsIntegrationTest < Test::Unit::TestCase
     modified_params['auth_token'] = auth_token
     session_mock = flexmock(session = Facebooker::Session.create(ENV['FACEBOOK_API_KEY'], ENV['FACEBOOK_SECRET_KEY']))
     session_params = { 'session_key' => '123', 'uid' => '321' }
-    session_mock.should_receive(:post).with('facebook.auth.getSession', :auth_token => auth_token).once.and_return(session_params).ordered
+    session_mock.should_receive(:post).with('facebook.auth.getSession', :auth_token => auth_token, :generate_session_secret => "0").once.and_return(session_params).ordered
     flexmock(@controller).should_receive(:new_facebook_session).once.and_return(session).ordered
     get :index, modified_params
   end
@@ -391,7 +412,7 @@ class RailsIntegrationTest < Test::Unit::TestCase
       modified_params['auth_token'] = auth_token
       session_mock = flexmock(session = Facebooker::Session.create(ENV['FACEBOOK_API_KEY'], ENV['FACEBOOK_SECRET_KEY']))
       session_params = { 'session_key' => '123', 'uid' => '321' }
-      session_mock.should_receive(:post).with('facebook.auth.getSession', :auth_token => auth_token).once.and_return(session_params).ordered
+      session_mock.should_receive(:post).with('facebook.auth.getSession', :auth_token => auth_token, :generate_session_secret => "0").once.and_return(session_params).ordered
       flexmock(@controller).should_receive(:new_facebook_session).once.and_return(session).ordered
       setup_fb_connect_cookies(expired_cookie_hash_for_auth)
       get :index, modified_params

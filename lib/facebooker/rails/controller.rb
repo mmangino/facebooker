@@ -31,6 +31,12 @@ module Facebooker
         secure_with_facebook_params! || secure_with_cookies! || secure_with_token!
       end
       
+      #this is used to proxy a connection through a rails app so the facebook secret key is not needed
+      #iphone apps use this
+      def create_facebook_session_with_secret
+        secure_with_session_secret!
+      end
+      
       def set_facebook_session
         # first, see if we already have a session
         session_set = session_already_secured?
@@ -145,6 +151,15 @@ module Facebooker
           @facebook_session = new_facebook_session
           @facebook_session.auth_token = params['auth_token']
           @facebook_session.secure!
+          @facebook_session
+        end
+      end
+    
+      def secure_with_session_secret!
+        if params['auth_token']
+          @facebook_session = new_facebook_session
+          @facebook_session.auth_token = params['auth_token']
+          @facebook_session.secure_with_session_secret!
           @facebook_session
         end
       end
