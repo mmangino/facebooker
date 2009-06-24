@@ -181,10 +181,14 @@ module Facebooker
       !@session_key.nil? && !expired?
     end
 
-    def secure!
-      response = post 'facebook.auth.getSession', :auth_token => auth_token
+    def secure!(args = {})
+      response = post 'facebook.auth.getSession', :auth_token => auth_token, :generate_session_secret => args[:generate_session_secret] ? "1" : "0"
       secure_with!(response['session_key'], response['uid'], response['expires'], response['secret'])
     end    
+    
+    def secure_with_session_secret!
+      self.secure!(:generate_session_secret => true)
+    end
 
     def secure_with!(session_key, uid = nil, expires = nil, secret_from_session = nil)
       @session_key = session_key
