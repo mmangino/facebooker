@@ -466,6 +466,13 @@ module Facebooker
       ActionController::Routing::Routes.named_routes.install(self.master_helper_module)
       include self.master_helper_module
       class <<self
+
+        def register_all_templates_on_all_applications
+          Facebooker.with_all_applications do
+            puts "Registering templates for #{Facebooker.api_key}"
+            register_all_templates
+          end
+        end
         
         def register_all_templates
           all_templates = instance_methods.grep(/_template$/) - %w(short_story_template full_story_template one_line_story_template) 
