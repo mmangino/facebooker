@@ -78,8 +78,9 @@ module Facebooker
         return
       end
 
-      # Save the old config to handle nested activation
-      old = Thread.current[:fb_api_config].dup rescue false
+      # Save the old config to handle nested activation. If no app context is
+      # set yet, use default app's configuration.
+      old = Thread.current[:fb_api_config] ? Thread.current[:fb_api_config].dup : @raw_facebooker_configuration
 
       if block_given?
         begin
