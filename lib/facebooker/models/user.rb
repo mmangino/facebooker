@@ -131,6 +131,19 @@ module Facebooker
                     :action_links => options[:action_links]
                    )
     end
+    
+    
+    ###
+    # Publish a comment on a post
+    #
+    # See: http://wiki.developers.facebook.com/index.php/Stream.addComment
+    #
+    # +post_id+ the post_id for the post that is being commented on
+    # +comment+ the text of the comment
+    def comment_on(post_id, comment)
+      @session.post('facebook.stream.addComment', {:post_id=>post_id, :comment=>comment})
+    end
+    
 
      def friend_lists
        @friend_lists ||= @session.post('facebook.friends.getLists').map do |hash|
@@ -350,6 +363,12 @@ module Facebooker
     def has_permission?(ext_perm) # ext_perm = email, offline_access, status_update, photo_upload, create_listing, create_event, rsvp_event, sms
       session.post('facebook.users.hasAppPermission',:ext_perm=>ext_perm) == "1"
     end    
+    
+    ##
+    # Convenience method to check multiple permissions at once
+    def has_permissions?(ext_perms)
+      ext_perms.all?{|p| has_permission?(p)}
+    end            
     
     ##
     # Convenience method to send email to the current user

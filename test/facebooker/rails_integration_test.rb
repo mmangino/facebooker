@@ -37,6 +37,13 @@ class FBConnectController < NoisyController
   end
 end
 
+class FBConnectControllerProxy < NoisyController
+  before_filter :create_facebook_session_with_secret
+  def index
+    render :text => 'score!'
+  end
+end
+
 class ControllerWhichRequiresFacebookAuthentication < NoisyController
   ensure_authenticated_to_facebook
   def index
@@ -259,13 +266,13 @@ class RailsIntegrationTestForApplicationInstallation < Test::Unit::TestCase
   def test_if_controller_requires_application_installation_unauthenticated_requests_will_redirect_to_install_page
     get :index
     assert_response :redirect
-    assert_equal("http://www.facebook.com/install.php?api_key=1234567&v=1.0", @response.headers['Location'])
+    assert_equal("http://www.facebook.com/install.php?api_key=1234567&v=1.0&next=http%3A%2F%2Ftest.host%2Frequire_install", @response.headers['Location'])
   end
   
   def test_if_controller_requires_application_installation_authenticated_requests_without_installation_will_redirect_to_install_page
     get :index, facebook_params(:fb_sig_added => nil)
     assert_response :success
-    assert_equal("<fb:redirect url=\"http://www.facebook.com/install.php?api_key=1234567&v=1.0\" />", @response.body)
+    assert(@response.body =~ /fb:redirect/)
   end
   
   def test_if_controller_requires_application_installation_authenticated_requests_with_installation_will_render
@@ -297,7 +304,7 @@ class RailsIntegrationTest < Test::Unit::TestCase
   def test_if_controller_requires_facebook_authentication_unauthenticated_requests_will_redirect
     get :index
     assert_response :redirect
-    assert_equal("http://www.facebook.com/login.php?api_key=1234567&v=1.0", @response.headers['Location'])
+    assert_equal("http://www.facebook.com/login.php?api_key=1234567&v=1.0&next=http%3A%2F%2Ftest.host%2Frequire_auth", @response.headers['Location'])
   end
 
   def test_facebook_params_are_parsed_into_a_separate_hash
@@ -382,6 +389,20 @@ class RailsIntegrationTest < Test::Unit::TestCase
     assert_equal(1111111, @controller.facebook_session.user.id)
   end
 
+  def test_session_can_be_secured_with_secret
+    @controller = FBConnectControllerProxy.new
+    auth_token = 'ohaiauthtokenhere111'
+    modified_params = facebook_params
+    modified_params.delete('fb_sig_session_key')
+    modified_params['auth_token'] = auth_token
+    modified_params['generate_session_secret'] = true
+    session_mock = flexmock(session = Facebooker::Session.create(ENV['FACEBOOK_API_KEY'], ENV['FACEBOOK_SECRET_KEY']))
+    session_params = { 'session_key' => '123', 'uid' => '321' }
+    session_mock.should_receive(:post).with('facebook.auth.getSession', :auth_token => auth_token, :generate_session_secret => "1").once.and_return(session_params).ordered
+    flexmock(@controller).should_receive(:new_facebook_session).once.and_return(session).ordered
+    get :index, modified_params
+  end
+
   def test_session_can_be_secured_with_auth_token
     auth_token = 'ohaiauthtokenhere111'
     modified_params = facebook_params
@@ -389,7 +410,7 @@ class RailsIntegrationTest < Test::Unit::TestCase
     modified_params['auth_token'] = auth_token
     session_mock = flexmock(session = Facebooker::Session.create(ENV['FACEBOOK_API_KEY'], ENV['FACEBOOK_SECRET_KEY']))
     session_params = { 'session_key' => '123', 'uid' => '321' }
-    session_mock.should_receive(:post).with('facebook.auth.getSession', :auth_token => auth_token).once.and_return(session_params).ordered
+    session_mock.should_receive(:post).with('facebook.auth.getSession', :auth_token => auth_token, :generate_session_secret => "0").once.and_return(session_params).ordered
     flexmock(@controller).should_receive(:new_facebook_session).once.and_return(session).ordered
     get :index, modified_params
   end
@@ -401,7 +422,7 @@ class RailsIntegrationTest < Test::Unit::TestCase
       modified_params['auth_token'] = auth_token
       session_mock = flexmock(session = Facebooker::Session.create(ENV['FACEBOOK_API_KEY'], ENV['FACEBOOK_SECRET_KEY']))
       session_params = { 'session_key' => '123', 'uid' => '321' }
-      session_mock.should_receive(:post).with('facebook.auth.getSession', :auth_token => auth_token).once.and_return(session_params).ordered
+      session_mock.should_receive(:post).with('facebook.auth.getSession', :auth_token => auth_token, :generate_session_secret => "0").once.and_return(session_params).ordered
       flexmock(@controller).should_receive(:new_facebook_session).once.and_return(session).ordered
       setup_fb_connect_cookies(expired_cookie_hash_for_auth)
       get :index, modified_params
@@ -435,7 +456,7 @@ class RailsIntegrationTest < Test::Unit::TestCase
   def test_redirect_to_renders_fbml_redirect_tag_if_request_is_for_a_facebook_canvas
     get :index, facebook_params(:fb_sig_user => nil)
     assert_response :success
-    assert_equal("<fb:redirect url=\"http://www.facebook.com/login.php?api_key=1234567&v=1.0\" />", @response.body)
+    assert @response.body =~ /fb:redirect/
   end
   
   def test_redirect_to_renders_javascript_redirect_if_request_is_for_a_facebook_iframe
@@ -443,7 +464,6 @@ class RailsIntegrationTest < Test::Unit::TestCase
     assert_response :success
     assert_match "javascript", @response.body
     assert_match "http-equiv", @response.body
-    assert_match "http://www.facebook.com/login.php?api_key=1234567&v=1.0".to_json, @response.body
     assert_match "http://www.facebook.com/login.php?api_key=1234567&amp;v=1.0", @response.body
   end
 
@@ -655,6 +675,22 @@ class RailsHelperTest < Test::Unit::TestCase
     assert_raises(ArgumentError) {@h.fb_prompt_permission("invliad", "a message")}
     
   end
+  
+  def test_fb_prompt_permissions_valid_no_callback
+    assert_equal "<fb:prompt-permission perms=\"publish_stream,read_stream\">Can I read and write your streams?</fb:prompt-permission>",
+                 @h.fb_prompt_permissions(['publish_stream', 'read_stream'],"Can I read and write your streams?")    
+  end
+  
+  def test_fb_prompt_permissions_valid_with_callback
+    assert_equal "<fb:prompt-permission next_fbjs=\"do_stuff()\" perms=\"publish_stream,read_stream\">Can I read and write your streams?</fb:prompt-permission>",
+                 @h.fb_prompt_permissions(['publish_stream', 'read_stream'],"Can I read and write your streams?", "do_stuff()")    
+  end
+  
+  def test_fb_prompt_permissions_invalid_option
+    assert_raises(ArgumentError) {@h.fb_prompt_permissions(["invliad", "read_stream"], "a message")}
+    
+  end  
+ 
   
   def test_fb_add_profile_section
     assert_equal "<fb:add-section-button section=\"profile\" />",@h.fb_add_profile_section

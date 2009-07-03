@@ -46,6 +46,7 @@ function encodeURIComponent(str) {
   }
 };
 
+var Form = {};
 Form.serialize = function(form_element) {
   return  $(form_element).serialize();  
 };
@@ -66,6 +67,15 @@ Ajax.Updater = function (container,url,options) {
   }
   if (options["onFailure"]) {
     this.ajax.onerror = options["onFailure"];
+  }
+
+  if (!options['parameters']) {
+    options['parameters'] = {}
+  }
+
+  // simulate other verbs over post
+  if (options['method']) {
+    options['parameters']['_method'] = options['method'];
   }
 
   this.ajax.post(url,options['parameters']); 

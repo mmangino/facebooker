@@ -31,6 +31,12 @@ module Facebooker
         secure_with_facebook_params! || secure_with_cookies! || secure_with_token!
       end
       
+      #this is used to proxy a connection through a rails app so the facebook secret key is not needed
+      #iphone apps use this
+      def create_facebook_session_with_secret
+        secure_with_session_secret!
+      end
+      
       def set_facebook_session
         # first, see if we already have a session
         session_set = session_already_secured?
@@ -148,6 +154,15 @@ module Facebooker
           @facebook_session
         end
       end
+    
+      def secure_with_session_secret!
+        if params['auth_token']
+          @facebook_session = new_facebook_session
+          @facebook_session.auth_token = params['auth_token']
+          @facebook_session.secure_with_session_secret!
+          @facebook_session
+        end
+      end
       
       def secure_with_facebook_params!
         return unless request_comes_from_facebook?
@@ -163,11 +178,15 @@ module Facebooker
       def after_facebook_login_url
         nil
       end
+
+      def default_after_facebook_login_url
+        url_for(:only_path => false, :overwrite_params => {})
+      end
       
       def create_new_facebook_session_and_redirect!
         session[:facebook_session] = new_facebook_session
-        url_params = after_facebook_login_url.nil? ? {} : {:next=>after_facebook_login_url}
-        top_redirect_to session[:facebook_session].login_url(url_params) unless @installation_required
+        next_url = after_facebook_login_url || default_after_facebook_login_url
+        top_redirect_to session[:facebook_session].login_url({:next => next_url}) unless @installation_required
         false
       end
       
@@ -293,8 +312,8 @@ module Facebooker
       end
       
       def application_is_not_installed_by_facebook_user
-        url_params = after_facebook_login_url.nil? ? {} : { :next => after_facebook_login_url }
-        top_redirect_to session[:facebook_session].install_url(url_params)
+        next_url = after_facebook_login_url || default_after_facebook_login_url
+        top_redirect_to session[:facebook_session].install_url({:next => next_url})
       end
       
       def set_facebook_request_format

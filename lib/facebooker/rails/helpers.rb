@@ -24,6 +24,14 @@ module Facebooker
         end
       end
       
+      def fb_iframe(src, options = {})
+        content_tag "fb:iframe", '', options.merge({ :src => src })
+      end
+
+      def fb_swf(src, options = {})
+        tag "fb:swf", options.merge(:swfsrc => src)
+      end
+      
       def fb_dialog_title( title )
         content_tag "fb:dialog-title", title
       end
@@ -331,7 +339,8 @@ module Facebooker
       VALID_FB_SHARED_PHOTO_SIZES = [:thumb, :small, :normal, :square]
       VALID_FB_PHOTO_SIZES = VALID_FB_SHARED_PHOTO_SIZES      
       VALID_FB_PROFILE_PIC_SIZES = VALID_FB_SHARED_PHOTO_SIZES
-      VALID_PERMISSIONS=[:email, :offline_access, :status_update, :photo_upload, :create_listing, :create_event, :rsvp_event, :sms, :video_upload]
+      VALID_PERMISSIONS=[:email, :offline_access, :status_update, :photo_upload, :create_listing, :create_event, :rsvp_event, :sms, :video_upload, 
+                         :publish_stream, :read_stream]
       
       # Render an fb:tabs tag containing some number of fb:tab_item tags.
       # Example:
@@ -639,20 +648,22 @@ module Facebooker
       # 
       # You can prompt a user with the following permissions:
       #   * email
+      #   * read_stream
+      #   * publish_stream
       #   * offline_access
       #   * status_update
       #   * photo_upload
-      #   * video_upload
-      #   * create_listing
       #   * create_event
       #   * rsvp_event
       #   * sms
-      # 
+      #   * video_upload
+      #   * create_note
+      #   * share_item
       # Example:
       # <%= fb_prompt_permission('email', "Would you like to receive email from our application?" ) %>
       #
       # See http://wiki.developers.facebook.com/index.php/Fb:prompt-permission for 
-      # more details
+      # more details. Correct as of 7th June 2009.
       #
       def fb_prompt_permission(permission,message,callback=nil)
         raise(ArgumentError, "Unknown value for permission: #{permission}") unless VALID_PERMISSIONS.include?(permission.to_sym)
@@ -660,6 +671,19 @@ module Facebooker
         args[:next_fbjs]=callback unless callback.nil?
         content_tag("fb:prompt-permission",message,args)
       end
+      
+      # Renders a link to prompt for multiple permissions at once.
+      #
+      # Example:
+      # <%= fb_prompt_permissions(['email','offline_access','status_update'], 'Would you like to grant some permissions?')
+      def fb_prompt_permissions(permissions,message,callback=nil)
+        permissions.each do |p|
+          raise(ArgumentError, "Unknown value for permission: #{p}") unless VALID_PERMISSIONS.include?(p.to_sym)          
+        end
+        args={:perms=>permissions*','}
+        args[:next_fbjs]=callback unless callback.nil?
+        content_tag("fb:prompt-permission",message,args)        
+      end      
       
       # Renders an <fb:eventlink /> tag that displays the event name and links to the event's page. 
       def fb_eventlink(eid)
