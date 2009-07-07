@@ -32,14 +32,14 @@ module Rack
     def call(env)
       if @condition.nil? || @condition.call(env)
         request = Rack::Request.new(env)
-        fb_params = extract_fb_sig_params(request.POST)
+        fb_params = extract_fb_sig_params(request.params)
         unless fb_params.empty?
           Facebooker.with_application(fb_params['api_key']) do
-            unless signature_is_valid?(fb_params, request.POST['fb_sig'])
+            unless signature_is_valid?(fb_params, request.params['fb_sig'])
               return Rack::Response.new(["Invalid Facebook signature"], 400).finish
             end
             env['REQUEST_METHOD'] = fb_params["request_method"] if fb_params["request_method"]
-            convert_parameters!(request.POST)
+            convert_parameters!(request.params)
             @app.call(env)
           end
         else
