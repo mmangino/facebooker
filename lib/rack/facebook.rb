@@ -30,27 +30,34 @@ module Rack
     end
     
     def call(env)
-      if @condition.nil? || @condition.call(env)
-        request = Rack::Request.new(env)
-        fb_params = extract_fb_sig_params(request.params)
-        unless fb_params.empty?
-          Facebooker.with_application(fb_params['api_key']) do
-            unless signature_is_valid?(fb_params, request.params['fb_sig'])
-              return Rack::Response.new(["Invalid Facebook signature"], 400).finish
-            end
-            env['REQUEST_METHOD'] = fb_params["request_method"] if fb_params["request_method"]
-            convert_parameters!(request.params)
-            @app.call(env)
-          end
-        else
-          @app.call(env)
+      return @app.call(env) unless @condition.nil? || @condition.call(env)
+
+      request = Rack::Request.new(env)
+      fb_sig, fb_params = nil, nil
+
+      [ request.POST, request.GET ].each do |params|
+        fb_sig, fb_params = fb_sig_and_params( params )
+        break if fb_sig
+      end
+
+      return @app.call(env) if fb_params.empty?
+
+      Facebooker.with_application(fb_params['api_key']) do
+        unless signature_is_valid?(fb_params, fb_sig)
+          return Rack::Response.new(["Invalid Facebook signature"], 400).finish
         end
-      else
+        env['REQUEST_METHOD'] = fb_params["request_method"] if fb_params["request_method"]
+        convert_parameters!(request.params)
         @app.call(env)
       end
     end
     
     private
+
+    def fb_sig_and_params( params )
+      return nil, [] unless params['fb_sig']
+      return params['fb_sig'], extract_fb_sig_params(params)
+    end
 
     def extract_fb_sig_params(params)
       params.inject({}) do |collection, (param, value)|
