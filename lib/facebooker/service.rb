@@ -1,9 +1,3 @@
-begin
-  require 'curb'
-  Facebooker.use_curl = true
-rescue LoadError
-  require 'net/http'
-end
 require 'facebooker/parser'
 module Facebooker
   class Service
@@ -13,10 +7,63 @@ module Facebooker
       @api_key = api_key
     end
 
+    def self.active_service
+      unless @active_service
+        if Facebooker.use_curl?
+          @active_service = Facebooker::Service::CurlService.new
+        else
+          @active_service = Facebooker::Service::NetHttpService.new
+        end        
+      end
+      @active_service
+    end
+    
+    def self.active_service=(new_service)
+      @active_service = new_service
+    end
+    
+    def self.with_service(service)
+      old_service = active_service
+      self.active_service = service
+      begin
+        yield
+      ensure
+        self.active_service = old_service
+      end
+    end
+    
+    
+    # Process all calls to Facebook in th block asynchronously
+    # nil will be returned from all calls and no results will be parsed. This is mostly useful
+    # for sending large numbers of notifications or sending a lot of profile updates
+    #
+    # for example:
+    #   User.all.each_slice(200) do |users|
+    #     Faceboooker::Service.with_async do
+    #       users.each {|u| u.facebook_session.send_notification(...)}
+    #     end
+    #   end
+    #
+    # Note: You shouldn't make more than about 200 api calls in a with_async block
+    # or you might exhaust all filehandles. 
+    def self.with_async(&proc)
+      block_with_process = Proc.new { proc.call ; process_async}
+      with_service(Facebooker::Service::TyphoeusMultiService.new,&block_with_process)
+    end
+    
+    def self.process_async
+      active_service.process
+    end  
+    
+
     # TODO: support ssl 
     def post(params)
       attempt = 0
-      Parser.parse(params[:method], post_form(url,params) )
+      if active_service.parse_results?
+        Parser.parse(params[:method], post_form(url,params) )
+      else
+        post_form(url,params)
+      end
     rescue Errno::ECONNRESET, EOFError
       if attempt == 0
         attempt += 1
@@ -25,42 +72,17 @@ module Facebooker
     end
 
     def post_form(url,params)
-      if Facebooker.use_curl?
-        post_form_with_curl(url,params)
-      else
-        post_form_with_net_http(url,params)
-      end
-    end
-
-    def post_form_with_net_http(url,params)
-      post_params = {}
-      params.each do |k,v|
-        post_params[k] = v
-        post_params[k] = Facebooker.json_encode(v) if Array === v
-      end
-      Net::HTTP.post_form(url, post_params)
-    end
-
-    def post_form_with_curl(url,params,multipart=false)
-      response = Curl::Easy.http_post(url.to_s, *to_curb_params(params)) do |c|
-        c.multipart_form_post = multipart
-        c.timeout = Facebooker.timeout
-      end
-      response.body_str
+      active_service.post_form(url,params)
     end
     
     def post_multipart_form(url,params)
-      if Facebooker.use_curl?
-        post_form_with_curl(url,params,true)
-      else
-        post_multipart_form_with_net_http(url,params)
-      end
+      active_service.post_multipart_form(url,params)
     end
     
-    def post_multipart_form_with_net_http(url,params)
-      Net::HTTP.post_multipart_form(url, params)
+    def active_service
+      self.class.active_service
     end
-    
+        
     def post_file(params)
       service_url = url(params.delete(:base))
       result = post_multipart_form(service_url, params)
@@ -73,30 +95,5 @@ module Facebooker
       URI.parse('http://'+ base + @api_path)
     end
 
-    # Net::HTTP::MultipartPostFile
-    def multipart_post_file?(object)
-      object.respond_to?(:content_type) &&
-      object.respond_to?(:data) &&
-      object.respond_to?(:filename)
-    end
-
-    def to_curb_params(params)
-      parray = []
-      params.each_pair do |k,v|
-        if multipart_post_file?(v)
-          # Curl doesn't like blank field names
-          field = Curl::PostField.file((k.blank? ? 'xxx' : k.to_s), nil, File.basename(v.filename))
-          field.content_type = v.content_type
-          field.content = v.data
-          parray << field
-        else
-          parray << Curl::PostField.content(
-            k.to_s,
-            Array === v ? Facebooker.json_encode(v) : v.to_s
-          )
-        end
-      end
-      parray
-    end
   end
 end
