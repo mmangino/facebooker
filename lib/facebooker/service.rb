@@ -32,6 +32,20 @@ module Facebooker
       end
     end
     
+    
+    # Process all calls to Facebook in th block asynchronously
+    # nil will be returned from all calls and no results will be parsed. This is mostly useful
+    # for sending large numbers of notifications or sending a lot of profile updates
+    #
+    # for example:
+    #   User.all.each_slice(200) do |users|
+    #     Faceboooker::Service.with_async do
+    #       users.each {|u| u.facebook_session.send_notification(...)}
+    #     end
+    #   end
+    #
+    # Note: You shouldn't make more than about 200 api calls in a with_async block
+    # or you might exhaust all filehandles. 
     def self.with_async(&proc)
       block_with_process = Proc.new { proc.call ; process_async}
       with_service(Facebooker::Service::TyphoeusMultiService.new,&block_with_process)
