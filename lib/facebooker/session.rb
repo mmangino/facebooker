@@ -421,7 +421,7 @@ module Facebooker
     def send_email(user_ids, subject, text, fbml = nil)       
       user_ids = Array(user_ids)
       params = {:fbml => fbml, :recipients => user_ids.map{ |id| User.cast_to_facebook_id(id)}.join(','), :text => text, :subject => subject} 
-      post 'facebook.notifications.sendEmail', params
+      post 'facebook.notifications.sendEmail', params, false
     end
 
     # Only serialize the bare minimum to recreate the session.
