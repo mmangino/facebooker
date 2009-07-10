@@ -37,10 +37,9 @@ module Facebooker
 
     def load_configuration(facebooker_yaml_file)
       if File.exist?(facebooker_yaml_file)
+        @raw_facebooker_configuration = YAML.load_file(ERB.new(File.read(facebooker_yaml_file)).result)
         if defined? RAILS_ENV
-          @raw_facebooker_configuration = YAML.load_file(ERB.new(File.read(facebooker_yaml_file)).result)[RAILS_ENV]
-        else
-          @raw_facebooker_configuration = YAML.load_file(ERB.new(File.read(facebooker_yaml_file)).result)
+          @raw_facebooker_configuration = @raw_facebooker_configuration[RAILS_ENV]
         end
         Thread.current[:fb_api_config] = @raw_facebooker_configuration unless Thread.current[:fb_api_config]
         apply_configuration(@raw_facebooker_configuration)
