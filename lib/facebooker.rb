@@ -37,7 +37,7 @@ module Facebooker
 
     def load_configuration(facebooker_yaml_file)
       if File.exist?(facebooker_yaml_file)
-        @raw_facebooker_configuration = YAML.load_file(ERB.new(File.read(facebooker_yaml_file)).result)
+        @raw_facebooker_configuration = YAML.load(ERB.new(File.read(facebooker_yaml_file)).result)
         if defined? RAILS_ENV
           @raw_facebooker_configuration = @raw_facebooker_configuration[RAILS_ENV]
         end
@@ -186,6 +186,11 @@ require 'facebooker/logging'
 require 'facebooker/model'
 require 'facebooker/parser'
 require 'facebooker/service'
+require 'facebooker/service/base_service'
+require 'facebooker/service/curl_service' rescue nil
+require 'facebooker/service/typhoeus_service' rescue nil
+require 'facebooker/service/typhoeus_multi_service' rescue nil
+require 'facebooker/service/net_http_service'
 require 'facebooker/server_cache'
 require 'facebooker/data'
 require 'facebooker/admin'
