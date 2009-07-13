@@ -187,9 +187,19 @@ require 'facebooker/model'
 require 'facebooker/parser'
 require 'facebooker/service'
 require 'facebooker/service/base_service'
-require 'facebooker/service/curl_service' rescue nil
-require 'facebooker/service/typhoeus_service' rescue nil
-require 'facebooker/service/typhoeus_multi_service' rescue nil
+#optional HTTP service adapters
+begin
+  require 'facebooker/service/curl_service' 
+rescue LoadError
+  nil
+end
+begin
+  require 'facebooker/service/typhoeus_service'
+  require 'facebooker/service/typhoeus_multi_service'
+rescue LoadError
+  nil
+end
+
 require 'facebooker/service/net_http_service'
 require 'facebooker/server_cache'
 require 'facebooker/data'
