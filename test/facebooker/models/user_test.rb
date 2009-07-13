@@ -135,6 +135,11 @@ class Facebooker::UserTest < Test::Unit::TestCase
     expect_http_posts_with_responses(example_profile_publish_to_get_xml)
     @user.publish_to(@other_user, :message => 'i love you man')
   end
+  def test_publish_to_converts_attachment_to_json
+    @user = Facebooker::User.new(548871286, @session)
+    @user.session.expects(:post).with("facebook.stream.publish",has_entry(:attachment=>instance_of(String)))
+    @user.publish_to(@other_user, :message => 'i love you man',:attachment=>{:a=>"b"})
+  end
 
   def test_comment_on
     @user = Facebooker::User.new(548871286, @session)
