@@ -303,6 +303,11 @@ module Facebooker
       post('facebook.pages.isFan', :page_id=>page_id, :uid=>uid)
     end    
 
+    # Takes page_id and uid, returns true if the user is an admin of the page
+    def is_admin(page_id, uid)
+      post('facebook.pages.isAdmin', :page_id=>page_id, :uid=>uid)
+    end  
+
     #
     # Returns a proxy object for handling calls to Facebook cached items
     # such as images and FBML ref handles
