@@ -300,13 +300,10 @@ module Facebooker
 
     # Takes page_id and uid, returns true if uid is a fan of the page_id
     def is_fan(page_id, uid)
-      post('facebook.pages.isFan', :page_id=>page_id, :uid=>uid)
+      puts "Deprecated. Use Page#user_is_fan? instead"
+      Page.new(page_id).user_is_fan?(uid)
     end    
 
-    # Takes page_id and uid, returns true if the user is an admin of the page
-    def is_admin(page_id, uid)
-      post('facebook.pages.isAdmin', :page_id=>page_id, :uid=>uid)
-    end  
 
     #
     # Returns a proxy object for handling calls to Facebook cached items

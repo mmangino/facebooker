@@ -1,6 +1,14 @@
 require 'facebooker/model'
 module Facebooker
   class Page
+    
+    def initialize(*args)
+      if args.size == 1 and (args.first.is_a?(Integer) or args.first.is_a?(String))
+        self.page_id=args.first
+      else
+        super
+      end
+    end
 
     class Genre
       include Model
@@ -23,6 +31,14 @@ module Facebooker
 
     def genre=(value)
       @genre = value.kind_of?(Hash) ? Genre.from_hash(value) : value
+    end
+    
+    def user_is_admin?(user)
+      Session.current.post('facebook.pages.isAdmin', :page_id=>self.page_id, :uid=>Facebooker::User.cast_to_facebook_id(user))
+    end
+    
+    def user_is_fan?(user)
+      Session.current.post('facebook.pages.isFan', :page_id=>self.page_id, :uid=>Facebooker::User.cast_to_facebook_id(user))
     end
   end
 end

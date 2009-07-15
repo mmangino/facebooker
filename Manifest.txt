@@ -116,6 +116,7 @@ test/facebooker/logging_test.rb
 test/facebooker/mobile_test.rb
 test/facebooker/model_test.rb
 test/facebooker/models/event_test.rb
+test/facebooker/models/page_test.rb
 test/facebooker/models/photo_test.rb
 test/facebooker/models/user_test.rb
 test/facebooker/rails/publisher_test.rb
