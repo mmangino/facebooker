@@ -394,14 +394,22 @@ module Facebooker
     # Register a template bundle with Facebook.
     # returns the template id to use to send using this template
     def register_template_bundle(one_line_story_templates,short_story_templates=nil,full_story_template=nil, action_links=nil)
-      parameters = {:one_line_story_templates => Array(one_line_story_templates).to_json}
-
-      parameters[:action_links] = action_links.to_json unless action_links.blank?
-
-      parameters[:short_story_templates] = Array(short_story_templates).to_json unless short_story_templates.blank?
-
-      parameters[:full_story_template] = full_story_template.to_json unless full_story_template.blank?
-
+      templates = ensure_array(one_line_story_templates)
+      parameters = {:one_line_story_templates => templates.to_json}
+      
+      unless action_links.blank?
+        parameters[:action_links] = action_links.to_json
+      end
+      
+      unless short_story_templates.blank?
+        templates = ensure_array(short_story_templates)
+        parameters[:short_story_templates] = templates.to_json
+      end
+      
+      unless full_story_template.blank?
+        parameters[:full_story_template] = full_story_template.to_json
+      end
+      
       post("facebook.feed.registerTemplateBundle", parameters, false)
     end
 
@@ -627,6 +635,10 @@ module Facebooker
           collection
         end.sort.join
         Digest::MD5.hexdigest([raw_string, secret_for_method(params[:method])].join)
+      end
+      
+      def ensure_array(value)
+        value.is_a?(Array) ? value : [value]
       end
   end
 
