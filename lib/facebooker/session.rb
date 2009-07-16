@@ -50,6 +50,7 @@ module Facebooker
     class FQLStatementNotIndexable < StandardError; end
     class FQLFunctionDoesNotExist < StandardError; end
     class FQLWrongNumberArgumentsPassedToFunction < StandardError; end
+    class PermissionError < StandardError; end
     class InvalidAlbumId < StandardError; end
     class AlbumIsFull < StandardError; end
     class MissingOrInvalidImageFile < StandardError; end

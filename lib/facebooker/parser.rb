@@ -565,6 +565,7 @@ module Facebooker
       103 => Facebooker::Session::CallOutOfOrder,
       104 => Facebooker::Session::IncorrectSignature,
       120 => Facebooker::Session::InvalidAlbumId,
+      200 => Facebooker::Session::PermissionError,
       250 => Facebooker::Session::ExtendedPermissionRequired,
       321 => Facebooker::Session::AlbumIsFull,
       324 => Facebooker::Session::MissingOrInvalidImageFile,
