@@ -99,6 +99,11 @@ lib/facebooker/rails/test_helpers.rb
 lib/facebooker/rails/utilities.rb
 lib/facebooker/server_cache.rb
 lib/facebooker/service.rb
+lib/facebooker/service/base_service.rb
+lib/facebooker/service/curl_service.rb
+lib/facebooker/service/net_http_service.rb
+lib/facebooker/service/typhoeus_service.rb
+lib/facebooker/service/typhoeus_multi_service.rb
 lib/facebooker/session.rb
 lib/facebooker/version.rb
 lib/net/http_multipart_post.rb
