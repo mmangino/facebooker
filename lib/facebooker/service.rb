@@ -38,7 +38,7 @@ module Facebooker
     # for sending large numbers of notifications or sending a lot of profile updates
     #
     # for example:
-    #   User.all.each_slice(200) do |users|
+    #   User.find_in_batches(:batch_size => 200) do |users|
     #     Faceboooker::Service.with_async do
     #       users.each {|u| u.facebook_session.send_notification(...)}
     #     end
@@ -46,6 +46,9 @@ module Facebooker
     #
     # Note: You shouldn't make more than about 200 api calls in a with_async block
     # or you might exhaust all filehandles. 
+    #
+    # This functionality require the typhoeus gem
+    #
     def self.with_async(&proc)
       block_with_process = Proc.new { proc.call ; process_async}
       with_service(Facebooker::Service::TyphoeusMultiService.new,&block_with_process)
