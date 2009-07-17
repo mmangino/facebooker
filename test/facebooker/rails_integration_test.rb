@@ -700,7 +700,15 @@ class RailsHelperTest < Test::Unit::TestCase
     assert_equal "<fb:add-section-button section=\"info\" />",@h.fb_add_info_section
   end
 
-  def test_fb_name_with_invalid_key_sizee
+  def test_fb_application_name
+    assert_equal "<fb:application-name />", @h.fb_application_name
+  end
+
+  def test_fb_application_name_with_linked_false
+    assert_equal '<fb:application-name linked="false" />', @h.fb_application_name( :linked => false )
+  end
+
+  def test_fb_name_with_invalid_key_size
     assert_raises(ArgumentError) {@h.fb_name(1234, :sizee => false)}
   end
 
