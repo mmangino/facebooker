@@ -187,10 +187,10 @@ module Facebooker
       #     <fb:editor-button label="Save Poke"
       #    </fb:editor-buttonset>
       #  </fb:editor>
-     def facebook_form_for( record_or_name_or_array,*args, &proc)
+      def facebook_form_for( record_or_name_or_array,*args, &proc)
 
-       raise ArgumentError, "Missing block" unless block_given?
-       options = args.last.is_a?(Hash) ? args.pop : {}
+        raise ArgumentError, "Missing block" unless block_given?
+        options = args.last.is_a?(Hash) ? args.pop : {}
 
         case record_or_name_or_array
         when String, Symbol
@@ -230,8 +230,18 @@ module Facebooker
           fields_for( object_name,*(args << options), &proc)
           concat("</fb:editor>",proc.binding)
         end
-    end
+      end
       
+      # Render an fb:application-name tag
+      #
+      # This renders the current application name via fbml. See
+      # http://wiki.developers.facebook.com/index.php/Fb:application-name
+      # for a full description.
+      #
+      def fb_application_name(options={})
+        tag "fb:application-name", stringify_vals(options)
+      end
+
       # Render an fb:name tag for the given user
       # This renders the name of the user specified.  You can use this tag as both subject and object of 
       # a sentence.  <em> See </em> http://wiki.developers.facebook.com/index.php/Fb:name for full description.  
