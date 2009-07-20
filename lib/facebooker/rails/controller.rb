@@ -180,7 +180,11 @@ module Facebooker
       end
 
       def default_after_facebook_login_url
-        url_for(:only_path => false, :overwrite_params => {})
+        omit_keys = ["_method", "format"]
+        options = (params||{}).clone 
+        options = options.reject{|k,v| k.to_s.match(/^fb_sig/) or omit_keys.include?(k.to_s)} 
+        options = options.merge({:only_path => false})
+        url_for(options)
       end
       
       def create_new_facebook_session_and_redirect!

@@ -476,6 +476,11 @@ class RailsIntegrationTest < Test::Unit::TestCase
     get :link_test,facebook_params(:fb_sig_in_canvas=>0,:canvas=>false)
     assert !@response.body.match(/root/)
   end
+  
+  def test_default_url_omits_fb_params
+    get :index,facebook_params(:fb_sig_friends=>"overwriteme",:get_param=>"yes")
+    assert_equal "http://apps.facebook.com/root/require_auth?get_param=yes", @controller.send(:default_after_facebook_login_url)
+  end
 
   def test_url_for_links_to_canvas_if_canvas_is_not_set
     get :link_test,facebook_params
