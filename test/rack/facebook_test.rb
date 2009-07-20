@@ -7,6 +7,7 @@ class Rack::FacebookTest < Test::Unit::TestCase
   
   def setup
     flexmock(Facebooker).should_receive(:secret_key).and_return('secret')
+    flexmock(Facebooker).should_receive(:load_adapter)
     @app = lambda do |env|
       @env = env
       Rack::Response.new().to_a
