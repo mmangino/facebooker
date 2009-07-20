@@ -7,7 +7,6 @@ module Facebooker
       include Facebooker::Rails::ProfilePublisherExtensions
       def self.included(controller)
         controller.extend(ClassMethods)
-        controller.before_filter :set_adapter 
         controller.before_filter :set_facebook_request_format
         controller.helper_attr :facebook_session_parameters
         controller.helper_method :request_comes_from_facebook?
@@ -324,10 +323,6 @@ module Facebooker
         end
       end
       
-      def set_adapter
-        Facebooker.load_adapter(params) if(params[:fb_sig_api_key])
-      end
-
       
       module ClassMethods
         #

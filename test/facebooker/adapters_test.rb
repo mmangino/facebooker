@@ -171,4 +171,21 @@ class Facebooker::AdaptersTest < Test::Unit::TestCase
     assert_equal 'my secret key', @secret_in_outer_block
   end
 
+  def test_adapter_loaded_when_config_applied
+    flexmock( Facebooker ).
+      should_receive( :fetch_config_for ).
+      and_return(
+        { 'api_key'          => 'a_key',
+          'canvas_page_name' => 'default_name' },
+        { 'api_key' => 'another_key',
+          'canvas_page_name' => 'alternative_name' }
+      )
+    Facebooker.with_application('a_key') do
+      assert_equal 'default_name', Facebooker.current_adapter.facebooker_config['canvas_page_name']
+      Facebooker.with_application('another_key') do
+        assert_equal 'alternative_name', Facebooker.current_adapter.facebooker_config['canvas_page_name']
+      end
+    end
+  end
+
 end

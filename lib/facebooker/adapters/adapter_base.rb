@@ -12,7 +12,7 @@ module Facebooker
       @facebook_path_prefix = prefix
     end
 
-    def  facebooker_config
+    def facebooker_config
       @config
     end
 
