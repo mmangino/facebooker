@@ -12,7 +12,7 @@ class Facebooker::Rails::IntegrationSession < ActionController::Integration::Ses
   end
   
   def reset!
-    self.default_request_params = {:fb_sig_in_canvas => '1'}.with_indifferent_access
+    self.default_request_params = {:fb_sig_in_canvas => '1', :fb_sig_api_key => Facebooker::Session.api_key}.with_indifferent_access
     self.canvas = true
     super
   end
