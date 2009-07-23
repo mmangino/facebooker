@@ -492,6 +492,11 @@ class RailsIntegrationTest < Test::Unit::TestCase
     get :link_test,facebook_params(:fb_sig_in_canvas=>0,:canvas=>false)
     assert !@response.body.match(/root/)
   end
+  
+  def test_default_url_omits_fb_params
+    get :index,facebook_params(:fb_sig_friends=>"overwriteme",:get_param=>"yes")
+    assert_equal "http://apps.facebook.com/root/require_auth?get_param=yes", @controller.send(:default_after_facebook_login_url)
+  end
 
   def test_url_for_links_to_canvas_if_canvas_is_not_set
     get :link_test,facebook_params
@@ -1080,7 +1085,11 @@ class RailsHelperTest < Test::Unit::TestCase
   def test_fb_logout_link
     assert_equal @h.fb_logout_link("Logout","My URL"),"<a href=\"#\" onclick=\"FB.Connect.logoutAndRedirect(&quot;My URL&quot;);; return false;\">Logout</a>"
   end
-  def test_fb_user_action
+  def test_fb_user_action_with_literal_callback
+    action = Facebooker::Rails::Publisher::UserAction.new
+    assert_equal @h.fb_user_action(action,"message","prompt","function() {alert('hi')}"),"FB.Connect.showFeedDialog(null, null, null, null, null, FB.RequireConnect.promptConnect, function() {alert('hi')}, \"prompt\", {\"value\": \"message\"});"
+  end
+  def test_fb_user_action_with_nil_callback
     action = Facebooker::Rails::Publisher::UserAction.new
     assert_equal @h.fb_user_action(action,"message","prompt"),"FB.Connect.showFeedDialog(null, null, null, null, null, FB.RequireConnect.promptConnect, null, \"prompt\", {\"value\": \"message\"});"
   end

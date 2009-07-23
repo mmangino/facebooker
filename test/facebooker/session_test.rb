@@ -204,6 +204,47 @@ class Facebooker::SessionTest < Test::Unit::TestCase
     @session = Facebooker::Session.create(ENV['FACEBOOK_API_KEY'], ENV['FACEBOOK_SECRET_KEY'])
     assert_equal 17876842716, @session.register_template_bundle("{*actor*} did something",nil,nil,[{:text=>"text",:href=>"href"}])
   end
+  
+  def test_can_register_template_bundle_with_short_story
+    one_line = "{*actor*} did something"
+    short_story = { :title => 'title', :body => 'body' }
+    
+    @session = Facebooker::Session.create(ENV['FACEBOOK_API_KEY'], ENV['FACEBOOK_SECRET_KEY'])
+    @session.expects(:post).with(
+      'facebook.feed.registerTemplateBundle',
+      {:one_line_story_templates => [one_line].to_json, :short_story_templates => [short_story].to_json},
+      false
+    )
+    @session.register_template_bundle(one_line, short_story)
+  end
+  
+  def test_can_register_template_bundle_with_short_story_for_several_templates
+    one_line = ["{*actor*} did something", "{*actor*} did something again"]
+    short_story = [{ :title => 'title', :body => 'body' }, { :title => 'title2', :body => 'body2' }]
+    
+    @session = Facebooker::Session.create(ENV['FACEBOOK_API_KEY'], ENV['FACEBOOK_SECRET_KEY'])
+    @session.expects(:post).with(
+      'facebook.feed.registerTemplateBundle',
+      {:one_line_story_templates => one_line.to_json, :short_story_templates => short_story.to_json},
+      false
+    )
+    @session.register_template_bundle(one_line, short_story)
+  end
+  
+  def test_can_register_template_bundle_with_full_story_for_several_templates
+    one_line = ["{*actor*} did something", "{*actor*} did something again"]
+    short_story = [{ :title => 'title', :body => 'body' }, { :title => 'title2', :body => 'body2' }]
+    full_story = { :title => 'title', :body => 'body' }
+    
+    @session = Facebooker::Session.create(ENV['FACEBOOK_API_KEY'], ENV['FACEBOOK_SECRET_KEY'])
+    @session.expects(:post).with(
+      'facebook.feed.registerTemplateBundle',
+      {:one_line_story_templates => one_line.to_json, :short_story_templates => short_story.to_json, :full_story_template => full_story.to_json},
+      false
+    )
+    @session.register_template_bundle(one_line, short_story, full_story)
+  end
+  
   def test_can_publish_user_action
     expect_http_posts_with_responses(publish_user_action_return_xml)
     @session = Facebooker::Session.create(ENV['FACEBOOK_API_KEY'], ENV['FACEBOOK_SECRET_KEY'])
