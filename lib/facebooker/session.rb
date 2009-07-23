@@ -562,7 +562,7 @@ module Facebooker
     end
 
     def post(method, params = {}, use_session_key = true, &proc)
-      if batch_request?
+      if batch_request? or Facebooker::Logging.skip_api_logging
         post_without_logging(method, params, use_session_key, &proc)
       else
         Logging.log_fb_api(method, params) do
