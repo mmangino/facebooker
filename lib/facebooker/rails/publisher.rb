@@ -193,7 +193,7 @@ module Facebooker
           end
 
           def template_name(klass,method)
-            "#{klass.name}::#{method}"
+            "#{Facebooker.api_key}: #{klass.name}::#{method}"
           end
         end
       end
