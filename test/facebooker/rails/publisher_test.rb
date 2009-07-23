@@ -145,6 +145,7 @@ class Facebooker::Rails::Publisher::FacebookTemplateTest < Test::Unit::TestCase
 
   def setup
     super
+    ENV['FACEBOOK_API_KEY'] = '1234567'
     @template = mock("facebook template")
     FacebookTemplate.stubs(:register).returns(@template)
     FacebookTemplate.clear_cache!
@@ -167,13 +168,13 @@ class Facebooker::Rails::Publisher::FacebookTemplateTest < Test::Unit::TestCase
   end
 
   def test_find_in_db_should_run_find
-    FacebookTemplate.expects(:find_by_template_name).with("TestPublisher::simple_user_action").returns(@template)
+    FacebookTemplate.expects(:find_by_template_name).with("1234567: TestPublisher::simple_user_action").returns(@template)
     @template.stubs(:template_changed?).returns(false)
     assert_equal FacebookTemplate.find_in_db(TestPublisher,"simple_user_action"), @template
   end
 
   def test_find_in_db_should_register_if_not_found
-    FacebookTemplate.expects(:find_by_template_name).with("TestPublisher::simple_user_action").returns(nil)
+    FacebookTemplate.expects(:find_by_template_name).with("1234567: TestPublisher::simple_user_action").returns(nil)
     FacebookTemplate.expects(:register).with(TestPublisher,"simple_user_action").returns(@template)
     FacebookTemplate.find_cached(TestPublisher,"simple_user_action")
 
@@ -195,7 +196,7 @@ class Facebooker::Rails::Publisher::FacebookTemplateTest < Test::Unit::TestCase
   end
 
   def test_find_in_db_should_re_register_if_changed
-    FacebookTemplate.stubs(:find_by_template_name).with("TestPublisher::simple_user_action").returns(@template)
+    FacebookTemplate.stubs(:find_by_template_name).with("1234567: TestPublisher::simple_user_action").returns(@template)
     FacebookTemplate.stubs(:hashed_content).returns("MY CONTENT")
     @template.stubs(:template_changed?).returns(true)
     @template.stubs(:destroy)
