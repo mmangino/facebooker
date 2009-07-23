@@ -70,5 +70,4 @@ class Rack::FacebookTest < Test::Unit::TestCase
     response = @page.call
     assert_equal 400, response.status
   end
-
 end
