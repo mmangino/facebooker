@@ -245,6 +245,16 @@ class Facebooker::SessionTest < Test::Unit::TestCase
     @session.register_template_bundle(one_line, short_story, full_story)
   end
   
+  def test_can_deactivate_template_bundle_by_id
+    @session = Facebooker::Session.create(ENV['FACBEOOK_API_KEY'], ENV['FACEBOOK_SECRET_KEY'])
+    @session.expects(:post).with(
+      'facebook.feed.deactivateTemplateBundleByID',
+      {:template_bundle_id => '999'},
+      false
+    )
+    @session.deactivate_template_bundle_by_id(999)
+  end
+
   def test_can_publish_user_action
     expect_http_posts_with_responses(publish_user_action_return_xml)
     @session = Facebooker::Session.create(ENV['FACEBOOK_API_KEY'], ENV['FACEBOOK_SECRET_KEY'])

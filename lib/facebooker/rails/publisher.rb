@@ -130,6 +130,13 @@ module Facebooker
           end
         end
         
+        def deactivate
+          Facebooker::Session.create.deactivate_template_bundle_by_id(self.bundle_id)
+          return true
+        rescue Facebooker::Session::TemplateBundleInvalid => e
+          return false
+        end
+
         
         
         class << self
@@ -138,6 +145,7 @@ module Facebooker
             publisher = setup_publisher(klass,method)            
             template_id = Facebooker::Session.create.register_template_bundle(publisher.one_line_story_templates,publisher.short_story_templates,publisher.full_story_template,publisher.action_links)
             template = find_or_initialize_by_template_name(template_name(klass,method))
+            template.deactivate if template.bundle_id  # deactivate old templates to avoid exceeding templates/app limit
             template.bundle_id = template_id
             template.content_hash = hashed_content(klass,method) if template.respond_to?(:content_hash)
             template.save!
@@ -166,12 +174,8 @@ module Facebooker
           
           def find_in_db(klass,method)
             template = find_by_template_name(template_name(klass,method))
-            if template and template.template_changed?(hashed_content(klass,method))
-              template.destroy
-              template = nil
-            end
             
-            if template.nil?
+            if template.nil? || template.template_changed?(hashed_content(klass, method))
               template = register(klass,method)
             end
             template
