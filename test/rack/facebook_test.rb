@@ -55,19 +55,19 @@ class Rack::FacebookTest < Test::Unit::TestCase
   
   def test_skips_with_false_condition
     @facebook = Rack::Facebook.new(@app) { false }
-    response = @page.call
+    response = @page.call({})
     assert_equal 200, response.status
   end
   
   def test_skips_with_true_condition_without_fb_sig
     @facebook = Rack::Facebook.new(@app) { true }
-    response = @page.call(:fb_sig => nil)
+    response = @page.call(:fb_sig_user => 'ignored')
     assert_equal 200, response.status
   end
   
   def test_verifies_with_true_condition_with_fb_sig
     @facebook = Rack::Facebook.new(@app) { true }
-    response = @page.call
+    response = @page.call(:fb_sig => 'wrong', :fb_sig_user => 'ignored')
     assert_equal 400, response.status
   end
 end

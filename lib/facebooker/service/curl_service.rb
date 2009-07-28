@@ -2,11 +2,12 @@ require 'curb'
 Facebooker.use_curl = true
 class Facebooker::Service::CurlService < Facebooker::Service::BaseService
   def post_form(url,params,multipart=false)
-    response = Curl::Easy.http_post(url.to_s, *to_curb_params(params)) do |c|
+    curl = Curl::Easy.new(url.to_s) do |c|
       c.multipart_form_post = multipart
       c.timeout = Facebooker.timeout
     end
-    response.body_str
+    curl.http_post(*to_curb_params(params)) 
+    curl.body_str
   end
   
   def post_multipart_form(url,params)
