@@ -29,9 +29,9 @@ end
 require 'facebooker'
 require 'facebooker/rails/test_helpers'
 
-
 class Test::Unit::TestCase
-  include Facebooker::Rails::TestHelpers
+
+  include Facebooker::Rails::TestHelpers unless self.included_modules.include?( Facebooker::Rails::TestHelpers )
 
   private
 

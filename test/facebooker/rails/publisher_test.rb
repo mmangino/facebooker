@@ -141,7 +141,6 @@ end
 
 class Facebooker::Rails::Publisher::FacebookTemplateTest < Test::Unit::TestCase
   FacebookTemplate = Facebooker::Rails::Publisher::FacebookTemplate
-  include Facebooker::Rails::TestHelpers
 
   def setup
     super
