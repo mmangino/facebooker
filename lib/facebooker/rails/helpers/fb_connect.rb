@@ -3,11 +3,12 @@ module Facebooker
     module Helpers
       module FbConnect
         
-        def fb_connect_javascript_tag
+        def fb_connect_javascript_tag(options = {})
+          lang = "/#{options[:lang]}" if options[:lang]
           if request.ssl?
-            javascript_include_tag "https://www.connect.facebook.com/js/api_lib/v0.4/FeatureLoader.js.php"
+            "<script src=\"https://www.connect.facebook.com/js/api_lib/v0.4/FeatureLoader.js.php#{lang}\" type=\"text/javascript\"></script>"
           else
-            javascript_include_tag "http://static.ak.connect.facebook.com/js/api_lib/v0.4/FeatureLoader.js.php"
+            "<script src=\"http://static.ak.connect.facebook.com/js/api_lib/v0.4/FeatureLoader.js.php#{lang}\" type=\"text/javascript\"></script>"
           end
         end
         

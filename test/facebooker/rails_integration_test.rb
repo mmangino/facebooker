@@ -1089,6 +1089,13 @@ class RailsHelperTest < Test::Unit::TestCase
     end
   end
 
+  def test_fb_connect_javascript_tag_with_language_option
+    silence_warnings do
+      assert_equal "<script src=\"http://static.ak.connect.facebook.com/js/api_lib/v0.4/FeatureLoader.js.php/en_US\" type=\"text/javascript\"></script>",
+        @h.fb_connect_javascript_tag(:lang => "en_US")
+    end
+  end
+
   def test_fb_connect_javascript_tag_ssl
     @h.instance_eval do
       def request
@@ -1101,6 +1108,21 @@ class RailsHelperTest < Test::Unit::TestCase
     silence_warnings do
       assert_equal "<script src=\"https://www.connect.facebook.com/js/api_lib/v0.4/FeatureLoader.js.php\" type=\"text/javascript\"></script>",
         @h.fb_connect_javascript_tag
+    end
+  end
+
+  def test_fb_connect_javascript_tag_ssl_with_language_option
+    @h.instance_eval do
+      def request
+        ssl_request = ActionController::TestRequest.new
+        ssl_request.stubs(:ssl?).returns(true)
+        ssl_request
+      end
+    end
+
+    silence_warnings do
+      assert_equal "<script src=\"https://www.connect.facebook.com/js/api_lib/v0.4/FeatureLoader.js.php/en_US\" type=\"text/javascript\"></script>",
+        @h.fb_connect_javascript_tag(:lang => "en_US")
     end
   end
 
