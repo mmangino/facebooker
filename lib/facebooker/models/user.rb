@@ -104,6 +104,11 @@ module Facebooker
       @friends_hash[cache_key]
     end
 
+    def friend_ids
+      options = {:uid => self.id}
+      @session.post('facebook.friends.get', options, false)
+    end
+
     ###
     # Publish a post into the stream on the user's Wall and News Feed.  This
     # post also appears in the user's friend's streams.  The +publish_stream+
@@ -176,9 +181,13 @@ module Facebooker
     end
     
     def friends_with_this_app
-      @friends_with_this_app ||= session.post('facebook.friends.getAppUsers').map do |uid|
+      @friends_with_this_app ||= friend_ids_with_this_app.map do |uid|
         User.new(uid, session)
       end
+    end
+
+    def friend_ids_with_this_app
+      @friend_ids_with_this_app ||= session.post('facebook.friends.getAppUsers')
     end
     
     def groups(gids = [])
