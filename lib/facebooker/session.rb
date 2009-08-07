@@ -100,11 +100,11 @@ module Facebooker
 
     def login_url(options={})
       options = default_login_url_options.merge(options)
-      "#{Facebooker.login_url_base(@api_key)}#{login_url_optional_parameters(options)}"
+      "#{Facebooker.login_url_base}#{login_url_optional_parameters(options)}"
     end
 
     def install_url(options={})
-      "#{Facebooker.install_url_base(@api_key)}#{install_url_optional_parameters(options)}"
+      "#{Facebooker.install_url_base}#{install_url_optional_parameters(options)}"
     end
 
     # The url to get user to approve extended permissions
