@@ -58,7 +58,7 @@ module Facebooker
     def self.element(name, data)
       data = data.body rescue data # either data or an HTTP response
       begin
-        xml = Nokogiri::XML(data.strip).at(name)
+        xml = Nokogiri::XML(data.strip)
         if node = xml.at(name)
           return node
         end
