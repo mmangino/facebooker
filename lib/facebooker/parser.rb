@@ -65,7 +65,7 @@ module Facebooker
         if xml.root.name == name
           return xml.root
         end
-      rescue # Can't parse with Nokogiri
+      rescue NameError # Can't parse with Nokogiri
         doc = REXML::Document.new(data)
         doc.elements.each(name) do |element|
           return element
@@ -413,18 +413,19 @@ module Facebooker
   class FqlMultiquery < Parser#nodoc
     def self.process(data)
       root = element('fql_multiquery_response', data)
-      root.elements.collect do |elm|
-        [
-         elm.elements[1].text,
-          if elm.elements[2].elements[1].nil?
-            [] 
+      root.children.reject { |child| child.text? }.map do |elm|
+        elm.children.reject { |child| child.text? }.map do |query|
+          if 'name' == query.name
+            query.text
           else
-            [
-             elm.elements[2].elements[1].name,
-             array_of_hashes(elm.elements[2], elm.elements[2].elements[1].name)
-            ]
+            list = query.children.reject { |child| child.text? }
+            if list.length == 0
+              []
+            else
+              [list.first.name, array_of_hashes(query, list.first.name)]
+            end
           end
-        ]
+        end
       end
     end
   end
