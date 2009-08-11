@@ -26,7 +26,7 @@ module Facebooker
     end
 
     include Model
-    attr_accessor :page_id, :name, :pic_small, :pic_big, :pic_square, :pic_large, :type, :type, :website, :location, :hours, :band_members, :bio, :hometown, :record_label, :influences, :has_added_app, :founded, :company_overview, :mission, :products, :release_date, :starring, :written_by, :directed_by, :produced_by, :studio, :awards, :plot_outline, :network, :season, :schedule
+    attr_accessor :page_id, :name, :pic_small, :pic_big, :pic_square, :pic_large, :page_url, :type, :website, :location, :hours, :band_members, :bio, :hometown, :record_label, :influences, :has_added_app, :founded, :company_overview, :mission, :products, :release_date, :starring, :written_by, :directed_by, :produced_by, :studio, :awards, :plot_outline, :network, :season, :schedule
     attr_reader :genre
 
     def genre=(value)
