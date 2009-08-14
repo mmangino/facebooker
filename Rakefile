@@ -1,5 +1,5 @@
 # -*- ruby -*-
-# 
+#
 require 'rubygems'
 require 'hoe'
 begin
@@ -8,19 +8,24 @@ rescue LoadError
   $stderr.puts "Install the multi_rails gem to run tests against multiple versions of Rails"
 end
 
-$: << File.dirname(__FILE__) + '/lib'
-require './lib/facebooker.rb'
+require 'lib/facebooker/version'
 
-HOE = Hoe.new('facebooker', Facebooker::VERSION::STRING) do |p|
-  p.rubyforge_name = 'facebooker'
-  p.author = ['Chad Fowler', 'Patrick Ewing', 'Mike Mangino', 'Shane Vitarana', 'Corey Innis']
-  p.email = 'mmangino@elevatedrails.com'
-  p.readme_file   = 'README.rdoc'
-  p.history_file  = 'CHANGELOG.rdoc'
-  p.remote_rdoc_dir = '' # Release to root
-  p.test_globs = 'test/**/*_test.rb'
-  p.extra_deps << ['json', '>= 1.0.0']
-  p.extra_rdoc_files  = FileList['*.rdoc']
+HOE = Hoe.spec('facebooker') do
+  self.version = Facebooker::VERSION::STRING
+  self.rubyforge_name = 'facebooker'
+  developer 'Chad Fowler',    'chad@chadfowlwer.com'
+  developer 'Patrick Ewing',  ''
+  developer 'Mike Mangino',   ''
+  developer 'Shane Vitarana', ''
+  developer 'Corey Innis',    ''
+  developer 'Mike Mangino',   'mmangino@elevatedrails.com'
+
+  self.readme_file   = 'README.rdoc'
+  self.history_file  = 'CHANGELOG.rdoc'
+  self.remote_rdoc_dir = '' # Release to root
+  self.test_globs = 'test/**/*_test.rb'
+  extra_deps << ['json', '>= 1.0.0']
+  self.extra_rdoc_files  = FileList['*.rdoc']
 end
 
 require 'rcov/rcovtask'

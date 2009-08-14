@@ -95,6 +95,24 @@ module Facebooker
       end
     end
 
+    def all_api_keys
+      [
+        @raw_facebooker_configuration['api_key']
+      ] + (
+        @raw_facebooker_configuration['alternative_keys'] ?
+        @raw_facebooker_configuration['alternative_keys'].keys :
+        []
+      )
+    end
+
+    def with_all_applications(&block)
+      all_api_keys.each do |current_api_key|
+        with_application(current_api_key) do
+          block.call
+        end
+      end
+    end
+
     def fetch_config_for(api_key)
       if @raw_facebooker_configuration['api_key'] == api_key
         return @raw_facebooker_configuration

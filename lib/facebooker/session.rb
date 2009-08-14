@@ -415,6 +415,14 @@ module Facebooker
     end
 
     ##
+    # Deactivate a template bundle with Facebook.
+    # Returns true if a bundle with the specified id is active and owned by this app.
+    # Useful to avoid exceeding the 100 templates/app limit.
+    def deactivate_template_bundle_by_id(template_bundle_id)
+      post("facebook.feed.deactivateTemplateBundleByID", {:template_bundle_id => template_bundle_id.to_s}, false)
+    end
+
+    ##
     # publish a previously rendered template bundle
     # see http://wiki.developers.facebook.com/index.php/Feed.publishUserAction
     #

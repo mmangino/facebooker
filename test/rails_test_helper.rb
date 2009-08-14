@@ -15,6 +15,14 @@ require 'facebooker/rails/helpers'
 require 'facebooker/rails/publisher'
 require 'facebooker/rails/facebook_form_builder'
 
+if Rails.version >= '2.3'
+  Test::Unit::TestCase.send :include, ActionController::TestCase::Assertions
+  Test::Unit::TestCase.send :include, ActionController::TestProcess
+  Test::Unit::TestCase.send :include, Facebooker::Rails::TestHelpers
+
+  ActionController::Base.session = { :key => "9hfwfl8slgh9", :secret => "db08fcba0378a9e066ce037bec4b72bc" }
+end
+
 ActionController::Routing::Routes.draw do |map|
   map.connect '', :controller=>"facebook",:conditions=>{:canvas=>true}
   map.connect '', :controller=>"plain_old_rails"

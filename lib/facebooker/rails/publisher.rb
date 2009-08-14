@@ -101,8 +101,12 @@ module Facebooker
         @controller           = PublisherController.new(self)
       end
 
-      def default_url_options
+      def self.default_url_options
         {:host => Facebooker.canvas_server_base + Facebooker.facebook_path_prefix}
+      end
+
+      def default_url_options
+        self.class.default_url_options
       end
 
       # use facebook options everywhere
@@ -126,6 +130,13 @@ module Facebooker
           end
         end
         
+        def deactivate
+          Facebooker::Session.create.deactivate_template_bundle_by_id(self.bundle_id)
+          return true
+        rescue Facebooker::Session::TemplateBundleInvalid => e
+          return false
+        end
+
         
         
         class << self
@@ -134,6 +145,7 @@ module Facebooker
             publisher = setup_publisher(klass,method)            
             template_id = Facebooker::Session.create.register_template_bundle(publisher.one_line_story_templates,publisher.short_story_templates,publisher.full_story_template,publisher.action_links)
             template = find_or_initialize_by_template_name(template_name(klass,method))
+            template.deactivate if template.bundle_id  # deactivate old templates to avoid exceeding templates/app limit
             template.bundle_id = template_id
             template.content_hash = hashed_content(klass,method) if template.respond_to?(:content_hash)
             template.save!
@@ -162,12 +174,8 @@ module Facebooker
           
           def find_in_db(klass,method)
             template = find_by_template_name(template_name(klass,method))
-            if template and template.template_changed?(hashed_content(klass,method))
-              template.destroy
-              template = nil
-            end
             
-            if template.nil?
+            if template.nil? || template.template_changed?(hashed_content(klass, method))
               template = register(klass,method)
             end
             template
@@ -462,6 +470,13 @@ module Facebooker
       ActionController::Routing::Routes.named_routes.install(self.master_helper_module)
       include self.master_helper_module
       class <<self
+
+        def register_all_templates_on_all_applications
+          Facebooker.with_all_applications do
+            puts "Registering templates for #{Facebooker.api_key}"
+            register_all_templates
+          end
+        end
         
         def register_all_templates
           all_templates = instance_methods.grep(/_template$/) - %w(short_story_template full_story_template one_line_story_template) 

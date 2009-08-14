@@ -125,10 +125,6 @@ class PlainOldRailsController < ActionController::Base
   end
 end
 
-class Test::Unit::TestCase
-  include Facebooker::Rails::TestHelpers
-end
-
 
 # you can't use asset_recognize, because it can't pass parameters in to the requests
 class UrlRecognitionTests < Test::Unit::TestCase
@@ -332,6 +328,16 @@ class RailsIntegrationTest < Test::Unit::TestCase
     get :index, facebook_params('fb_sig_added' => "1")
     assert_equal(true, @controller.facebook_params['added'])
   end
+
+  def test_facebook_params_convert_added_to_boolean_false_when_already_false
+    get :index, facebook_params('fb_sig_added' => false)
+    assert_equal(false, @controller.facebook_params['added'])
+  end
+
+  def test_facebook_params_convert_added_to_boolean_true_when_already_true
+    get :index, facebook_params('fb_sig_added' => true)
+    assert_equal(true, @controller.facebook_params['added'])
+  end
   
   def test_facebook_params_convert_expirey_into_nil
     get :index, facebook_params(:fb_sig_expires => '0')
@@ -429,7 +435,7 @@ class RailsIntegrationTest < Test::Unit::TestCase
     setup_fb_connect_cookies
     get :index
     assert_equal(77777, @controller.facebook_session.user.id)
-    end
+  end
   
   def test_session_does_NOT_secure_with_expired_cookies
     setup_fb_connect_cookies(expired_cookie_hash_for_auth)
@@ -547,6 +553,23 @@ class RailsSignatureTest < Test::Unit::TestCase
     @response   = ActionController::TestResponse.new    
 
   end
+
+  if Rails.version < '2.3'
+  
+    def test_should_raise_on_bad_sig
+      begin
+        get :fb_params_test, facebook_params.merge('fb_sig' => 'incorrect')
+        fail "No IncorrectSignature raised"
+      rescue Facebooker::Session::IncorrectSignature=>e
+      end
+    end
+
+    def test_valid_signature
+      @controller.expects(:earliest_valid_session).returns(Time.at(1186588275.5988)-1)
+      get :fb_params_test, facebook_params 
+    end
+
+  end
   
   def test_should_raise_too_old_for_replayed_session
     begin
@@ -554,20 +577,6 @@ class RailsSignatureTest < Test::Unit::TestCase
       fail "No SignatureTooOld raised"
     rescue Facebooker::Session::SignatureTooOld=>e
     end
-  end
-  
-  def test_should_raise_on_bad_sig
-    begin
-      get :fb_params_test, facebook_params.merge('fb_sig' => 'incorrect')
-      fail "No IncorrectSignature raised"
-    rescue Facebooker::Session::IncorrectSignature=>e
-    end
-  end
-  
-  def test_valid_signature
-    @controller.expects(:earliest_valid_session).returns(Time.at(1186588275.5988)-1)
-    get :fb_params_test, facebook_params
-    
   end
   
 end
@@ -1072,13 +1081,17 @@ class RailsHelperTest < Test::Unit::TestCase
   def test_fb_logout_link
     assert_equal @h.fb_logout_link("Logout","My URL"),"<a href=\"#\" onclick=\"FB.Connect.logoutAndRedirect(&quot;My URL&quot;);; return false;\">Logout</a>"
   end
+
   def test_fb_user_action_with_literal_callback
     action = Facebooker::Rails::Publisher::UserAction.new
-    assert_equal @h.fb_user_action(action,"message","prompt","function() {alert('hi')}"),"FB.Connect.showFeedDialog(null, null, null, null, null, FB.RequireConnect.promptConnect, function() {alert('hi')}, \"prompt\", {\"value\": \"message\"});"
+    assert_equal "FB.Connect.showFeedDialog(null, null, null, null, null, FB.RequireConnect.promptConnect, function() {alert('hi')}, \"prompt\", #{{"value" => "message"}.to_json});",
+                 @h.fb_user_action(action,"message","prompt","function() {alert('hi')}")
   end
+
   def test_fb_user_action_with_nil_callback
     action = Facebooker::Rails::Publisher::UserAction.new
-    assert_equal @h.fb_user_action(action,"message","prompt"),"FB.Connect.showFeedDialog(null, null, null, null, null, FB.RequireConnect.promptConnect, null, \"prompt\", {\"value\": \"message\"});"
+    assert_equal "FB.Connect.showFeedDialog(null, null, null, null, null, FB.RequireConnect.promptConnect, null, \"prompt\", #{{"value" => "message"}.to_json});",
+                 @h.fb_user_action(action,"message","prompt")
   end
 
 

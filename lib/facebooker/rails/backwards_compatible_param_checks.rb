@@ -16,7 +16,7 @@ module Facebooker::Rails::BackwardsCompatibleParamChecks
     def zero_or_false( value )
       case value
         when String then
-          value == "0"
+          value.empty? || value == "0"
         when Numeric then
           value.to_f == 0.0
         when FalseClass then

@@ -205,10 +205,6 @@ module Facebooker
           end
         end
       end
-            
-      def blank?(value)
-        (value == '0' || value.nil? || value == '')        
-      end
 
       def verified_facebook_params
         facebook_sig_params = params.inject({}) do |collection, pair|
@@ -229,12 +225,11 @@ module Facebooker
       
       def verify_signature(facebook_sig_params,expected_signature)
         # Don't verify the signature if rack has already done so.
-        if ::Rails.version >= "2.3"
-          return if ActionController::Dispatcher.middleware.include? Rack::Facebook
+        unless ::Rails.version >= "2.3" and ActionController::Dispatcher.middleware.include? Rack::Facebook
+          raw_string = facebook_sig_params.map{ |*args| args.join('=') }.sort.join
+          actual_sig = Digest::MD5.hexdigest([raw_string, Facebooker::Session.secret_key].join)
+          raise Facebooker::Session::IncorrectSignature if actual_sig != expected_signature
         end
-        raw_string = facebook_sig_params.map{ |*args| args.join('=') }.sort.join
-        actual_sig = Digest::MD5.hexdigest([raw_string, Facebooker::Session.secret_key].join)
-        raise Facebooker::Session::IncorrectSignature if actual_sig != expected_signature
         raise Facebooker::Session::SignatureTooOld if facebook_sig_params['time'] && Time.at(facebook_sig_params['time'].to_f) < earliest_valid_session
         true
       end
@@ -243,11 +238,11 @@ module Facebooker
         @facebook_parameter_conversions ||= Hash.new do |hash, key| 
           lambda{|value| value}
         end.merge(
-          'time' => lambda{|value| Time.at(value.to_f)},
-          'in_canvas' => lambda{|value| !blank?(value)},
-          'added' => lambda{|value| !blank?(value)},
-          'expires' => lambda{|value| blank?(value) ? nil : Time.at(value.to_f)},
-          'friends' => lambda{|value| value.split(/,/)}
+          'time'      => lambda{|value| Time.at(value.to_f)},
+          'in_canvas' => lambda{|value| one_or_true(value)},
+          'added'     => lambda{|value| one_or_true(value)},
+          'expires'   => lambda{|value| zero_or_false(value) ? nil : Time.at(value.to_f)},
+          'friends'   => lambda{|value| value.split(/,/)}
         )
       end
       
