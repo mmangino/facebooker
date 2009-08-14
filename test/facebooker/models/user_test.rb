@@ -137,7 +137,7 @@ class Facebooker::UserTest < Test::Unit::TestCase
   end
   def test_publish_to_converts_attachment_to_json
     @user = Facebooker::User.new(548871286, @session)
-    @user.session.expects(:post).with("facebook.stream.publish",has_entry(:attachment=>instance_of(String)))
+    @user.session.expects(:post).with("facebook.stream.publish",has_entry(:attachment=>instance_of(String)),false)
     @user.publish_to(@other_user, :message => 'i love you man',:attachment=>{:a=>"b"})
   end
 

@@ -5,6 +5,7 @@ module Facebooker
         
         def fb_connect_javascript_tag(options = {})
           lang = "/#{options[:lang]}" if options[:lang]
+          # dont use the javascript_include_tag helper since it adds a .js at the end
           if request.ssl?
             "<script src=\"https://www.connect.facebook.com/js/api_lib/v0.4/FeatureLoader.js.php#{lang}\" type=\"text/javascript\"></script>"
           else
