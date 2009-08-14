@@ -38,6 +38,7 @@ generators/facebook_scaffold/templates/view_new.html.erb
 generators/facebook_scaffold/templates/view_show.fbml.erb
 generators/facebook_scaffold/templates/view_show.html.erb
 generators/publisher/publisher_generator.rb
+generators/xd_receiver/templates/xd_receiver_ssl.html
 generators/xd_receiver/templates/xd_receiver.html
 generators/xd_receiver/xd_receiver_generator.rb
 init.rb
