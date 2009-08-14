@@ -28,21 +28,25 @@ HOE = Hoe.spec('facebooker') do
   self.extra_rdoc_files  = FileList['*.rdoc']
 end
 
-require 'rcov/rcovtask'
+begin
+  require 'rcov/rcovtask'
 
-namespace :test do
-  namespace :coverage do
-    desc "Delete aggregate coverage data."
-    task(:clean) { rm_f "coverage.data" }
+  namespace :test do
+    namespace :coverage do
+      desc "Delete aggregate coverage data."
+      task(:clean) { rm_f "coverage.data" }
+    end
+    desc 'Aggregate code coverage for unit, functional and integration tests'
+    Rcov::RcovTask.new(:coverage) do |t|
+      t.libs << "test"
+      t.test_files = FileList["test/**/*_test.rb"]
+      t.output_dir = "coverage/"
+      t.verbose = true
+      t.rcov_opts = ['--exclude', 'test,/usr/lib/ruby,/Library/Ruby,/System/Library', '--sort', 'coverage']
+    end
   end
-  desc 'Aggregate code coverage for unit, functional and integration tests'
-  Rcov::RcovTask.new(:coverage) do |t|
-    t.libs << "test"
-    t.test_files = FileList["test/**/*_test.rb"]
-    t.output_dir = "coverage/"
-    t.verbose = true
-    t.rcov_opts = ['--exclude', 'test,/usr/lib/ruby,/Library/Ruby,/System/Library', '--sort', 'coverage']
-  end
+rescue LoadError
+  $stderr.puts "Install the rcov gem to enable test coverage analysis"
 end
 
 namespace :gem do
