@@ -1,6 +1,6 @@
 module Facebooker
   class BatchRequest
-    instance_methods.each { |m| undef_method m unless m =~ /(^__|^nil\?$|^send$|proxy_|^respond_to\?$|^new$)/ }
+    instance_methods.each { |m| undef_method m unless m =~ /(^__|^nil\?$|^send$|proxy_|^respond_to\?$|^new|object_id$)/ }
     attr_reader :uri
     attr_reader :method
     class UnexecutedRequest < StandardError; end
