@@ -44,6 +44,10 @@ module Facebooker
     def install_url_base
       "http://#{www_server_base_url}/install.php?api_key=#{api_key}&v=1.0"
     end
+
+    def permission_url_base
+      "http://#{www_server_base_url}/connect/prompt_permissions.php?api_key=#{api_key}&v=1.0"
+    end
     
   end
   

@@ -22,6 +22,12 @@ class Facebooker::SessionTest < Test::Unit::TestCase
     assert_equal("http://www.facebook.com/install.php?api_key=1234567&v=1.0&next=next_url%3Fa%3D1%26b%3D2", session.install_url(:next => "next_url?a=1&b=2"))
   end
 
+  def test_permission_url_returns_correct_url_and_parameters
+    fb_url = "http://www.facebook.com/connect/prompt_permissions.php?api_key=#{ENV['FACEBOOK_API_KEY']}&v=1.0&ext_perm=publish_stream,email&next=next_url"
+    url = Facebooker::Session.new(ENV['FACEBOOK_API_KEY'], ENV['FACEBOOK_SECRET_KEY']).permission_url('publish_stream,email', {:next => 'next_url'})
+    assert_equal url, fb_url
+  end
+
   def test_can_get_api_and_secret_key_from_environment
     assert_equal('1234567', Facebooker::Session.api_key)
     assert_equal('7654321', Facebooker::Session.secret_key)

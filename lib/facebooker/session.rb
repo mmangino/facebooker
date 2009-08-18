@@ -122,7 +122,9 @@ module Facebooker
     # * sms
     def permission_url(permission,options={})
       options = default_login_url_options.merge(options)
-      "http://#{Facebooker.www_server_base_url}/authorize.php?api_key=#{@api_key}&v=1.0&ext_perm=#{permission}#{install_url_optional_parameters(options)}"
+      options << "&ext_perm=permission"
+      options = add_next_parameters(options)
+      "#{Facebooker.permission_url_base}#{options.join}"
     end
 
     def install_url_optional_parameters(options)
