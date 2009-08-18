@@ -122,8 +122,8 @@ module Facebooker
     # * sms
     def permission_url(permission,options={})
       options = default_login_url_options.merge(options)
-      options << "&ext_perm=permission"
       options = add_next_parameters(options)
+      options << "&ext_perm=#{permission}"
       "#{Facebooker.permission_url_base}#{options.join}"
     end
 
