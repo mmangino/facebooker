@@ -451,10 +451,10 @@ module Facebooker
       def facebook_messages
         message=""
         unless flash[:notice].blank?
-          message += fb_success(flash[:notice])
+          message += fb_success(*flash[:notice])
         end
         unless flash[:error].blank?
-          message += fb_error(flash[:error])
+          message += fb_error(*flash[:error])
         end
         message
       end
