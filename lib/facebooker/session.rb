@@ -352,8 +352,7 @@ module Facebooker
         raise ArgumentError, "Can't get a photo without a picture, album or subject ID" 
       end
       # We have to normalize params orherwise FB complain about signature
-      params = {:pids => pids, :subj_id => subj_id, :aid => aid}
-      params = params.inject({}) {|p,pair| p[pair[0]] = pair[1] unless pair[1].nil?; p }
+      params = {:pids => pids, :subj_id => subj_id, :aid => aid}.delete_if { |k,v| v.nil? }
       @photos = post('facebook.photos.get', params ) do |response|
         response.map do |hash|
           Photo.from_hash(hash)
