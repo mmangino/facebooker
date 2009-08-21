@@ -147,6 +147,8 @@ module Facebooker
       optional_parameters << "&skipcookie=true" if options[:skip_cookie]
       optional_parameters << "&hide_checkbox=true" if options[:hide_checkbox]
       optional_parameters << "&canvas=true" if options[:canvas]
+      optional_parameters << "&fbconnect=true" if options[:fbconnect]
+      optional_parameters << "&req_perms=#{options[:req_perms]}" if options[:req_perms]
       optional_parameters.join
     end
 

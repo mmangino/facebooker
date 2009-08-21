@@ -23,9 +23,30 @@ class Facebooker::SessionTest < Test::Unit::TestCase
   end
 
   def test_permission_url_returns_correct_url_and_parameters
-    fb_url = "http://www.facebook.com/connect/prompt_permissions.php?api_key=#{ENV['FACEBOOK_API_KEY']}&v=1.0&ext_perm=publish_stream,email&next=next_url"
+    fb_url = "http://www.facebook.com/connect/prompt_permissions.php?api_key=#{ENV['FACEBOOK_API_KEY']}&v=1.0&next=next_url&ext_perm=publish_stream,email"
     url = Facebooker::Session.new(ENV['FACEBOOK_API_KEY'], ENV['FACEBOOK_SECRET_KEY']).permission_url('publish_stream,email', {:next => 'next_url'})
     assert_equal url, fb_url
+  end
+
+  def test_login_url_skips_all_parameters_when_not_passed_or_false
+    session = Facebooker::Session.new(ENV['FACEBOOK_API_KEY'], ENV['FACEBOOK_SECRET_KEY'])
+    url = session.login_url({:fbconnect => false})
+    expected_url = Facebooker.login_url_base
+    assert_equal url, expected_url
+  end
+
+  def test_login_url_adds_all_parameters_when_passed
+    login_options = {:skipcookie => true,
+                     :hide_checkbox => true,
+                     :canvas => true,
+                     :fbconnect => true,
+                     :req_perms => 'publish_stream',
+                     :next => 'http://example.com'}
+
+    session = Facebooker::Session.new(ENV['FACEBOOK_API_KEY'], ENV['FACEBOOK_SECRET_KEY'])
+    url = session.login_url(login_options)
+    expected_url = "#{Facebooker.login_url_base}&next=#{CGI.escape(login_options[:next])}&hide_checkbox=true&canvas=true&fbconnect=true&req_perms=publish_stream"
+    assert_equal url, expected_url
   end
 
   def test_can_get_api_and_secret_key_from_environment
