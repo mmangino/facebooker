@@ -254,6 +254,12 @@ class Facebooker::UserTest < Test::Unit::TestCase
     assert_equal "http://www.facebook.com/profile.php?id=8055", @user.profile_url
   end
 
+  def test_can_rsvp_to_event
+    expect_http_posts_with_responses(example_events_rsvp_xml)
+    result = @user.rsvp_event(1000, 'attending')
+    assert result
+  end
+
   private
   def example_profile_photos_get_xml
     "<?xml version=\"1.0\" encoding=\"UTF-8\"?>

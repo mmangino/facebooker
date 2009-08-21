@@ -63,7 +63,17 @@ module Facebooker
       @events[params.to_s] ||= @session.post('facebook.events.get', {:uid => self.id}.merge(params)).map do |event|
         Event.from_hash(event)
       end
-    end    
+    end
+
+    # Rsvp to an event with the eid and rsvp_status which can be 'attending', 'unsure', or 'declined'.
+    # http://wiki.developers.facebook.com/index.php/Events.rsvp
+    # E.g:
+    #  @user.rsvp_event('100321123', 'attending')
+    #  # => Returns true if all went well
+    def rsvp_event(eid, rsvp_status, options = {})
+      result = @session.post('facebook.events.rsvp', options.merge(:eid => eid, :rsvp_status => rsvp_status))
+      result == '1' ? true : false
+    end
     
     # 
     # Set the list of friends, given an array of User objects.  If the list has been retrieved previously, will not set

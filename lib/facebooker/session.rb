@@ -273,6 +273,23 @@ module Facebooker
       end
     end
 
+    # Creates an event with the event_info hash and an optional Net::HTTP::MultipartPostFile for the event picture
+    # Returns the eid of the newly created event
+    # http://wiki.developers.facebook.com/index.php/Events.create
+    def create_event(event_info, multipart_post_file = nil)
+      post_file('facebook.events.create', :event_info => event_info.to_json, nil => multipart_post_file)
+    end
+    
+    # Cancel an event
+    # http://wiki.developers.facebook.com/index.php/Events.cancel
+    # E.g:
+    #  @session.cancel_event('100321123', :cancel_message => "It's raining...")
+    #  # => Returns true if all went well
+    def cancel_event(eid, options = {})
+      result = post('facebook.events.cancel', options.merge(:eid => eid))
+      result == '1' ? true : false
+    end
+
     def event_members(eid)
       @members ||= post('facebook.events.getMembers', :eid => eid) do |response|
         response.map do |attendee_hash|
