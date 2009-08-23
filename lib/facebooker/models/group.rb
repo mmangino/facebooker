@@ -8,7 +8,7 @@ module Facebooker
       attr_accessor :position, :gid, :uid
     end
     include Model
-    attr_accessor :pic, :pic_small, :pic_big, :name, :creator, :recent_news, :update_time, :group_subtype, :group_type, :website, :office, :description, :venue, :nid
+    attr_accessor :pic, :pic_small, :pic_big, :name, :creator, :recent_news, :update_time, :group_subtype, :group_type, :website, :office, :description, :venue, :nid, :privacy
 
     id_is :gid
 
