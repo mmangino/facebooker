@@ -529,7 +529,7 @@ module Facebooker
           args.each do |arg|
             case arg
             when Symbol,String
-              add_template_helper("#{arg.to_s.classify}Helper".constantize)
+              add_template_helper("#{arg.to_s.camelcase}Helper".constantize)
             when Module
               add_template_helper(arg)
             end
