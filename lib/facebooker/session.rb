@@ -445,6 +445,10 @@ module Facebooker
       post("facebook.feed.deactivateTemplateBundleByID", {:template_bundle_id => template_bundle_id.to_s}, false)
     end
 
+    def active_template_bundles
+      post("facebook.feed.getRegisteredTemplateBundles",{},false)
+    end
+
     ##
     # publish a previously rendered template bundle
     # see http://wiki.developers.facebook.com/index.php/Feed.publishUserAction

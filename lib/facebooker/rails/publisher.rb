@@ -487,6 +487,15 @@ module Facebooker
           end
         end
         
+        def unregister_inactive_templates
+          session = Facebooker::Session.create
+          active_template_ids = FacebookTemplate.all.map(&:bundle_id)
+          all_template_ids = session.active_template_bundles.map {|t| t["template_bundle_id"]}
+          (all_template_ids - active_template_ids).each do |template_bundle_id|
+            session.deactivate_template_bundle_by_id(template_bundle_id)
+          end
+        end
+        
         def method_missing(name,*args)
           should_send = false
           method = ''
