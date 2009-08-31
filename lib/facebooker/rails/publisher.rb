@@ -4,7 +4,7 @@ module Facebooker
     # 
     # To use, create a subclass and define methods
     # Each method should start by calling send_as to specify the type of message
-    # Valid options are  :email and :notification, :user_action, :profile, :ref
+    # Valid options are  :email and :notification, :user_action, :profile, :ref, :publish_stream
     # 
     #
     # Below is an example of each type
@@ -77,6 +77,16 @@ module Facebooker
     #       fbml render(:file=>"users/profile",:assigns=>{:user=>user_to_update})
     #       handle "a_ref_handle"
     #   end
+    #
+    #     #  Publish a post into the stream on the user's Wall and News Feed.
+    #     def publish_stream(user_with_session_to_use, user_to_update, params)
+    #       send_as :publish_stream
+    #       from  user_with_session_to_use
+    #       target user_to_update
+    #       attachment params[:attachment]
+    #       message params[:message]
+    #       action_links params[:action_links]
+    #     end
     #
     #
     # To send a message, use ActionMailer like semantics
@@ -250,6 +260,13 @@ module Facebooker
         end
       end
 
+      class PublishStream
+        attr_accessor :target
+        attr_accessor :attachment
+        attr_accessor :action_links
+        attr_accessor :message
+      end
+
       cattr_accessor :ignore_errors
       attr_accessor :_body
 
@@ -288,6 +305,8 @@ module Facebooker
           Ref.new
         when :user_action
           UserAction.new
+        when :publish_stream
+          PublishStream.new
         else
           raise UnknownBodyType.new("Unknown type to publish")
         end
@@ -399,6 +418,8 @@ module Facebooker
           Facebooker::Session.create.server_cache.set_ref_handle(_body.handle,_body.fbml)
         when UserAction
           @from.session.publish_user_action(_body.template_id,_body.data_hash,_body.target_ids,_body.body_general,_body.story_size)
+        when PublishStream
+         @from.publish_to(_body.target, {:attachment => _body.attachment, :action_links => @action_links, :message => _body.message })
         else
           raise UnspecifiedBodyType.new("You must specify a valid send_as")
         end

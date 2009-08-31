@@ -137,6 +137,23 @@ class TestPublisher < Facebooker::Rails::Publisher
     recipients to
   end
 
+  def publish_post_to_own_stream(user)
+    send_as :publish_stream
+    from  user
+    target user
+    attachment({:name => "Facebooker", :href => "http://www.exampple.com"})
+    message "Posting post to own stream"
+    action_links([{:text => "Action Link", :href => "http://www.example.com/action_link"}])
+  end
+
+  def publish_post_to_friends_stream(from, to)
+    send_as :publish_stream
+    from  from
+    target to
+    attachment({:name => "Facebooker", :href => "http://www.exampple.com"})
+    message "Posting post to friends stream"
+    action_links([{:text => "Action Link", :href => "http://www.example.com/action_link"}])
+  end
 end
 
 class Facebooker::Rails::Publisher::FacebookTemplateTest < Test::Unit::TestCase
@@ -413,6 +430,20 @@ class Facebooker::Rails::Publisher::PublisherTest < Test::Unit::TestCase
     }
   end
 
+  def test_publish_post_to_own_stream
+    @user = Facebooker::User.new
+    @user.expects(:publish_to).with(@user, has_entry(:attachment=>instance_of(Hash)))
+
+    TestPublisher.deliver_publish_post_to_own_stream(@user)
+  end
+
+  def test_publish_post_to_friends_stream
+    @from_user = Facebooker::User.new
+    @to_user = Facebooker::User.new
+    @from_user.expects(:publish_to).with(@to_user, has_entry(:action_links=>instance_of(Array)))
+
+    TestPublisher.deliver_publish_post_to_friends_stream(@from_user, @to_user)
+  end
 
   def test_keeps_class_method_missing
     assert_raises(NoMethodError) {
