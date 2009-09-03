@@ -137,20 +137,24 @@ module Facebooker
     #     :text => 'my website',
     #     :href => 'http://tenderlovemaking.com/'
     #   ])
-    def publish_to target, options = {}
-      
-      attachment = options[:attachment]
-      links = options[:action_links]
-      @session.post('facebook.stream.publish',
-                    { :uid        => self.id,
-                      :target_id  => target.id,
-                      :message    => options[:message],
-                      :attachment => attachment && Facebooker.json_encode(attachment),
-                      :action_links => links && Facebooker.json_encode(links) }, 
-                    false
-                   )
+    def publish_to(target, options = {})
+      @session.post('facebook.stream.publish', prepare_publish_to_options(target, options), false)
     end
-    
+   
+    # Prepares options for the stream.publish
+    def prepare_publish_to_options(target, options)
+      opts = {:uid          => self.id,
+              :target_id    => target.id,
+              :message      => options[:message]} 
+
+      if(attachment = options[:attachment] && Facebooker.json_encode(options[:attachment]))
+        opts[:attachment] = attachment
+      end
+      if (links = options[:action_links] && Facebooker.json_encode(options[:action_links]))
+        opts[:action_links] = links
+      end
+      opts
+    end
     
     ###
     # Publish a comment on a post

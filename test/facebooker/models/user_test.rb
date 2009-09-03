@@ -130,6 +130,14 @@ class Facebooker::UserTest < Test::Unit::TestCase
     assert_equal "2357384227378429949", photos.first.aid
   end
 
+  def test_prepare_publish_to_options_pass_only_neccessary_parameters
+    options = @user.prepare_publish_to_options(@user, {:message => 'Hey there', :action_links => [:text => 'Link', :href => 'http://example.com']})
+    assert_equal(options[:uid], @user.uid)
+    assert_equal(options[:target_id], @user.id)
+    assert_equal(options[:message], 'Hey there')
+    assert_nil(options[:attachment])
+    assert_equal(options[:action_links], [:text => 'Link', :href => 'http://example.com'].to_json )
+  end
   def test_publish_to
     @user = Facebooker::User.new(548871286, @session)
     expect_http_posts_with_responses(example_profile_publish_to_get_xml)
