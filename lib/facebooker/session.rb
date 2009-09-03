@@ -127,6 +127,13 @@ module Facebooker
       "#{Facebooker.permission_url_base}#{options.join}"
     end
 
+    def connect_permission_url(permission,options={})
+      options = default_login_url_options.merge(options)
+      options = add_next_parameters(options)
+      options << "&ext_perm=#{permission}"
+      "#{Facebooker.connect_permission_url_base}#{options.join}"
+    end
+
     def install_url_optional_parameters(options)
       optional_parameters = []      
       optional_parameters += add_next_parameters(options)

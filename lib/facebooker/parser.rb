@@ -459,6 +459,12 @@ module Facebooker
       array_of_hashes(element('data_getCookie_response', data), 'cookies')
     end
   end
+  
+  class EventsRsvp < Parser#:nodoc:
+     def self.process(data)
+       element('events_rsvp_response', data).content.strip
+     end
+   end
 
   class EventsGet < Parser#:nodoc:
     def self.process(data)
@@ -662,6 +668,7 @@ module Facebooker
       'facebook.stream.publish' => StreamPublish,
       'facebook.stream.addComment' => StreamAddComment,      
       'facebook.events.get' => EventsGet,
+      'facebook.events.rsvp' => EventsRsvp,
       'facebook.groups.get' => GroupsGet,
       'facebook.events.getMembers' => EventMembersGet,
       'facebook.groups.getMembers' => GroupGetMembers,

@@ -24,7 +24,7 @@ class Facebooker::SessionTest < Test::Unit::TestCase
 
   def test_permission_url_returns_correct_url_and_parameters
     fb_url = "http://www.facebook.com/connect/prompt_permissions.php?api_key=#{ENV['FACEBOOK_API_KEY']}&v=1.0&next=next_url&ext_perm=publish_stream,email"
-    url = Facebooker::Session.new(ENV['FACEBOOK_API_KEY'], ENV['FACEBOOK_SECRET_KEY']).permission_url('publish_stream,email', {:next => 'next_url'})
+    url = Facebooker::Session.new(ENV['FACEBOOK_API_KEY'], ENV['FACEBOOK_SECRET_KEY']).connect_permission_url('publish_stream,email', {:next => 'next_url'})
     assert_equal url, fb_url
   end
 

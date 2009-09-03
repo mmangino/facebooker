@@ -377,4 +377,13 @@ class Facebooker::UserTest < Test::Unit::TestCase
 <stream_addComment_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd">703826862_78463536863</stream_addComment_response>
     eoxml
   end  
+  
+  def example_events_rsvp_xml
+      <<-E
+      <?xml version="1.0" encoding="UTF-8"?>
+      <events_rsvp_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+          xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd">1
+      </events_rsvp_response>
+    E
+  end
 end
