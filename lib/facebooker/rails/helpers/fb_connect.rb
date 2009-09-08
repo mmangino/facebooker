@@ -33,9 +33,9 @@ module Facebooker
           end
 
           if request.ssl?
-            init_string = "FB.Facebook.init('#{Facebooker.api_key}','/xd_receiver_ssl.html', #{options[:app_settings]});"
+            init_string = "FB.init('#{Facebooker.api_key}','/xd_receiver_ssl.html', #{options[:app_settings]});"
           else
-            init_string = "FB.Facebook.init('#{Facebooker.api_key}','/xd_receiver.html', #{options[:app_settings]});"
+            init_string = "FB.init('#{Facebooker.api_key}','/xd_receiver.html', #{options[:app_settings]});"
           end
           unless required_features.blank?
              init_string = <<-FBML
