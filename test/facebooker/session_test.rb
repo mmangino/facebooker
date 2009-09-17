@@ -157,6 +157,13 @@ class Facebooker::SessionTest < Test::Unit::TestCase
     assert_equal(["1240077", "222332", "222333", "222335", "222336"], event_attendances.map{|ea| ea.uid}.sort)
     assert_equal 5, event_attendances.size
   end
+  
+  def test_can_create_events
+    mock_http = establish_session
+    mock_http.should_receive(:post_multipart_form).and_return(example_event_create_xml).once
+    event_id = @session.create_event(:name => 'foo', :category => 'bar')
+    assert_equal '34444349712', event_id
+  end
 
   def test_can_query_for_events
     expect_http_posts_with_responses(example_events_get_xml)
@@ -431,6 +438,15 @@ XML
     </groups_get_response>
     XML
   end
+  
+  def example_event_create_xml
+    <<-XML
+    <?xml version="1.0" encoding="UTF-8"?>
+    <events_create_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd">
+      34444349712
+    </events_create_response> 
+    XML
+  end
 
   def example_events_get_xml
     <<-XML
@@ -690,6 +706,7 @@ XML
     </users_getStandardInfo_response>
     XML
   end
+  
 end
 
 
