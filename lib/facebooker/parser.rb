@@ -471,6 +471,12 @@ module Facebooker
       element('events_create_response', data).content.strip
     end
   end
+  
+  class EventsCancel < Parser#:nodoc:
+    def self.process(data)
+      element('events_cancel_response', data).content.strip
+    end
+  end
 
   class EventsGet < Parser#:nodoc:
     def self.process(data)
@@ -674,6 +680,7 @@ module Facebooker
       'facebook.stream.publish' => StreamPublish,
       'facebook.stream.addComment' => StreamAddComment,
       'facebook.events.create' => EventsCreate,
+      'facebook.events.cancel' => EventsCancel,
       'facebook.events.get' => EventsGet,
       'facebook.events.rsvp' => EventsRsvp,
       'facebook.groups.get' => GroupsGet,
