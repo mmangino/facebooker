@@ -7,6 +7,7 @@ module Facebooker
       @api_key = api_key
     end
 
+    @active_service = nil
     def self.active_service
       unless @active_service
         if Facebooker.use_curl?
