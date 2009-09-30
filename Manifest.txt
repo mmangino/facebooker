@@ -63,6 +63,7 @@ lib/facebooker/models/applicationrestrictions.rb
 lib/facebooker/models/cookie.rb
 lib/facebooker/models/education_info.rb
 lib/facebooker/models/event.rb
+lib/facebooker/models/family_relative_info.rb
 lib/facebooker/models/friend_list.rb
 lib/facebooker/models/group.rb
 lib/facebooker/models/info_item.rb
