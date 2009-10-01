@@ -191,6 +191,15 @@ class Facebooker::SessionTest < Test::Unit::TestCase
     events = @session.events
     assert_equal 'Technology Tasting', events.first.name
   end
+  
+  def test_query_for_events_caching_honors_params
+    @session.expects(:post).returns([{:eid=>1}])
+    assert_equal 1, @session.events.first[:eid]
+    @session.expects(:post).returns([{:eid=>2}])
+    assert_equal 2,@session.events(:start_time=>1.day.ago).first[:eid]
+    @session.expects(:post).never
+    assert_equal 1,@session.events.first[:eid]
+  end
 
   def test_can_query_for_groups
     expect_http_posts_with_responses(example_groups_get_xml)
