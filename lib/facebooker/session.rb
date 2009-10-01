@@ -227,6 +227,8 @@ module Facebooker
         Page.from_hash(hash)
       when 'group'
         Group.from_hash(hash)
+      when 'event'
+        Event.from_hash(hash)
       when 'event_member'
         Event::Attendance.from_hash(hash)
       else
