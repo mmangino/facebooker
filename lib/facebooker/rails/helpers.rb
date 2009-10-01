@@ -25,7 +25,7 @@ module Facebooker
       end
       
       def fbjs_library
-        "<script>var _token = '#{form_authenticity_token}';var _hostname = '#{@controller.asset_host}'</script>"+
+        "<script>var _token = '#{form_authenticity_token}';var _hostname = '#{ActionController::Base.asset_host}'</script>"+
         "#{javascript_include_tag 'facebooker'}"
       end
       

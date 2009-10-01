@@ -864,6 +864,11 @@ class RailsHelperTest < Test::Unit::TestCase
       (@h.fb_multi_friend_request("invite","ignored","action") {})
   end
   
+  def test_fbjs_library
+    @h.expects(:form_authenticity_token).returns('form_token')
+    assert_equal "<script>var _token = 'form_token';var _hostname = 'http://facebook.host.com'</script><script src=\"http://facebook.host.com/javascripts/facebooker.js\" type=\"text/javascript\"></script>", @h.fbjs_library
+  end
+  
   def test_fb_dialog
     @h.expects(:capture).returns("dialog content")
     @h.fb_dialog( "my_dialog", "1" ) do
