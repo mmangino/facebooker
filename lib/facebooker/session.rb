@@ -277,7 +277,8 @@ module Facebooker
     # :end_time => Filter with this UTC as upper bound. A missing or zero parameter indicates no upper bound. (Time or Integer)
     # :rsvp_status => Filter by this RSVP status.
     def events(options = {})
-      @events ||= post('facebook.events.get', options) do |response|
+      @events ||= {}
+      @events[options.to_s] ||= post('facebook.events.get', options) do |response|
         response.map do |hash|
           Event.from_hash(hash)
         end
