@@ -303,7 +303,8 @@ module Facebooker
     end
 
     def event_members(eid)
-      @members ||= post('facebook.events.getMembers', :eid => eid) do |response|
+      @members ||= {}
+      @members[eid] ||= post('facebook.events.getMembers', :eid => eid) do |response|
         response.map do |attendee_hash|
           Event::Attendance.from_hash(attendee_hash)
         end

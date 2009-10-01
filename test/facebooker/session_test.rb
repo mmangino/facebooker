@@ -174,6 +174,15 @@ class Facebooker::SessionTest < Test::Unit::TestCase
     assert_equal 5, event_attendances.size
   end
   
+  def test_query_for_event_members_caching_honors_params
+    @session.expects(:post).returns(["1"])
+    assert_equal ["1"], @session.event_members(100)
+    @session.expects(:post).returns(["2"])
+    assert_equal ["2"],@session.event_members(200)
+    @session.expects(:post).never
+    assert_equal ["1"],@session.event_members(100)
+  end
+  
   def test_can_create_events
     mock_http = establish_session
     mock_http.should_receive(:post_multipart_form).and_return(example_event_create_xml).once
