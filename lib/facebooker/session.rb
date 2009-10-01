@@ -219,6 +219,8 @@ module Facebooker
         user
       when 'photo'
         Photo.from_hash(hash)
+      when 'album'
+        Album.from_hash(hash)
       when 'page'
         Page.from_hash(hash)
       when 'page_admin'

@@ -148,6 +148,14 @@ class Facebooker::SessionTest < Test::Unit::TestCase
     assert_kind_of(Facebooker::Event::Attendance, response.first)
     assert_equal('attending', response.first.rsvp_status)
   end
+  
+  def test_can_fql_query_for_albums
+    @session = Facebooker::Session.create(ENV['FACEBOOK_API_KEY'], ENV['FACEBOOK_SECRET_KEY'])
+    expect_http_posts_with_responses(example_fql_query_albums_xml)
+    response = @session.fql_query("DOES NOT REALLY MATTER FOR TEST")
+    assert_kind_of(Facebooker::Album, response.first)
+    assert_equal('Films you will never see', response.first.name)
+  end
 
   def test_can_query_for_event_members
     expect_http_posts_with_responses(example_event_members_xml)
@@ -510,6 +518,29 @@ XML
     </fql_query_response>
     XML
   end
+  
+  def example_fql_query_albums_xml
+    <<-XML
+    <?xml version="1.0" encoding="UTF-8"?>
+    <fql_query_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd" list="true">
+      <album>
+        <aid>34595963571485</aid>
+        <cover_pid>34595991612812</cover_pid>
+        <owner>8055</owner>
+        <name>Films you will never see</name>
+        <created>1132553109</created>
+        <modified>1132553363</modified>
+        <description>No I will not make out with you</description>
+        <location>York, PA</location>
+        <link>http://www.facebook.com/album.php?aid=2002205&id=8055</link>
+        <size>30</size>
+        <visible>friends</visible>
+        <modified_major>1241834423</modified_major>
+      </album>
+    </fql_query_response>
+    XML
+  end
+  
   def example_check_friendship_xml
     <<-XML
     <?xml version="1.0" encoding="UTF-8"?>
@@ -579,7 +610,7 @@ XML
     </fql_query_response>
     XML
   end
-
+  
   def example_fql_for_multiple_photos_with_anon_xml
     <<-XML
     <?xml version="1.0" encoding="UTF-8"?>
