@@ -149,6 +149,14 @@ class Facebooker::SessionTest < Test::Unit::TestCase
     assert_equal('attending', response.first.rsvp_status)
   end
   
+  def test_can_fql_query_for_events
+    @session = Facebooker::Session.create(ENV['FACEBOOK_API_KEY'], ENV['FACEBOOK_SECRET_KEY'])
+    expect_http_posts_with_responses(example_fql_query_events_xml)
+    response = @session.fql_query("DOES NOT REALLY MATTER FOR TEST")
+    assert_kind_of(Facebooker::Event, response.first)
+    assert_equal('Technology Tasting', response.first.name)
+  end
+  
   def test_can_fql_query_for_albums
     @session = Facebooker::Session.create(ENV['FACEBOOK_API_KEY'], ENV['FACEBOOK_SECRET_KEY'])
     expect_http_posts_with_responses(example_fql_query_albums_xml)
@@ -515,6 +523,38 @@ XML
         <eid>2454827764</eid>
         <rsvp_status>declined</rsvp_status>
       </event_member>
+    </fql_query_response>
+    XML
+  end
+  
+  def example_fql_query_events_xml
+    <<-XML
+    <?xml version="1.0" encoding="UTF-8"?>
+    <fql_query_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd" list="true">
+      <event>
+        <eid>1037629024</eid>
+        <name>Technology Tasting</name>
+        <tagline>Who said Engineering can't be delicious?</tagline>
+        <nid>12409987</nid>
+        <pic>http://photos-628.facebook.com/ip006/object/1345/48/s1037629024_30775.jpg</pic>
+        <pic_big>http://photos-628.facebook.com/ip006/object/1345/48/n1037629024_30775.jpg</pic_big>
+        <pic_small>http://photos-628.facebook.com/ip006/object/1345/48/t1037629024_30775.jpg</pic_small>
+        <host>Facebook</host>
+        <description>Facebook will be hosting technology thought leaders and avid software engineers for a social evening of technology tasting. We invite you to connect with some of our newest technologies and innovative people over hors d'oeuvres and wine. Come share ideas, ask questions, and challenge existing technology paradigms in the spirit of the open source community.</description>
+        <event_type>Party</event_type>
+        <event_subtype>Cocktail Party</event_subtype>
+        <start_time>1172107800</start_time>
+        <end_time>1172115000</end_time>
+        <creator>1078</creator>
+        <update_time>1170096157</update_time>
+        <location>Facebook's New Office</location>
+        <venue>
+          <street>156 University Ave.</street>
+          <city>Palo Alto</city>
+          <state>CA</state>
+          <country>United States</country>
+        </venue>
+      </event> 
     </fql_query_response>
     XML
   end
