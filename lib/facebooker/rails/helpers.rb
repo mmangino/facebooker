@@ -24,6 +24,11 @@ module Facebooker
         end
       end
       
+      def fbjs_library
+        "<script>var _token = '#{form_authenticity_token}';var _hostname = '#{@controller.asset_host}'</script>"+
+        "#{javascript_include_tag 'facebooker'}"
+      end
+      
       def fb_iframe(src, options = {})
         content_tag "fb:iframe", '', options.merge({ :src => src })
       end
