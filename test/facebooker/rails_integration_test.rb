@@ -230,23 +230,28 @@ class RailsIntegrationTestForExtendedPermissions < Test::Unit::TestCase
     assert_equal("<fb:redirect url=\"http://www.facebook.com/authorize.php?api_key=1234567&v=1.0&ext_perm=status_update\" />", @response.body)
   end
   def test_redirects_without_photo_upload
-    post :index, facebook_params(:fb_sig_ext_perms=>"status_update")
+    post :index, facebook_params(:fb_sig_ext_perms=>"status_update,create_event")
     assert_response :success
     assert_equal("<fb:redirect url=\"http://www.facebook.com/authorize.php?api_key=1234567&v=1.0&ext_perm=photo_upload\" />", @response.body)
   end
   def test_redirects_without_video_upload
-    post :index, facebook_params(:fb_sig_ext_perms=>"status_update,photo_upload")
+    post :index, facebook_params(:fb_sig_ext_perms=>"status_update,photo_upload,create_event")
     assert_response :success
     assert_equal("<fb:redirect url=\"http://www.facebook.com/authorize.php?api_key=1234567&v=1.0&ext_perm=video_upload\" />", @response.body)
   end
   def test_redirects_without_create_listing
-    post :index, facebook_params(:fb_sig_ext_perms=>"status_update,photo_upload,video_upload")
+    post :index, facebook_params(:fb_sig_ext_perms=>"status_update,photo_upload,video_upload,create_event")
     assert_response :success
     assert_equal("<fb:redirect url=\"http://www.facebook.com/authorize.php?api_key=1234567&v=1.0&ext_perm=create_listing\" />", @response.body)
   end
+  def test_redirects_without_create_event
+    post :index, facebook_params(:fb_sig_ext_perms=>"status_update,photo_upload,create_listing,video_upload")
+    assert_response :success
+    assert_equal("<fb:redirect url=\"http://www.facebook.com/authorize.php?api_key=1234567&v=1.0&ext_perm=create_event\" />", @response.body)
+  end
   
   def test_renders_with_permission
-    post :index, facebook_params(:fb_sig_ext_perms=>"status_update,photo_upload,create_listing,video_upload")
+    post :index, facebook_params(:fb_sig_ext_perms=>"status_update,photo_upload,create_listing,video_upload,create_event")
     assert_response :success
     assert_equal("score!", @response.body)
     
