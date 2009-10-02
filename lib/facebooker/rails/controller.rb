@@ -294,6 +294,9 @@ module Facebooker
       def ensure_has_create_listing
         has_extended_permission?("create_listing") || application_needs_permission("create_listing")
       end
+      def ensure_has_create_event(options = {})
+        has_extended_permission?("create_event") || application_needs_permission("create_event")
+      end
       
       def application_needs_permission(perm)
         top_redirect_to(facebook_session.permission_url(perm))
