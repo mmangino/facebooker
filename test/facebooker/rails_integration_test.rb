@@ -25,6 +25,7 @@ class ControllerWhichRequiresExtendedPermissions< NoisyController
   before_filter :ensure_has_photo_upload
   before_filter :ensure_has_video_upload
   before_filter :ensure_has_create_listing
+  before_filter :ensure_has_create_event
   def index
     render :text => 'score!'
   end

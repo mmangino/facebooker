@@ -294,7 +294,7 @@ module Facebooker
       def ensure_has_create_listing
         has_extended_permission?("create_listing") || application_needs_permission("create_listing")
       end
-      def ensure_has_create_event(options = {})
+      def ensure_has_create_event
         has_extended_permission?("create_event") || application_needs_permission("create_event")
       end
       
