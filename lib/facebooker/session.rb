@@ -356,6 +356,10 @@ module Facebooker
     def admin
       Facebooker::Admin.new(self)
     end
+    
+    def application
+      Facebooker::Application.new(self)
+    end
 
     def mobile
       Facebooker::Mobile.new(self)
