@@ -282,6 +282,12 @@ module Facebooker
       element('admin_getAllocation_response', data).content.strip
     end
   end
+  
+  class GetPublicInfo < Parser#:nodoc:
+    def self.process(data)
+      hashinate(element('application_getPublicInfo_response', data))
+    end
+  end
 
   class BatchRun < Parser #:nodoc:
     class << self
@@ -668,6 +674,7 @@ module Facebooker
       'facebook.admin.setRestrictionInfo' => SetRestrictionInfo,
       'facebook.admin.getRestrictionInfo' => GetRestrictionInfo,
       'facebook.admin.getAllocation' => GetAllocation,
+      'facebook.application.getPublicInfo' => GetPublicInfo,
       'facebook.batch.run' => BatchRun,
       'facebook.fql.query' => FqlQuery,
       'facebook.fql.multiquery' => FqlMultiquery,
