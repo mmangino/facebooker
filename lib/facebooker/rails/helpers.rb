@@ -107,17 +107,17 @@ module Facebooker
 
       # Create an fb:request-form with an fb_multi_friend_selector inside
       # 
-      # The content of the block are used as the message on the form,
+      # The content of the block are used as the message on the form, the options hash is passed onto fb_multi_friend_selector.
       #
       # For example:
-      #  <% fb_multi_friend_request("Poke","Choose some friends to Poke",create_poke_path) do %>
+      #  <% fb_multi_friend_request("Poke","Choose some friends to Poke",create_poke_path,:exclude_ids => "123456789,987654321") do %>
       #    If you select some friends, they will see this message.
       #    <%= fb_req_choice("They will get this button, too",new_poke_path) %>
       #  <% end %>
-      def fb_multi_friend_request(type,friend_selector_message,url,&block)
+      def fb_multi_friend_request(type,friend_selector_message,url, fb_multi_friend_selector_options = {},&block)
         content = capture(&block)
         versioned_concat(content_tag("fb:request-form",
-                            fb_multi_friend_selector(friend_selector_message) + token_tag,
+                            fb_multi_friend_selector(friend_selector_message, fb_multi_friend_selector_options) + token_tag,
                             {:action=>url,:method=>"post",:invite=>true,:type=>type,:content=>content}
                             ),
               block.binding)
