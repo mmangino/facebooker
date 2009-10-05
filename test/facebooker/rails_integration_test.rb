@@ -495,6 +495,12 @@ class RailsIntegrationTest < Test::Unit::TestCase
     assert !@response.body.match(/root/)
   end
   
+  def test_url_for_links_to_canvas_if_fb_sig_is_ajax_is_true_and_fb_sig_in_canvas_is_not_true
+    # Normal fb ajax calls have no fb_sig_canvas_param but we must explicitly set it to 0 because it is set to 1 in default_facebook_parameters in test helpers
+    get :link_test, facebook_params(:fb_sig_is_ajax=>1, :fb_sig_in_canvas=>0)
+    assert_match(/apps.facebook.com/, @response.body)
+  end
+  
   def test_default_url_omits_fb_params
     get :index,facebook_params(:fb_sig_friends=>"overwriteme",:get_param=>"yes")
     assert_equal "http://apps.facebook.com/root/require_auth?get_param=yes", @controller.send(:default_after_facebook_login_url)
