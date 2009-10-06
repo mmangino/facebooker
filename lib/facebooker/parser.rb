@@ -302,7 +302,7 @@ module Facebooker
       array_of_text_values(element('batch_run_response',data),"batch_run_response_elt").each_with_index do |response,i|
         batch_request=current_batch[i]
         body=Struct.new(:body).new
-        body.body=CGI.unescapeHTML(response)
+        body.body=response
         begin
           batch_request.result=Parser.parse(batch_request.method,body)
         rescue Exception=>ex

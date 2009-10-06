@@ -362,6 +362,17 @@ class Facebooker::SessionTest < Test::Unit::TestCase
     assert_kind_of(Facebooker::Event::Attendance, @fql_response.first)
     assert_equal('attending', @fql_response.first.rsvp_status)
   end
+  
+   def test_parses_batch_response_with_escaped_chars
+     @session = Facebooker::Session.create(ENV['FACEBOOK_API_KEY'], ENV['FACEBOOK_SECRET_KEY'])
+     expect_http_posts_with_responses(example_batch_run_with_escaped_chars_xml)
+     @session.batch do
+       @response = @session.events(:start_time => Time.now.to_i)
+     end
+     assert_kind_of(Facebooker::Event, @response.first)
+     assert_equal('Wolf & Crow', @response.first.name)
+  end
+  
   def test_parses_batch_response_sets_exception
     @session = Facebooker::Session.create(ENV['FACEBOOK_API_KEY'], ENV['FACEBOOK_SECRET_KEY'])
     expect_http_posts_with_responses(example_batch_run_xml)
@@ -739,6 +750,29 @@ XML
     </batch_run_response>
     XML
   end
+  
+  def example_batch_run_with_escaped_chars_xml
+    <<-XML
+    <?xml version="1.0" encoding="UTF-8"?>
+    <batch_run_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd" list="true">
+      <batch_run_response_elt>
+        #{CGI.escapeHTML(event_with_amp_in_xml)}
+      </batch_run_response_elt>
+    </batch_run_response>
+    XML
+  end
+  def event_with_amp_in_xml
+    <<-XML
+    <?xml version="1.0" encoding="UTF-8"?>
+    <events_get_response xmlns=\"http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd" list="true">
+      <event>
+        <eid>1</eid>
+        <name>Wolf &amp; Crow</name>
+      </event>
+    </events_get_response>
+    XML
+  end
+  
 
   def example_event_members_xml
     <<-XML
