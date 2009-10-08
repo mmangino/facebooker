@@ -548,6 +548,12 @@ module Facebooker
     end
   end
 
+  class GetStatus < Parser # :nodoc:
+    def self.process(data)
+      array_of_hashes(element('status_get_response',data),'user_status')
+    end
+  end
+
   class GetPreference < Parser#:nodoc:
     def self.process(data)
       element('data_getUserPreference_response', data).content.strip
@@ -641,6 +647,7 @@ module Facebooker
       'facebook.users.getInfo' => UserInfo,
       'facebook.users.getStandardInfo' => UserStandardInfo,
       'facebook.users.setStatus' => SetStatus,
+      'facebook.status.get' => GetStatus,
       'facebook.users.getLoggedInUser' => GetLoggedInUser,
       'facebook.users.hasAppPermission' => UserHasPermission,
       'facebook.pages.isAdmin' => PagesIsAdmin,
