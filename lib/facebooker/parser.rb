@@ -1,5 +1,11 @@
 require 'rexml/document'
 require 'facebooker/session'
+
+begin
+    require 'nokogiri'
+rescue Exception
+end
+
 module Facebooker
   class Parser
 
@@ -57,7 +63,7 @@ module Facebooker
 
     def self.element(name, data)
       data = data.body rescue data # either data or an HTTP response
-      begin
+      if Object.const_defined?(:Nokogiri)
         xml = Nokogiri::XML(data.strip)
         if node = xml.at(name)
           return node
@@ -65,7 +71,7 @@ module Facebooker
         if xml.root.name == name
           return xml.root
         end
-      rescue NameError # Can't parse with Nokogiri
+      else
         doc = REXML::Document.new(data)
         doc.elements.each(name) do |element|
           return element
