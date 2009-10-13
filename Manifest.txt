@@ -118,7 +118,6 @@ setup.rb
 templates/layout.erb
 test/facebooker/adapters_test.rb
 test/facebooker/admin_test.rb
-test/facebooker/application.rb
 test/facebooker/application_test.rb
 test/facebooker/batch_request_test.rb
 test/facebooker/data_test.rb
