@@ -285,10 +285,33 @@ module Facebooker
       end
     end
 
-    # Creates an event with the event_info hash and an optional Net::HTTP::MultipartPostFile for the event picture
+    # Creates an event with the event_info hash and an optional Net::HTTP::MultipartPostFile for the event picture.
+    # If ActiveSupport::TimeWithZone is installed (it's in Rails > 2.1), and start_time or end_time are given as
+    # ActiveSupport::TimeWithZone, then they will be assumed to represent local time for the event. They will automatically be
+    # converted to the expected timezone for Facebook, which is PST or PDT depending on when the event occurs.
     # Returns the eid of the newly created event
     # http://wiki.developers.facebook.com/index.php/Events.create
     def create_event(event_info, multipart_post_file = nil)
+      if defined?(ActiveSupport::TimeWithZone) && defined?(ActiveSupport::TimeZone)
+        # Facebook expects all event local times to be in Pacific Time, so we need to take the actual local time and 
+        # send it to Facebook as if it were Pacific Time converted to Unix epoch timestamp. Very confusing...
+        facebook_time = ActiveSupport::TimeZone["Pacific Time (US & Canada)"]
+        
+        start_time = event_info.delete(:start_time) || event_info.delete('start_time')
+        if start_time && start_time.is_a?(ActiveSupport::TimeWithZone)
+          event_info['start_time'] = facebook_time.parse(start_time.strftime("%Y-%m-%d %H:%M:%S")).to_i
+        else
+          event_info['start_time'] = start_time
+        end
+        
+        end_time = event_info.delete(:end_time) || event_info.delete('end_time')
+        if end_time && end_time.is_a?(ActiveSupport::TimeWithZone)
+          event_info['end_time'] = facebook_time.parse(end_time.strftime("%Y-%m-%d %H:%M:%S")).to_i
+        else
+          event_info['end_time'] = end_time
+        end
+      end
+      
       post_file('facebook.events.create', :event_info => event_info.to_json, nil => multipart_post_file)
     end
     

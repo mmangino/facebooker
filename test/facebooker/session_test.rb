@@ -190,6 +190,29 @@ class Facebooker::SessionTest < Test::Unit::TestCase
     assert_equal '34444349712', event_id
   end
   
+  def test_can_create_events_with_time_zones
+    mock_http = establish_session
+    mock_session = flexmock(@session)
+    
+    # Start time is Jan 1, 2012 at 12:30pm EST
+    # This should be sent to Facebook as 12:30pm PST, or 1325449800 in Epoch time
+    start_time = ActiveSupport::TimeZone["Eastern Time (US & Canada)"].parse("2012-01-01 12:30:00")
+    
+    # End time is July 4, 2012 at 3:00pm CDT
+    # Should be sent to Facebook as 3:00pm PDT, or 1341439200 in Epoch time
+    end_time = ActiveSupport::TimeZone["Central Time (US & Canada)"].parse("2012-07-04 15:00:00")
+    
+    expected_info = {
+      'name' => 'foo',
+      'category' => 'bar', 
+      'start_time' => 1325449800,
+      'end_time' => 1341439200
+    }.to_json
+    
+    mock_session.should_receive(:post_file).once.with('facebook.events.create', {:event_info => expected_info, nil => nil}).and_return(example_event_create_xml).once
+    mock_session.create_event('name' => 'foo', 'category' => 'bar', :start_time => start_time, :end_time => end_time)
+  end
+  
   def test_can_cancel_events
     expect_http_posts_with_responses(example_event_cancel_xml)
     assert @session.cancel_event("12345", :cancel_message => "It's raining")
