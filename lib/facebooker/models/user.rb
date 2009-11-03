@@ -155,6 +155,12 @@ module Facebooker
       if (links = options[:action_links] && Facebooker.json_encode(options[:action_links]))
         opts[:action_links] = links
       end
+      unless options[:uid].nil?
+        opts[:uid] = options[:uid]
+      end
+      if options[:post_as_page]
+        opts.delete(:target_id)
+      end
       opts
     end
     
