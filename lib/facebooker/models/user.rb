@@ -374,7 +374,14 @@ module Facebooker
         @status = Status.from_hash(message)
       end
     end
-    
+   
+
+    ## 
+    # Return +limit+ statuses from the user
+    def statuses( limit = 50 )
+      session.post('facebook.status.get', {:uid => uid, :limit => limit}).collect { |ret| Status.from_hash(ret) }
+    end
+
     ##
     # Set the status for a user
     # DOES NOT prepend "is" to the message

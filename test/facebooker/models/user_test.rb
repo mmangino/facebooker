@@ -98,6 +98,14 @@ class Facebooker::UserTest < Test::Unit::TestCase
     @user.profile_main="test"
   end
 
+
+  def test_can_call_get_status
+    @session.expects(:post).with('facebook.status.get', {:uid => 1234, :limit => 4}).returns([{ "time" => 1233804858, "source" => 6628568379, "message" => "my message rocks!", "status_id" => 61436484312, 'uid' => 1234 }])
+    st = @user.statuses( 4 )
+    assert_equal st.size, 1
+    assert_equal st.first.message, 'my message rocks!'
+  end
+
   def test_can_call_set_profile_fbml
     @session.expects(:post).with('facebook.profile.setFBML', {:uid=>1234,:profile=>"profile",:profile_action=>"action",:mobile_profile=>"mobile"},false)
     @user.set_profile_fbml("profile","mobile","action")
