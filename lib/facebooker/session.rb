@@ -239,9 +239,12 @@ module Facebooker
     def fql_query(query, format = 'XML')
       post('facebook.fql.query', :query => query, :format => format) do |response|
         type = response.shift
-        return [] if type.nil?
-        response.shift.map do |hash|
-          fql_build_object(type, hash)
+        if type.nil?
+          []
+        else
+          response.shift.map do |hash|
+            fql_build_object(type, hash)
+          end
         end
       end
     end
