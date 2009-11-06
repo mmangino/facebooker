@@ -10,7 +10,7 @@ module Facebooker
       def self.create_with_offset(name,offset)
         define_method name do |field,*args|
           options = args[offset] || {}
-          build_shell(field,options) do
+          build_shell(field,options.with_indifferent_access) do
             super
           end
         end    
@@ -42,6 +42,7 @@ module Facebooker
       
       
       def text_field(method, options = {})
+        options = options.with_indifferent_access
         options[:label] ||= label_for(method,options)
         add_default_name_and_id(options,method)
         options["value"] ||= value_before_type_cast(object,method)

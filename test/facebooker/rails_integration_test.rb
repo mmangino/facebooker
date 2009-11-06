@@ -1079,7 +1079,7 @@ class RailsHelperTest < Test::Unit::TestCase
   
   def test_init_fb_connect_with_features_and_options_js_jquery
     assert @h.init_fb_connect("XFBML", :js => :jquery).match(/XFBML.*/)
-    assert @h.init_fb_connect("XFBML", :js => :jquery).match(/\$\(document\).ready\(/)
+    assert @h.init_fb_connect("XFBML", :js => :jquery).match(/\jQuery\(document\).ready\(/)
   end
 
   def test_init_fb_connect_without_options_app_settings
