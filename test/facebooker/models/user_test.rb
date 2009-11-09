@@ -16,14 +16,14 @@ class Facebooker::UserTest < Test::Unit::TestCase
 
   def test_has_permission
     expect_http_posts_with_responses(has_app_permission_response_xml)
-    assert @user.has_permission?("status_update")    
+    assert @user.has_permission?("status_update")
   end
 
   def test_has_permissions
-    expect_http_posts_with_responses(has_app_permission_response_xml, has_app_permission_response_xml)    
-    assert @user.has_permissions?(["status_update", "read_stream"])    
-  end 
- 
+    expect_http_posts_with_responses(has_app_permission_response_xml, has_app_permission_response_xml)
+    assert @user.has_permissions?(["status_update", "read_stream"])
+  end
+
   def test_can_ask_user_if_he_or_she_is_friends_with_another_user
     assert(@user.friends_with?(@other_user))
   end
@@ -146,6 +146,17 @@ class Facebooker::UserTest < Test::Unit::TestCase
     assert_nil(options[:attachment])
     assert_equal(options[:action_links], [:text => 'Link', :href => 'http://example.com'].to_json )
   end
+
+  def test_prepare_publish_to_options_to_page_on_behave_of_page
+    page_id = 12345678
+    options = @user.prepare_publish_to_options(@user, {:uid => 12345678, :post_as_page => true, :message => 'Hey there', :action_links => [:text => 'Link', :href => 'http://example.com']})
+    assert_equal(options[:uid], page_id)
+    assert_nil(options[:target_id])
+    assert_equal(options[:message], 'Hey there')
+    assert_nil(options[:attachment])
+    assert_equal(options[:action_links], [:text => 'Link', :href => 'http://example.com'].to_json )
+  end
+
   def test_publish_to
     @user = Facebooker::User.new(548871286, @session)
     expect_http_posts_with_responses(example_profile_publish_to_get_xml)
@@ -162,7 +173,7 @@ class Facebooker::UserTest < Test::Unit::TestCase
     expect_http_posts_with_responses(example_comment_on_response)
     assert_equal('703826862_78463536863', @user.comment_on('703826862_78463536862', :message => 'that was hilarious!'))
   end
-  
+
   def test_can_send_email
     @user.expects(:send_email).with("subject", "body text")
     @user.send_email("subject", "body text")
@@ -378,18 +389,18 @@ class Facebooker::UserTest < Test::Unit::TestCase
 <stream_publish_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd">703826862_78463536862</stream_publish_response>
     eoxml
   end
-  
+
   def example_comment_on_response
     <<-eoxml
 <?xml version="1.0" encoding="UTF-8"?>
 <stream_addComment_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd">703826862_78463536863</stream_addComment_response>
     eoxml
-  end  
-  
+  end
+
   def example_events_rsvp_xml
       <<-E
       <?xml version="1.0" encoding="UTF-8"?>
-      <events_rsvp_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+      <events_rsvp_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd">1
       </events_rsvp_response>
     E
