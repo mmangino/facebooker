@@ -781,6 +781,14 @@ module Facebooker
         tag "fb:date", stringify_vals({:t => time.to_i}.merge(options))
       end
 
+      # Renders the Facebook bookmark button
+      #
+      # See http://wiki.developers.facebook.com/index.php/Fb:bookmark for
+      # more details
+      def fb_bookmark_button
+        content_tag "fb:bookmark"
+      end
+
       # Renders a fb:fbml-attribute element
       #
       # Example:

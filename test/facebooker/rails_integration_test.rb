@@ -1099,6 +1099,10 @@ class RailsHelperTest < Test::Unit::TestCase
     assert_equal @h.fb_logout_link("Logout","My URL"),"<a href=\"#\" onclick=\"FB.Connect.logoutAndRedirect(&quot;My URL&quot;);; return false;\">Logout</a>"
   end
 
+  def test_fb_bookmark_link
+    assert_equal @h.fb_bookmark_link("Bookmark","My URL"),"<a href=\"#\" onclick=\"FB.Connect.showBookmarkDialog(&quot;My URL&quot;);; return false;\">Bookmark</a>"
+  end
+
   def test_fb_user_action_with_literal_callback
     action = Facebooker::Rails::Publisher::UserAction.new
     assert_equal "FB.Connect.showFeedDialog(null, null, null, null, null, FB.RequireConnect.promptConnect, function() {alert('hi')}, \"prompt\", #{{"value" => "message"}.to_json});",

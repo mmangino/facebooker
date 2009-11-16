@@ -109,6 +109,13 @@ module Facebooker
           link_to_function text, js, *args
         end
 
+        def fb_bookmark_link(text,url,*args)
+          js = update_page do |page|
+            page.call "FB.Connect.showBookmarkDialog",url
+          end
+          link_to_function text, js, *args
+        end
+
         def fb_user_action(action, user_message = nil, prompt = "", callback = nil)
           defaulted_callback = callback || "null"
           update_page do |page|
