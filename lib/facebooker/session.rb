@@ -206,7 +206,7 @@ module Facebooker
     def secure_with!(session_key, uid = nil, expires = nil, secret_from_session = nil)
       @session_key = session_key
       @uid = uid ? Integer(uid) : post('facebook.users.getLoggedInUser', :session_key => session_key)
-      @expires = Integer(expires)
+      @expires = expires ? Integer(expires) : 0
       @secret_from_session = secret_from_session
     end
 
