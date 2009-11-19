@@ -31,7 +31,7 @@ class Facebooker::ApplicationTest < Test::Unit::TestCase
       <logo_url>http://photos-c.ak.facebook.com/photos-ak-sctm/v43/130/2413267546/app_1_2413267546_2324.gif</logo_url> 
       <developers list="true"/> 
       <company_name>iLike, inc</company_name> 
-      <description>iLike lets you add music to your profile and find your favorite concerts (not to mention see who else is going!). Bonus: Use it to get free mp3’s that match your tastes and try to beat your friends at the Music Challenge.</description> 
+      <description>iLike lets you add music to your profile and find your favorite concerts (not to mention see who else is going!). Bonus: Use it to get free mp3's that match your tastes and try to beat your friends at the Music Challenge.</description> 
       <daily_active_users>392008</daily_active_users> 
       <weekly_active_users>1341749</weekly_active_users> 
       <monthly_active_users>3922784</monthly_active_users> 
