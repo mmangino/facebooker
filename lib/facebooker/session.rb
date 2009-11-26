@@ -155,6 +155,8 @@ module Facebooker
       optional_parameters << "&hide_checkbox=true" if options[:hide_checkbox]
       optional_parameters << "&canvas=true" if options[:canvas]
       optional_parameters << "&fbconnect=true" if options[:fbconnect]
+      optional_parameters << "&return_session=true" if options[:return_session]
+      optional_parameters << "&session_key_only=true" if options[:session_key_only]
       optional_parameters << "&req_perms=#{options[:req_perms]}" if options[:req_perms]
       optional_parameters.join
     end
