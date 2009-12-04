@@ -200,6 +200,7 @@ module Facebooker
   end
 end
 
+require 'facebooker/attachment'
 require 'facebooker/batch_request'
 require 'facebooker/feed'
 require 'facebooker/logging'
