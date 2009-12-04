@@ -2,11 +2,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{facebooker}
-  s.version = "1.0.56"
+  s.version = "1.0.55"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Chad Fowler", "Patrick Ewing", "Mike Mangino", "Shane Vitarana", "Corey Innis", "Mike Mangino"]
-  s.date = %q{2009-11-06}
+  s.date = %q{2009-12-04}
   s.description = %q{Facebooker is a Ruby wrapper over the Facebook[http://facebook.com] {REST API}[http://wiki.developers.facebook.com/index.php/API].  Its goals are:
 
 * Idiomatic Ruby
