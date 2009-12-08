@@ -152,8 +152,8 @@ module Facebooker
               :target_id    => target.id,
               :message      => options[:message]}
 
-      if(attachment = options[:attachment] && Facebooker.json_encode(options[:attachment]))
-        opts[:attachment] = attachment
+      if a = options[:attachment]
+        opts[:attachment] = convert_attachment_to_json(a)
       end
       if (links = options[:action_links] && Facebooker.json_encode(options[:action_links]))
         opts[:action_links] = links
@@ -165,6 +165,11 @@ module Facebooker
         opts.delete(:target_id)
       end
       opts
+    end
+    
+    def convert_attachment_to_json(attachment)
+      a = attachment.respond_to?(:to_hash) ? attachment.to_hash : attachment
+      Facebooker.json_encode(a)
     end
 
     ###
