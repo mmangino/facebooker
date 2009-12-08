@@ -109,6 +109,7 @@ lib/facebooker/service/net_http_service.rb
 lib/facebooker/service/typhoeus_service.rb
 lib/facebooker/service/typhoeus_multi_service.rb
 lib/facebooker/session.rb
+lib/facebooker/stream_post.rb
 lib/facebooker/version.rb
 lib/net/http_multipart_post.rb
 lib/rack/facebook.rb

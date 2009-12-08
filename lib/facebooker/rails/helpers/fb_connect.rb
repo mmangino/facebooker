@@ -122,6 +122,21 @@ module Facebooker
             page.call("FB.Connect.showFeedDialog",action.template_id,action.data,action.target_ids,action.body_general,nil,page.literal("FB.RequireConnect.promptConnect"),page.literal(defaulted_callback),prompt,user_message.nil? ? nil : {:value=>user_message})
           end
         end
+        
+        def fb_connect_stream_publish(stream_post,user_message_prompt=nil,callback=nil,auto_publish=false,actor=nil)
+          defaulted_callback = callback || "null"
+          update_page do |page|
+            page.call("FB.Connect.streamPublish",
+                        stream_post.user_message,
+                        stream_post.attachment.to_hash,
+                        stream_post.action_links,
+                        Facebooker::User.cast_to_facebook_id(stream_post.target),
+                        user_message_prompt,
+                        page.literal(defaulted_callback),
+                        auto_publish,
+                        Facebooker::User.cast_to_facebook_id(actor))
+          end          
+        end
 
       end
     end

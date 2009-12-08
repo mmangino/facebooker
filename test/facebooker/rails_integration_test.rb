@@ -1114,7 +1114,17 @@ class RailsHelperTest < Test::Unit::TestCase
     assert_equal "FB.Connect.showFeedDialog(null, null, null, null, null, FB.RequireConnect.promptConnect, null, \"prompt\", #{{"value" => "message"}.to_json});",
                  @h.fb_user_action(action,"message","prompt")
   end
-
+  
+  def test_fb_connect_stream_publish
+    stream_post = Facebooker::StreamPost.new
+    attachment = Facebooker::Attachment.new
+    attachment.name="name"
+    stream_post.message = "message"
+    stream_post.target="12451752"
+    stream_post.attachment = attachment
+    
+    assert_equal "FB.Connect.streamPublish(\"message\", {\"name\": \"name\"}, [], \"12451752\", null, null, false, null);",@h.fb_connect_stream_publish(stream_post)
+  end
 
   def test_fb_connect_javascript_tag
     silence_warnings do

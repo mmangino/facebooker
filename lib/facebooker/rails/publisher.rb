@@ -306,7 +306,7 @@ module Facebooker
         when :user_action
           UserAction.new
         when :publish_stream
-          PublishStream.new
+          StreamPost.new
         else
           raise UnknownBodyType.new("Unknown type to publish")
         end
@@ -331,6 +331,9 @@ module Facebooker
       end
 
       def action_links(*links)
+        if self._body and self._body.respond_to?(:action_links)
+          self._body.send(:action_links,*links)
+        end
         if links.blank?
           @action_links
         else
@@ -418,7 +421,7 @@ module Facebooker
           Facebooker::Session.create.server_cache.set_ref_handle(_body.handle,_body.fbml)
         when UserAction
           @from.session.publish_user_action(_body.template_id,_body.data_hash,_body.target_ids,_body.body_general,_body.story_size)
-        when PublishStream
+        when Facebooker::StreamPost
          @from.publish_to(_body.target, {:attachment => _body.attachment, :action_links => @action_links, :message => _body.message })
         else
           raise UnspecifiedBodyType.new("You must specify a valid send_as")

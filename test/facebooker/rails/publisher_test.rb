@@ -436,6 +436,19 @@ class Facebooker::Rails::Publisher::PublisherTest < Test::Unit::TestCase
 
     TestPublisher.deliver_publish_post_to_own_stream(@user)
   end
+  
+  def test_publish_stream_sets_action_links
+    @user = Facebooker::User.new
+    stream_post = TestPublisher.create_publish_post_to_own_stream(@user)
+    assert_equal [{:text => "Action Link", :href => "http://www.example.com/action_link"}],stream_post.action_links
+  end
+  
+  def test_publish_stream_sets_target
+    @user = Facebooker::User.new
+    stream_post = TestPublisher.create_publish_post_to_own_stream(@user)
+    assert_equal @user,stream_post.target
+    
+  end
 
   def test_publish_post_to_friends_stream
     @from_user = Facebooker::User.new
