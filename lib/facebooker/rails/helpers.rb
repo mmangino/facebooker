@@ -725,12 +725,12 @@ module Facebooker
       # Meant to be used for a Facebook Connect site or an iframe application
       def fb_serverfbml(options={},&proc)
         inner = capture(&proc)
-        concat(content_tag("fb:serverfbml",inner,options),&proc.binding)
+        concat(content_tag("fb:serverfbml",inner,options))
       end
 
       def fb_container(options={},&proc)
         inner = capture(&proc)
-        concat(content_tag("fb:container",inner,options),&proc.binding)
+        concat(content_tag("fb:container",inner,options))
       end
       
       # Renders an fb:time element
