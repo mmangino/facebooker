@@ -624,7 +624,7 @@ XML
         <modified>1132553363</modified>
         <description>No I will not make out with you</description>
         <location>York, PA</location>
-        <link>http://www.facebook.com/album.php?aid=2002205&id=8055</link>
+        <link>http://www.facebook.com/album.php?aid=2002205&amp;id=8055</link>
         <size>30</size>
         <visible>friends</visible>
         <modified_major>1241834423</modified_major>

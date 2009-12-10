@@ -309,7 +309,7 @@ class Facebooker::UserTest < Test::Unit::TestCase
          <src>http://ip002.facebook.com/v11/135/18/8055/s1240077_30043524_2020.jpg</src>
          <src_big>http://ip002.facebook.com/v11/135/18/8055/n1240077_30043524_2020.jpg</src_big>
          <src_small>http://ip002.facebook.com/v11/135/18/8055/t1240077_30043524_2020.jpg</src_small>
-         <link>http://www.facebook.com/photo.php?pid=30043524&id=8055</link>
+         <link>http://www.facebook.com/photo.php?pid=30043524&amp;id=8055</link>
          <caption>From The Deathmatch (Trailer) (1999)</caption>
          <created>1132553361</created>
        </photo>
@@ -320,7 +320,7 @@ class Facebooker::UserTest < Test::Unit::TestCase
          <src>http://ip002.facebook.com/v11/135/18/8055/s1240077_30043525_2184.jpg</src>
          <src_big>http://ip002.facebook.com/v11/135/18/8055/n1240077_30043525_2184.jpg</src_big>
          <src_small>http://ip002.facebook.com/v11/135/18/8055/t1240077_30043525_2184.jpg</src_small>
-         <link>http://www.facebook.com/photo.php?pid=30043525&id=8055</link>
+         <link>http://www.facebook.com/photo.php?pid=30043525&amp;id=8055</link>
          <caption>Mexico City, back cover of the CYHS Student Underground 1999.</caption>
          <created>1132553362</created>
        </photo>

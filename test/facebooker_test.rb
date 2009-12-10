@@ -854,7 +854,7 @@ class TestFacebooker < Test::Unit::TestCase
       <src>http://ip002.facebook.com/v67/161/72/219074/s219074_31637752_5455.jpg</src>
       <src_big>http://ip002.facebook.com/v67/161/72/219074/n219074_31637752_5455.jpg</src_big>
       <src_small>http://ip002.facebook.com/v67/161/72/219074/t219074_31637752_5455.jpg</src_small>
-      <link>http://www.facebook.com/photo.php?pid=31637752&id=219074</link>
+      <link>http://www.facebook.com/photo.php?pid=31637752&amp;id=219074</link>
       <caption>Under the sunset</caption>
     </photos_upload_response>
     XML
@@ -872,7 +872,7 @@ class TestFacebooker < Test::Unit::TestCase
       <modified>1132553363</modified>
       <description>No I will not make out with you</description>
       <location>York, PA</location>
-      <link>http://www.facebook.com/album.php?aid=2002205&id=8055</link>
+      <link>http://www.facebook.com/album.php?aid=2002205&amp;id=8055</link>
       <size>0</size>
     </photos_createAlbum_response>
     XML
