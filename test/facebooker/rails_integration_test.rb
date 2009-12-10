@@ -1387,8 +1387,8 @@ class RailsUrlHelperExtensionsTest < Test::Unit::TestCase
     @prompt = "Are you sure?"
     @default_title = "Please Confirm"
     @title = "Confirm Request"
-    @style = {:color => 'black', :background => 'white'}
-    @verbose_style = "{background: 'white', color: 'black'}"
+    @style = {:color => 'black'}
+    @verbose_style = "{color: 'black'}"
     @default_okay = "Okay"
     @default_cancel = "Cancel"
     @default_style = "" #"'width','200px'"
