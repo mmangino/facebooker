@@ -11,7 +11,7 @@ module Facebooker
         define_method name do |field,*args|
           options = args[offset] || {}
           build_shell(field,options.with_indifferent_access) do
-            super
+            super(field,*args)
           end
         end    
       end
