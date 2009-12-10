@@ -34,7 +34,7 @@ end
 
 # Things that don't actually work as expected in BEBO
 module Facebooker
-   class User
+  class User
     def set_profile_fbml_with_bebo_adapter(profile_fbml, mobile_fbml, profile_action_fbml, profile_main = nil)
       if(Facebooker.is_for?(:bebo))
         self.session.post('facebook.profile.setFBML', :uid => @id, :markup => profile_fbml)
@@ -61,14 +61,14 @@ module Facebooker
   end
 
 
-   class PublishTemplatizedAction < Parser#:nodoc:
+  class PublishTemplatizedAction < Parser#:nodoc:
     class <<self
-     def process_with_bebo_adapter(data)
-       if(Facebooker.is_for?(:bebo))
-       element('feed_publishTemplatizedAction_response', data).content
-       else
-         process_without_bebo_adapter(data)
-       end
+      def process_with_bebo_adapter(data)
+        if(Facebooker.is_for?(:bebo))
+          element('feed_publishTemplatizedAction_response', data).content
+        else
+          process_without_bebo_adapter(data)
+        end
       end
       alias_method :process_without_bebo_adapter, :process
       alias_method :process, :process_with_bebo_adapter

@@ -57,7 +57,7 @@ class ControllerWhichRequiresFacebookAuthentication < NoisyController
     render :text=>url_for(options)
   end
   
-   def named_route_test
+  def named_route_test
     render :text=>comments_url()
   end
   
@@ -965,7 +965,7 @@ class RailsHelperTest < Test::Unit::TestCase
     assert_equal("<fb:request-form-submit />",@h.fb_request_form_submit)  
   end   
 
-	def test_fb_request_form_submit_with_uid
+  def test_fb_request_form_submit_with_uid
     assert_equal("<fb:request-form-submit uid=\"123456789\" />",@h.fb_request_form_submit({:uid => "123456789"}))
   end
 

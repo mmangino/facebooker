@@ -473,10 +473,10 @@ module Facebooker
   end
   
   class EventsRsvp < Parser#:nodoc:
-     def self.process(data)
+    def self.process(data)
        element('events_rsvp_response', data).content.strip
-     end
-   end
+    end
+  end
    
   class EventsCreate < Parser#:nodoc:
     def self.process(data)
