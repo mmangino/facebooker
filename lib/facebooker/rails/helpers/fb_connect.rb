@@ -59,7 +59,7 @@ module Facebooker
             :block_is_within_action_view? : :block_called_from_erb?
 
           if block_given? && send(block_tester, proc)
-            concat(javascript_tag(init_string))
+            versioned_concat(javascript_tag(init_string),proc.binding)
           else
             javascript_tag init_string
           end
