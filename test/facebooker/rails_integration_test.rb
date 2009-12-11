@@ -171,6 +171,7 @@ class RailsIntegrationTestForFBConnect < Test::Unit::TestCase
   def test_doesnt_set_cookie_but_facebook_session_is_available
     setup_fb_connect_cookies
     get :index
+    p "this one"
     assert_not_nil @controller.facebook_session
     assert_nil @response.cookies[:facebook_session] 
     
@@ -1123,7 +1124,7 @@ class RailsHelperTest < Test::Unit::TestCase
     stream_post.target="12451752"
     stream_post.attachment = attachment
     
-    assert_equal "FB.Connect.streamPublish(\"message\", {\"name\": \"name\"}, [], \"12451752\", null, null, false, null);",@h.fb_connect_stream_publish(stream_post)
+    assert @h.fb_connect_stream_publish(stream_post).match(/FB.Connect\.streamPublish\(\"message\", {\"name\":\s?\"name\"}, \[], \"12451752\", null, null, false, null\);/)
   end
 
   def test_fb_connect_javascript_tag
