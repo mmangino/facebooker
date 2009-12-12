@@ -171,7 +171,6 @@ class RailsIntegrationTestForFBConnect < Test::Unit::TestCase
   def test_doesnt_set_cookie_but_facebook_session_is_available
     setup_fb_connect_cookies
     get :index
-    p "this one"
     assert_not_nil @controller.facebook_session
     assert_nil @response.cookies[:facebook_session] 
     
