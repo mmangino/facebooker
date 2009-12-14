@@ -2,7 +2,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../rails_test_helper')
 
 module FBConnectTestHelpers
   def setup_fb_connect_cookies(params=cookie_hash_for_auth)
-    params.each {|k,v| @request.cookies[ENV['FACEBOOK_API_KEY']+k] = CGI::Cookie.new(ENV['FACEBOOK_API_KEY']+k,v)}
+    params.each {|k,v| @request.cookies[ENV['FACEBOOK_API_KEY']+k] = CGI::Cookie.new(ENV['FACEBOOK_API_KEY']+k,v).first}
   end
 
   def expired_cookie_hash_for_auth
@@ -171,7 +171,6 @@ class RailsIntegrationTestForFBConnect < Test::Unit::TestCase
   def test_doesnt_set_cookie_but_facebook_session_is_available
     setup_fb_connect_cookies
     get :index
-    p "this one"
     assert_not_nil @controller.facebook_session
     assert_nil @response.cookies[:facebook_session] 
     
