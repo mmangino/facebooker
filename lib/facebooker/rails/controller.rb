@@ -138,7 +138,7 @@ module Facebooker
           return unless parsed['session_key'] && parsed['user'] && parsed['expires'] && parsed['ss'] 
           return unless (Time.at(parsed['expires'].to_s.to_f) > Time.now) || (parsed['expires'] == "0")      
           #if we have the unexpired cookies, we'll throw an exception if the sig doesn't verify
-          verify_signature(parsed,cookies[Facebooker.api_key])
+          verify_signature(parsed,cookies[Facebooker.api_key], true)
 
           @facebook_session = new_facebook_session
           @facebook_session.secure_with!(parsed['session_key'],parsed['user'],parsed['expires'],parsed['ss'])
