@@ -1123,7 +1123,7 @@ class RailsHelperTest < Test::Unit::TestCase
     stream_post.target="12451752"
     stream_post.attachment = attachment
     
-    assert @h.fb_connect_stream_publish(stream_post).match(/FB.Connect\.streamPublish\(\"message\", {\"name\":\s?\"name\"}, \[], \"12451752\", null, null, false, null\);/)
+    assert @h.fb_connect_stream_publish(stream_post).match(/FB.Connect\.streamPublish\(\"message\", \{\"name\":\s?\"name\"\}, \[\], \"12451752\", null, null, false, null\);/)
   end
 
   def test_fb_connect_javascript_tag
