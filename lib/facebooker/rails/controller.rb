@@ -131,17 +131,14 @@ module Facebooker
 
       def secure_with_cookies!
           parsed = {}
-          
-          # josephsofaer finds the cookies[key] returns an array, 
-          # it doesn't happen for me (mmangino)
-          # so force it to array and take the first value
-          fb_cookie_names.each { |key| parsed[key[fb_cookie_prefix.size,key.size]] = Array(cookies[key]).first }
+
+          fb_cookie_names.each { |key| parsed[key[fb_cookie_prefix.size,key.size]] = cookies[key] }
 
           #returning gracefully if the cookies aren't set or have expired
           return unless parsed['session_key'] && parsed['user'] && parsed['expires'] && parsed['ss'] 
           return unless (Time.at(parsed['expires'].to_s.to_f) > Time.now) || (parsed['expires'] == "0")      
           #if we have the unexpired cookies, we'll throw an exception if the sig doesn't verify
-          verify_signature(parsed,cookies[Facebooker.api_key],true)
+          verify_signature(parsed,cookies[Facebooker.api_key])
 
           @facebook_session = new_facebook_session
           @facebook_session.secure_with!(parsed['session_key'],parsed['user'],parsed['expires'],parsed['ss'])
