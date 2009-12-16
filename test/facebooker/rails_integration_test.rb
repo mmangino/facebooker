@@ -883,8 +883,7 @@ class RailsHelperTest < Test::Unit::TestCase
   
   def test_fb_dialog
     @h.expects(:capture).returns("dialog content")
-    @h.fb_dialog( "my_dialog", "1" ) do
-    end
+    @h.fb_dialog( "my_dialog", true ) {}
     assert_equal '<fb:dialog cancel_button="1" id="my_dialog">dialog content</fb:dialog>', @h.output_buffer
   end
   def test_fb_dialog_title

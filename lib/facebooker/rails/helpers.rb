@@ -25,6 +25,7 @@ module Facebooker
       # cancel_button is true or false
       def fb_dialog( id, cancel_button, &block )
         content = capture(&block)
+        cancel_button = cancel_button ? 1 : 0 unless cancel_button == 0
         versioned_concat( content_tag("fb:dialog", content, {:id => id, :cancel_button => cancel_button}), block.binding )
       end
       
