@@ -11,7 +11,7 @@ class Rack::FacebookSessionTest < Test::Unit::TestCase
       Rack::Response.new().to_a
     end
     
-    @facebook = Rack::FacebookSession.new(@app)
+    @facebook = Rack::FacebookSession.new(@app, lambda { '_top_sekrit' })
   end
   
   def params(p)
@@ -24,11 +24,11 @@ class Rack::FacebookSessionTest < Test::Unit::TestCase
   
   def test_converts_session_key_on_get
     response = app.get '/', :input => params(:fb_sig_session_key => 'foo')
-    assert_equal '_session_id=foo', @env['HTTP_COOKIE']
+    assert_equal '_top_sekrit=foo', @env['HTTP_COOKIE']
   end
   
   def test_converts_session_key_on_post
     response = app.post '/', :input => params(:fb_sig_session_key => 'foo')
-    assert_equal '_session_id=foo', @env['HTTP_COOKIE']
+    assert_equal '_top_sekrit=foo', @env['HTTP_COOKIE']
   end
 end

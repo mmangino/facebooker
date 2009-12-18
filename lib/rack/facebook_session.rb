@@ -7,7 +7,7 @@ module Rack
   
     def initialize(app, session_key = lambda { '_session_id' })
       @app = app
-      @session_key = lambda { session_key }
+      @session_key = session_key
     end
 
     def call(env)
