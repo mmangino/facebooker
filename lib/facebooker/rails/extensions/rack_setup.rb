@@ -10,5 +10,5 @@ ActionController::Dispatcher.middleware.insert_before(
 ActionController::Dispatcher.middleware.insert_before(
   ActionController::Base.session_store,
   Rack::FacebookSession,
-  lambda { ActionController::Base.session_options[:key]
+  lambda { ActionController::Base.session_options[:key] }
 )
