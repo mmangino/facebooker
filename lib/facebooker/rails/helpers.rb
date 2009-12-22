@@ -12,16 +12,25 @@ module Facebooker
 
       include Facebooker::Rails::Helpers::FbConnect
 
+      def versioned_concat(string,binding)
+        if ignore_binding?
+          concat(string)
+        else
+          concat(string,binding)
+        end
+      end
+
       # Create an fb:dialog
       # id must be a unique name e.g. "my_dialog"
       # cancel_button is true or false
       def fb_dialog( id, cancel_button, &block )
         content = capture(&block)
-        if ignore_binding?
-          concat( content_tag("fb:dialog", content, {:id => id, :cancel_button => cancel_button}) )
-        else
-          concat( content_tag("fb:dialog", content, {:id => id, :cancel_button => cancel_button}), block.binding )
-        end
+        versioned_concat( content_tag("fb:dialog", content, {:id => id, :cancel_button => cancel_button}), block.binding )
+      end
+      
+      def fbjs_library
+        "<script>var _token = '#{form_authenticity_token}';var _hostname = '#{ActionController::Base.asset_host}'</script>"+
+        "#{javascript_include_tag 'facebooker'}"
       end
       
       def fb_iframe(src, options = {})
@@ -38,11 +47,7 @@ module Facebooker
       
       def fb_dialog_content( &block )
         content = capture(&block)
-        if ignore_binding?
-          concat( content_tag("fb:dialog-content", content) )
-        else
-          concat( content_tag("fb:dialog-content", content), block.binding )
-        end
+        versioned_concat( content_tag("fb:dialog-content", content), block.binding )
       end
       
       def fb_dialog_button( type, value, options={} )
@@ -78,14 +83,9 @@ module Facebooker
       def fb_request_form(type,message_param,url,options={},&block)
         content = capture(&block)
         message = @template.instance_variable_get("@content_for_#{message_param}")
-        if ignore_binding?
-          concat(content_tag("fb:request-form", content + token_tag,
-                    {:action=>url,:method=>"post",:invite=>true,:type=>type,:content=>message}.merge(options)))
-        else
-          concat(content_tag("fb:request-form", content + token_tag,
-                    {:action=>url,:method=>"post",:invite=>true,:type=>type,:content=>message}.merge(options)),
-                block.binding)
-        end
+        versioned_concat(content_tag("fb:request-form", content + token_tag,
+                  {:action=>url,:method=>"post",:invite=>true,:type=>type,:content=>message}.merge(options)),
+              block.binding)
       end
 
       # Create a submit button for an <fb:request-form>
@@ -116,18 +116,11 @@ module Facebooker
       #  <% end %>
       def fb_multi_friend_request(type,friend_selector_message,url,&block)
         content = capture(&block)
-        if ignore_binding?
-          concat(content_tag("fb:request-form",
-                              fb_multi_friend_selector(friend_selector_message) + token_tag,
-                              {:action=>url,:method=>"post",:invite=>true,:type=>type,:content=>content}
-                              ))
-        else
-          concat(content_tag("fb:request-form",
-                              fb_multi_friend_selector(friend_selector_message) + token_tag,
-                              {:action=>url,:method=>"post",:invite=>true,:type=>type,:content=>content}
-                              ),
-                block.binding)
-        end
+        versioned_concat(content_tag("fb:request-form",
+                            fb_multi_friend_selector(friend_selector_message) + token_tag,
+                            {:action=>url,:method=>"post",:invite=>true,:type=>type,:content=>content}
+                            ),
+              block.binding)
       end
       
       # Render an <fb:friend-selector> element
@@ -217,19 +210,11 @@ module Facebooker
         width=options.delete(:labelwidth)
         editor_options[:labelwidth]=width unless width.blank?
 
-        if ignore_binding?
-          concat(tag("fb:editor",editor_options,true))
-          concat(tag(:input,{:type=>"hidden",:name=>:_method, :value=>method},false)) unless method.blank?
-          concat(token_tag)
-          fields_for( object_name,*(args << options), &proc)
-          concat("</fb:editor>")
-        else
-          concat(tag("fb:editor",editor_options,true) , proc.binding)
-          concat(tag(:input,{:type=>"hidden",:name=>:_method, :value=>method},false), proc.binding) unless method.blank?
-          concat(token_tag, proc.binding)
-          fields_for( object_name,*(args << options), &proc)
-          concat("</fb:editor>",proc.binding)
-        end
+        versioned_concat(tag("fb:editor",editor_options,true) , proc.binding)
+        versioned_concat(tag(:input,{:type=>"hidden",:name=>:_method, :value=>method},false), proc.binding) unless method.blank?
+        versioned_concat(token_tag, proc.binding)
+        fields_for( object_name,*(args << options), &proc)
+        versioned_concat("</fb:editor>",proc.binding)
       end
       
       # Render an fb:application-name tag
@@ -360,11 +345,7 @@ module Facebooker
       # <% end %>        
       def fb_tabs(&block)
         content = capture(&block)
-        if ignore_binding?
-          concat(content_tag("fb:tabs", content))
-        else
-          concat(content_tag("fb:tabs", content), block.binding)
-        end
+        versioned_concat(content_tag("fb:tabs", content), block.binding)
       end
       
       # Render an fb:tab_item tag. 
@@ -407,11 +388,7 @@ module Facebooker
       #   <% end %>
       def fb_wall(&proc)
         content = capture(&proc)
-        if ignore_binding?
-          concat(content_tag("fb:wall",content,{}))
-        else
-          concat(content_tag("fb:wall",content,{}),proc.binding)
-        end
+        versioned_concat(content_tag("fb:wall",content,{}),proc.binding)
       end
       
       # Render an <fb:wallpost> tag
@@ -471,11 +448,7 @@ module Facebooker
       def fb_dashboard(&proc)
         if block_given?
           content = capture(&proc)
-          if ignore_binding?
-            concat(content_tag("fb:dashboard",content,{}))
-          else
-            concat(content_tag("fb:dashboard",content,{}),proc.binding)
-          end
+          versioned_concat(content_tag("fb:dashboard",content,{}),proc.binding)
         else
           content_tag("fb:dashboard",content,{})
         end
@@ -484,21 +457,13 @@ module Facebooker
       # Content for the wide profile box goes in this tag
       def fb_wide(&proc)
         content = capture(&proc)
-        if ignore_binding?
-          concat(content_tag("fb:wide", content, {}))
-        else
-          concat(content_tag("fb:wide", content, {}), proc.binding)
-        end
+        versioned_concat(content_tag("fb:wide", content, {}), proc.binding)
       end
 
       # Content for the narrow profile box goes in this tag
       def fb_narrow(&proc)
         content = capture(&proc)
-        if ignore_binding?
-          concat(content_tag("fb:narrow", content, {}))
-        else
-          concat(content_tag("fb:narrow", content, {}), proc.binding)
-        end
+        versioned_concat(content_tag("fb:narrow", content, {}), proc.binding)
       end
 
       # Renders an action using the <fb:action> tag
@@ -558,11 +523,7 @@ module Facebooker
         content = capture(&proc) 
         options = options.dup
         options.merge!(:uid=>cast_to_facebook_id(user)) if user
-        if ignore_binding?
-          concat(content_tag("fb:if-is-app-user",content,stringify_vals(options)))
-        else
-          concat(content_tag("fb:if-is-app-user",content,stringify_vals(options)),proc.binding)
-        end
+        versioned_concat(content_tag("fb:if-is-app-user",content,stringify_vals(options)),proc.binding)
       end
 
       # Render if-user-has-added-app tag
@@ -578,11 +539,7 @@ module Facebooker
       def fb_if_user_has_added_app(user,options={},&proc)
         content = capture(&proc) 
         options = options.dup
-        if ignore_binding?
-          concat(content_tag("fb:if-user-has-added-app", content, stringify_vals(options.merge(:uid=>cast_to_facebook_id(user)))))
-        else
-          concat(content_tag("fb:if-user-has-added-app", content, stringify_vals(options.merge(:uid=>cast_to_facebook_id(user)))),proc.binding)
-        end
+        versioned_concat(content_tag("fb:if-user-has-added-app", content, stringify_vals(options.merge(:uid=>cast_to_facebook_id(user)))),proc.binding)
       end
       
       # Render fb:if-is-user tag
@@ -600,22 +557,14 @@ module Facebooker
         content = capture(&proc) 
         user = [user] unless user.is_a? Array
         user_list=user.map{|u| cast_to_facebook_id(u)}.join(",")
-        if ignore_binding?
-          concat(content_tag("fb:if-is-user",content,{:uid=>user_list}))
-        else
-          concat(content_tag("fb:if-is-user",content,{:uid=>user_list}),proc.binding)
-        end
+        versioned_concat(content_tag("fb:if-is-user",content,{:uid=>user_list}),proc.binding)
       end
       
       # Render fb:else tag
       # Must be used within if block such as fb_if_is_user or fb_if_is_app_user . See example in fb_if_is_app_user
       def fb_else(&proc)
         content = capture(&proc)
-        if ignore_binding?
-          concat(content_tag("fb:else",content))
-        else
-          concat(content_tag("fb:else",content),proc.binding)
-        end
+        versioned_concat(content_tag("fb:else",content),proc.binding)
       end
       
       #
@@ -720,12 +669,12 @@ module Facebooker
       # Meant to be used for a Facebook Connect site or an iframe application
       def fb_serverfbml(options={},&proc)
         inner = capture(&proc)
-        concat(content_tag("fb:serverfbml",inner,options),&proc.binding)
+        versioned_concat(content_tag("fb:serverfbml",inner,options), proc.binding)
       end
 
       def fb_container(options={},&proc)
         inner = capture(&proc)
-        concat(content_tag("fb:container",inner,options),&proc.binding)
+        versioned_concat(content_tag("fb:container",inner,options), proc.binding)
       end
       
       # Renders an fb:time element
@@ -774,6 +723,14 @@ module Facebooker
       # more details
       def fb_date(time, options={})
         tag "fb:date", stringify_vals({:t => time.to_i}.merge(options))
+      end
+
+      # Renders the Facebook bookmark button
+      #
+      # See http://wiki.developers.facebook.com/index.php/Fb:bookmark for
+      # more details
+      def fb_bookmark_button
+        content_tag "fb:bookmark"
       end
 
       # Renders a fb:fbml-attribute element

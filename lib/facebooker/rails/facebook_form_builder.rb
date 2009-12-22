@@ -10,8 +10,8 @@ module Facebooker
       def self.create_with_offset(name,offset)
         define_method name do |field,*args|
           options = args[offset] || {}
-          build_shell(field,options) do
-            super
+          build_shell(field,options.with_indifferent_access) do
+            super(field,*args)
           end
         end    
       end
@@ -42,6 +42,7 @@ module Facebooker
       
       
       def text_field(method, options = {})
+        options = options.with_indifferent_access
         options[:label] ||= label_for(method,options)
         add_default_name_and_id(options,method)
         options["value"] ||= value_before_type_cast(object,method)
@@ -102,11 +103,39 @@ module Facebooker
         @template.content_tag("fb:editor-button","",:value=>name,:name=>"commit")
       end
       
-      def add_default_name_and_id(options,method)
-        options[:name] ||= "#{object.class.name.underscore}[#{method}]"
-        options[:id] ||= "#{object.class.name.underscore}_#{method}"
+      def add_default_name_and_id(options, method)
+        @method_name = method
+        if options.has_key?("index")
+          options["name"] ||= tag_name_with_index(options["index"])
+          options["id"]   ||= tag_id_with_index(options["index"])
+          options.delete("index")
+        else
+          options["name"] ||= tag_name + (options.has_key?('multiple') ? '[]' : '')
+          options["id"]   ||= "#{sanitized_object_name}_#{sanitized_method_name}"
+        end
       end
 
+
+      private
+        def tag_name
+          "#{@object_name.to_s}[#{sanitized_method_name}]"
+        end
+
+        def tag_name_with_index(index)
+          "#{@object_name.to_s}[#{index}][#{sanitized_method_name}]"
+        end
+
+        def tag_id_with_index(index)
+          "#{sanitized_object_name}_#{index}_#{sanitized_method_name}"
+        end
+
+        def sanitized_object_name
+          @object_name.to_s.gsub(/\]\[|[^-a-zA-Z0-9:.]/, "_").sub(/_$/, "")
+        end
+
+        def sanitized_method_name
+          @method_name.to_s.sub(/\?$/,"")
+        end
     end
   end
 end

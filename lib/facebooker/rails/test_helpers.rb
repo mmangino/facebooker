@@ -11,24 +11,24 @@ module Facebooker
         facebook_post facebook_redirect_url
       end
       
-      def facebook_get(path,params={})
-        facebook_verb(:get,path,params)
+      def facebook_get(path, params={}, session=nil, flash=nil)
+        facebook_verb(:get, path, params, session, flash)
       end
       
-      def facebook_post(path,params={})
-        facebook_verb(:post,path,params)
+      def facebook_post(path,params={}, session=nil, flash=nil)
+        facebook_verb(:post, path, params, session, flash)
       end
       
-      def facebook_put(path,params={})
-        facebook_verb(:put,path,params)
+      def facebook_put(path,params={}, session=nil, flash=nil)
+        facebook_verb(:put, path, params, session, flash)
       end
       
-      def facebook_delete(path,params={})
-        facebook_verb(:delete,path,params)
+      def facebook_delete(path,params={}, session=nil, flash=nil)
+        facebook_verb(:delete, path, params, session, flash)
       end
       
-      def facebook_verb(verb,path, params={})
-        send verb, path, facebook_params(params).reverse_merge(:canvas => true)
+      def facebook_verb(verb, path, params={}, session=nil, flash=nil)
+        send verb, path, facebook_params(params).reverse_merge(:canvas => true), session, flash
       end
       
       def facebook_params(params = {})

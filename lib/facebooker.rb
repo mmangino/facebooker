@@ -26,14 +26,14 @@ require 'digest/md5'
 
 module Facebooker
 
-    @facebooker_configuration = {}
-    @raw_facebooker_configuration = {}
-    @current_adapter = nil
-    @set_asset_host_to_callback_url = true
-    @path_prefix = nil
-    @use_curl    = false
+  @facebooker_configuration = {}
+  @raw_facebooker_configuration = {}
+  @current_adapter = nil
+  @set_asset_host_to_callback_url = true
+  @path_prefix = nil
+  @use_curl    = false
 
-    class << self
+  class << self
 
     def load_configuration(facebooker_yaml_file)
       return false unless File.exist?(facebooker_yaml_file)
@@ -200,6 +200,7 @@ module Facebooker
   end
 end
 
+require 'facebooker/attachment'
 require 'facebooker/batch_request'
 require 'facebooker/feed'
 require 'facebooker/logging'
@@ -224,8 +225,10 @@ require 'facebooker/service/net_http_service'
 require 'facebooker/server_cache'
 require 'facebooker/data'
 require 'facebooker/admin'
+require 'facebooker/application'
 require 'facebooker/mobile'
 require 'facebooker/session'
+require 'facebooker/stream_post'
 require 'facebooker/version'
 require 'facebooker/models/location'
 require 'facebooker/models/affiliation'

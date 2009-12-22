@@ -2,9 +2,10 @@ module Facebooker
   module Rails
     module Helpers
       module FbConnect
-        
+
         def fb_connect_javascript_tag(options = {})
-          lang = "/#{options[:lang]}" if options[:lang]
+          # accept both Rails and Facebook locale formatting, i.e. "en-US" and "en_US".
+          lang = "/#{options[:lang].to_s.gsub('-', '_')}" if options[:lang]
           # dont use the javascript_include_tag helper since it adds a .js at the end
           if request.ssl?
             "<script src=\"https://www.connect.facebook.com/js/api_lib/v0.4/FeatureLoader.js.php#{lang}\" type=\"text/javascript\"></script>"
@@ -12,9 +13,9 @@ module Facebooker
             "<script src=\"http://static.ak.connect.facebook.com/js/api_lib/v0.4/FeatureLoader.js.php#{lang}\" type=\"text/javascript\"></script>"
           end
         end
-        
-        # 
-        # For information on the :app_settings argument see http://wiki.developers.facebook.com/index.php/JS_API_M_FB.Facebook.Init_2 
+
+        #
+        # For information on the :app_settings argument see http://wiki.developers.facebook.com/index.php/JS_API_M_FB.Facebook.Init_2
         # While it would be nice to treat :app_settings as a hash, some of the arguments do different things if they are a string vs a javascript function
         # and Rails' Hash#to_json always quotes strings so there is no way to indicate when the value should be a javascript function.
         # For this reason :app_settings needs to be a string that is valid JSON (including the {}'s).
@@ -40,7 +41,7 @@ module Facebooker
           unless required_features.blank?
              init_string = <<-FBML
              #{case options[:js]
-               when :jquery then "$(document).ready("
+               when :jquery then "jQuery(document).ready("
                when :dojo then "dojo.addOnLoad("
                else "Element.observe(window,'load',"
                end} function() {
@@ -58,14 +59,14 @@ module Facebooker
             :block_is_within_action_view? : :block_called_from_erb?
 
           if block_given? && send(block_tester, proc)
-            concat(javascript_tag(init_string))
+            versioned_concat(javascript_tag(init_string),proc.binding)
           else
             javascript_tag init_string
           end
         end
-  
+
         # Render an <fb:login-button> element
-        # 
+        #
         # ==== Examples
         #
         # <%= fb_login_button%>
@@ -96,18 +97,25 @@ module Facebooker
           end
           content_tag("fb:login-button",nil,options.merge(:onlogin=>js))
         end
-        
+
         def fb_unconnected_friends_count
           content_tag "fb:unconnected-friends-count",nil
         end
-        
+
         def fb_logout_link(text,url,*args)
           js = update_page do |page|
             page.call "FB.Connect.logoutAndRedirect",url
           end
           link_to_function text, js, *args
         end
-        
+
+        def fb_bookmark_link(text,url,*args)
+          js = update_page do |page|
+            page.call "FB.Connect.showBookmarkDialog",url
+          end
+          link_to_function text, js, *args
+        end
+
         def fb_user_action(action, user_message = nil, prompt = "", callback = nil)
           defaulted_callback = callback || "null"
           update_page do |page|
@@ -115,6 +123,21 @@ module Facebooker
           end
         end
         
+        def fb_connect_stream_publish(stream_post,user_message_prompt=nil,callback=nil,auto_publish=false,actor=nil)
+          defaulted_callback = callback || "null"
+          update_page do |page|
+            page.call("FB.Connect.streamPublish",
+                        stream_post.user_message,
+                        stream_post.attachment.to_hash,
+                        stream_post.action_links,
+                        Facebooker::User.cast_to_facebook_id(stream_post.target),
+                        user_message_prompt,
+                        page.literal(defaulted_callback),
+                        auto_publish,
+                        Facebooker::User.cast_to_facebook_id(actor))
+          end          
+        end
+
       end
     end
   end

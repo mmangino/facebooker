@@ -70,7 +70,7 @@ class TestPublisher < Facebooker::Rails::Publisher
 
   end
 
-   def profile_update_with_profile_main(to,f)
+  def profile_update_with_profile_main(to,f)
     send_as :profile
     recipients to
     from f
@@ -299,7 +299,7 @@ class Facebooker::Rails::Publisher::PublisherTest < Test::Unit::TestCase
     assert_equal "profile_action",p.profile_action
     assert_equal "mobile_profile",p.mobile_profile
   end
-   def test_create_profile_update_with_profile_main
+  def test_create_profile_update_with_profile_main
     p=TestPublisher.create_profile_update_with_profile_main(@user,@user)
     assert_equal Facebooker::Rails::Publisher::Profile,p.class
     assert_equal "profile",p.profile
@@ -315,7 +315,7 @@ class Facebooker::Rails::Publisher::PublisherTest < Test::Unit::TestCase
     TestPublisher.deliver_profile_update(@user,@user)
   end
 
-   def test_deliver_profile_with_main
+  def test_deliver_profile_with_main
     Facebooker::User.stubs(:new).returns(@user)
     @user.expects(:set_profile_fbml).with('profile', 'mobile_profile', 'profile_action','profile_main')
     TestPublisher.deliver_profile_update_with_profile_main(@user,@user)
@@ -435,6 +435,19 @@ class Facebooker::Rails::Publisher::PublisherTest < Test::Unit::TestCase
     @user.expects(:publish_to).with(@user, has_entry(:attachment=>instance_of(Hash)))
 
     TestPublisher.deliver_publish_post_to_own_stream(@user)
+  end
+  
+  def test_publish_stream_sets_action_links
+    @user = Facebooker::User.new
+    stream_post = TestPublisher.create_publish_post_to_own_stream(@user)
+    assert_equal [{:text => "Action Link", :href => "http://www.example.com/action_link"}],stream_post.action_links
+  end
+  
+  def test_publish_stream_sets_target
+    @user = Facebooker::User.new
+    stream_post = TestPublisher.create_publish_post_to_own_stream(@user)
+    assert_equal @user,stream_post.target
+    
   end
 
   def test_publish_post_to_friends_stream

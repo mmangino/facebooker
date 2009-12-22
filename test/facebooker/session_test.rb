@@ -148,6 +148,22 @@ class Facebooker::SessionTest < Test::Unit::TestCase
     assert_kind_of(Facebooker::Event::Attendance, response.first)
     assert_equal('attending', response.first.rsvp_status)
   end
+  
+  def test_can_fql_query_for_events
+    @session = Facebooker::Session.create(ENV['FACEBOOK_API_KEY'], ENV['FACEBOOK_SECRET_KEY'])
+    expect_http_posts_with_responses(example_fql_query_events_xml)
+    response = @session.fql_query("DOES NOT REALLY MATTER FOR TEST")
+    assert_kind_of(Facebooker::Event, response.first)
+    assert_equal('Technology Tasting', response.first.name)
+  end
+  
+  def test_can_fql_query_for_albums
+    @session = Facebooker::Session.create(ENV['FACEBOOK_API_KEY'], ENV['FACEBOOK_SECRET_KEY'])
+    expect_http_posts_with_responses(example_fql_query_albums_xml)
+    response = @session.fql_query("DOES NOT REALLY MATTER FOR TEST")
+    assert_kind_of(Facebooker::Album, response.first)
+    assert_equal('Films you will never see', response.first.name)
+  end
 
   def test_can_query_for_event_members
     expect_http_posts_with_responses(example_event_members_xml)
@@ -157,11 +173,64 @@ class Facebooker::SessionTest < Test::Unit::TestCase
     assert_equal(["1240077", "222332", "222333", "222335", "222336"], event_attendances.map{|ea| ea.uid}.sort)
     assert_equal 5, event_attendances.size
   end
+  
+  def test_query_for_event_members_caching_honors_params
+    @session.expects(:post).returns(["1"])
+    assert_equal ["1"], @session.event_members(100)
+    @session.expects(:post).returns(["2"])
+    assert_equal ["2"],@session.event_members(200)
+    @session.expects(:post).never
+    assert_equal ["1"],@session.event_members(100)
+  end
+  
+  def test_can_create_events
+    mock_http = establish_session
+    mock_http.should_receive(:post_multipart_form).and_return(example_event_create_xml).once
+    event_id = @session.create_event(:name => 'foo', :category => 'bar')
+    assert_equal '34444349712', event_id
+  end
+  
+  def test_can_create_events_with_time_zones
+    mock_http = establish_session
+    mock_session = flexmock(@session)
+    
+    # Start time is Jan 1, 2012 at 12:30pm EST
+    # This should be sent to Facebook as 12:30pm PST, or 1325449800 in Epoch time
+    start_time = ActiveSupport::TimeZone["Eastern Time (US & Canada)"].parse("2012-01-01 12:30:00")
+    
+    # End time is July 4, 2012 at 3:00pm CDT
+    # Should be sent to Facebook as 3:00pm PDT, or 1341439200 in Epoch time
+    end_time = ActiveSupport::TimeZone["Central Time (US & Canada)"].parse("2012-07-04 15:00:00")
+    
+    expected_info = {
+      'name' => 'foo',
+      'category' => 'bar', 
+      'start_time' => 1325449800,
+      'end_time' => 1341439200
+    }.to_json
+    
+    mock_session.should_receive(:post_file).once.with('facebook.events.create', {:event_info => expected_info, nil => nil}).and_return(example_event_create_xml).once
+    mock_session.create_event('name' => 'foo', 'category' => 'bar', :start_time => start_time, :end_time => end_time)
+  end
+  
+  def test_can_cancel_events
+    expect_http_posts_with_responses(example_event_cancel_xml)
+    assert @session.cancel_event("12345", :cancel_message => "It's raining")
+  end
 
   def test_can_query_for_events
     expect_http_posts_with_responses(example_events_get_xml)
     events = @session.events
     assert_equal 'Technology Tasting', events.first.name
+  end
+  
+  def test_query_for_events_caching_honors_params
+    @session.expects(:post).returns([{:eid=>1}])
+    assert_equal 1, @session.events.first[:eid]
+    @session.expects(:post).returns([{:eid=>2}])
+    assert_equal 2,@session.events(:start_time=>1.day.ago).first[:eid]
+    @session.expects(:post).never
+    assert_equal 1,@session.events.first[:eid]
   end
 
   def test_can_query_for_groups
@@ -316,6 +385,17 @@ class Facebooker::SessionTest < Test::Unit::TestCase
     assert_kind_of(Facebooker::Event::Attendance, @fql_response.first)
     assert_equal('attending', @fql_response.first.rsvp_status)
   end
+  
+  def test_parses_batch_response_with_escaped_chars
+    @session = Facebooker::Session.create(ENV['FACEBOOK_API_KEY'], ENV['FACEBOOK_SECRET_KEY'])
+    expect_http_posts_with_responses(example_batch_run_with_escaped_chars_xml)
+    @session.batch do
+      @response = @session.events(:start_time => Time.now.to_i)
+    end
+    assert_kind_of(Facebooker::Event, @response.first)
+    assert_equal('Wolf & Crow', @response.first.name)
+  end
+  
   def test_parses_batch_response_sets_exception
     @session = Facebooker::Session.create(ENV['FACEBOOK_API_KEY'], ENV['FACEBOOK_SECRET_KEY'])
     expect_http_posts_with_responses(example_batch_run_xml)
@@ -431,6 +511,24 @@ XML
     </groups_get_response>
     XML
   end
+  
+  def example_event_create_xml
+    <<-XML
+    <?xml version="1.0" encoding="UTF-8"?>
+    <events_create_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd">
+      34444349712
+    </events_create_response> 
+    XML
+  end
+  
+  def example_event_cancel_xml
+    <<-XML
+    <?xml version="1.0" encoding="UTF-8"?>
+    <events_cancel_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd">
+      1
+    </events_cancel_response> 
+    XML
+  end
 
   def example_events_get_xml
     <<-XML
@@ -480,6 +578,61 @@ XML
     </fql_query_response>
     XML
   end
+  
+  def example_fql_query_events_xml
+    <<-XML
+    <?xml version="1.0" encoding="UTF-8"?>
+    <fql_query_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd" list="true">
+      <event>
+        <eid>1037629024</eid>
+        <name>Technology Tasting</name>
+        <tagline>Who said Engineering can't be delicious?</tagline>
+        <nid>12409987</nid>
+        <pic>http://photos-628.facebook.com/ip006/object/1345/48/s1037629024_30775.jpg</pic>
+        <pic_big>http://photos-628.facebook.com/ip006/object/1345/48/n1037629024_30775.jpg</pic_big>
+        <pic_small>http://photos-628.facebook.com/ip006/object/1345/48/t1037629024_30775.jpg</pic_small>
+        <host>Facebook</host>
+        <description>Facebook will be hosting technology thought leaders and avid software engineers for a social evening of technology tasting. We invite you to connect with some of our newest technologies and innovative people over hors d'oeuvres and wine. Come share ideas, ask questions, and challenge existing technology paradigms in the spirit of the open source community.</description>
+        <event_type>Party</event_type>
+        <event_subtype>Cocktail Party</event_subtype>
+        <start_time>1172107800</start_time>
+        <end_time>1172115000</end_time>
+        <creator>1078</creator>
+        <update_time>1170096157</update_time>
+        <location>Facebook's New Office</location>
+        <venue>
+          <street>156 University Ave.</street>
+          <city>Palo Alto</city>
+          <state>CA</state>
+          <country>United States</country>
+        </venue>
+      </event> 
+    </fql_query_response>
+    XML
+  end
+  
+  def example_fql_query_albums_xml
+    <<-XML
+    <?xml version="1.0" encoding="UTF-8"?>
+    <fql_query_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd" list="true">
+      <album>
+        <aid>34595963571485</aid>
+        <cover_pid>34595991612812</cover_pid>
+        <owner>8055</owner>
+        <name>Films you will never see</name>
+        <created>1132553109</created>
+        <modified>1132553363</modified>
+        <description>No I will not make out with you</description>
+        <location>York, PA</location>
+        <link>http://www.facebook.com/album.php?aid=2002205&amp;id=8055</link>
+        <size>30</size>
+        <visible>friends</visible>
+        <modified_major>1241834423</modified_major>
+      </album>
+    </fql_query_response>
+    XML
+  end
+  
   def example_check_friendship_xml
     <<-XML
     <?xml version="1.0" encoding="UTF-8"?>
@@ -549,7 +702,7 @@ XML
     </fql_query_response>
     XML
   end
-
+  
   def example_fql_for_multiple_photos_with_anon_xml
     <<-XML
     <?xml version="1.0" encoding="UTF-8"?>
@@ -620,6 +773,29 @@ XML
     </batch_run_response>
     XML
   end
+  
+  def example_batch_run_with_escaped_chars_xml
+    <<-XML
+    <?xml version="1.0" encoding="UTF-8"?>
+    <batch_run_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd" list="true">
+      <batch_run_response_elt>
+        #{CGI.escapeHTML(event_with_amp_in_xml)}
+      </batch_run_response_elt>
+    </batch_run_response>
+    XML
+  end
+  def event_with_amp_in_xml
+    <<-XML
+    <?xml version="1.0" encoding="UTF-8"?>
+    <events_get_response xmlns=\"http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd" list="true">
+      <event>
+        <eid>1</eid>
+        <name>Wolf &amp; Crow</name>
+      </event>
+    </events_get_response>
+    XML
+  end
+  
 
   def example_event_members_xml
     <<-XML
@@ -690,6 +866,7 @@ XML
     </users_getStandardInfo_response>
     XML
   end
+  
 end
 
 

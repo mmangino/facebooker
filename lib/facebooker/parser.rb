@@ -1,5 +1,11 @@
 require 'rexml/document'
 require 'facebooker/session'
+
+begin
+    require 'nokogiri'
+rescue Exception
+end
+
 module Facebooker
   class Parser
 
@@ -57,7 +63,7 @@ module Facebooker
 
     def self.element(name, data)
       data = data.body rescue data # either data or an HTTP response
-      begin
+      if Object.const_defined?(:Nokogiri)
         xml = Nokogiri::XML(data.strip)
         if node = xml.at(name)
           return node
@@ -65,7 +71,7 @@ module Facebooker
         if xml.root.name == name
           return xml.root
         end
-      rescue NameError # Can't parse with Nokogiri
+      else
         doc = REXML::Document.new(data)
         doc.elements.each(name) do |element|
           return element
@@ -282,6 +288,12 @@ module Facebooker
       element('admin_getAllocation_response', data).content.strip
     end
   end
+  
+  class GetPublicInfo < Parser#:nodoc:
+    def self.process(data)
+      hashinate(element('application_getPublicInfo_response', data))
+    end
+  end
 
   class BatchRun < Parser #:nodoc:
     class << self
@@ -296,7 +308,7 @@ module Facebooker
       array_of_text_values(element('batch_run_response',data),"batch_run_response_elt").each_with_index do |response,i|
         batch_request=current_batch[i]
         body=Struct.new(:body).new
-        body.body=CGI.unescapeHTML(response)
+        body.body=response
         begin
           batch_request.result=Parser.parse(batch_request.method,body)
         rescue Exception=>ex
@@ -461,10 +473,22 @@ module Facebooker
   end
   
   class EventsRsvp < Parser#:nodoc:
-     def self.process(data)
+    def self.process(data)
        element('events_rsvp_response', data).content.strip
-     end
-   end
+    end
+  end
+   
+  class EventsCreate < Parser#:nodoc:
+    def self.process(data)
+      element('events_create_response', data).content.strip
+    end
+  end
+  
+  class EventsCancel < Parser#:nodoc:
+    def self.process(data)
+      element('events_cancel_response', data).content.strip
+    end
+  end
 
   class EventsGet < Parser#:nodoc:
     def self.process(data)
@@ -527,6 +551,12 @@ module Facebooker
   class SetStatus < Parser
     def self.process(data)
       element('users_setStatus_response',data).content.strip == '1'
+    end
+  end
+
+  class GetStatus < Parser # :nodoc:
+    def self.process(data)
+      array_of_hashes(element('status_get_response',data),'user_status')
     end
   end
 
@@ -623,6 +653,7 @@ module Facebooker
       'facebook.users.getInfo' => UserInfo,
       'facebook.users.getStandardInfo' => UserStandardInfo,
       'facebook.users.setStatus' => SetStatus,
+      'facebook.status.get' => GetStatus,
       'facebook.users.getLoggedInUser' => GetLoggedInUser,
       'facebook.users.hasAppPermission' => UserHasPermission,
       'facebook.pages.isAdmin' => PagesIsAdmin,
@@ -656,6 +687,7 @@ module Facebooker
       'facebook.admin.setRestrictionInfo' => SetRestrictionInfo,
       'facebook.admin.getRestrictionInfo' => GetRestrictionInfo,
       'facebook.admin.getAllocation' => GetAllocation,
+      'facebook.application.getPublicInfo' => GetPublicInfo,
       'facebook.batch.run' => BatchRun,
       'facebook.fql.query' => FqlQuery,
       'facebook.fql.multiquery' => FqlMultiquery,
@@ -666,7 +698,9 @@ module Facebooker
       'facebook.photos.addTag' => AddTags,
       'facebook.photos.upload' => UploadPhoto,
       'facebook.stream.publish' => StreamPublish,
-      'facebook.stream.addComment' => StreamAddComment,      
+      'facebook.stream.addComment' => StreamAddComment,
+      'facebook.events.create' => EventsCreate,
+      'facebook.events.cancel' => EventsCancel,
       'facebook.events.get' => EventsGet,
       'facebook.events.rsvp' => EventsRsvp,
       'facebook.groups.get' => GroupsGet,

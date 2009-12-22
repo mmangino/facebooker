@@ -126,20 +126,20 @@ module Facebooker
       end
 
       def fb_cookie_names
-        fb_cookie_names = cookies.keys.select{|k| k.starts_with?(fb_cookie_prefix)}
+        fb_cookie_names = cookies.keys.select{|k| k && k.starts_with?(fb_cookie_prefix)}
       end
 
       def secure_with_cookies!
           parsed = {}
-          
+
           fb_cookie_names.each { |key| parsed[key[fb_cookie_prefix.size,key.size]] = cookies[key] }
- 
+
           #returning gracefully if the cookies aren't set or have expired
           return unless parsed['session_key'] && parsed['user'] && parsed['expires'] && parsed['ss'] 
-          return unless Time.at(parsed['expires'].to_s.to_f) > Time.now || (parsed['expires'] == "0")          
+          return unless (Time.at(parsed['expires'].to_s.to_f) > Time.now) || (parsed['expires'] == "0")      
           #if we have the unexpired cookies, we'll throw an exception if the sig doesn't verify
-          verify_signature(parsed,cookies[Facebooker.api_key])
-          
+          verify_signature(parsed,cookies[Facebooker.api_key], true)
+
           @facebook_session = new_facebook_session
           @facebook_session.secure_with!(parsed['session_key'],parsed['user'],parsed['expires'],parsed['ss'])
           @facebook_session
@@ -189,7 +189,7 @@ module Facebooker
       def create_new_facebook_session_and_redirect!
         session[:facebook_session] = new_facebook_session
         next_url = after_facebook_login_url || default_after_facebook_login_url
-        top_redirect_to session[:facebook_session].login_url({:next => next_url}) unless @installation_required
+        top_redirect_to session[:facebook_session].login_url({:next => next_url, :canvas=>params[:fb_sig_in_canvas]}) unless @installation_required
         false
       end
       
@@ -223,9 +223,9 @@ module Facebooker
         48.hours.ago
       end
       
-      def verify_signature(facebook_sig_params,expected_signature)
+      def verify_signature(facebook_sig_params,expected_signature,force=false)
         # Don't verify the signature if rack has already done so.
-        unless ::Rails.version >= "2.3" and ActionController::Dispatcher.middleware.include? Rack::Facebook
+        unless ::Rails.version >= "2.3" and ActionController::Dispatcher.middleware.include? Rack::Facebook and !force
           raw_string = facebook_sig_params.map{ |*args| args.join('=') }.sort.join
           actual_sig = Digest::MD5.hexdigest([raw_string, Facebooker::Session.secret_key].join)
           raise Facebooker::Session::IncorrectSignature if actual_sig != expected_signature
@@ -293,6 +293,9 @@ module Facebooker
       end
       def ensure_has_create_listing
         has_extended_permission?("create_listing") || application_needs_permission("create_listing")
+      end
+      def ensure_has_create_event
+        has_extended_permission?("create_event") || application_needs_permission("create_event")
       end
       
       def application_needs_permission(perm)
