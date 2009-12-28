@@ -698,8 +698,11 @@ module Facebooker
       # more details
       def fb_intl(text=nil, options={}, &proc)
         raise ArgumentError, "Missing block or text" unless block_given? or text
-        content = block_given? ? capture(&proc) : text
-        content_tag("fb:intl", content, stringify_vals(options))
+        if block_given?
+          concat(fb_intl(capture(&proc), options))
+        else
+          content_tag("fb:intl", text, stringify_vals(options))
+        end
       end
 
       # Renders a fb:intl-token element
@@ -711,8 +714,11 @@ module Facebooker
       # more details
       def fb_intl_token(name, text=nil, &proc)
         raise ArgumentError, "Missing block or text" unless block_given? or text
-        content = block_given? ? capture(&proc) : text
-        content_tag("fb:intl-token", content, stringify_vals({:name => name}))
+        if block_given?
+          concat(fb_intl_token(name, capture(&proc)))
+        else
+          content_tag("fb:intl-token", text, stringify_vals({:name => name}))
+        end
       end
 
       # Renders a fb:date element
