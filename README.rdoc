@@ -48,6 +48,12 @@ Facebooker can be installed as a Rails plugin by:
 
 If you don't have git, the plugin can be downloaded from http://github.com/mmangino/facebooker/tarball/master
 
+=== Using Gem in Rails
+
+The rake task would not be added automatically, so to use it in rails you would have to add the following towards the end of your Rakefile:
+  
+  require 'tasks/facebooker'
+
 Once the plugin is installed, you will need to configure your Facebook app in config/facebooker.yml. 
 
 Your application users will need to have added the application in facebook to access all of facebooker's features. You enforce this by adding
