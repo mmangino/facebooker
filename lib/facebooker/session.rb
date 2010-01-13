@@ -709,6 +709,7 @@ module Facebooker
       end
 
       def signature_for(params)
+        params.delete_if { |k,v| v.nil? }
         raw_string = params.inject([]) do |collection, pair|
           collection << pair.map { |x|
             Array === x ? Facebooker.json_encode(x) : x
