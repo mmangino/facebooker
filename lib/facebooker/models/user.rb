@@ -183,6 +183,15 @@ module Facebooker
       @session.post('facebook.stream.addComment', {:post_id=>post_id, :comment=>comment})
     end
 
+    ###
+    # Add a like on a post
+    #
+    # See: http://wiki.developers.facebook.com/index.php/Stream.addLike
+    #
+    # +post_id+ the post_id for the post that is being commented on
+    def add_like_on(post_id)
+      @session.post('facebook.stream.addLike', {:post_id=>post_id})
+    end
 
      def friend_lists
        @friend_lists ||= @session.post('facebook.friends.getLists').map do |hash|
