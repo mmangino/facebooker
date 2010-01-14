@@ -183,7 +183,7 @@ class Facebooker::UserTest < Test::Unit::TestCase
     assert_equal('703826862_78463536863', @user.comment_on('703826862_78463536862', :message => 'that was hilarious!'))
   end
 
-  def test_add_like
+  def test_add_like_on
     @user = Facebooker::User.new(548871286, @session)
     expect_http_posts_with_responses(example_add_like_on_response)
     assert_equal('1', @user.add_like_on('703826862_78463536862'))
