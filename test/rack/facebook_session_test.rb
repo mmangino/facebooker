@@ -11,7 +11,7 @@ class Rack::FacebookSessionTest < Test::Unit::TestCase
       Rack::Response.new().to_a
     end
     
-    @facebook = Rack::FacebookSession.new(@app, lambda { '_top_sekrit' })
+    @facebook = Rack::FacebookSession.new(@app, '_top_sekrit')
   end
   
   def params(p)
