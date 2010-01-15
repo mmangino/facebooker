@@ -115,6 +115,7 @@ lib/net/http_multipart_post.rb
 lib/rack/facebook.rb
 lib/rack/facebook_session.rb
 lib/tasks/facebooker.rake
+lib/tasks/facebooker.rb
 lib/tasks/tunnel.rake
 rails/init.rb
 setup.rb
