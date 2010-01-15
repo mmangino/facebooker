@@ -699,7 +699,7 @@ module Facebooker
       def fb_intl(text=nil, options={}, &proc)
         raise ArgumentError, "Missing block or text" unless block_given? or text
         if block_given?
-          concat(fb_intl(capture(&proc), options))
+          versioned_concat(fb_intl(capture(&proc), options))
         else
           content_tag("fb:intl", text, stringify_vals(options))
         end
@@ -715,7 +715,7 @@ module Facebooker
       def fb_intl_token(name, text=nil, &proc)
         raise ArgumentError, "Missing block or text" unless block_given? or text
         if block_given?
-          concat(fb_intl_token(name, capture(&proc)))
+          versioned_concat(fb_intl_token(name, capture(&proc)))
         else
           content_tag("fb:intl-token", text, stringify_vals({:name => name}))
         end
