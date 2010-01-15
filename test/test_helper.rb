@@ -13,7 +13,7 @@ rescue LoadError
   # multi rails not installed, test against newest supported version of Rails
   gem 'rails', '2.3.5'
 end
-require 'activesupport'
+require 'active_support'
 require 'flexmock/test_unit'
 require 'mocha'
 
