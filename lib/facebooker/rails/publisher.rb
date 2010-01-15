@@ -109,6 +109,7 @@ module Facebooker
         @full_story_template  = nil
         @recipients           = nil
         @controller           = PublisherController.new(self)
+        @action_links         = nil
       end
 
       def self.default_url_options
