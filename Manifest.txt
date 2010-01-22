@@ -95,6 +95,7 @@ lib/facebooker/rails/facebook_url_helper.rb
 lib/facebooker/rails/facebook_url_rewriting.rb
 lib/facebooker/rails/helpers.rb
 lib/facebooker/rails/helpers/fb_connect.rb
+lib/facebooker/rails/helpers/stream_publish.rb
 lib/facebooker/rails/integration_session.rb
 lib/facebooker/rails/profile_publisher_extensions.rb
 lib/facebooker/rails/publisher.rb

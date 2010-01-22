@@ -9,7 +9,7 @@ module Facebooker
     # It will use to_s if the facebook_id attribute is not present.
     #
     module Helpers
-
+      
       include Facebooker::Rails::Helpers::FbConnect
 
       def versioned_concat(string,binding)
@@ -28,6 +28,11 @@ module Facebooker
         cancel_button = cancel_button ? 1 : 0 unless cancel_button == 0
         versioned_concat( content_tag("fb:dialog", content, {:id => id, :cancel_button => cancel_button}), block.binding )
       end
+      
+      def fb_stream_publish(stream_post,user_message_prompt=nil,callback=nil,auto_publish=false,actor=nil)
+        stream_publish("Facebook.streamPublish",stream_post,user_message_prompt,callback,auto_publish,actor)
+      end
+ 
       
       def fbjs_library
         "<script>var _token = '#{form_authenticity_token}';var _hostname = '#{ActionController::Base.asset_host}'</script>"+

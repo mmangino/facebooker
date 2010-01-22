@@ -2,7 +2,7 @@ module Facebooker
   module Rails
     module Helpers
       module FbConnect
-
+        include Facebooker::Rails::Helpers::StreamPublish
         def fb_connect_javascript_tag(options = {})
           # accept both Rails and Facebook locale formatting, i.e. "en-US" and "en_US".
           lang = "/#{options[:lang].to_s.gsub('-', '_')}" if options[:lang]
@@ -124,18 +124,7 @@ module Facebooker
         end
         
         def fb_connect_stream_publish(stream_post,user_message_prompt=nil,callback=nil,auto_publish=false,actor=nil)
-          defaulted_callback = callback || "null"
-          update_page do |page|
-            page.call("FB.Connect.streamPublish",
-                        stream_post.user_message,
-                        stream_post.attachment.to_hash,
-                        stream_post.action_links,
-                        Facebooker::User.cast_to_facebook_id(stream_post.target),
-                        user_message_prompt,
-                        page.literal(defaulted_callback),
-                        auto_publish,
-                        Facebooker::User.cast_to_facebook_id(actor))
-          end          
+          stream_publish("FB.Connect.streamPublish",stream_post,user_message_prompt,callback,auto_publish,actor)
         end
 
       end
