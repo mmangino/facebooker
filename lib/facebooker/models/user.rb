@@ -455,6 +455,12 @@ module Facebooker
     end
 
     ##
+    # Returns whether the user (either the session user or user specified by uid) has authorized the calling application
+    def app_user?
+      session.post('facebook.users.isAppUser', {:uid => self.id}, use_session_key = true)
+    end
+
+    ##
     # Convenience method to check multiple permissions at once
     def has_permissions?(ext_perms)
       ext_perms.all?{|p| has_permission?(p)}

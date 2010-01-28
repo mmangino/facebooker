@@ -157,6 +157,12 @@ module Facebooker
     end
   end
 
+  class IsAppUser < Parser#:nodoc:
+    def self.process(data)
+      element('users_isAppUser_response', data).content == '1'
+    end
+  end
+
   class GetFriends < Parser#:nodoc:
     def self.process(data)
       array_of_text_values(element('friends_get_response', data), 'uid')
@@ -687,6 +693,7 @@ module Facebooker
       'facebook.status.get' => GetStatus,
       'facebook.users.getLoggedInUser' => GetLoggedInUser,
       'facebook.users.hasAppPermission' => UserHasPermission,
+      'facebook.users.isAppUser' => IsAppUser,
       'facebook.pages.isAdmin' => PagesIsAdmin,
       'facebook.pages.getInfo' => PagesGetInfo,
       'facebook.pages.isFan' => PagesIsFan,

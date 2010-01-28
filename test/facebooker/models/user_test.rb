@@ -24,6 +24,16 @@ class Facebooker::UserTest < Test::Unit::TestCase
     assert @user.has_permissions?(["status_update", "read_stream"])
   end
 
+  def test_app_user_should_return_false_if_facebook_returns_one
+    expect_http_posts_with_responses(is_app_user_true_response_xml)
+    assert @user.app_user?
+  end
+
+  def test_app_user_should_return_false_if_facebook_does_not_return_one
+    expect_http_posts_with_responses(is_app_user_false_response_xml)
+    assert !@user.app_user?
+  end
+
   def test_can_ask_user_if_he_or_she_is_friends_with_another_user
     assert(@user.friends_with?(@other_user))
   end
@@ -460,6 +470,24 @@ private
     <users_hasAppPermission_response xmlns="http://api.facebook.com/1.0/"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd">1</users_hasAppPermission_response>
+    XML
+  end
+
+  def is_app_user_true_response_xml
+    <<-XML
+    <?xml version="1.0" encoding="UTF-8"?>
+    <users_isAppUser_response xmlns="http://api.facebook.com/1.0/"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+      xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd">1</users_isAppUser_response>
+    XML
+  end
+
+  def is_app_user_false_response_xml
+    <<-XML
+    <?xml version="1.0" encoding="UTF-8"?>
+    <users_isAppUser_response xmlns="http://api.facebook.com/1.0/"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+      xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd">0</users_isAppUser_response>
     XML
   end
 
