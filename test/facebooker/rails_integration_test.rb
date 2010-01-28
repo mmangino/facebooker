@@ -1159,7 +1159,7 @@ class RailsHelperTest < Test::Unit::TestCase
     end
 
     silence_warnings do
-      assert_equal "<script src=\"https://www.connect.facebook.com/js/api_lib/v0.4/FeatureLoader.js.php\" type=\"text/javascript\"></script>",
+      assert_equal "<script src=\"https://ssl.connect.facebook.com/js/api_lib/v0.4/FeatureLoader.js.php\" type=\"text/javascript\"></script>",
         @h.fb_connect_javascript_tag
     end
   end
@@ -1174,7 +1174,7 @@ class RailsHelperTest < Test::Unit::TestCase
     end
 
     silence_warnings do
-      assert_equal "<script src=\"https://www.connect.facebook.com/js/api_lib/v0.4/FeatureLoader.js.php/en_US\" type=\"text/javascript\"></script>",
+      assert_equal "<script src=\"https://ssl.connect.facebook.com/js/api_lib/v0.4/FeatureLoader.js.php/en_US\" type=\"text/javascript\"></script>",
         @h.fb_connect_javascript_tag(:lang => "en_US")
     end
   end
