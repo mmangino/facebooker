@@ -2,11 +2,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{facebooker}
-  s.version = "1.0.61"
+  s.version = "1.0.62"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Chad Fowler", "Patrick Ewing", "Mike Mangino", "Shane Vitarana", "Corey Innis", "Mike Mangino"]
-  s.date = %q{2010-01-22}
+  s.date = %q{2010-02-05}
   s.description = %q{Facebooker is a Ruby wrapper over the Facebook[http://facebook.com] {REST API}[http://wiki.developers.facebook.com/index.php/API].  Its goals are:
 
 * Idiomatic Ruby
@@ -29,14 +29,14 @@ Gem::Specification.new do |s|
     s.specification_version = 3
 
     if Gem::Version.new(Gem::RubyGemsVersion) >= Gem::Version.new('1.2.0') then
-      s.add_runtime_dependency(%q<json>, [">= 1.0.0"])
+      s.add_runtime_dependency(%q<json_pure>, [">= 1.0.0"])
       s.add_development_dependency(%q<hoe>, [">= 2.4.0"])
     else
-      s.add_dependency(%q<json>, [">= 1.0.0"])
+      s.add_dependency(%q<json_pure>, [">= 1.0.0"])
       s.add_dependency(%q<hoe>, [">= 2.4.0"])
     end
   else
-    s.add_dependency(%q<json>, [">= 1.0.0"])
+    s.add_dependency(%q<json_pure>, [">= 1.0.0"])
     s.add_dependency(%q<hoe>, [">= 2.4.0"])
   end
 end
