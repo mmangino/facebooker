@@ -25,6 +25,8 @@ module Facebooker
 
     populating_attr_reader :status
 
+    attr_accessor :request_locale
+
     # Can pass in these two forms:
     # id, session, (optional) attribute_hash
     # attribute_hash
@@ -214,7 +216,9 @@ module Facebooker
     # Retrieve profile data for logged in user
     # Optional: list of fields to retrieve as symbols
     def populate(*fields)
-      session.post('facebook.users.getInfo', :fields => collect(fields), :uids => id) do |response|
+      arguments = {:fields => collect(fields), :uids => id}
+      arguments[:locale]=request_locale unless request_locale.nil?
+      session.post('facebook.users.getInfo', arguments) do |response|
         populate_from_hash!(response.first)
       end
     end

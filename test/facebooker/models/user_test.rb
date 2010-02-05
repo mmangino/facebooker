@@ -79,6 +79,25 @@ class Facebooker::UserTest < Test::Unit::TestCase
   def test_raises_when_no_session_bound
     assert_raises(Facebooker::Model::UnboundSessionException) { Facebooker::User.new(1, nil).populate }
   end
+  
+  def test_passes_request_locale_when_set
+    session = mock()
+    session.expects(:post).with("facebook.users.getInfo",has_entry(:locale,"es_ES"))
+    Facebooker::Session.expects(:current).returns(session)
+    user=Facebooker::User.new(1)
+    user.request_locale="es_ES"
+    user.name
+    
+  end
+  
+  def test_doesnt_pass_request_locale_when_not_set
+    session = mock()
+    session.expects(:post).with("facebook.users.getInfo",Not(has_key(:locale)))
+    Facebooker::Session.expects(:current).returns(session)
+    user=Facebooker::User.new(1)
+    user.name
+    
+  end
 
   def test_can_set_mobile_fbml
     @user.expects(:set_profile_fbml).with(nil,"test",nil,nil)
