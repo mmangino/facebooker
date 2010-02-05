@@ -1,5 +1,10 @@
 unless defined?(ActiveSupport) and defined?(ActiveSupport::JSON)
-  require 'json'
+  begin
+    require 'json'
+  rescue LoadError
+    gem "json_pure"
+    require "json"
+  end
   module Facebooker
     def self.json_decode(str)
       JSON.parse(str)
