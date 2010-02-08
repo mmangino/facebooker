@@ -626,6 +626,30 @@ module Facebooker
     end
   end
 
+  class DashboardGetCount < Parser
+    def self.process(data)
+      element('dashboard_getCount_response', data).content.strip.to_i
+    end
+  end
+
+  class DashboardSetCount < Parser
+    def self.process(data)
+      element('dashboard_setCount_response', data).content.strip == '1'
+    end
+  end
+
+  class DashboardIncrementCount < Parser
+    def self.process(data)
+      element('dashboard_incrementCount_response', data).content.strip == '1'
+    end
+  end
+
+  class DashboardDecrementCount < Parser
+    def self.process(data)
+      element('dashboard_decrementCount_response', data).content.strip == '1'
+    end
+  end
+
   class Errors < Parser#:nodoc:
     EXCEPTIONS = {
       1 	=> Facebooker::Session::UnknownError,
@@ -754,7 +778,11 @@ module Facebooker
       'facebook.sms.canSend' => SmsCanSend,
       'facebook.comments.add' => CommentsAdd,
       'facebook.comments.remove' => CommentsRemove,
-      'facebook.comments.get' => CommentsGet
+      'facebook.comments.get' => CommentsGet,
+      'facebook.dashboard.setCount' => DashboardSetCount,
+      'facebook.dashboard.getCount' => DashboardGetCount,
+      'facebook.dashboard.incrementCount' => DashboardIncrementCount,
+      'facebook.dashboard.decrementCount' => DashboardDecrementCount
     }
   end
 end

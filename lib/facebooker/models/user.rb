@@ -493,6 +493,27 @@ module Facebooker
     def to_s
       id.to_s
     end
+    
+    
+    ### NEW DASHBOARD API STUFF
+    
+    def dashboard_count
+      session.post('facebook.dashboard.getCount', { :uid => uid })
+    end
+    
+    def dashboard_count=(new_count)
+      session.post('facebook.dashboard.setCount', { :uid => uid, :count => new_count })
+    end
+    
+    def dashboard_increment_count
+      session.post('facebook.dashboard.incrementCount', { :uid => uid })
+    end
+    
+    def dashboard_decrement_count
+      session.post('facebook.dashboard.decrementCount', { :uid => uid })
+    end
+    
+    
 
     ##
     # Two Facebooker::User objects should be considered equal if their Facebook ids are equal
