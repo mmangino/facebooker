@@ -79,7 +79,7 @@ module Facebooker
       end
       raise "Element #{name} not found in #{data}"
     end
-
+    
     def self.hash_or_value_for(element)
       if element.children.size == 1 && element.children.first.text?
         element.content.strip
@@ -628,7 +628,7 @@ module Facebooker
 
   class DashboardGetCount < Parser
     def self.process(data)
-      element('dashboard_getCount_response', data).content.strip.to_i
+      element('dashboard_getCount_response', data).content.strip
     end
   end
 
@@ -649,6 +649,152 @@ module Facebooker
       element('dashboard_decrementCount_response', data).content.strip == '1'
     end
   end
+  
+  class DashboardMultiGetCount < Parser
+    def self.process(data)
+      ret = {}
+      element('dashboard_multiGetCount_response', data).children.select { |child| child.name == 'dashboard_multiGetCount_response_elt' }.each do |child|
+        ret[child['key']] = child.text
+      end
+      ret
+    end
+  end
+  
+  class DashboardAddGlobalNews < Parser
+    def self.process(data)
+      element('dashboard_addGlobalNews_response', data).content.strip
+    end
+  end
+  
+  # Currently, always returns all
+  class DashboardGetGlobalNews < Parser
+    def self.process(data)
+      ret = {}
+      element('dashboard_getGlobalNews_response', data).children.reject { |child| child.text? }.each do |news_list|
+        info = {}
+        
+        if image_node = news_list.css('[key=image]')
+          info[:image] = image_node.first.content
+        end
+        
+        if image_node = news_list.css('[key=time]')
+          info[:time] = image_node.first.content
+        end
+        
+        news_items = []
+        news_nodes = news_list.css('dashboard_getGlobalNews_response_elt_elt_elt')
+        news_nodes.each do |news_item|
+          news = {}
+          news[:message] = news_item.css('[key=message]').first.content
+          action_link = news_item.css('[key=action_link]')
+          if action_link.size > 0
+            news[:action_link] = {
+              :href => action_link.css('[key=href]').first.content, 
+              :text => action_link.css('[key=text]').first.content
+            }
+          end
+          news_items << news
+        end
+        info[:news] = news_items
+        
+        ret[news_list['key']] = info
+      end
+      ret
+    end
+  end
+  
+  class DashboardClearGlobalNews < Parser
+    def self.process(data)
+      ret = {}
+      element('dashboard_clearGlobalNews_response', data).children.select { |child| child.name == 'dashboard_clearGlobalNews_response_elt' }.each do |child|
+        ret[child['key']] = (child.text == 1)
+      end
+      ret
+    end
+  end
+  
+  class DashboardAddNews < Parser
+    def self.process(data)
+      element('dashboard_addNews_response', data).content.strip
+    end
+  end
+  
+  class DashboardGetNews < Parser
+    def self.process(data)
+      ret = {}
+      element('dashboard_getNews_response', data).children.reject { |child| child.text? }.each do |news_list|
+        info = {}
+        
+        if image_node = news_list.css('[key=image]')
+          info[:image] = image_node.first.content
+        end
+        
+        if image_node = news_list.css('[key=time]')
+          info[:time] = image_node.first.content
+        end
+        
+        news_items = []
+        news_nodes = news_list.css('dashboard_getNews_response_elt_elt_elt')
+        news_nodes.each do |news_item|
+          news = {}
+          news[:message] = news_item.css('[key=message]').first.content
+          action_link = news_item.css('[key=action_link]')
+          if action_link.size > 0
+            news[:action_link] = {
+              :href => action_link.css('[key=href]').first.content, 
+              :text => action_link.css('[key=text]').first.content
+            }
+          end
+          news_items << news
+        end
+        info[:news] = news_items
+        
+        ret[news_list['key']] = info
+      end
+      ret
+    end
+  end
+  
+  class DashboardClearNews < Parser
+    def self.process(data)
+      ret = {}
+      element('dashboard_clearNews_response', data).children.select { |child| child.name == 'dashboard_clearNews_response_elt' }.each do |child|
+        ret[child['key']] = (child.text == 1)
+      end
+      ret
+    end
+  end
+  
+  class DashboardPublishActivity < Parser
+    def self.process(data)
+      puts data
+    end
+  end
+  
+  class DashboardRemoveActivity < Parser
+    def self.process(data)
+      puts data
+    end
+  end
+  
+  class DashboardGetActivity < Parser
+    def self.process(data)
+      puts data
+    end
+  end
+  
+  
+  
+
+  # class DashboardMultiGetCount < Parser
+  #   def self.process(data)
+  #     ret = {}
+  #     element('dashboard_multiGetCount_response', data).children.select { |child| child.name == 'dashboard_multiGetCount_response_elt' }.each do |child|
+  #       ret[child['key']] = child.text
+  #     end
+  #     ret
+  #   end
+  # end
 
   class Errors < Parser#:nodoc:
     EXCEPTIONS = {
@@ -782,7 +928,17 @@ module Facebooker
       'facebook.dashboard.setCount' => DashboardSetCount,
       'facebook.dashboard.getCount' => DashboardGetCount,
       'facebook.dashboard.incrementCount' => DashboardIncrementCount,
-      'facebook.dashboard.decrementCount' => DashboardDecrementCount
+      'facebook.dashboard.decrementCount' => DashboardDecrementCount,
+      'facebook.dashboard.multiGetCount' => DashboardMultiGetCount,
+      'facebook.dashboard.addGlobalNews' => DashboardAddGlobalNews,
+      'facebook.dashboard.getGlobalNews' => DashboardGetGlobalNews,
+      'facebook.dashboard.clearGlobalNews' => DashboardClearGlobalNews,
+      'facebook.dashboard.addNews' => DashboardAddNews,
+      'facebook.dashboard.getNews' => DashboardGetNews,
+      'facebook.dashboard.clearNews' => DashboardClearNews,
+      'facebook.dashboard.publishActivity' => DashboardPublishActivity,
+      'facebook.dashboard.removeActivity' => DashboardRemoveActivity,
+      'facebook.dashboard.getActivity' => DashboardGetActivity
     }
   end
 end

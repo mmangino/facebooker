@@ -396,7 +396,7 @@ class Facebooker::UserTest < Test::Unit::TestCase
     end
   end
 
-private
+  private
   def example_profile_photos_get_xml
     "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
     <photos_get_response xmlns=\"http://api.facebook.com/1.0/\"

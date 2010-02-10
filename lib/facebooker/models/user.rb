@@ -513,6 +513,54 @@ module Facebooker
       session.post('facebook.dashboard.decrementCount', { :uid => uid })
     end
     
+    # TODO: test
+    def self.dashboard_multi_get_count(*uids)
+      uids.flatten!
+      Facebooker::Session.create.post("facebook.dashboard.multiGetCount",:uids => uids)
+    end
+    
+    def get_news(news_ids=nil)
+      params = { :uid => uid }
+      params[:news_ids] = news_ids if news_ids
+      
+      session.post('facebook.dashboard.getNews', params)
+    end
+    
+    def add_news(news, image=nil)
+      params = { :uid => uid }
+      params[:news] = news
+      params[:image] = image if image
+      
+      session.post('facebook.dashboard.addNews', params)
+    end
+    
+    def clear_news(news_ids=nil)
+      params = { :uid => uid }
+      params[:news_ids] = news_ids if news_ids
+      
+      session.post('facebook.dashboard.clearNews', params)
+    end
+    
+    
+    def get_activity(activity_ids=nil)
+      params = {}
+      params[:activity_ids] = activity_ids if activity_ids
+      
+      session.post('facebook.dashboard.getActivity', params)
+    end
+    
+    # BRoken
+    # def publish_activity(activity)
+    #   session.post('facebook.dashboard.publishActivity', { :activity => activity })
+    # end
+    
+    
+    # Values needs to be a hash with keys = uid, values = corresponding counts
+    # This always returns Incorrect Signature?
+    # def dashboard_multi_set_count(values)
+    #   session.post("facebook.dashboard.multiSetCount",:ids => values)
+    # end
+    
     
 
     ##
