@@ -1532,3 +1532,4 @@ class RailsRequestFormatTest < Test::Unit::TestCase
   end
   
 end
+

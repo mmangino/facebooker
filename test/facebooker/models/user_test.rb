@@ -337,6 +337,8 @@ class Facebooker::UserTest < Test::Unit::TestCase
     assert result
   end
   
+  # Dashboard count APIs
+  
   def test_can_set_dashboard_count
     @session.expects(:post).with('facebook.dashboard.setCount', {:uid => @user.uid, :count => 12})
     @user.dashboard_count = 12
@@ -455,8 +457,32 @@ class Facebooker::UserTest < Test::Unit::TestCase
   def test_parse_dashboard_multi_decrement_count
     expect_http_posts_with_responses(dashboard_multi_decrement_count_xml)
     assert_equal({ '1234' => '1', '4321' => '1' }, Facebooker::User.dashboard_multi_decrement_count(['1234', '4321']))
+  
+  # Dashboard
+  
+  def test_can_get_news
+    @session.expects(:post).with('facebook.dashboard.getNews', {:uid => @user.uid, :news_ids => ['123']})
+    @user.get_news ['123']
   end
   
+  def test_can_add_news
+    @session.expects(:post).with('facebook.dashboard.addNews', {:uid => 1234, :news => [{:message => 'Feel my biceps', :action_link => {:text => 'Okay', :href => 'http://mybiceps.com'}}], :image => 'http://biceppix.com/dang.png'})
+    @user.add_news [{ :message => 'Feel my biceps', :action_link => { :href => 'http://mybiceps.com', :text => 'Okay' } }], 'http://biceppix.com/dang.png'
+  end
+  
+  def test_can_clear_news
+    @session.expects(:post).with('facebook.dashboard.clearNews', {:uid => @user.uid, :news_ids => ['123']})
+    @user.clear_news ['123']
+  end
+  
+  def test_can_get_activity
+    @session.expects(:post).with('facebook.dashboard.getActivity', {:activity_ids => ['123']})
+    @user.get_activity ['123']
+  end
+  
+  def test_can_get_activity
+    
+  end
   
   
   

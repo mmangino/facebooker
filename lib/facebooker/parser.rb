@@ -143,6 +143,8 @@ module Facebooker
       end #do |hash, child|
     end
 
+
+
     def self.booleanize(response)
       response == "1" ? true : false
     end
@@ -606,7 +608,7 @@ module Facebooker
       end
     end
 
-  private
+    private
     def self.are_friends?(raw_value)
       if raw_value == '1'
         true
@@ -686,11 +688,25 @@ module Facebooker
   
   class DashboardMultiGetCount < Parser
     def self.process(data)
-      ret = {}
-      element('dashboard_multiGetCount_response', data).children.select { |child| child.name == 'dashboard_multiGetCount_response_elt' }.each do |child|
-        ret[child['key']] = child.text
-      end
-      ret
+      hashinate_by_key(element('dashboard_multiGetCount_response', data))
+    end
+  end
+  
+  class DashboardMultiSetCount < Parser
+    def self.process(data)
+      hashinate_by_key(element('dashboard_multiSetCount_response', data))
+    end
+  end
+  
+  class DashboardMultiIncrementCount < Parser
+    def self.process(data)
+      hashinate_by_key(element('dashboard_multiIncrementCount_response', data))
+    end
+  end
+  
+  class DashboardMultiDecrementCount < Parser
+    def self.process(data)
+      hashinate_by_key(element('dashboard_multiDecrementCount_response', data))
     end
   end
   
@@ -722,14 +738,12 @@ module Facebooker
   # Currently, always returns all
   class DashboardGetGlobalNews < Parser
     def self.process(data)
-      puts data
       hashinate_by_key(element('dashboard_getGlobalNews_response', data))
     end
   end
   
   class DashboardClearGlobalNews < Parser
     def self.process(data)
-      puts data
       hashinate_by_key(element('dashboard_clearGlobalNews_response', data))
     end
   end
@@ -743,14 +757,12 @@ module Facebooker
   
   class DashboardGetNews < Parser
     def self.process(data)
-      puts data
       hashinate_by_key(element('dashboard_getNews_response', data))
     end
   end
   
   class DashboardClearNews < Parser
     def self.process(data)
-      puts data
       hashinate_by_key(element('dashboard_clearNews_response', data))
     end
   end
@@ -778,37 +790,22 @@ module Facebooker
   
   class DashboardPublishActivity < Parser
     def self.process(data)
-      puts data
       element('dashboard_publishActivity_response', data).content.strip
     end
   end
   
   class DashboardRemoveActivity < Parser
     def self.process(data)
-      puts data
       hashinate_by_key(element('dashboard_removeActivity_response', data))
     end
   end
   
   class DashboardGetActivity < Parser
     def self.process(data)
-      puts data
       hashinate_by_key(element('dashboard_getActivity_response', data))
     end
   end
-  
-  
-  
 
-  # class DashboardMultiGetCount < Parser
-  #   def self.process(data)
-  #     ret = {}
-  #     element('dashboard_multiGetCount_response', data).children.select { |child| child.name == 'dashboard_multiGetCount_response_elt' }.each do |child|
-  #       ret[child['key']] = child.text
-  #     end
-  #     ret
-  #   end
-  # end
 
   class Errors < Parser#:nodoc:
     EXCEPTIONS = {

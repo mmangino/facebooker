@@ -522,7 +522,7 @@ module Facebooker
     
     # Facebooker::User.dashboard_multi_get_count ['1234', '5678']
     def self.dashboard_multi_get_count(*uids)
-      Facebooker::Session.create.post("facebook.dashboard.multiGetCount", :uids => uids.flatten)
+     Facebooker::Session.create.post("facebook.dashboard.multiGetCount", :uids => uids.flatten)
     end
     
     # Facebooker::User.dashboard_multi_set_count({ '1234' => '11', '5678' => '22' })
@@ -539,6 +539,21 @@ module Facebooker
     def self.dashboard_multi_decrement_count(*uids)
       Facebooker::Session.create.post("facebook.dashboard.multiDecrementCount", :uids => uids.flatten.to_json)
     end
+    
+    def self.dashboard_multi_set_count(ids)
+      Facebooker::Session.create.post("facebook.dashboard.multiSetCount", :ids => ids.to_json)
+    end
+    
+    def self.dashboard_multi_increment_count(uids)
+      Facebooker::Session.create.post("facebook.dashboard.multiIncrementCount", :uids => uids.to_json)
+    end
+    
+    def self.dashboard_multi_decrement_count(uids)
+      Facebooker::Session.create.post("facebook.dashboard.multiDecrementCount", :uids => uids.to_json)
+    end
+    
+    
+    
     
     def get_news(news_ids=nil)
       params = { :uid => uid }
@@ -562,6 +577,18 @@ module Facebooker
       session.post('facebook.dashboard.clearNews', params)
     end
     
+    def self.multi_add_news(uids, news, image=nil)
+      params = { :uids => uids, :news => news }
+      params[:image] = image if image
+
+      Facebooker::Session.create.post("facebook.dashboard.multiAddNews", params)
+    end
+    
+    def self.multi_clear_news(ids, image=nil)
+      Facebooker::Session.create.post("facebook.dashboard.multiclearNews", :ids => ids.to_json)
+    end
+    
+    
     
     def get_activity(activity_ids=nil)
       params = {}
@@ -570,10 +597,15 @@ module Facebooker
       session.post('facebook.dashboard.getActivity', params)
     end
     
-    # BRoken
-    # def publish_activity(activity)
-    #   session.post('facebook.dashboard.publishActivity', { :activity => activity })
-    # end
+    # Must call to_json for signature
+    def publish_activity(activity)
+      session.post('facebook.dashboard.publishActivity', { :activity => activity.to_json })
+    end
+    
+    # Expects an array of strings
+    def remove_activity(activity_ids)
+      session.post('facebook.dashboard.removeActivity', { :activity_ids => activity_ids })
+    end
     
     
     # Values needs to be a hash with keys = uid, values = corresponding counts
