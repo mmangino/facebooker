@@ -342,9 +342,20 @@ class Facebooker::UserTest < Test::Unit::TestCase
     @user.dashboard_count = 12
   end
 
+  def test_parse_set_dashboard_count
+    expect_http_posts_with_responses(dashboard_set_count_xml)
+    assert_equal 12, @user.dashboard_count = 12
+  end
+
   def test_can_increment_dashboard_count
     @session.expects(:post).with('facebook.dashboard.incrementCount', {:uid => @user.uid})
     @user.dashboard_increment_count
+  end
+
+  def test_parse_increment_dashboard_count
+    expect_http_posts_with_responses(dashboard_increment_count_xml)
+    debugger
+    assert_equal true, @user.dashboard_increment_count
   end
 
   def test_can_decrement_dashboard_count
@@ -352,9 +363,14 @@ class Facebooker::UserTest < Test::Unit::TestCase
     @user.dashboard_decrement_count
   end
 
+  def test_parse_decrement_dashboard_count
+    expect_http_posts_with_responses(dashboard_decrement_count_xml)
+    assert_equal true, @user.dashboard_decrement_count
+  end
+
   def test_can_get_dashboard_count
     @session.expects(:post).with('facebook.dashboard.getCount', {:uid => @user.uid}).returns(12)
-    assert_equal 12, @user.dashboard_count
+    @user.dashboard_count
   end
   
   def test_threads_should_return_an_array_of_thread_instances_containing_messages_and_attachments
@@ -396,6 +412,79 @@ class Facebooker::UserTest < Test::Unit::TestCase
     end
   end
 
+  def test_parse_get_dashboard_count
+    expect_http_posts_with_responses(dashboard_get_count_xml)
+    assert_equal '12', @user.dashboard_count
+  end
+  
+  def test_can_dashboard_multi_set_count
+    Facebooker::Session.any_instance.expects(:post).with('facebook.dashboard.multiSetCount', :ids => { '1234' => '11', '5678' => '22' }.to_json)
+    Facebooker::User.dashboard_multi_set_count({ '1234' => '11', '5678' => '22' })
+  end
+  
+  def test_parse_dashboard_multi_set_count
+    expect_http_posts_with_responses(dashboard_multi_set_count_xml)
+    assert_equal({ '1234' => '1', '4321' => '1' }, Facebooker::User.dashboard_multi_set_count({ '1234' => '11', '5678' => '22' }))
+  end
+  
+  def test_can_dashboard_multi_get_count
+    Facebooker::Session.any_instance.expects(:post).with('facebook.dashboard.multiGetCount', :uids => ['1234', '4321'])
+    Facebooker::User.dashboard_multi_get_count ['1234', '4321']
+  end
+  
+  def test_parse_dashboard_multi_get_count
+    expect_http_posts_with_responses(dashboard_multi_get_count_xml)
+    assert_equal({ '1234' => '11', '4321' => '22' }, Facebooker::User.dashboard_multi_get_count(['1234', '4321']))
+  end
+  
+  def test_can_dashboard_multi_increment_count
+    Facebooker::Session.any_instance.expects(:post).with('facebook.dashboard.multiIncrementCount', :uids => ['1234', '4321'].to_json)
+    Facebooker::User.dashboard_multi_increment_count ['1234', '4321']
+  end
+  
+  def test_parse_dashboard_multi_increment_count
+    expect_http_posts_with_responses(dashboard_multi_increment_count_xml)
+    assert_equal({ '1234' => '1', '4321' => '1' }, Facebooker::User.dashboard_multi_increment_count(['1234', '4321']))
+  end
+  
+  def test_can_dashboard_multi_decrement_count
+    Facebooker::Session.any_instance.expects(:post).with('facebook.dashboard.multiDecrementCount', :uids => ['1234', '4321'].to_json)
+    Facebooker::User.dashboard_multi_decrement_count ['1234', '4321']
+  end
+
+  def test_parse_dashboard_multi_decrement_count
+    expect_http_posts_with_responses(dashboard_multi_decrement_count_xml)
+    assert_equal({ '1234' => '1', '4321' => '1' }, Facebooker::User.dashboard_multi_decrement_count(['1234', '4321']))
+  end
+  
+  
+  
+  
+  # def test_can_get_news
+  #   @session.expects(:post).with('facebook.dashboard.getNews', {:uid => @user.uid, :news_ids => ['123']})
+  #   @user.get_news ['123']
+  # end
+  # 
+  # def test_can_add_news
+  #   @session.expects(:post).with('facebook.dashboard.addNews', {:uid => 1234, :news => [{:message => 'Feel my biceps', :action_link => {:text => 'Okay', :href => 'http://mybiceps.com'}}], :image => 'http://biceppix.com/dang.png'})
+  #   @user.add_news [{ :message => 'Feel my biceps', :action_link => { :href => 'http://mybiceps.com', :text => 'Okay' } }], 'http://biceppix.com/dang.png'
+  # end
+  # 
+  # def test_can_clear_news
+  #   @session.expects(:post).with('facebook.dashboard.clearNews', {:uid => @user.uid, :news_ids => ['123']})
+  #   @user.clear_news ['123']
+  # end
+  # 
+  # def test_can_get_activity
+  #   @session.expects(:post).with('facebook.dashboard.getActivity', {:activity_ids => ['123']})
+  #   @user.get_activity ['123']
+  # end
+  # 
+  # def test_can_get_activity
+  #   
+  # end
+  # 
+  
   private
   def example_profile_photos_get_xml
     "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
@@ -694,4 +783,117 @@ From all of us at Facebook, we wish you and your families &quot;Happy Holidays,&
       <dashboard_getCount_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd">12</dashboard_getCount_response>
     XML
   end
+  
+  def dashboard_set_count_xml
+    <<-XML
+      <?xml version="1.0" encoding="UTF-8"?>
+      <dashboard_setCount_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd">1</dashboard_setCount_response>
+    XML
+  end
+  
+  def dashboard_increment_count_xml
+    <<-XML
+      <?xml version="1.0" encoding="UTF-8"?>
+      <dashboard_incrementCount_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd">1</dashboard_incrementCount_response>
+    XML
+  end
+  
+  def dashboard_decrement_count_xml
+    <<-XML
+      <?xml version="1.0" encoding="UTF-8"?>
+      <dashboard_decrementCount_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd">1</dashboard_decrementCount_response>
+    XML
+  end
+
+  def dashboard_multi_set_count_xml
+    <<-XML
+      <?xml version="1.0" encoding="UTF-8"?>
+      <dashboard_multiSetCount_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd" list="true">
+        <dashboard_multiSetCount_response_elt key="1234">1</dashboard_multiSetCount_response_elt>
+        <dashboard_multiSetCount_response_elt key="4321">1</dashboard_multiSetCount_response_elt>
+      </dashboard_multiSetCount_response>
+    XML
+  end
+
+  def dashboard_multi_get_count_xml
+    <<-XML
+      <?xml version="1.0" encoding="UTF-8"?>
+      <dashboard_multiGetCount_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd" list="true">
+        <dashboard_multiGetCount_response_elt key="1234">11</dashboard_multiGetCount_response_elt>
+        <dashboard_multiGetCount_response_elt key="4321">22</dashboard_multiGetCount_response_elt>
+      </dashboard_multiGetCount_response>
+    XML
+  end
+
+  def dashboard_multi_increment_count_xml
+    <<-XML
+      <?xml version="1.0" encoding="UTF-8"?>
+      <dashboard_multiIncrementCount_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd" list="true">
+        <dashboard_multiIncrementCount_response_elt key="1234">1</dashboard_multiIncrementCount_response_elt>
+        <dashboard_multiIncrementCount_response_elt key="4321">1</dashboard_multiIncrementCount_response_elt>
+      </dashboard_multiIncrementCount_response>
+    XML
+  end
+
+  def dashboard_multi_decrement_count_xml
+    <<-XML
+      <?xml version="1.0" encoding="UTF-8"?>
+      <dashboard_multiDecrementCount_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd" list="true">
+        <dashboard_multiDecrementCount_response_elt key="1234">1</dashboard_multiDecrementCount_response_elt>
+        <dashboard_multiDecrementCount_response_elt key="4321">1</dashboard_multiDecrementCount_response_elt>
+      </dashboard_multiDecrementCount_response>
+    XML
+  end
+  # 
+  # def dashboard_increment_count_xml
+  #   <<-XML
+  #     
+  #   XML
+  # end
+  # 
+  # def dashboard_increment_count_xml
+  #   <<-XML
+  #     
+  #   XML
+  # end
+  # 
+  # def dashboard_increment_count_xml
+  #   <<-XML
+  #     
+  #   XML
+  # end
+  # 
+  # def dashboard_increment_count_xml
+  #   <<-XML
+  #     
+  #   XML
+  # end
+  # 
+  # def dashboard_increment_count_xml
+  #   <<-XML
+  #     
+  #   XML
+  # end
+  # 
+  # def dashboard_increment_count_xml
+  #   <<-XML
+  #     
+  #   XML
+  # end
+  # 
+  # def dashboard_increment_count_xml
+  #   <<-XML
+  #     
+  #   XML
+  # end
+  # 
+  # def dashboard_increment_count_xml
+  #   <<-XML
+  #     
+  #   XML
+  # end
+
+  
+  
+  
 end

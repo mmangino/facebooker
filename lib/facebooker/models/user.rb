@@ -497,26 +497,47 @@ module Facebooker
     
     ### NEW DASHBOARD API STUFF
     
+    # facebook_session.user.dashboard_count
     def dashboard_count
-      session.post('facebook.dashboard.getCount', { :uid => uid })
+      session.post('facebook.dashboard.getCount', :uid => uid)
     end
     
+    # facebook_session.user.dashboard_count = 5
     def dashboard_count=(new_count)
-      session.post('facebook.dashboard.setCount', { :uid => uid, :count => new_count })
+      session.post('facebook.dashboard.setCount', :uid => uid, :count => new_count)
     end
     
+    # facebook_session.user.dashboard_increment_count
     def dashboard_increment_count
-      session.post('facebook.dashboard.incrementCount', { :uid => uid })
+      session.post('facebook.dashboard.incrementCount', :uid => uid)
     end
     
+    # facebook_session.user.dashboard_decrement_count
     def dashboard_decrement_count
-      session.post('facebook.dashboard.decrementCount', { :uid => uid })
+      session.post('facebook.dashboard.decrementCount', :uid => uid)
     end
     
-    # TODO: test
+    # The following methods are not bound to a specific user but do relate to Users in general,
+    #   so I've made them into class methods.
+    
+    # Facebooker::User.dashboard_multi_get_count ['1234', '5678']
     def self.dashboard_multi_get_count(*uids)
-      uids.flatten!
-      Facebooker::Session.create.post("facebook.dashboard.multiGetCount",:uids => uids)
+      Facebooker::Session.create.post("facebook.dashboard.multiGetCount", :uids => uids.flatten)
+    end
+    
+    # Facebooker::User.dashboard_multi_set_count({ '1234' => '11', '5678' => '22' })
+    def self.dashboard_multi_set_count(ids)
+      Facebooker::Session.create.post("facebook.dashboard.multiSetCount", :ids => ids.to_json)
+    end
+    
+    # Facebooker::User.dashboard_multi_increment_count ['1234', '5678']
+    def self.dashboard_multi_increment_count(*uids)
+      Facebooker::Session.create.post("facebook.dashboard.multiIncrementCount", :uids => uids.flatten.to_json)
+    end
+    
+    # Facebooker::User.dashboard_multi_decrement_count ['1234', '5678']
+    def self.dashboard_multi_decrement_count(*uids)
+      Facebooker::Session.create.post("facebook.dashboard.multiDecrementCount", :uids => uids.flatten.to_json)
     end
     
     def get_news(news_ids=nil)
