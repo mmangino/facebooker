@@ -465,22 +465,96 @@ class Facebooker::UserTest < Test::Unit::TestCase
     @user.get_news ['123']
   end
   
+  def test_can_get_news
+    @session.expects(:post).with('facebook.dashboard.getNews', {:uid => @user.uid, :news_ids => ['123']})
+    @user.get_news ['123']
+  end
+  
+  def test_parse_get_news
+    expect_http_posts_with_responses(get_news_xml)
+    assert_equal({"304847042079"=>{"fbid"=>"304847042079", "time"=>"1266020260510", "news"=>[{"action_link"=>{"href"=>"http://facebook.er/", "text"=>"I... I'm a test user"}, "message"=>"Hey, who are you?"}, {"action_link"=>{"href"=>"http://facebook.er/", "text"=>"I'm sorry"}, "message"=>"Stop using my application, nerd"}], "image"=>"http://facebook.er/icon.png"}}, @user.get_news(['304847042079']))
+  end
+  
   def test_can_add_news
-    @session.expects(:post).with('facebook.dashboard.addNews', {:uid => 1234, :news => [{:message => 'Feel my biceps', :action_link => {:text => 'Okay', :href => 'http://mybiceps.com'}}], :image => 'http://biceppix.com/dang.png'})
-    @user.add_news [{ :message => 'Feel my biceps', :action_link => { :href => 'http://mybiceps.com', :text => 'Okay' } }], 'http://biceppix.com/dang.png'
+    @session.expects(:post).with('facebook.dashboard.addNews', {:news => [{:message => 'Hi user', :action_link => {:text => 'Uh hey there app', :href => 'http://facebook.er/'}}], :uid => @user.uid, :image => 'http://facebook.er/icon.png'})
+    @user.add_news [{ :message => 'Hi user', :action_link => { :text => "Uh hey there app", :href => 'http://facebook.er/' }}], 'http://facebook.er/icon.png'
+  end
+  
+  def test_parse_add_news
+    expect_http_posts_with_responses(add_news_xml)
+    assert_equal("316446838026", @user.add_news([{ :message => 'Hi user', :action_link => { :text => "Uh hey there app", :href => 'http://facebook.er/' }}], 'http://facebook.er/icon.png'))
   end
   
   def test_can_clear_news
-    @session.expects(:post).with('facebook.dashboard.clearNews', {:uid => @user.uid, :news_ids => ['123']})
-    @user.clear_news ['123']
+    @session.expects(:post).with('facebook.dashboard.clearNews', { :uid => @user.uid, :news_ids => ['123']})
+    @user.clear_news '123'
+  end
+  
+  def test_parse_clear_news
+    expect_http_posts_with_responses(clear_news_xml)
+    assert_equal({"362466171040"=>"1"}, @user.clear_news('362466171040'))
+  end
+  
+  def test_can_multi_add_news
+    Facebooker::Session.any_instance.expects(:post).with('facebook.dashboard.multiAddNews', { :uids => ['1234', '4321'], :news => [{ :message => 'Hi user', :action_link => { :text => "Uh hey there app", :href => 'http://facebook.er/' }}], :image => 'http://facebook.er/icon.png'})
+    Facebooker::User.multi_add_news(['1234', '4321'], [{ :message => 'Hi user', :action_link => { :text => "Uh hey there app", :href => 'http://facebook.er/' }}], 'http://facebook.er/icon.png')
+  end
+  
+  def test_parse_multi_add_news
+    expect_http_posts_with_responses(multi_add_news_xml)
+    assert_equal({"1234"=>"319103117527", "4321"=>"313954287803"}, Facebooker::User.multi_add_news(['1234', '4321'], [{ :message => 'Hi user', :action_link => { :text => "Uh hey there app", :href => 'http://facebook.er/' }}], 'http://facebook.er/icon.png'))
+  end
+  
+  def test_can_multi_get_news
+    Facebooker::Session.any_instance.expects(:post).with('facebook.dashboard.multiGetNews', { :ids => {"1234"=>["319103117527"], "4321"=>["313954287803"]}.to_json})
+    Facebooker::User.multi_get_news({"1234"=>["319103117527"], "4321"=>["313954287803"]})
+  end
+  
+  def test_parse_multi_get_news
+    expect_http_posts_with_responses(multi_get_news_xml)
+    assert_equal({"1234"=>{"319103117527"=>{"fbid"=>"319103117527", "time"=>"1266605866056", "news"=>[{"action_link"=>{"href"=>"http://facebook.er/", "text"=>"Uh hey there app"}, "message"=>"Hi user"}], "image"=>"http://facebook.er/icon.png"}}, "4321"=>{"313954287803"=>{"fbid"=>"313954287803", "time"=>"1266605866123", "news"=>[{"action_link"=>{"href"=>"http://facebook.er/", "text"=>"Uh hey there app"}, "message"=>"Hi user"}], "image"=>"http://facebook.er/icon.png"}}}, Facebooker::User.multi_get_news({"1234"=>["319103117527"], "4321"=>["313954287803"]}))
+  end
+  
+  def test_can_multi_clear_news
+    Facebooker::Session.any_instance.expects(:post).with('facebook.dashboard.multiClearNews', { :ids => {"1234"=>["319103117527"], "4321"=>["313954287803"]}.to_json})
+    Facebooker::User.multi_clear_news({"1234"=>["319103117527"], "4321"=>["313954287803"]})
+  end
+  
+  def test_parse_multi_clear_news
+    expect_http_posts_with_responses(multi_clear_news_xml)
+    assert_equal({"1234"=>{"319103117527"=>"1"}, "4321"=>{"313954287803"=>"1"}}, Facebooker::User.multi_clear_news({"1234"=>["319103117527"], "4321"=>["313954287803"]}))
+  end
+  
+  def test_can_publish_activity
+    @session.expects(:post).with('facebook.dashboard.publishActivity', { :activity => { :message => '{*actor*} rolled around', :action_link => { :text => 'Roll around too', :href => 'http://facebook.er/' }}.to_json})
+    @user.publish_activity({ :message => '{*actor*} rolled around', :action_link => { :text => 'Roll around too', :href => 'http://facebook.er/' }})
+  end
+  
+  def test_parse_publish_activity
+    expect_http_posts_with_responses(publish_activity_xml)
+    assert_equal('484161135393', @user.publish_activity({ :message => '{*actor*} rolled around', :action_link => { :text => 'Roll around too', :href => 'http://facebook.er/' }}))
   end
   
   def test_can_get_activity
-    @session.expects(:post).with('facebook.dashboard.getActivity', {:activity_ids => ['123']})
-    @user.get_activity ['123']
+    @session.expects(:post).with('facebook.dashboard.getActivity', { :activity_ids => ['123'] })
+    @user.get_activity '123'
   end
   
+  def test_parse_get_activity
+    expect_http_posts_with_responses(get_activity_xml)
+    assert_equal({"342454152268"=>{"fbid"=>"342454152268", "time"=>"1266607632567", "action_link"=>{"href"=>"http://facebook.er/", "text"=>"Roll around too"}, "message"=>"{*actor*} rolled around"}}, @user.get_activity('342454152268'))
+  end
   
+  def test_can_remove_activity
+    @session.expects(:post).with('facebook.dashboard.removeActivity', { :activity_ids => ['123'] })
+    @user.remove_activity ['123']
+  end
+  
+  def test_parse_remove_activity
+    expect_http_posts_with_responses(remove_activity_xml)
+    assert_equal({"342454152268"=>"1"}, @user.remove_activity('123'))
+  end
+
   
   private
   def example_profile_photos_get_xml
@@ -841,9 +915,146 @@ From all of us at Facebook, we wish you and your families &quot;Happy Holidays,&
       </dashboard_multiDecrementCount_response>
     XML
   end
- 
 
+  def get_news_xml
+    <<-XML
+      <?xml version="1.0" encoding="UTF-8"?>
+      <dashboard_getNews_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd" list="true">
+        <dashboard_getNews_response_elt key="304847042079" list="true">
+          <dashboard_getNews_response_elt_elt key="image">http://facebook.er/icon.png</dashboard_getNews_response_elt_elt>
+          <dashboard_getNews_response_elt_elt key="news" list="true">
+            <dashboard_getNews_response_elt_elt_elt list="true">
+              <dashboard_getNews_response_elt_elt_elt_elt key="action_link" list="true">
+                <dashboard_getNews_response_elt_elt_elt_elt_elt key="href">http://facebook.er/</dashboard_getNews_response_elt_elt_elt_elt_elt>
+                <dashboard_getNews_response_elt_elt_elt_elt_elt key="text">I... I'm a test user</dashboard_getNews_response_elt_elt_elt_elt_elt>
+              </dashboard_getNews_response_elt_elt_elt_elt>
+              <dashboard_getNews_response_elt_elt_elt_elt key="message">Hey, who are you?</dashboard_getNews_response_elt_elt_elt_elt>
+            </dashboard_getNews_response_elt_elt_elt>
+            <dashboard_getNews_response_elt_elt_elt list="true">
+              <dashboard_getNews_response_elt_elt_elt_elt key="action_link" list="true">
+                <dashboard_getNews_response_elt_elt_elt_elt_elt key="href">http://facebook.er/</dashboard_getNews_response_elt_elt_elt_elt_elt>
+                <dashboard_getNews_response_elt_elt_elt_elt_elt key="text">I'm sorry</dashboard_getNews_response_elt_elt_elt_elt_elt>
+              </dashboard_getNews_response_elt_elt_elt_elt>
+              <dashboard_getNews_response_elt_elt_elt_elt key="message">Stop using my application, nerd</dashboard_getNews_response_elt_elt_elt_elt>
+            </dashboard_getNews_response_elt_elt_elt>
+          </dashboard_getNews_response_elt_elt>
+          <dashboard_getNews_response_elt_elt key="time">1266020260510</dashboard_getNews_response_elt_elt>
+          <dashboard_getNews_response_elt_elt key="fbid">304847042079</dashboard_getNews_response_elt_elt>
+        </dashboard_getNews_response_elt>
+      </dashboard_getNews_response>
+    XML
+  end
   
+  def add_news_xml
+    <<-XML
+      <?xml version="1.0" encoding="UTF-8"?>
+      <dashboard_addNews_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd">316446838026</dashboard_addNews_response>
+    XML
+  end
   
+  def clear_news_xml
+    <<-XML
+      <?xml version="1.0" encoding="UTF-8"?>
+      <dashboard_clearNews_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd" list="true">
+        <dashboard_clearNews_response_elt key="362466171040">1</dashboard_clearNews_response_elt>
+      </dashboard_clearNews_response>
+    XML
+  end
+  
+  def multi_add_news_xml
+    <<-XML
+      <?xml version="1.0" encoding="UTF-8"?>
+      <dashboard_multiAddNews_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd" list="true">
+        <dashboard_multiAddNews_response_elt key="1234">319103117527</dashboard_multiAddNews_response_elt>
+        <dashboard_multiAddNews_response_elt key="4321">313954287803</dashboard_multiAddNews_response_elt>
+      </dashboard_multiAddNews_response>
+    XML
+  end
+  
+  def multi_get_news_xml
+    <<-XML
+      <?xml version="1.0" encoding="UTF-8"?>
+      <dashboard_multiGetNews_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd" list="true">
+        <dashboard_multiGetNews_response_elt key="1234" list="true">
+          <dashboard_multiGetNews_response_elt_elt key="319103117527" list="true">
+            <dashboard_multiGetNews_response_elt_elt_elt key="image">http://facebook.er/icon.png</dashboard_multiGetNews_response_elt_elt_elt>
+            <dashboard_multiGetNews_response_elt_elt_elt key="news" list="true">
+              <dashboard_multiGetNews_response_elt_elt_elt_elt list="true">
+                <dashboard_multiGetNews_response_elt_elt_elt_elt_elt key="message">Hi user</dashboard_multiGetNews_response_elt_elt_elt_elt_elt>
+                <dashboard_multiGetNews_response_elt_elt_elt_elt_elt key="action_link" list="true">
+                  <dashboard_multiGetNews_response_elt_elt_elt_elt_elt_elt key="href">http://facebook.er/</dashboard_multiGetNews_response_elt_elt_elt_elt_elt_elt>
+                  <dashboard_multiGetNews_response_elt_elt_elt_elt_elt_elt key="text">Uh hey there app</dashboard_multiGetNews_response_elt_elt_elt_elt_elt_elt>
+                </dashboard_multiGetNews_response_elt_elt_elt_elt_elt>
+              </dashboard_multiGetNews_response_elt_elt_elt_elt>
+            </dashboard_multiGetNews_response_elt_elt_elt>
+            <dashboard_multiGetNews_response_elt_elt_elt key="time">1266605866056</dashboard_multiGetNews_response_elt_elt_elt>
+            <dashboard_multiGetNews_response_elt_elt_elt key="fbid">319103117527</dashboard_multiGetNews_response_elt_elt_elt>
+          </dashboard_multiGetNews_response_elt_elt>
+        </dashboard_multiGetNews_response_elt>
+        <dashboard_multiGetNews_response_elt key="4321" list="true">
+          <dashboard_multiGetNews_response_elt_elt key="313954287803" list="true">
+            <dashboard_multiGetNews_response_elt_elt_elt key="image">http://facebook.er/icon.png</dashboard_multiGetNews_response_elt_elt_elt>
+            <dashboard_multiGetNews_response_elt_elt_elt key="news" list="true">
+              <dashboard_multiGetNews_response_elt_elt_elt_elt list="true">
+                <dashboard_multiGetNews_response_elt_elt_elt_elt_elt key="message">Hi user</dashboard_multiGetNews_response_elt_elt_elt_elt_elt>
+                <dashboard_multiGetNews_response_elt_elt_elt_elt_elt key="action_link" list="true">
+                  <dashboard_multiGetNews_response_elt_elt_elt_elt_elt_elt key="href">http://facebook.er/</dashboard_multiGetNews_response_elt_elt_elt_elt_elt_elt>
+                  <dashboard_multiGetNews_response_elt_elt_elt_elt_elt_elt key="text">Uh hey there app</dashboard_multiGetNews_response_elt_elt_elt_elt_elt_elt>
+                </dashboard_multiGetNews_response_elt_elt_elt_elt_elt>
+              </dashboard_multiGetNews_response_elt_elt_elt_elt>
+            </dashboard_multiGetNews_response_elt_elt_elt>
+            <dashboard_multiGetNews_response_elt_elt_elt key="time">1266605866123</dashboard_multiGetNews_response_elt_elt_elt>
+            <dashboard_multiGetNews_response_elt_elt_elt key="fbid">313954287803</dashboard_multiGetNews_response_elt_elt_elt>
+          </dashboard_multiGetNews_response_elt_elt>
+        </dashboard_multiGetNews_response_elt>
+      </dashboard_multiGetNews_response>
+    XML
+  end
+  
+  def multi_clear_news_xml
+    <<-XML
+      <?xml version="1.0" encoding="UTF-8"?><dashboard_multiClearNews_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd" list="true">
+        <dashboard_multiClearNews_response_elt key="1234" list="true">
+          <dashboard_multiClearNews_response_elt_elt key="319103117527">1</dashboard_multiClearNews_response_elt_elt>
+        </dashboard_multiClearNews_response_elt>
+        <dashboard_multiClearNews_response_elt key="4321" list="true">
+          <dashboard_multiClearNews_response_elt_elt key="313954287803">1</dashboard_multiClearNews_response_elt_elt>
+        </dashboard_multiClearNews_response_elt>
+      </dashboard_multiClearNews_response>
+    XML
+  end
+  
+  def publish_activity_xml
+    <<-XML
+      <?xml version="1.0" encoding="UTF-8"?>
+      <dashboard_publishActivity_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd">484161135393</dashboard_publishActivity_response>
+    XML
+  end
+  
+  def get_activity_xml
+    <<-XML
+      <?xml version="1.0" encoding="UTF-8"?>
+      <dashboard_getActivity_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd" list="true">
+        <dashboard_getActivity_response_elt key="342454152268" list="true">
+          <dashboard_getActivity_response_elt_elt key="message">{*actor*} rolled around</dashboard_getActivity_response_elt_elt>
+          <dashboard_getActivity_response_elt_elt key="action_link" list="true">
+            <dashboard_getActivity_response_elt_elt_elt key="href">http://facebook.er/</dashboard_getActivity_response_elt_elt_elt>
+            <dashboard_getActivity_response_elt_elt_elt key="text">Roll around too</dashboard_getActivity_response_elt_elt_elt>
+          </dashboard_getActivity_response_elt_elt>
+          <dashboard_getActivity_response_elt_elt key="time">1266607632567</dashboard_getActivity_response_elt_elt>
+          <dashboard_getActivity_response_elt_elt key="fbid">342454152268</dashboard_getActivity_response_elt_elt>
+        </dashboard_getActivity_response_elt>
+      </dashboard_getActivity_response>
+    XML
+  end
+  
+  def remove_activity_xml
+    <<-XML
+      <?xml version="1.0" encoding="UTF-8"?>
+      <dashboard_removeActivity_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd" list="true">
+        <dashboard_removeActivity_response_elt key="342454152268">1</dashboard_removeActivity_response_elt>
+      </dashboard_removeActivity_response>
+    XML
+  end
   
 end

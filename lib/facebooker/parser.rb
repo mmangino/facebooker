@@ -730,7 +730,6 @@ module Facebooker
   
   class DashboardAddGlobalNews < Parser
     def self.process(data)
-      puts data
       element('dashboard_addGlobalNews_response', data).content.strip
     end
   end
@@ -750,7 +749,6 @@ module Facebooker
   
   class DashboardAddNews < Parser
     def self.process(data)
-      puts data
       element('dashboard_addNews_response', data).content.strip
     end
   end
@@ -769,21 +767,18 @@ module Facebooker
   
   class DashboardMultiAddNews < Parser
     def self.process(data)
-      puts data
       hashinate_by_key(element('dashboard_multiAddNews_response', data))
     end
   end
   
   class DashboardMultiClearNews < Parser
     def self.process(data)
-      puts data
       hashinate_by_key(element('dashboard_multiClearNews_response', data))
     end
   end
   
   class DashboardMultiGetNews < Parser
     def self.process(data)
-      puts data
       hashinate_by_key(element('dashboard_multiGetNews_response', data))
     end
   end

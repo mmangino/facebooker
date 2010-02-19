@@ -555,13 +555,14 @@ module Facebooker
     
     
     
-    def get_news(news_ids=nil)
+    def get_news(*news_ids)
       params = { :uid => uid }
-      params[:news_ids] = news_ids if news_ids
+      params[:news_ids] = news_ids.flatten if news_ids
       
       session.post('facebook.dashboard.getNews', params)
     end
     
+    # facebook_session.user.add_news [{ :message => 'Hey, who are you?', :action_link => { :text => "I-I'm a test user", :href => 'http://facebook.er/' }}], 'http://facebook.er/icon.png'
     def add_news(news, image=nil)
       params = { :uid => uid }
       params[:news] = news
@@ -570,13 +571,15 @@ module Facebooker
       session.post('facebook.dashboard.addNews', params)
     end
     
-    def clear_news(news_ids=nil)
+    # facebook_session.user.clear_news ['111111']
+    def clear_news(*news_ids)
       params = { :uid => uid }
-      params[:news_ids] = news_ids if news_ids
+      params[:news_ids] = news_ids.flatten if news_ids
       
       session.post('facebook.dashboard.clearNews', params)
     end
     
+    # Facebooker::User.multi_add_news(['1234', '4321'], [{ :message => 'Hi users', :action_link => { :text => "Uh hey there app", :href => 'http://facebook.er/' }}], 'http://facebook.er/icon.png')
     def self.multi_add_news(uids, news, image=nil)
       params = { :uids => uids, :news => news }
       params[:image] = image if image
@@ -584,38 +587,35 @@ module Facebooker
       Facebooker::Session.create.post("facebook.dashboard.multiAddNews", params)
     end
     
-    def self.multi_clear_news(ids, image=nil)
-      Facebooker::Session.create.post("facebook.dashboard.multiclearNews", :ids => ids.to_json)
+    # Facebooker::User.multi_clear_news({"1234"=>["319103117527"], "4321"=>["313954287803"]})
+    def self.multi_clear_news(ids)
+      Facebooker::Session.create.post("facebook.dashboard.multiClearNews", :ids => ids.to_json)
     end
     
+    # Facebooker::User.multi_get_news({"1234"=>["319103117527"], "4321"=>["313954287803"]})
+    def self.multi_get_news(ids)
+      Facebooker::Session.create.post('facebook.dashboard.multiGetNews', :ids => ids.to_json)
+    end
     
-    
-    def get_activity(activity_ids=nil)
+    # facebook_session.user.get_activity '123'
+    def get_activity(*activity_ids)
       params = {}
-      params[:activity_ids] = activity_ids if activity_ids
+      params[:activity_ids] = activity_ids.flatten if activity_ids
       
       session.post('facebook.dashboard.getActivity', params)
     end
     
-    # Must call to_json for signature
+    # facebook_session.user.publish_activity({ :message => '{*actor*} rolled around', :action_link => { :text => 'Roll around too', :href => 'http://facebook.er/' }})
     def publish_activity(activity)
       session.post('facebook.dashboard.publishActivity', { :activity => activity.to_json })
     end
     
-    # Expects an array of strings
-    def remove_activity(activity_ids)
-      session.post('facebook.dashboard.removeActivity', { :activity_ids => activity_ids })
+    # facebook_session.user.remove_activity ['123']
+    def remove_activity(*activity_ids)
+      session.post('facebook.dashboard.removeActivity', { :activity_ids => activity_ids.flatten })
     end
     
     
-    # Values needs to be a hash with keys = uid, values = corresponding counts
-    # This always returns Incorrect Signature?
-    # def dashboard_multi_set_count(values)
-    #   session.post("facebook.dashboard.multiSetCount",:ids => values)
-    # end
-    
-    
-
     ##
     # Two Facebooker::User objects should be considered equal if their Facebook ids are equal
     def ==(other_user)

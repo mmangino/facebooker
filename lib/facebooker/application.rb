@@ -10,7 +10,7 @@ module Facebooker
       (@session.post 'facebook.application.getPublicInfo', properties)
     end
     
-    # News is an array of news items: http://wiki.developers.facebook.com/index.php/Dashboard.addGlobalNews
+    # facebook_session.application.add_global_news [{ :message => 'Hi all users', :action_link => { :text => "Hi application", :href => 'http://facebook.er/' }}], 'http://facebook.er/icon.png'
     def add_global_news(news, image=nil)
       params = {}
       params[:news] = news
@@ -18,16 +18,18 @@ module Facebooker
       @session.post('facebook.dashboard.addGlobalNews', params)
     end
     
-    # currently bugged; returns all
-    def get_global_news(news_ids=nil)
+    # currently bugged on Facebook; returns all
+    # facebook_session.application.get_global_news '310354202543'
+    def get_global_news(*news_ids)
       params = {}
-      params[:news_ids] = news_ids if news_ids
+      params[:news_ids] = news_ids.flatten if news_ids
       @session.post('facebook.dashboard.getGlobalNews', params)
     end
     
-    def clear_global_news(news_ids=nil)
+    # facebook_session.application.clear_global_news '310354202543'
+    def clear_global_news(*news_ids)
       params = {}
-      params[:news_ids] = news_ids if news_ids
+      params[:news_ids] = news_ids.flatten if news_ids
       @session.post('facebook.dashboard.clearGlobalNews', params)
     end
     
