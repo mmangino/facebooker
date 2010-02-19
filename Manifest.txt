@@ -78,6 +78,7 @@ lib/facebooker/models/tag.rb
 lib/facebooker/models/user.rb
 lib/facebooker/models/video.rb
 lib/facebooker/models/work_info.rb
+lib/facebooker/models/message_thread.rb
 lib/facebooker/parser.rb
 lib/facebooker/rails/backwards_compatible_param_checks.rb
 lib/facebooker/rails/controller.rb

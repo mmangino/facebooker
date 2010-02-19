@@ -246,6 +246,21 @@ module Facebooker
       end
     end
 
+    ###
+    # Get threads in a folder
+    #
+    # See: http://wiki.developers.facebook.com/index.php/Message.getThreadsInFolder
+    #
+    # +options+ possible options are :folder_id, :limit and :offset
+    def threads(options = {})
+      options ||= {}
+      @threads = session.post('facebook.message.getThreadsInFolder', options) do |response|
+        response.map do |hash|
+          MessageThread.from_hash(hash)
+        end
+      end
+    end
+
     def notifications
       @notifications ||= Notifications.from_hash(session.post('facebook.notifications.get'))
     end

@@ -330,6 +330,12 @@ module Facebooker
     end
   end
 
+  class MessageGetThreadsInFolder < Parser#:nodoc:
+    def self.process(data)
+      array_of_hashes(element('message_getThreadsInFolder_response', data), 'thread')
+    end
+  end
+
   class NotificationsGet < Parser#:nodoc:
     def self.process(data)
       hashinate(element('notifications_get_response', data))
@@ -636,6 +642,7 @@ module Facebooker
       604 => Facebooker::Session::FQLStatementNotIndexable,
       605 => Facebooker::Session::FQLFunctionDoesNotExist,
       606 => Facebooker::Session::FQLWrongNumberArgumentsPassedToFunction,
+      612 => Facebooker::Session::ReadMailboxExtendedPermissionRequired,
       807 => Facebooker::Session::TemplateBundleInvalid
     }
     def self.process(data)
@@ -676,6 +683,7 @@ module Facebooker
       'facebook.feed.deactivateTemplateBundleByID' => DeactivateTemplateBundleByID,
       'facebook.feed.getRegisteredTemplateBundles' => GetRegisteredTemplateBundles,
       'facebook.feed.publishUserAction' => PublishUserAction,
+      'facebook.message.getThreadsInFolder' => MessageGetThreadsInFolder,
       'facebook.notifications.get' => NotificationsGet,
       'facebook.notifications.send' => NotificationsSend,
       'facebook.notifications.sendRequest' => SendRequest,

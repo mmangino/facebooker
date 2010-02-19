@@ -321,7 +321,47 @@ class Facebooker::UserTest < Test::Unit::TestCase
     assert result
   end
 
-  private
+  def test_threads_should_return_an_array_of_thread_instances_containing_messages_and_attachments
+    expect_http_posts_with_responses(example_threads)
+    threads = @user.threads
+    assert_not_nil threads
+    assert_instance_of Array, threads
+    assert_operator threads.size, :>, 0
+    for thread in threads
+      assert_instance_of Facebooker::MessageThread, thread
+      assert_instance_of Array, thread.messages
+      assert_operator thread.messages.size, :>, 0
+      assert_instance_of Facebooker::MessageThread::Message, thread.messages.first
+      
+      for message in thread.messages
+        next if message.attachment.blank?
+        assert_instance_of Facebooker::MessageThread::Message::Attachment, message.attachment
+        
+        case message.message_id
+        when '1344434538976_0'
+          assert message.attachment.photo?, 'Attachment of message "1344434538976_0" should be a photo'
+        when '1344434538976_2'
+          assert message.attachment.link?, 'Attachment of message "1344434538976_2" should be a link'
+        when '1012985167472_0'
+          assert message.attachment.video?, 'Attachment of message "1012985167472_0" should be a video'
+        end
+      end
+    end
+  end
+
+  def test_threads_should_return_populated_fields
+    expect_http_posts_with_responses(example_threads)
+    threads = @user.threads
+    
+    thread = threads.first
+    [:thread_id, :subject, :updated_time, :recipients, :parent_message_id, :parent_thread_id,
+      :message_count, :snippet, :snippet_author, :object_id, :unread].each do |field|
+      assert_not_nil thread.__send__(field), "Field #{field} should not be nil"
+    end
+  end
+
+private
+
   def example_profile_photos_get_xml
     "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
     <photos_get_response xmlns=\"http://api.facebook.com/1.0/\"
@@ -446,4 +486,145 @@ class Facebooker::UserTest < Test::Unit::TestCase
       </events_rsvp_response>
     E
   end
+
+  def example_threads
+    <<-XML
+<message_getThreadsInFolder_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd" list="true">
+  <thread>
+    <thread_id>1344434538976</thread_id>
+    <subject>Test attachments</subject>
+    <recipients list="true">
+      <uid>1410850842</uid>
+      <uid>662074872</uid>
+    </recipients>
+    <updated_time>1265723631</updated_time>
+    <parent_message_id>0</parent_message_id>
+    <parent_thread_id>0</parent_thread_id>
+    <message_count>3</message_count>
+    <snippet>one link attachment to a youtube video</snippet>
+    <snippet_author>1410850842</snippet_author>
+    <object_id>0</object_id>
+    <unread>0</unread>
+    <messages list="true">
+      <message>
+        <message_id>1344434538976_0</message_id>
+        <author_id>662074872</author_id>
+        <body>one photo attachment ,  4KB jpeg image</body>
+        <created_time>1265723631</created_time>
+        <attachment>
+          <media list="true"/>
+          <href>http://www.facebook.com/photo.php?pid=3358326&amp;id=662074872</href>
+          <properties list="true"/>
+          <icon>http://static.ak.fbcdn.net/rsrc.php/zB010/hash/9yvl71tw.gif</icon>
+          <fb_object_type/>
+          <fb_object_id/>
+          <tagged_ids list="true"/>
+        </attachment>
+        <thread_id>1344434538976</thread_id>
+      </message>
+      <message>
+        <message_id>1344434538976_1</message_id>
+        <author_id>1410850842</author_id>
+        <body>one link attachment (http://www.facebook.com/l/e46dd;google.fr)</body>
+        <created_time>1265723941</created_time>
+        <attachment>
+          <media list="true">
+            <stream_media>
+              <href>http://www.facebook.com/l.php?u=http%253A%252F%252Fwww.google.fr%252F&amp;h=e46dd63cdbfadb74958fbe44e98f339c</href>
+              <type>link</type>
+              <src>http://external.ak.fbcdn.net/safe_image.php?d=dd54bba6b6e6479a89bb8084573c02c8&amp;w=90&amp;h=90&amp;url=http%3A%2F%2Fwww.google.fr%2Fintl%2Ffr_fr%2Fimages%2Flogo.gif</src>
+            </stream_media>
+          </media>
+          <name>Google</name>
+          <href>http://www.facebook.com/l.php?u=http%253A%252F%252Fwww.google.fr%252F&amp;h=e46dd63cdbfadb74958fbe44e98f339c</href>
+          <caption>www.google.fr</caption>
+          <properties list="true"/>
+          <icon>http://static.ak.fbcdn.net/rsrc.php/zB010/hash/9yvl71tw.gif</icon>
+          <fb_object_type/>
+          <fb_object_id/>
+          <tagged_ids list="true"/>
+        </attachment>
+        <thread_id>1344434538976</thread_id>
+      </message>
+      <message>
+        <message_id>1344434538976_2</message_id>
+        <author_id>1410850842</author_id>
+        <body>one link attachment to a youtube video</body>
+        <created_time>1265726503</created_time>
+        <attachment>
+          <media list="true">
+            <stream_media>
+              <href>http://www.facebook.com/l.php?u=http%253A%252F%252Fwww.youtube.com%252Fwatch%253Fv%253DAW-sNQUmUIM%2526feature%253Dpopular&amp;h=e46dd63cdbfadb74958fbe44e98f339c</href>
+              <alt>super bowl 44 highlights saints vs colts</alt>
+              <type>video</type>
+              <src>http://external.ak.fbcdn.net/safe_image.php?d=66f4aa965e2ae4a20a11c6a8ae3e4b1b&amp;w=90&amp;h=90&amp;url=http%3A%2F%2Fi.ytimg.com%2Fvi%2FAW-sNQUmUIM%2F2.jpg</src>
+              <video>
+                <display_url>http://www.youtube.com/watch?v=AW-sNQUmUIM&amp;feature=popular</display_url>
+                <source_url>http://www.youtube.com/v/AW-sNQUmUIM&amp;autoplay=1</source_url>
+                <owner>1410850842</owner>
+                <source_type>html</source_type>
+              </video>
+            </stream_media>
+          </media>
+          <name>super bowl 44 highlights saints vs colts</name>
+          <href>http://www.facebook.com/l.php?u=http%253A%252F%252Fwww.youtube.com%252Fwatch%253Fv%253DAW-sNQUmUIM%2526feature%253Dpopular&amp;h=e46dd63cdbfadb74958fbe44e98f339c</href>
+          <caption>www.youtube.com</caption>
+          <description>NFL super bowl 44 highlights saints vs colts from south florida.</description>
+          <properties list="true"/>
+          <icon>http://static.ak.fbcdn.net/rsrc.php/z9XZ8/hash/976ulj6z.gif</icon>
+          <fb_object_type/>
+          <fb_object_id/>
+          <tagged_ids list="true"/>
+        </attachment>
+        <thread_id>1344434538976</thread_id>
+      </message>
+    </messages>
+  </thread>
+  <thread>
+    <thread_id>1012985167472</thread_id>
+    <subject>Happy Holidays from the Facebook Platform Team</subject>
+    <recipients list="true">
+      <uid>220400</uid>
+    </recipients>
+    <updated_time>1230000685</updated_time>
+    <parent_message_id>0</parent_message_id>
+    <parent_thread_id>0</parent_thread_id>
+    <message_count>1</message_count>
+    <snippet>We wanted to take a moment and thank you for all of your great work and amazi...</snippet>
+    <snippet_author>220400</snippet_author>
+    <object_id>2205007948</object_id>
+    <unread>0</unread>
+    <messages list="true">
+      <message>
+        <message_id>1012985167472_0</message_id>
+        <author_id>220400</author_id>
+        <body>We wanted to take a moment and thank you for all of your great work and amazing applications that have helped make Facebook Platform the largest and fastest-growing social platform over the past year and a half. As we end 2008 there are over 660,000 of you worldwide building applications that give users more powerful ways to share and connect, and collectively your applications have reached nearly 140 million people.
+
+Just recently, we've been excited to bring you Facebook Connect - allowing you to integrate the tools and features of Facebook Platform on your Websites, devices and desktop applications. In the next several months, we're looking forward to introducing additional improvements to help users more easily find your applications as well as launching the first sets of Verified Applications to users. If you haven't applied for verification yet, apply here:
+http://developers.facebook.com/verification.php
+
+Over the next year, we look forward to continued developments to improve Facebook Platform and help you reach and engage more users, and grow and sustain your business.  We would love your feedback and input on what you think is most important - please take a few minutes and answer our survey here: 
+
+http://www.facebook.com/l/e46dd;https://www.questionpro.com/akira/TakeSurvey?id=1121648
+
+From all of us at Facebook, we wish you and your families &quot;Happy Holidays,&quot; and we look forward to making the web even more social with you in 2009!</body>
+        <created_time>1230000042</created_time>
+        <attachment>
+          <media list="true"/>
+          <name>Feb 10, 2010 1:26pm</name>
+          <href>http://www.facebook.com/video/video.php?v=12345</href>
+          <properties list="true"/>
+          <icon>http://static.ak.fbcdn.net/rsrc.php/zB010/hash/9yvl71tw.gif</icon>
+          <fb_object_type/>
+          <fb_object_id/>
+          <tagged_ids list="true"/>
+        </attachment>
+        <thread_id>1012985167472</thread_id>
+      </message>
+    </messages>
+  </thread>
+</message_getThreadsInFolder_response>
+    XML
+  end
+
 end

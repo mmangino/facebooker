@@ -341,7 +341,7 @@ module Facebooker
       VALID_FB_PHOTO_SIZES = VALID_FB_SHARED_PHOTO_SIZES      
       VALID_FB_PROFILE_PIC_SIZES = VALID_FB_SHARED_PHOTO_SIZES
       VALID_PERMISSIONS=[:email, :offline_access, :status_update, :photo_upload, :create_listing, :create_event, :rsvp_event, :sms, :video_upload, 
-                         :publish_stream, :read_stream]
+                         :publish_stream, :read_stream, :read_mailbox]
       
       # Render an fb:tabs tag containing some number of fb:tab_item tags.
       # Example:
@@ -624,6 +624,7 @@ module Facebooker
       #   * video_upload
       #   * create_note
       #   * share_item
+      #   * read_mailbox
       # Example:
       # <%= fb_prompt_permission('email', "Would you like to receive email from our application?" ) %>
       #

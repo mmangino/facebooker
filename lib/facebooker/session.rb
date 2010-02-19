@@ -56,6 +56,7 @@ module Facebooker
     class MissingOrInvalidImageFile < StandardError; end
     class TooManyUnapprovedPhotosPending < StandardError; end
     class ExtendedPermissionRequired < StandardError; end
+    class ReadMailboxExtendedPermissionRequired < StandardError; end
     class InvalidFriendList < StandardError; end
     class UserUnRegistrationFailed < StandardError
       attr_accessor :failed_users
@@ -120,6 +121,7 @@ module Facebooker
     # * create_event
     # * rsvp_event
     # * sms
+    # * read_mailbox
     def permission_url(permission,options={})
       options = default_login_url_options.merge(options)
       options = add_next_parameters(options)
