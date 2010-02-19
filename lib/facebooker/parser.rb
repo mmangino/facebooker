@@ -119,6 +119,8 @@ module Facebooker
       end
     end
 
+    # A modification to hashinate. The new dashboard API returns XML in a different format than
+    # the other calls.  What used to be the element name has become an attribute called "key".
     def self.hashinate_by_key(response_element)
       response_element.children.reject{|c| c.text? }.inject({}) do |hash, child|
         # If the node hasn't any child, and is not a list, we want empty strings, not empty hashes,
@@ -132,15 +134,14 @@ module Facebooker
           child.children.reject{|c| c.text? }.map { |subchild| hash_by_key_or_value_for(subchild)}
         elsif child['list'] == 'true'
           hash_by_key_or_value_for(child)
-#          child.children.reject{|c| c.text? }.map { |subchild| hash_by_key_or_value_for(subchild)}
         else
           child.children.reject{|c| c.text? }.inject({}) do |subhash, subchild|
             subhash[subchild['key']] = hash_by_key_or_value_for(subchild)
             subhash
           end
-        end #if (child.attributes)
+        end
         hash
-      end #do |hash, child|
+      end
     end
 
 
