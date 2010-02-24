@@ -424,6 +424,20 @@ module Facebooker
       end
     end
 
+    #remove a comment from a given xid stream with comment_id
+    def remove_comment(xid,comment_id)
+      post('facebook.comments.remove', :xid=>xid, :comment_id =>comment_id)
+    end
+  
+    #pulls comment list for a given XID
+    def get_comments(xid)
+      @comments = post('facebook.comments.get', :xid => xid) do |response|
+        response.map do |hash|
+          Comment.from_hash(hash)
+        end
+      end
+    end
+
     def get_albums(aids)
       @albums = post('facebook.photos.getAlbums', :aids => aids) do |response|
         response.map do |hash|        

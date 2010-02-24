@@ -201,6 +201,12 @@ class Facebooker::UserTest < Test::Unit::TestCase
     expect_http_posts_with_responses(example_comment_on_response)
     assert_equal('703826862_78463536863', @user.comment_on('703826862_78463536862', :message => 'that was hilarious!'))
   end
+  
+  def test_add_comment
+    @user = Facebooker::User.new(548871286, @session)
+    expect_http_posts_with_responses(example_add_comment_response)
+    assert_equal('403917', @user.add_comment('test_xid','that was realy hilarious!') )
+  end
 
   def test_add_like_on
     @user = Facebooker::User.new(548871286, @session)
@@ -468,6 +474,13 @@ private
     <<-eoxml
 <?xml version="1.0" encoding="UTF-8"?>
 <stream_addComment_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd">703826862_78463536863</stream_addComment_response>
+    eoxml
+  end
+  
+  def example_add_comment_response
+    <<-eoxml
+<?xml version="1.0" encoding="UTF-8"?>
+<comments_add_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd">403917</comments_add_response>
     eoxml
   end
   

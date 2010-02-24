@@ -185,6 +185,18 @@ module Facebooker
       @session.post('facebook.stream.addComment', {:post_id=>post_id, :comment=>comment})
     end
 
+
+    ###
+    # Publish a comment to a specific comment set by xid
+    #
+    # See: http://wiki.developers.facebook.com/index.php/Comments.add
+    #
+    # +xid+ the xid for the set of comments
+    # +text+ the text of the comment
+    def add_comment(xid, text,title=nil,url=nil,publish_to_stream=false)
+      @session.post('facebook.comments.add',{:xid=>xid,:text=>text,:title=>title,:url=>url,:publish_to_stream=>publish_to_stream})
+    end
+
     ###
     # Add a like on a post
     #

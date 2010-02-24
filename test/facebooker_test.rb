@@ -246,6 +246,13 @@ class TestFacebooker < Test::Unit::TestCase
     assert_raise(ArgumentError) { @session.get_photos() }
   end
 
+  def test_can_get_comments_by_xid
+    expect_http_posts_with_responses(example_comments_xml)
+    comments = @session.get_comments('pete_comments')
+    assert_equal('Hola', comments[0].text)
+    assert_equal(2, comments.size)
+  end
+
   def test_can_get_albums_for_user
     expect_http_posts_with_responses(example_user_albums_xml)
     assert_equal('Summertime is Best', @session.user.albums.first.name)
@@ -376,6 +383,20 @@ class TestFacebooker < Test::Unit::TestCase
     expect_http_posts_with_responses(example_revoke_authorization_false)
     assert_equal false, @session.post('facebook.auth.revokeAuthorization', :uid => 123)
   end
+  
+  
+  
+  def test_remove_comment_true
+    expect_http_posts_with_responses(example_remove_comment_true)
+    assert_equal true,  @session.remove_comment('pete_comments',123)
+  end
+  
+  def test_remove_comment_false
+    expect_http_posts_with_responses(example_remove_comment_false)
+    assert_equal false, @session.remove_comment('pete_comments',123)
+  end
+  
+  
   
   private
   def populate_user_info
@@ -812,6 +833,28 @@ class TestFacebooker < Test::Unit::TestCase
     XML
   end
 
+  def example_comments_xml
+    <<-XML
+      <?xml version="1.0" encoding="UTF-8"?>
+      <comments_get_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd" list="true">
+        <comment>
+          <xid>pete_comments</xid>
+          <fromid>563683308</fromid>
+          <time>1234227529</time>
+          <text>Hola</text>
+          <id>65020</id>
+        </comment>
+        <comment>
+          <xid>pete_comments</xid>
+          <fromid>563683308</fromid>
+          <time>1234227542</time>
+          <text>holla</text>
+          <id>65021</id>
+        </comment>
+      </comments_get_response>
+    XML
+  end
+
   def example_user_albums_xml
     <<-XML
     <?xml version="1.0" encoding="UTF-8"?>
@@ -948,4 +991,14 @@ class TestFacebooker < Test::Unit::TestCase
   def example_revoke_authorization_false
     "0"
   end
+  
+  
+  def example_remove_comment_true
+    "1"
+  end
+  
+  def example_remove_comment_false
+    "0"
+  end
+  
 end

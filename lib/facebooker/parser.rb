@@ -301,6 +301,24 @@ module Facebooker
     end
   end
 
+  class CommentsAdd < Parser#:nodoc:
+    def self.process(data)
+      element('comments_add_response', data).content.strip
+    end
+  end
+  
+  class CommentsRemove < Parser#:nodoc:
+    def self.process(data)
+      booleanize(data)
+    end
+  end
+  
+  class CommentsGet < Parser#:nodoc:
+    def self.process(data)
+       array_of_hashes(element('comments_get_response', data), 'comment')
+    end
+  end
+
   class BatchRun < Parser #:nodoc:
     class << self
       def current_batch=(current_batch)
@@ -726,7 +744,10 @@ module Facebooker
       'facebook.data.setUserPreference' => SetPreference,
       'facebook.video.upload' => UploadVideo,
       'facebook.sms.send' => SmsSend,
-      'facebook.sms.canSend' => SmsCanSend
+      'facebook.sms.canSend' => SmsCanSend,
+      'facebook.comments.add' => CommentsAdd,
+      'facebook.comments.remove' => CommentsRemove,
+      'facebook.comments.get' => CommentsGet
     }
   end
 end
