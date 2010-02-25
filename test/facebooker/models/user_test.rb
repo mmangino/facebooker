@@ -457,7 +457,7 @@ class Facebooker::UserTest < Test::Unit::TestCase
   def test_parse_dashboard_multi_decrement_count
     expect_http_posts_with_responses(dashboard_multi_decrement_count_xml)
     assert_equal({ '1234' => '1', '4321' => '1' }, Facebooker::User.dashboard_multi_decrement_count(['1234', '4321']))
-  
+  end
   # Dashboard
   
   def test_can_get_news
@@ -480,36 +480,7 @@ class Facebooker::UserTest < Test::Unit::TestCase
     @user.get_activity ['123']
   end
   
-  def test_can_get_activity
-    
-  end
   
-  
-  
-  # def test_can_get_news
-  #   @session.expects(:post).with('facebook.dashboard.getNews', {:uid => @user.uid, :news_ids => ['123']})
-  #   @user.get_news ['123']
-  # end
-  # 
-  # def test_can_add_news
-  #   @session.expects(:post).with('facebook.dashboard.addNews', {:uid => 1234, :news => [{:message => 'Feel my biceps', :action_link => {:text => 'Okay', :href => 'http://mybiceps.com'}}], :image => 'http://biceppix.com/dang.png'})
-  #   @user.add_news [{ :message => 'Feel my biceps', :action_link => { :href => 'http://mybiceps.com', :text => 'Okay' } }], 'http://biceppix.com/dang.png'
-  # end
-  # 
-  # def test_can_clear_news
-  #   @session.expects(:post).with('facebook.dashboard.clearNews', {:uid => @user.uid, :news_ids => ['123']})
-  #   @user.clear_news ['123']
-  # end
-  # 
-  # def test_can_get_activity
-  #   @session.expects(:post).with('facebook.dashboard.getActivity', {:activity_ids => ['123']})
-  #   @user.get_activity ['123']
-  # end
-  # 
-  # def test_can_get_activity
-  #   
-  # end
-  # 
   
   private
   def example_profile_photos_get_xml
@@ -870,54 +841,7 @@ From all of us at Facebook, we wish you and your families &quot;Happy Holidays,&
       </dashboard_multiDecrementCount_response>
     XML
   end
-  # 
-  # def dashboard_increment_count_xml
-  #   <<-XML
-  #     
-  #   XML
-  # end
-  # 
-  # def dashboard_increment_count_xml
-  #   <<-XML
-  #     
-  #   XML
-  # end
-  # 
-  # def dashboard_increment_count_xml
-  #   <<-XML
-  #     
-  #   XML
-  # end
-  # 
-  # def dashboard_increment_count_xml
-  #   <<-XML
-  #     
-  #   XML
-  # end
-  # 
-  # def dashboard_increment_count_xml
-  #   <<-XML
-  #     
-  #   XML
-  # end
-  # 
-  # def dashboard_increment_count_xml
-  #   <<-XML
-  #     
-  #   XML
-  # end
-  # 
-  # def dashboard_increment_count_xml
-  #   <<-XML
-  #     
-  #   XML
-  # end
-  # 
-  # def dashboard_increment_count_xml
-  #   <<-XML
-  #     
-  #   XML
-  # end
+ 
 
   
   
