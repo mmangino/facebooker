@@ -402,6 +402,16 @@ module Facebooker
     end
   end
 
+  class GetStream < Parser #:nodoc:
+    def self.process(data)
+      response = {}
+      response[:albums] = array_of_hashes(element('stream_get_response/albums', data), 'album')
+      response[:posts] = array_of_hashes(element('stream_get_response/posts', data), 'stream_post')
+      response[:profile] = array_of_hashes(element('stream_get_response/profiles', data), 'profile')
+      response
+    end
+  end
+
   class CreateAlbum < Parser#:nodoc:
     def self.process(data)
       hashinate(element('photos_createAlbum_response', data))
@@ -736,6 +746,7 @@ module Facebooker
       'facebook.photos.getTags' => GetTags,
       'facebook.photos.addTag' => AddTags,
       'facebook.photos.upload' => UploadPhoto,
+      'facebook.stream.get' => GetStream,
       'facebook.stream.publish' => StreamPublish,
       'facebook.stream.addComment' => StreamAddComment,
       'facebook.stream.addLike' => StreamAddLike,

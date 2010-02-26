@@ -446,6 +446,17 @@ module Facebooker
       end
     end
 
+    ###
+    # Retrieve a viewer's facebook stream
+    # See http://wiki.developers.facebook.com/index.php/Stream.get for options
+    #
+    def get_stream(viewer_id, options = {})
+
+      @stream = post('facebook.stream.get', prepare_get_stream_options(viewer_id, options), true) do |response|
+        response
+      end
+    end
+
     def get_tags(pids)
       @tags = post('facebook.photos.getTags', :pids => pids)  do |response|
         response.map do |hash|
@@ -737,6 +748,18 @@ module Facebooker
       
       def ensure_array(value)
         value.is_a?(Array) ? value : [value]
+      end
+
+      def prepare_get_stream_options(viewer_id, options)
+        opts = {}
+
+        opts[:viewer_id] = viewer_id if viewer_id.is_a?(Integer)
+        opts[:source_ids] = options[:source_ids] if options[:source_ids]
+        opts[:start_time] = options[:start_time].to_i if options[:start_time]
+        opts[:end_time] = options[:end_time].to_i if options[:end_time]
+        opts[:limit] = options[:limit] if options[:limit].is_a?(Integer)
+        opts[:metadata] = Facebooker.json_encode(options[:metadata]) if options[:metadata]
+        opts
       end
   end
 

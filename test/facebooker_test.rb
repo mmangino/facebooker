@@ -266,6 +266,13 @@ class TestFacebooker < Test::Unit::TestCase
     assert_equal('Bonofon\'s Recital', albums[1].name)
   end
 
+  def test_can_get_stream
+    expect_http_posts_with_responses(example_user_stream_xml)
+    stream = @session.get_stream(100000637452380)
+    assert stream[:albums].empty?
+    assert_equal('The bbc home page', stream[:posts].first['message'])
+  end
+
   def test_can_create_album
     expect_http_posts_with_responses(example_new_album_xml)
     assert_equal "My Empty Album", @session.user.create_album(:name => "My Empty Album", :location => "Limboland").name
@@ -884,6 +891,170 @@ class TestFacebooker < Test::Unit::TestCase
         <size>14</size>
       </album>
     </photos_getAlbums_response>
+    XML
+  end
+
+  def example_user_stream_xml
+    <<-XML
+    <?xml version="1.0" encoding="UTF-8"?>
+    <stream_get_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd">
+      <posts list="true">
+        <stream_post>
+          <post_id>100000637452380_329182455865</post_id>
+          <viewer_id>100000637452380</viewer_id>
+          <source_id>100000637452380</source_id>
+          <type>80</type>
+          <app_id>2309869772</app_id>
+          <attribution xsi:nil="true"/>
+          <actor_id>100000637452380</actor_id>
+          <target_id xsi:nil="true"/>
+          <message>The bbc home page</message>
+          <attachment>
+           <media list="true">
+             <stream_media>
+               <href>http://www.facebook.com/l.php?u=http%253A%252F%252Fwww.bbc.co.uk%252F&amp;h=d6020258c74e511ee6dc1c28746f1e31</href>
+               <type>link</type>
+               <src>http://external.ak.fbcdn.net/safe_image.php?d=d1e587ce2d7039feaceaf7ef4c2610cd&amp;w=90&amp;h=90&amp;url=http%3A%2F%2Fwww.bbc.co.uk%2Ffeedengine%2Fhomepage%2Fimages%2F_47351229_-1_201x150.jpg</src>
+             </stream_media>
+           </media>
+           <name>BBC - Homepage</name>
+           <href>http://www.facebook.com/l.php?u=http%253A%252F%252Fwww.bbc.co.uk%252F&amp;h=d6020258c74e511ee6dc1c28746f1e31</href>
+           <caption>www.bbc.co.uk</caption>
+           <description>Breaking news, sport, TV, radio and a whole lot more. The BBC informs, educates and entertains - wherever you are, whatever your age.</description>
+           <properties list="true"/>
+           <icon>http://static.ak.fbcdn.net/rsrc.php/zAXEX/hash/9yvl71tw.png</icon>
+           <fb_object_type/>
+           <fb_object_id/>
+          </attachment>
+          <app_data/>
+          <action_links xsi:nil="true"/>
+          <comments>
+           <can_remove>1</can_remove>
+           <can_post>1</can_post>
+           <count>1</count>
+           <comment_list list="true">
+             <comment>
+               <fromid>100000702701175</fromid>
+               <time>1267118534</time>
+               <text>I like this website!</text>
+               <id>100000637452380_329182455865_11562840</id>
+             </comment>
+           </comment_list>
+          </comments>
+          <likes>
+           <href>http://www.facebook.com/social_graph.php?node_id=329182455865&amp;class=LikeManager</href>
+           <count>1</count>
+           <sample list="true"/>
+           <friends list="true">
+             <uid>100000702701175</uid>
+           </friends>
+           <user_likes>0</user_likes>
+           <can_like>1</can_like>
+          </likes>
+          <privacy>
+           <description>Everyone</description>
+           <value>EVERYONE</value>
+           <friends>NO_FRIENDS</friends>
+           <networks/>
+           <allow/>
+           <deny/>
+          </privacy>
+          <updated_time>1267118534</updated_time>
+          <created_time>1267103491</created_time>
+          <tagged_ids list="true"/>
+          <is_hidden>0</is_hidden>
+          <filter_key/>
+          <permalink>http://www.facebook.com/profile.php?v=feed&amp;story_fbid=329182455865&amp;id=100000637452380</permalink>
+        </stream_post>
+        <stream_post>
+          <post_id>100000637452380_318491734561</post_id>
+          <viewer_id>100000637452380</viewer_id>
+          <source_id>100000637452380</source_id>
+          <type>237</type>
+          <app_id>22108119377</app_id>
+          <attribution>Digg.com</attribution>
+          <actor_id>100000637452380</actor_id>
+          <target_id xsi:nil="true"/>
+          <message>What is curling.</message>
+          <attachment>
+           <media list="true">
+             <stream_media>
+               <href>http://digg.com/olympics/Curling_Finally_Explained_InfoGraphic?OTC-fbc8</href>
+               <type>link</type>
+               <src>http://platform.ak.fbcdn.net/www/app_full_proxy.php?app=22108119377&amp;v=1&amp;size=z&amp;cksum=f8ecb50623115ff74e5ea8acd9cf4a2e&amp;src=http%3A%2F%2Fdigg.com%2Folympics%2FCurling_Finally_Explained_InfoGraphic%2Ft.jpg</src>
+             </stream_media>
+           </media>
+           <name>Curling Finally Explained [InfoGraphic]</name>
+           <href>http://digg.com/olympics/Curling_Finally_Explained_InfoGraphic?OTC-fbc1</href>
+           <caption>Phudki dugg this story on Digg</caption>
+           <description>At last, someone makes sense out of the weirdest sport of the Winter Olympics. </description>
+           <properties list="true">
+             <stream_property>
+               <name>Source</name>
+               <text>i.imgur.com</text>
+             </stream_property>
+             <stream_property>
+               <name>Diggs</name>
+               <text>247</text>
+             </stream_property>
+           </properties>
+           <icon>http://photos-b.ak.fbcdn.net/photos-ak-sf2p/v43/113/22108119377/app_2_22108119377_6404.gif</icon>
+           <fb_object_type/>
+           <fb_object_id/>
+          </attachment>
+          <app_data>
+           <attachment_data>{&quot;name&quot;:&quot;Curling Finally Explained [InfoGraphic]&quot;,&quot;href&quot;:&quot;http:\/\/digg.com\/olympics\/Curling_Finally_Explained_InfoGraphic?OTC-fbc1&quot;,&quot;description&quot;:&quot;At last, someone makes sense out of the weirdest sport of the Winter Olympics. &quot;,&quot;media&quot;:[{&quot;type&quot;:&quot;image&quot;,&quot;src&quot;:&quot;http:\/\/digg.com\/olympics\/Curling_Finally_Explained_InfoGraphic\/t.jpg&quot;,&quot;href&quot;:&quot;http:\/\/digg.com\/olympics\/Curling_Finally_Explained_InfoGraphic?OTC-fbc8&quot;}],&quot;caption&quot;:&quot;{*actor*} dugg this story on Digg&quot;,&quot;properties&quot;:{&quot;Source&quot;:&quot;i.imgur.com&quot;,&quot;Diggs&quot;:&quot;247&quot;}}</attachment_data>
+           <images>[{&quot;fbml&quot;:&quot;&lt;img src=\&quot;http:\/\/digg.com\/olympics\/Curling_Finally_Explained_InfoGraphic\/t.jpg\&quot; \/&gt;&quot;,&quot;href&quot;:&quot;http:\/\/digg.com\/olympics\/Curling_Finally_Explained_InfoGraphic?OTC-fbc8&quot;}]</images>
+          </app_data>
+          <action_links xsi:nil="true"/>
+          <comments>
+           <can_remove>1</can_remove>
+           <can_post>1</can_post>
+           <count>0</count>
+           <comment_list list="true"/>
+          </comments>
+          <likes>
+           <href>http://www.facebook.com/social_graph.php?node_id=318491734561&amp;class=LikeManager</href>
+           <count>0</count>
+           <sample list="true"/>
+           <friends list="true"/>
+           <user_likes>0</user_likes>
+           <can_like>1</can_like>
+          </likes>
+          <privacy>
+           <description>Everyone</description>
+           <value>EVERYONE</value>
+           <friends>NO_FRIENDS</friends>
+           <networks/>
+           <allow/>
+           <deny/>
+          </privacy>
+          <updated_time>1266919509</updated_time>
+          <created_time>1266919509</created_time>
+          <tagged_ids list="true"/>
+          <is_hidden>0</is_hidden>
+          <filter_key/>
+          <permalink>http://www.facebook.com/profile.php?v=feed&amp;story_fbid=318491734561&amp;id=100000637452380</permalink>
+        </stream_post>
+      </posts>
+      <profiles list="true">
+        <profile>
+          <id>100000637452380</id>
+          <url>http://www.facebook.com/profile.php?id=100000637452380</url>
+          <name>Phudki Bandar</name>
+          <pic_square>http://profile.ak.fbcdn.net/v22939/1286/112/q100000637452380_2062.jpg</pic_square>
+          <type>user</type>
+        </profile>
+        <profile>
+          <id>100000702701175</id>
+          <url>http://www.facebook.com/profile.php?id=100000702701175</url>
+          <name>Mahmood Tester</name>
+          <pic_square>http://profile.ak.fbcdn.net/v22940/1631/70/q100000702701175_5464.jpg</pic_square>
+          <type>user</type>
+        </profile>
+      </profiles>
+      <albums list="true"/>
+    </stream_get_response>
     XML
   end
 
