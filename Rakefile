@@ -24,7 +24,7 @@ HOE = Hoe.spec('facebooker') do
   self.history_file  = 'CHANGELOG.rdoc'
   self.remote_rdoc_dir = '' # Release to root
   self.test_globs = ['test/**/*_test.rb']
-  extra_deps << ['json', '>= 1.0.0']
+  extra_deps << ['json_pure', '>= 1.0.0']
   self.extra_rdoc_files  = FileList['*.rdoc']
 end
 

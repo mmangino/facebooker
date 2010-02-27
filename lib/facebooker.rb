@@ -1,5 +1,10 @@
 unless defined?(ActiveSupport) and defined?(ActiveSupport::JSON)
-  require 'json'
+  begin
+    require 'json'
+  rescue LoadError
+    gem "json_pure"
+    require "json"
+  end
   module Facebooker
     def self.json_decode(str)
       JSON.parse(str)
@@ -233,6 +238,7 @@ require 'facebooker/version'
 require 'facebooker/models/location'
 require 'facebooker/models/affiliation'
 require 'facebooker/models/album'
+require 'facebooker/models/comment'
 require 'facebooker/models/education_info'
 require 'facebooker/models/work_info'
 require 'facebooker/models/event'
@@ -249,6 +255,7 @@ require 'facebooker/models/info_item'
 require 'facebooker/models/info_section'
 require 'facebooker/models/friend_list'
 require 'facebooker/models/video'
+require 'facebooker/models/message_thread'
 require 'facebooker/adapters/adapter_base'
 require 'facebooker/adapters/facebook_adapter'
 require 'facebooker/adapters/bebo_adapter'

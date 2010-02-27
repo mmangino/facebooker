@@ -110,6 +110,7 @@ module Facebooker
         @recipients           = nil
         @action_links         = nil
         @controller           = PublisherController.new(self)
+        @action_links         = nil
       end
 
       def self.default_url_options

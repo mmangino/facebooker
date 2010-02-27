@@ -9,7 +9,7 @@ module Facebooker
     # It will use to_s if the facebook_id attribute is not present.
     #
     module Helpers
-
+      
       include Facebooker::Rails::Helpers::FbConnect
 
       def versioned_concat(string,binding)
@@ -25,8 +25,14 @@ module Facebooker
       # cancel_button is true or false
       def fb_dialog( id, cancel_button, &block )
         content = capture(&block)
+        cancel_button = cancel_button ? 1 : 0 unless cancel_button == 0
         versioned_concat( content_tag("fb:dialog", content, {:id => id, :cancel_button => cancel_button}), block.binding )
       end
+      
+      def fb_stream_publish(stream_post,user_message_prompt=nil,callback=nil,auto_publish=false,actor=nil)
+        stream_publish("Facebook.streamPublish",stream_post,user_message_prompt,callback,auto_publish,actor)
+      end
+ 
       
       def fbjs_library
         "<script>var _token = '#{form_authenticity_token}';var _hostname = '#{ActionController::Base.asset_host}'</script>"+
@@ -107,17 +113,17 @@ module Facebooker
 
       # Create an fb:request-form with an fb_multi_friend_selector inside
       # 
-      # The content of the block are used as the message on the form,
+      # The content of the block are used as the message on the form, the options hash is passed onto fb_multi_friend_selector.
       #
       # For example:
-      #  <% fb_multi_friend_request("Poke","Choose some friends to Poke",create_poke_path) do %>
+      #  <% fb_multi_friend_request("Poke","Choose some friends to Poke",create_poke_path,:exclude_ids => "123456789,987654321") do %>
       #    If you select some friends, they will see this message.
       #    <%= fb_req_choice("They will get this button, too",new_poke_path) %>
       #  <% end %>
-      def fb_multi_friend_request(type,friend_selector_message,url,&block)
+      def fb_multi_friend_request(type,friend_selector_message,url, fb_multi_friend_selector_options = {},&block)
         content = capture(&block)
         versioned_concat(content_tag("fb:request-form",
-                            fb_multi_friend_selector(friend_selector_message) + token_tag,
+                            fb_multi_friend_selector(friend_selector_message, fb_multi_friend_selector_options) + token_tag,
                             {:action=>url,:method=>"post",:invite=>true,:type=>type,:content=>content}
                             ),
               block.binding)
@@ -335,7 +341,7 @@ module Facebooker
       VALID_FB_PHOTO_SIZES = VALID_FB_SHARED_PHOTO_SIZES      
       VALID_FB_PROFILE_PIC_SIZES = VALID_FB_SHARED_PHOTO_SIZES
       VALID_PERMISSIONS=[:email, :offline_access, :status_update, :photo_upload, :create_listing, :create_event, :rsvp_event, :sms, :video_upload, 
-                         :publish_stream, :read_stream]
+                         :publish_stream, :read_stream, :read_mailbox]
       
       # Render an fb:tabs tag containing some number of fb:tab_item tags.
       # Example:
@@ -618,6 +624,7 @@ module Facebooker
       #   * video_upload
       #   * create_note
       #   * share_item
+      #   * read_mailbox
       # Example:
       # <%= fb_prompt_permission('email', "Would you like to receive email from our application?" ) %>
       #
@@ -697,8 +704,11 @@ module Facebooker
       # more details
       def fb_intl(text=nil, options={}, &proc)
         raise ArgumentError, "Missing block or text" unless block_given? or text
-        content = block_given? ? capture(&proc) : text
-        content_tag("fb:intl", content, stringify_vals(options))
+        if block_given?
+          versioned_concat(fb_intl(capture(&proc), options))
+        else
+          content_tag("fb:intl", text, stringify_vals(options))
+        end
       end
 
       # Renders a fb:intl-token element
@@ -710,8 +720,11 @@ module Facebooker
       # more details
       def fb_intl_token(name, text=nil, &proc)
         raise ArgumentError, "Missing block or text" unless block_given? or text
-        content = block_given? ? capture(&proc) : text
-        content_tag("fb:intl-token", content, stringify_vals({:name => name}))
+        if block_given?
+          versioned_concat(fb_intl_token(name, capture(&proc)))
+        else
+          content_tag("fb:intl-token", text, stringify_vals({:name => name}))
+        end
       end
 
       # Renders a fb:date element

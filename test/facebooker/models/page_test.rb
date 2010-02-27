@@ -13,9 +13,14 @@ class Facebooker::PageTest < Test::Unit::TestCase
     assert_equal(12345,p.page_id)
   end
   
-  def test_should_be_ble_to_initialize_with_photo_id_as_string
+  def test_should_be_able_to_initialize_with_photo_id_as_string
     p = Facebooker::Page.new("12345")
     assert_equal("12345",p.page_id)    
+  end
+  
+  def test_should_alias_photo_id_as_id
+    p = Facebooker::Page.new("12345")
+    assert_equal("12345", p.id)    
   end
   
   def test_should_be_able_to_initialize_with_hash

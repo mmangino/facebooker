@@ -246,7 +246,7 @@ module Facebooker
         )
       end
       
-      def fbml_redirect_tag(url)
+      def fbml_redirect_tag(url,*args)
         "<fb:redirect url=\"#{url_for(url)}\" />"
       end
       

@@ -56,6 +56,7 @@ module Facebooker
     class MissingOrInvalidImageFile < StandardError; end
     class TooManyUnapprovedPhotosPending < StandardError; end
     class ExtendedPermissionRequired < StandardError; end
+    class ReadMailboxExtendedPermissionRequired < StandardError; end
     class InvalidFriendList < StandardError; end
     class UserUnRegistrationFailed < StandardError
       attr_accessor :failed_users
@@ -120,6 +121,7 @@ module Facebooker
     # * create_event
     # * rsvp_event
     # * sms
+    # * read_mailbox
     def permission_url(permission,options={})
       options = default_login_url_options.merge(options)
       options = add_next_parameters(options)
@@ -422,11 +424,36 @@ module Facebooker
       end
     end
 
+    #remove a comment from a given xid stream with comment_id
+    def remove_comment(xid,comment_id)
+      post('facebook.comments.remove', :xid=>xid, :comment_id =>comment_id)
+    end
+  
+    #pulls comment list for a given XID
+    def get_comments(xid)
+      @comments = post('facebook.comments.get', :xid => xid) do |response|
+        response.map do |hash|
+          Comment.from_hash(hash)
+        end
+      end
+    end
+
     def get_albums(aids)
       @albums = post('facebook.photos.getAlbums', :aids => aids) do |response|
         response.map do |hash|        
           Album.from_hash(hash)
         end
+      end
+    end
+
+    ###
+    # Retrieve a viewer's facebook stream
+    # See http://wiki.developers.facebook.com/index.php/Stream.get for options
+    #
+    def get_stream(viewer_id, options = {})
+
+      @stream = post('facebook.stream.get', prepare_get_stream_options(viewer_id, options), true) do |response|
+        response
       end
     end
 
@@ -709,6 +736,7 @@ module Facebooker
       end
 
       def signature_for(params)
+        params.delete_if { |k,v| v.nil? }
         raw_string = params.inject([]) do |collection, pair|
           collection << pair.map { |x|
             Array === x ? Facebooker.json_encode(x) : x
@@ -720,6 +748,18 @@ module Facebooker
       
       def ensure_array(value)
         value.is_a?(Array) ? value : [value]
+      end
+
+      def prepare_get_stream_options(viewer_id, options)
+        opts = {}
+
+        opts[:viewer_id] = viewer_id if viewer_id.is_a?(Integer)
+        opts[:source_ids] = options[:source_ids] if options[:source_ids]
+        opts[:start_time] = options[:start_time].to_i if options[:start_time]
+        opts[:end_time] = options[:end_time].to_i if options[:end_time]
+        opts[:limit] = options[:limit] if options[:limit].is_a?(Integer)
+        opts[:metadata] = Facebooker.json_encode(options[:metadata]) if options[:metadata]
+        opts
       end
   end
 

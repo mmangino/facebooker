@@ -11,8 +11,8 @@ module Facebooker
       include Model
       attr_accessor :message, :time, :status_id
     end
-    FIELDS = [:status, :political, :pic_small, :name, :quotes, :is_app_user, :tv, :profile_update_time, :meeting_sex, :hs_info, :timezone, :relationship_status, :hometown_location, :about_me, :wall_count, :significant_other_id, :pic_big, :music, :work_history, :sex, :religion, :notes_count, :activities, :pic_square, :movies, :has_added_app, :education_history, :birthday, :birthday_date, :first_name, :meeting_for, :last_name, :interests, :current_location, :pic, :books, :affiliations, :locale, :profile_url, :proxied_email, :email_hashes, :allowed_restrictions, :pic_with_logo, :pic_big_with_logo, :pic_small_with_logo, :pic_square_with_logo, :online_presence, :verified, :profile_blurb, :username, :website, :is_blocked, :family]
-    STANDARD_FIELDS = [:uid, :first_name, :last_name, :name, :timezone, :birthday, :sex, :affiliations, :locale, :profile_url, :proxied_email]
+    FIELDS = [:status, :political, :pic_small, :name, :quotes, :is_app_user, :tv, :profile_update_time, :meeting_sex, :hs_info, :timezone, :relationship_status, :hometown_location, :about_me, :wall_count, :significant_other_id, :pic_big, :music, :work_history, :sex, :religion, :notes_count, :activities, :pic_square, :movies, :has_added_app, :education_history, :birthday, :birthday_date, :first_name, :meeting_for, :last_name, :interests, :current_location, :pic, :books, :affiliations, :locale, :profile_url, :proxied_email, :email_hashes, :allowed_restrictions, :pic_with_logo, :pic_big_with_logo, :pic_small_with_logo, :pic_square_with_logo, :online_presence, :verified, :profile_blurb, :username, :website, :is_blocked, :family, :email]
+    STANDARD_FIELDS = [:uid, :first_name, :last_name, :name, :timezone, :birthday, :sex, :affiliations, :locale, :profile_url, :proxied_email, :email]
     populating_attr_accessor(*FIELDS)
     attr_reader :affiliations
     populating_hash_settable_accessor :current_location, Location
@@ -24,6 +24,8 @@ module Facebooker
     populating_hash_settable_list_accessor :family, FamilyRelativeInfo
 
     populating_attr_reader :status
+
+    attr_accessor :request_locale
 
     # Can pass in these two forms:
     # id, session, (optional) attribute_hash
@@ -184,6 +186,27 @@ module Facebooker
     end
 
 
+    ###
+    # Publish a comment to a specific comment set by xid
+    #
+    # See: http://wiki.developers.facebook.com/index.php/Comments.add
+    #
+    # +xid+ the xid for the set of comments
+    # +text+ the text of the comment
+    def add_comment(xid, text,title=nil,url=nil,publish_to_stream=false)
+      @session.post('facebook.comments.add',{:xid=>xid,:text=>text,:title=>title,:url=>url,:publish_to_stream=>publish_to_stream})
+    end
+
+    ###
+    # Add a like on a post
+    #
+    # See: http://wiki.developers.facebook.com/index.php/Stream.addLike
+    #
+    # +post_id+ the post_id for the post that is being commented on
+    def add_like_on(post_id)
+      @session.post('facebook.stream.addLike', {:post_id=>post_id})
+    end
+
      def friend_lists
        @friend_lists ||= @session.post('facebook.friends.getLists').map do |hash|
          friend_list = FriendList.from_hash(hash)
@@ -205,7 +228,9 @@ module Facebooker
     # Retrieve profile data for logged in user
     # Optional: list of fields to retrieve as symbols
     def populate(*fields)
-      session.post('facebook.users.getInfo', :fields => collect(fields), :uids => id) do |response|
+      arguments = {:fields => collect(fields), :uids => id}
+      arguments[:locale]=request_locale unless request_locale.nil?
+      session.post('facebook.users.getInfo', arguments) do |response|
         populate_from_hash!(response.first)
       end
     end
@@ -230,6 +255,21 @@ module Facebooker
         group = Group.from_hash(hash)
         group.session = session
         group
+      end
+    end
+
+    ###
+    # Get threads in a folder
+    #
+    # See: http://wiki.developers.facebook.com/index.php/Message.getThreadsInFolder
+    #
+    # +options+ possible options are :folder_id, :limit and :offset
+    def threads(options = {})
+      options ||= {}
+      @threads = session.post('facebook.message.getThreadsInFolder', options) do |response|
+        response.map do |hash|
+          MessageThread.from_hash(hash)
+        end
       end
     end
 
@@ -415,6 +455,12 @@ module Facebooker
     end
 
     ##
+    # Returns whether the user (either the session user or user specified by uid) has authorized the calling application
+    def app_user?
+      session.post('facebook.users.isAppUser', {:uid => self.id}, use_session_key = true)
+    end
+
+    ##
     # Convenience method to check multiple permissions at once
     def has_permissions?(ext_perms)
       ext_perms.all?{|p| has_permission?(p)}
@@ -447,7 +493,129 @@ module Facebooker
     def to_s
       id.to_s
     end
+    
+    
+    ### NEW DASHBOARD API STUFF
+    
+    # facebook_session.user.dashboard_count
+    def dashboard_count
+      session.post('facebook.dashboard.getCount', :uid => uid)
+    end
+    
+    # facebook_session.user.dashboard_count = 5
+    def dashboard_count=(new_count)
+      session.post('facebook.dashboard.setCount', :uid => uid, :count => new_count)
+    end
+    
+    # facebook_session.user.dashboard_increment_count
+    def dashboard_increment_count
+      session.post('facebook.dashboard.incrementCount', :uid => uid)
+    end
+    
+    # facebook_session.user.dashboard_decrement_count
+    def dashboard_decrement_count
+      session.post('facebook.dashboard.decrementCount', :uid => uid)
+    end
+    
+    # The following methods are not bound to a specific user but do relate to Users in general,
+    #   so I've made them into class methods.
+    
+    # Facebooker::User.dashboard_multi_get_count ['1234', '5678']
+    def self.dashboard_multi_get_count(*uids)
+     Facebooker::Session.create.post("facebook.dashboard.multiGetCount", :uids => uids.flatten)
+    end
+    
+    # Facebooker::User.dashboard_multi_set_count({ '1234' => '11', '5678' => '22' })
+    def self.dashboard_multi_set_count(ids)
+      Facebooker::Session.create.post("facebook.dashboard.multiSetCount", :ids => ids.to_json)
+    end
+    
+    # Facebooker::User.dashboard_multi_increment_count ['1234', '5678']
+    def self.dashboard_multi_increment_count(*uids)
+      Facebooker::Session.create.post("facebook.dashboard.multiIncrementCount", :uids => uids.flatten.to_json)
+    end
+    
+    # Facebooker::User.dashboard_multi_decrement_count ['1234', '5678']
+    def self.dashboard_multi_decrement_count(*uids)
+      Facebooker::Session.create.post("facebook.dashboard.multiDecrementCount", :uids => uids.flatten.to_json)
+    end
+    
+    def self.dashboard_multi_set_count(ids)
+      Facebooker::Session.create.post("facebook.dashboard.multiSetCount", :ids => ids.to_json)
+    end
+    
+    def self.dashboard_multi_increment_count(uids)
+      Facebooker::Session.create.post("facebook.dashboard.multiIncrementCount", :uids => uids.to_json)
+    end
+    
+    def self.dashboard_multi_decrement_count(uids)
+      Facebooker::Session.create.post("facebook.dashboard.multiDecrementCount", :uids => uids.to_json)
+    end
+    
+    
+    
+    
+    def get_news(*news_ids)
+      params = { :uid => uid }
+      params[:news_ids] = news_ids.flatten if news_ids
+      
+      session.post('facebook.dashboard.getNews', params)
+    end
+    
+    # facebook_session.user.add_news [{ :message => 'Hey, who are you?', :action_link => { :text => "I-I'm a test user", :href => 'http://facebook.er/' }}], 'http://facebook.er/icon.png'
+    def add_news(news, image=nil)
+      params = { :uid => uid }
+      params[:news] = news
+      params[:image] = image if image
+      
+      session.post('facebook.dashboard.addNews', params)
+    end
+    
+    # facebook_session.user.clear_news ['111111']
+    def clear_news(*news_ids)
+      params = { :uid => uid }
+      params[:news_ids] = news_ids.flatten if news_ids
+      
+      session.post('facebook.dashboard.clearNews', params)
+    end
+    
+    # Facebooker::User.multi_add_news(['1234', '4321'], [{ :message => 'Hi users', :action_link => { :text => "Uh hey there app", :href => 'http://facebook.er/' }}], 'http://facebook.er/icon.png')
+    def self.multi_add_news(uids, news, image=nil)
+      params = { :uids => uids, :news => news }
+      params[:image] = image if image
 
+      Facebooker::Session.create.post("facebook.dashboard.multiAddNews", params)
+    end
+    
+    # Facebooker::User.multi_clear_news({"1234"=>["319103117527"], "4321"=>["313954287803"]})
+    def self.multi_clear_news(ids)
+      Facebooker::Session.create.post("facebook.dashboard.multiClearNews", :ids => ids.to_json)
+    end
+    
+    # Facebooker::User.multi_get_news({"1234"=>["319103117527"], "4321"=>["313954287803"]})
+    def self.multi_get_news(ids)
+      Facebooker::Session.create.post('facebook.dashboard.multiGetNews', :ids => ids.to_json)
+    end
+    
+    # facebook_session.user.get_activity '123'
+    def get_activity(*activity_ids)
+      params = {}
+      params[:activity_ids] = activity_ids.flatten if activity_ids
+      
+      session.post('facebook.dashboard.getActivity', params)
+    end
+    
+    # facebook_session.user.publish_activity({ :message => '{*actor*} rolled around', :action_link => { :text => 'Roll around too', :href => 'http://facebook.er/' }})
+    def publish_activity(activity)
+      session.post('facebook.dashboard.publishActivity', { :activity => activity.to_json })
+    end
+    
+    # facebook_session.user.remove_activity ['123']
+    def remove_activity(*activity_ids)
+      session.post('facebook.dashboard.removeActivity', { :activity_ids => activity_ids.flatten })
+    end
+    
+    
     ##
     # Two Facebooker::User objects should be considered equal if their Facebook ids are equal
     def ==(other_user)
