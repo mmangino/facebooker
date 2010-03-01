@@ -1076,6 +1076,10 @@ class RailsHelperTest < Test::Unit::TestCase
     assert ! @h.init_fb_connect(:js => :jquery).match(/\$\(document\).ready\(/)
   end
   
+  def test_init_fb_connect_with_options_js_mootools
+    assert @h.init_fb_connect("XFBML", :js => :mootools).match(/window.addEvent\('domready',/)
+  end
+  
   def test_init_fb_connect_with_features_and_options_js_jquery
     assert @h.init_fb_connect("XFBML", :js => :jquery).match(/XFBML.*/)
     assert @h.init_fb_connect("XFBML", :js => :jquery).match(/\jQuery\(document\).ready\(/)
