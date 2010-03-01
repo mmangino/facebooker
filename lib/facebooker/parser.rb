@@ -109,34 +109,35 @@ module Facebooker
       end #do |hash, child|
     end
     
-    def self.hash_by_key_or_value_for(element)
+    def self.hash_by_key_or_value_for(element, convert_1_to_true=false)
       if element.children.size == 0
         { element['key'] => nil }
       elsif element.children.size == 1 && element.children.first.text?
-        { element['key'] => element.content.strip }
+        { element['key'] => (convert_1_to_true ? element.content.strip == '1' : element.content.strip) }
       else
-        hashinate_by_key(element)
+        hashinate_by_key(element, convert_1_to_true)
       end
     end
 
     # A modification to hashinate. The new dashboard API returns XML in a different format than
     # the other calls.  What used to be the element name has become an attribute called "key".
-    def self.hashinate_by_key(response_element)
+    def self.hashinate_by_key(response_element, convert_1_to_true=false)
       response_element.children.reject{|c| c.text? }.inject({}) do |hash, child|
         # If the node hasn't any child, and is not a list, we want empty strings, not empty hashes,
         #   except if attributes['nil'] == true
+
         hash[child['key']] =
         if (child['nil'] == 'true')
           nil
         elsif (child.children.size == 1 && child.children.first.text?) || (child.children.size == 0 && child['list'] != 'true')
-          anonymous_field_from(child, hash) || child.content.strip
+          anonymous_field_from(child, hash) || (convert_1_to_true ? child.content.strip == '1' : child.content.strip)
         elsif child['list'] == 'true' && child.children.all? { |subchild| subchild['key'].nil? }
-          child.children.reject{|c| c.text? }.map { |subchild| hash_by_key_or_value_for(subchild)}
+          child.children.reject{|c| c.text? }.map { |subchild| hash_by_key_or_value_for(subchild, convert_1_to_true)}
         elsif child['list'] == 'true'
-          hash_by_key_or_value_for(child)
+          hash_by_key_or_value_for(child, convert_1_to_true)
         else
           child.children.reject{|c| c.text? }.inject({}) do |subhash, subchild|
-            subhash[subchild['key']] = hash_by_key_or_value_for(subchild)
+            subhash[subchild['key']] = hash_by_key_or_value_for(subchild, convert_1_to_true)
             subhash
           end
         end
@@ -705,39 +706,21 @@ module Facebooker
   
   class DashboardMultiSetCount < Parser
     def self.process(data)
-      hashinate_by_key(element('dashboard_multiSetCount_response', data))
+      hashinate_by_key(element('dashboard_multiSetCount_response', data), true)
     end
   end
   
   class DashboardMultiIncrementCount < Parser
     def self.process(data)
-      hashinate_by_key(element('dashboard_multiIncrementCount_response', data))
+      hashinate_by_key(element('dashboard_multiIncrementCount_response', data), true)
     end
   end
   
   class DashboardMultiDecrementCount < Parser
     def self.process(data)
-      hashinate_by_key(element('dashboard_multiDecrementCount_response', data))
+      hashinate_by_key(element('dashboard_multiDecrementCount_response', data), true)
     end
   end
-  
-  class DashboardMultiSetCount < Parser
-     def self.process(data)
-       hashinate_by_key(element('dashboard_multiSetCount_response', data))
-     end
-   end
-
-   class DashboardMultiIncrementCount < Parser
-     def self.process(data)
-       hashinate_by_key(element('dashboard_multiIncrementCount_response', data))
-     end
-   end
-
-   class DashboardMultiDecrementCount < Parser
-     def self.process(data)
-       hashinate_by_key(element('dashboard_multiDecrementCount_response', data))
-     end
-   end
   
   class DashboardAddGlobalNews < Parser
     def self.process(data)
@@ -754,7 +737,7 @@ module Facebooker
   
   class DashboardClearGlobalNews < Parser
     def self.process(data)
-      hashinate_by_key(element('dashboard_clearGlobalNews_response', data))
+      hashinate_by_key(element('dashboard_clearGlobalNews_response', data), true)
     end
   end
   
@@ -772,7 +755,7 @@ module Facebooker
   
   class DashboardClearNews < Parser
     def self.process(data)
-      hashinate_by_key(element('dashboard_clearNews_response', data))
+      hashinate_by_key(element('dashboard_clearNews_response', data), true)
     end
   end
   
@@ -784,7 +767,7 @@ module Facebooker
   
   class DashboardMultiClearNews < Parser
     def self.process(data)
-      hashinate_by_key(element('dashboard_multiClearNews_response', data))
+      hashinate_by_key(element('dashboard_multiClearNews_response', data), true)
     end
   end
   
@@ -802,7 +785,7 @@ module Facebooker
   
   class DashboardRemoveActivity < Parser
     def self.process(data)
-      hashinate_by_key(element('dashboard_removeActivity_response', data))
+      hashinate_by_key(element('dashboard_removeActivity_response', data), true)
     end
   end
   
