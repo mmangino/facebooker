@@ -108,6 +108,7 @@ module Facebooker
         @from                 = nil
         @full_story_template  = nil
         @recipients           = nil
+        @action_links         = nil
         @controller           = PublisherController.new(self)
         @action_links         = nil
       end

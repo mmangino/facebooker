@@ -1032,6 +1032,8 @@ class RailsHelperTest < Test::Unit::TestCase
   
   def test_fb_login_button
     assert_equal "<fb:login-button onlogin=\"somejs\"></fb:login-button>",@h.fb_login_button("somejs")
+
+    assert_equal "<fb:login-button onlogin=\"somejs\">Custom</fb:login-button>",@h.fb_login_button("somejs", :text => 'Custom')
   end
   
   def test_init_fb_connect_no_features
@@ -1096,6 +1098,8 @@ class RailsHelperTest < Test::Unit::TestCase
   
   def test_fb_login_and_redirect
     assert_equal @h.fb_login_and_redirect("/path"),"<fb:login-button onlogin=\"window.location.href = &quot;/path&quot;;\"></fb:login-button>"
+    
+    assert_equal @h.fb_login_and_redirect("/path", :text => 'foo'),"<fb:login-button onlogin=\"window.location.href = &quot;/path&quot;;\">foo</fb:login-button>"
   end
   
   def test_fb_logout_link
