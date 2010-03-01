@@ -42,6 +42,7 @@ module Facebooker
              init_string = <<-FBML
              #{case options[:js]
                when :jquery then "jQuery(document).ready("
+               when :mootools then "window.addEvent('domready',"
                when :dojo then "dojo.addOnLoad("
                else "Element.observe(window,'load',"
                end} function() {
