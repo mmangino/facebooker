@@ -532,24 +532,12 @@ module Facebooker
     
     # Facebooker::User.dashboard_multi_increment_count ['1234', '5678']
     def self.dashboard_multi_increment_count(*uids)
-      Facebooker::Session.create.post("facebook.dashboard.multiIncrementCount", :uids => uids.flatten.to_json)
+      Facebooker::Session.create.post("facebook.dashboard.multiIncrementCount", :uids => uids.flatten.collect{ |uid| uid.to_s }.to_json)
     end
     
     # Facebooker::User.dashboard_multi_decrement_count ['1234', '5678']
     def self.dashboard_multi_decrement_count(*uids)
-      Facebooker::Session.create.post("facebook.dashboard.multiDecrementCount", :uids => uids.flatten.to_json)
-    end
-    
-    def self.dashboard_multi_set_count(ids)
-      Facebooker::Session.create.post("facebook.dashboard.multiSetCount", :ids => ids.to_json)
-    end
-    
-    def self.dashboard_multi_increment_count(uids)
-      Facebooker::Session.create.post("facebook.dashboard.multiIncrementCount", :uids => uids.to_json)
-    end
-    
-    def self.dashboard_multi_decrement_count(uids)
-      Facebooker::Session.create.post("facebook.dashboard.multiDecrementCount", :uids => uids.to_json)
+      Facebooker::Session.create.post("facebook.dashboard.multiDecrementCount", :uids => uids.flatten.collect{ |uid| uid.to_s }.to_json)
     end
     
     

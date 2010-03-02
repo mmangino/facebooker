@@ -439,7 +439,17 @@ class Facebooker::UserTest < Test::Unit::TestCase
     assert_equal({ '1234' => '11', '4321' => '22' }, Facebooker::User.dashboard_multi_get_count(['1234', '4321']))
   end
   
-  def test_can_dashboard_multi_increment_count
+  def test_can_dashboard_multi_increment_count_with_single_uid
+    Facebooker::Session.any_instance.expects(:post).with('facebook.dashboard.multiIncrementCount', :uids => ['8675309'].to_json)
+    Facebooker::User.dashboard_multi_increment_count 8675309
+  end
+  
+  def test_can_dashboard_multi_increment_count_with_multiple_uids
+    Facebooker::Session.any_instance.expects(:post).with('facebook.dashboard.multiIncrementCount', :uids => ['8675309', '555'].to_json)
+    Facebooker::User.dashboard_multi_increment_count 8675309, 555
+  end
+  
+  def test_can_dashboard_multi_increment_count_with_array_of_uids
     Facebooker::Session.any_instance.expects(:post).with('facebook.dashboard.multiIncrementCount', :uids => ['1234', '4321'].to_json)
     Facebooker::User.dashboard_multi_increment_count ['1234', '4321']
   end
@@ -449,12 +459,17 @@ class Facebooker::UserTest < Test::Unit::TestCase
     assert_equal({ '1234' => '1', '4321' => '1' }, Facebooker::User.dashboard_multi_increment_count(['1234', '4321']))
   end
   
-  def test_can_dashboard_multi_decrement_count
-    Facebooker::Session.any_instance.expects(:post).with('facebook.dashboard.multiDecrementCount', :uids => ['1234', '4321'].to_json)
-    Facebooker::User.dashboard_multi_decrement_count ['1234', '4321']
+  def test_can_dashboard_multi_decrement_count_with_single_uid
+    Facebooker::Session.any_instance.expects(:post).with('facebook.dashboard.multiDecrementCount', :uids => ['99999999'].to_json)
+    Facebooker::User.dashboard_multi_decrement_count 99999999
+  end
+  
+  def test_can_dashboard_multi_decrement_count_with_multiple_uids
+    Facebooker::Session.any_instance.expects(:post).with('facebook.dashboard.multiDecrementCount', :uids => ['1111', '2222'].to_json)
+    Facebooker::User.dashboard_multi_decrement_count 1111, 2222
   end
 
-  def test_parse_dashboard_multi_decrement_count
+  def test_parse_dashboard_multi_decrement_count_with_array_of_uids
     expect_http_posts_with_responses(dashboard_multi_decrement_count_xml)
     assert_equal({ '1234' => '1', '4321' => '1' }, Facebooker::User.dashboard_multi_decrement_count(['1234', '4321']))
   end
