@@ -27,7 +27,7 @@ module Facebooker
           end
 
           # Yes, app_settings is set to a string of an empty JSON element. That's intentional.
-          options = {:js => :prototype, :app_settings => '{}'}
+          options = {:app_settings => '{}'}
 
           if required_features.last.is_a?(Hash)
             options.merge!(required_features.pop.symbolize_keys)
