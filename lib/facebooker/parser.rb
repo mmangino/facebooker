@@ -123,15 +123,15 @@ module Facebooker
     # the other calls.  What used to be the element name has become an attribute called "key".
     def self.hashinate_by_key(response_element, convert_1_to_true=false)
       response_element.children.reject{|c| c.text? }.inject({}) do |hash, child|
+        
         # If the node hasn't any child, and is not a list, we want empty strings, not empty hashes,
         #   except if attributes['nil'] == true
-
         hash[child['key']] =
         if (child['nil'] == 'true')
           nil
         elsif (child.children.size == 1 && child.children.first.text?) || (child.children.size == 0 && child['list'] != 'true')
           anonymous_field_from(child, hash) || (convert_1_to_true ? child.content.strip == '1' : child.content.strip)
-        elsif child['list'] == 'true' && child.children.all? { |subchild| subchild['key'].nil? }
+        elsif child['list'] == 'true' && child.children.all? { |subchild| !subchild.text? && subchild['key'].nil? }
           child.children.reject{|c| c.text? }.map { |subchild| hash_by_key_or_value_for(subchild, convert_1_to_true)}
         elsif child['list'] == 'true'
           hash_by_key_or_value_for(child, convert_1_to_true)
