@@ -20,14 +20,14 @@ module Facebooker
         # and Rails' Hash#to_json always quotes strings so there is no way to indicate when the value should be a javascript function.
         # For this reason :app_settings needs to be a string that is valid JSON (including the {}'s).
         #
-        def init_fb_connect(*required_features,&proc)
+        def init_fb_connect(options = {},*required_features, &proc)
           additions = ""
           if block_given?
             additions = capture(&proc)
           end
 
           # Yes, app_settings is set to a string of an empty JSON element. That's intentional.
-          options = {:app_settings => '{}'}
+          options = options.merge({:app_settings => '{}'})
 
           if required_features.last.is_a?(Hash)
             options.merge!(required_features.pop.symbolize_keys)
