@@ -292,6 +292,11 @@ class TestFacebooker < Test::Unit::TestCase
     assert_equal "Under the sunset", @session.user.upload_photo(f).caption
   end
 
+  def test_can_upload_native_strings
+    expect_http_posts_with_responses(example_upload_native_string_xml)
+    assert_equal "1", @session.upload_native_strings([:text => "Hello!", :description => "A common salutation."])
+  end
+
   def test_can_get_photo_tags
     expect_http_posts_with_responses(example_photo_tags_xml)
     assert_instance_of Facebooker::Tag, @session.get_tags(:pids => 97503428461115571 ).first
@@ -1159,6 +1164,13 @@ class TestFacebooker < Test::Unit::TestCase
     <description>Check it out</description>
     <link>http://www.facebook.com/video/video.php?v=15943367753</link>
   </video_upload_response>
+    XML
+  end
+
+  def example_upload_native_string_xml
+    <<-XML
+    <?xml version="1.0" encoding="UTF-8"?>
+    <intl_uploadNativeStrings_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd">1</intl_uploadNativeStrings_response>
     XML
   end
   

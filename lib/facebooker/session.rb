@@ -533,6 +533,21 @@ module Facebooker
       post("facebook.feed.publishUserAction", parameters)
     end
 
+    ##
+    # Upload strings in native locale to facebook for translations.
+    #
+    # e.g. facebook_session.upload_native_strings([:text => "Welcome {user}", :description => "Welcome message to currently logged in user."])
+    # returns the number of strings uploaded
+    #
+    # See http://wiki.developers.facebook.com/index.php/Intl.uploadNativeStrings for method options
+    #
+    def upload_native_strings(native_strings)
+      raise ArgumentError, "You must provide strings to upload" if native_strings.nil?
+
+      post('facebook.intl.uploadNativeStrings', :native_strings => Facebooker.json_encode(native_strings)) do |response|
+        response
+      end
+    end
 
     ##
     # Send email to as many as 100 users at a time
