@@ -273,6 +273,13 @@ class TestFacebooker < Test::Unit::TestCase
     assert_equal('The bbc home page', stream[:posts].first['message'])
   end
 
+  def test_can_get_user_stream
+    expect_http_posts_with_responses(example_user_stream_xml)
+    stream = @session.user.stream
+    assert stream[:albums].empty?
+    assert_equal('The bbc home page', stream[:posts].first['message'])
+  end
+
   def test_can_create_album
     expect_http_posts_with_responses(example_new_album_xml)
     assert_equal "My Empty Album", @session.user.create_album(:name => "My Empty Album", :location => "Limboland").name

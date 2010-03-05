@@ -297,6 +297,17 @@ module Facebooker
       end
     end
 
+    ###
+    # Retrieve user's facebook stream
+    # See http://wiki.developers.facebook.com/index.php/Stream.get for options
+    #
+
+    def stream(options = {})
+      @stream = session.post('facebook.stream.get', prepare_get_stream_options(options)) do |response|
+        response
+      end
+    end
+
     def create_album(params)
       @album = session.post('facebook.photos.createAlbum', params) {|response| Album.from_hash(response)}
     end
@@ -717,6 +728,18 @@ module Facebooker
     def merge_aid(aid, uid)
       (uid << 32) + (aid & 0xFFFFFFFF)
     end
+
+    def prepare_get_stream_options(options)
+        opts = {}
+
+        opts[:viewer_id] = self.id
+        opts[:source_ids] = options[:source_ids] if options[:source_ids]
+        opts[:start_time] = options[:start_time].to_i if options[:start_time]
+        opts[:end_time] = options[:end_time].to_i if options[:end_time]
+        opts[:limit] = options[:limit] if options[:limit].is_a?(Integer)
+        opts[:metadata] = Facebooker.json_encode(options[:metadata]) if options[:metadata]
+        opts
+      end
 
   end
 end
