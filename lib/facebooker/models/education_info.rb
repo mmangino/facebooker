@@ -6,6 +6,6 @@ module Facebooker
     end
     
     include Model
-    attr_accessor :concentrations, :name, :year, :degree
+    attr_accessor :concentrations, :name, :year, :degree, :school_type
   end
 end
