@@ -522,6 +522,14 @@ module Facebooker
           end
         end
         
+        def respond_to?(method_symbol, include_private=false)
+          if match = /^(create|deliver|register)_([_a-z]\w*)/.match(method_symbol.to_s)
+            instance_methods.include?(match[2])
+          else
+            super(method_symbol, include_private)
+          end
+        end
+        
         def method_missing(name,*args)
           should_send = false
           method = ''

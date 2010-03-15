@@ -232,6 +232,12 @@ class Facebooker::Rails::Publisher::PublisherTest < Test::Unit::TestCase
   def teardown
     super
   end
+  
+  def test_respond_to
+    assert TestPublisher.respond_to?(:create_action)
+    assert TestPublisher.respond_to?(:deliver_action)
+    assert TestPublisher.respond_to?(:register_action)
+  end
 
   def test_create_action
     action=TestPublisher.create_action(@user)
