@@ -339,7 +339,7 @@ module Facebooker
         if links.blank?
           @action_links
         else
-          @action_links = links
+          @action_links = *links
         end
       end
       
