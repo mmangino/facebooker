@@ -403,7 +403,10 @@ class TestFacebooker < Test::Unit::TestCase
     assert_equal false, @session.post('facebook.auth.revokeAuthorization', :uid => 123)
   end
   
-  
+  def test_revoke_extended_permission
+    expect_http_posts_with_responses(example_revoke_extended_permission)
+    assert_equal true, @session.post('facebook.auth.revokeExtendedPermission', {:perm => 'email', :uid => 123}, false)
+  end
   
   def test_remove_comment_true
     expect_http_posts_with_responses(example_remove_comment_true)
@@ -1182,7 +1185,13 @@ class TestFacebooker < Test::Unit::TestCase
     "0"
   end
   
-  
+  def example_revoke_extended_permission
+    <<-XML
+    <?xml version="1.0" encoding="UTF-8"?>
+    <auth_revokeExtendedPermission_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd">1</auth_revokeExtendedPermission_response>
+    XML
+  end
+
   def example_remove_comment_true
     "1"
   end
