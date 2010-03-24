@@ -84,7 +84,12 @@ module Facebooker
       if element.children.size == 1 && element.children.first.text?
         element.content.strip
       else
-        hashinate(element)
+        # We can have lists in not list item
+        if element['list'] == 'true'
+          element.children.reject{|c| c.text? }.map { |subchild| hash_or_value_for(subchild)}
+        else
+          hashinate(element)
+        end
       end
     end
 

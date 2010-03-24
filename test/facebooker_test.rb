@@ -418,7 +418,14 @@ class TestFacebooker < Test::Unit::TestCase
     assert_equal false, @session.remove_comment('pete_comments',123)
   end
   
-  
+  # We can have lists in not list item, see ewample_with_list_in_none_list_item_xml : there is comment_list in comments node
+  def test_parser_with_list_item_in_not_list_item
+    expect_http_posts_with_responses(ewample_with_list_in_none_list_item_xml)
+    response = @session.fql_query('Lets be frank. We are not testing the query here')
+    assert_equal 3, response.first["comments"]['comment_list'].size
+    assert_equal "ahahhahaha\n    i don't know the original one, but this is awesome (without waiting for it)", response.first["comments"]['comment_list'].first['text']
+  end
+
   
   private
   def populate_user_info
@@ -1199,5 +1206,58 @@ class TestFacebooker < Test::Unit::TestCase
   def example_remove_comment_false
     "0"
   end
+  
+  def ewample_with_list_in_none_list_item_xml
+    <<-XML
+    <?xml version="1.0" encoding="UTF-8"?>
+    <fql_query_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" list="true">
+      <stream_post>
+        <post_id>12345678_901234</post_id>
+        <actor_id>12345</actor_id>
+        <comments>
+          <can_remove>1</can_remove>
+          <can_post>1</can_post>
+          <count>3</count>
+          <comment_list list="true">
+            <comment>
+              <fromid>6667785</fromid>
+              <time>2223332</time>
+              <text>ahahhahaha
+    i don't know the original one, but this is awesome (without waiting for it)</text>
+              <id>12345678_901234_23456</id>
+            </comment>
+            <comment>
+              <fromid>6667785</fromid>
+              <time>1268732285</time>
+              <text>héhé :)
+    Have you listen their Mickeal Jackson's cover ?</text>
+              <id>785637999_368045444730_12404854</id>
+            </comment>
+            <comment>
+              <fromid>1345267</fromid>
+              <time>1268733276</time>
+              <text>not yet!
+    unfortunately i'm at work so i can't go through all of them..
+    but yes, i saw it
+    brilliant!</text>
+              <id>12345678_901234_234567</id>
+            </comment>
+          </comment_list>
+        </comments>
+        <likes>
+          <href>http://www.facebook.com/social_graph.php?node_id=23546&amp;class=LikeManager</href>
+          <count>1</count>
+          <sample list="true"/>
+          <friends list="true">
+            <uid>234567</uid>
+          </friends>
+          <user_likes>0</user_likes>
+          <can_like>1</can_like>
+        </likes>
+      </stream_post>
+    </fql_query_response>
+    XML
+  end
+  
   
 end
