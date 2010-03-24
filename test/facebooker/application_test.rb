@@ -41,7 +41,7 @@ class Facebooker::ApplicationTest < Test::Unit::TestCase
   
   def test_can_parse_global_news
     expect_http_posts_with_responses(clear_global_news_xml)
-    assert_equal({"342345290762"=>"1"}, @session.application.clear_global_news('342345290762'))
+    assert_equal({"342345290762"=>true}, @session.application.clear_global_news('342345290762'))
   end
 
   private
