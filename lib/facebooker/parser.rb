@@ -284,6 +284,12 @@ module Facebooker
     end
   end  
 
+  class StreamRemoveLike < Parser#:nodoc:
+    def self.process(data)
+      booleanize(element('stream_removeLike_response', data).content.strip)
+    end
+  end  
+
   class RegisterTemplateBundle < Parser#:nodoc:
     def self.process(data)
       element('feed_registerTemplateBundle_response', data).content.to_i
@@ -928,6 +934,7 @@ module Facebooker
       'facebook.stream.publish' => StreamPublish,
       'facebook.stream.addComment' => StreamAddComment,
       'facebook.stream.addLike' => StreamAddLike,
+      'facebook.stream.removeLike' => StreamRemoveLike,
       'facebook.events.create' => EventsCreate,
       'facebook.events.cancel' => EventsCancel,
       'facebook.events.get' => EventsGet,
