@@ -575,7 +575,7 @@ module Facebooker
 
   class GetCookies < Parser#:nodoc:
     def self.process(data)
-      array_of_hashes(element('data_getCookie_response', data), 'cookies')
+      array_of_hashes(element('data_getCookies_response', data), 'cookies')
     end
   end
   
