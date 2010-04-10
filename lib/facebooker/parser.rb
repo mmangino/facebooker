@@ -597,6 +597,12 @@ module Facebooker
     end
   end
 
+  class EventsEdit < Parser#:nodoc:
+      def self.process(data)
+        booleanize(element('events_edit_response', data).content)
+      end
+    end
+
   class GroupGetMembers < Parser#:nodoc:
     def self.process(data)
       root = element('groups_getMembers_response', data)
@@ -931,6 +937,7 @@ module Facebooker
       'facebook.events.create' => EventsCreate,
       'facebook.events.cancel' => EventsCancel,
       'facebook.events.get' => EventsGet,
+      'facebook.events.edit' => EventsEdit,
       'facebook.events.rsvp' => EventsRsvp,
       'facebook.groups.get' => GroupsGet,
       'facebook.events.getMembers' => EventMembersGet,
