@@ -860,7 +860,8 @@ module Facebooker
       605 => Facebooker::Session::FQLFunctionDoesNotExist,
       606 => Facebooker::Session::FQLWrongNumberArgumentsPassedToFunction,
       612 => Facebooker::Session::ReadMailboxExtendedPermissionRequired,
-      807 => Facebooker::Session::TemplateBundleInvalid
+      807 => Facebooker::Session::TemplateBundleInvalid,
+      1001=> Facebooker::Session::EventNameLocked
     }
     def self.process(data)
       response_element = element('error_response', data) rescue nil

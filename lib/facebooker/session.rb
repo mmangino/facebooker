@@ -58,6 +58,7 @@ module Facebooker
     class ExtendedPermissionRequired < StandardError; end
     class ReadMailboxExtendedPermissionRequired < StandardError; end
     class InvalidFriendList < StandardError; end
+    class EventNameLocked < StandardError ; end
     class UserUnRegistrationFailed < StandardError
       attr_accessor :failed_users
     end
