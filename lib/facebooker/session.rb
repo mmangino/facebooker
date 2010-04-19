@@ -4,7 +4,8 @@ module Facebooker
   #
   # Raised when trying to perform an operation on a user
   # other than the logged in user (if that's unallowed)
-  class NonSessionUser < StandardError;  end
+  class Error < StandardError; end
+  class NonSessionUser < Error;  end
   class Session
 
     #
@@ -13,55 +14,55 @@ module Facebooker
     # user logs out of facebook
     # can be handled with:
     # rescue_from Facebooker::Session::SessionExpired, :with => :some_method_name
-    class SessionExpired < StandardError; end
+    class SessionExpired < Error; end
 
-    class UnknownError < StandardError; end
-    class ServiceUnavailable < StandardError; end
-    class MaxRequestsDepleted < StandardError; end
-    class HostNotAllowed < StandardError; end
-    class MissingOrInvalidParameter < StandardError; end
-    class InvalidAPIKey < StandardError; end
-    class SessionExpired < StandardError; end
-    class CallOutOfOrder < StandardError; end
-    class IncorrectSignature     < StandardError; end
-    class SignatureTooOld     < StandardError; end
-    class TooManyUserCalls < StandardError; end
-    class TooManyUserActionCalls < StandardError; end
-    class InvalidFeedTitleLink < StandardError; end
-    class InvalidFeedTitleLength < StandardError; end
-    class InvalidFeedTitleName < StandardError; end
-    class BlankFeedTitle < StandardError; end
-    class FeedBodyLengthTooLong < StandardError; end
-    class InvalidFeedPhotoSource < StandardError; end
-    class InvalidFeedPhotoLink < StandardError; end    
-    class TemplateDataMissingRequiredTokens < StandardError; end
-    class FeedMarkupInvalid < StandardError; end
-    class FeedTitleDataInvalid < StandardError; end
-    class FeedTitleTemplateInvalid < StandardError; end
-    class FeedBodyDataInvalid < StandardError; end
-    class FeedBodyTemplateInvalid < StandardError; end
-    class FeedPhotosNotRetrieved < StandardError; end
-    class FeedTargetIdsInvalid < StandardError; end
-    class TemplateBundleInvalid < StandardError; end
-    class ConfigurationMissing < StandardError; end
-    class FQLParseError < StandardError; end
-    class FQLFieldDoesNotExist < StandardError; end
-    class FQLTableDoesNotExist < StandardError; end
-    class FQLStatementNotIndexable < StandardError; end
-    class FQLFunctionDoesNotExist < StandardError; end
-    class FQLWrongNumberArgumentsPassedToFunction < StandardError; end
-    class PermissionError < StandardError; end
-    class InvalidAlbumId < StandardError; end
-    class AlbumIsFull < StandardError; end
-    class MissingOrInvalidImageFile < StandardError; end
-    class TooManyUnapprovedPhotosPending < StandardError; end
-    class ExtendedPermissionRequired < StandardError; end
-    class ReadMailboxExtendedPermissionRequired < StandardError; end
-    class InvalidFriendList < StandardError; end
-    class UserUnRegistrationFailed < StandardError
+    class UnknownError < Error; end
+    class ServiceUnavailable < Error; end
+    class MaxRequestsDepleted < Error; end
+    class HostNotAllowed < Error; end
+    class MissingOrInvalidParameter < Error; end
+    class InvalidAPIKey < Error; end
+    class SessionExpired < Error; end
+    class CallOutOfOrder < Error; end
+    class IncorrectSignature     < Error; end
+    class SignatureTooOld     < Error; end
+    class TooManyUserCalls < Error; end
+    class TooManyUserActionCalls < Error; end
+    class InvalidFeedTitleLink < Error; end
+    class InvalidFeedTitleLength < Error; end
+    class InvalidFeedTitleName < Error; end
+    class BlankFeedTitle < Error; end
+    class FeedBodyLengthTooLong < Error; end
+    class InvalidFeedPhotoSource < Error; end
+    class InvalidFeedPhotoLink < Error; end    
+    class TemplateDataMissingRequiredTokens < Error; end
+    class FeedMarkupInvalid < Error; end
+    class FeedTitleDataInvalid < Error; end
+    class FeedTitleTemplateInvalid < Error; end
+    class FeedBodyDataInvalid < Error; end
+    class FeedBodyTemplateInvalid < Error; end
+    class FeedPhotosNotRetrieved < Error; end
+    class FeedTargetIdsInvalid < Error; end
+    class TemplateBundleInvalid < Error; end
+    class ConfigurationMissing < Error; end
+    class FQLParseError < Error; end
+    class FQLFieldDoesNotExist < Error; end
+    class FQLTableDoesNotExist < Error; end
+    class FQLStatementNotIndexable < Error; end
+    class FQLFunctionDoesNotExist < Error; end
+    class FQLWrongNumberArgumentsPassedToFunction < Error; end
+    class PermissionError < Error; end
+    class InvalidAlbumId < Error; end
+    class AlbumIsFull < Error; end
+    class MissingOrInvalidImageFile < Error; end
+    class TooManyUnapprovedPhotosPending < Error; end
+    class ExtendedPermissionRequired < Error; end
+    class ReadMailboxExtendedPermissionRequired < Error; end
+    class InvalidFriendList < Error; end
+    class UserUnRegistrationFailed < Error
       attr_accessor :failed_users
     end
-    class UserRegistrationFailed < StandardError
+    class UserRegistrationFailed < Error
       attr_accessor :failed_users
     end
 
