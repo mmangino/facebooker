@@ -53,7 +53,7 @@ class Facebooker::DataTest < Test::Unit::TestCase
   def example_get_cookies_xml
     <<-XML
     <?xml version="1.0" encoding="UTF-8"?>
-    <data_getCookie_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    <data_getCookies_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd">
       <cookies>
         <uid>508508326</uid>
@@ -62,7 +62,7 @@ class Facebooker::DataTest < Test::Unit::TestCase
         <expires>0</expires>
         <path>/tmp/</path>
       </cookies>
-    </data_getCookie_response>
+    </data_getCookies_response>
     XML
   end
 
