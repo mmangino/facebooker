@@ -126,7 +126,7 @@ module Facebooker
       end
 
       def fb_cookie_names
-        fb_cookie_names = cookies.keys.select{|k| k && k.starts_with?(fb_cookie_prefix)}
+        fb_cookie_names = cookies.keys.select{|k| k && k.to_s.starts_with?(fb_cookie_prefix)}
       end
 
       def secure_with_cookies!
