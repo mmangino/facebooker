@@ -575,7 +575,7 @@ module Facebooker
   
   class EventsRsvp < Parser#:nodoc:
     def self.process(data)
-      element('events_rsvp_response', data).content.strip
+      booleanize(element('events_rsvp_response', data).content)
     end
   end
 
