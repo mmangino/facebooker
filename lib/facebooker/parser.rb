@@ -575,16 +575,16 @@ module Facebooker
   
   class EventsRsvp < Parser#:nodoc:
     def self.process(data)
-       element('events_rsvp_response', data).content.strip
+      element('events_rsvp_response', data).content.strip
     end
   end
-   
+
   class EventsCreate < Parser#:nodoc:
     def self.process(data)
       element('events_create_response', data).content.strip
     end
   end
-  
+
   class EventsCancel < Parser#:nodoc:
     def self.process(data)
       element('events_cancel_response', data).content.strip
@@ -598,16 +598,16 @@ module Facebooker
   end
 
   class EventsEdit < Parser#:nodoc:
-      def self.process(data)
-        booleanize(element('events_edit_response', data).content)
-      end
+    def self.process(data)
+      booleanize(element('events_edit_response', data).content)
     end
+  end
 
-    class EventsInvite < Parser#:nodoc:
-        def self.process(data)
-          booleanize(element('events_invite_response', data).content)
-        end
-      end
+  class EventsInvite < Parser#:nodoc:
+    def self.process(data)
+      booleanize(element('events_invite_response', data).content)
+    end
+  end
 
   class GroupGetMembers < Parser#:nodoc:
     def self.process(data)
