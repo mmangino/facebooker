@@ -224,6 +224,12 @@ class Facebooker::UserTest < Test::Unit::TestCase
     assert_equal('1', @user.add_like_on('703826862_78463536862'))
   end
 
+  def test_remove_like_on
+    @user = Facebooker::User.new(548871286, @session)
+    expect_http_posts_with_responses(example_remove_like_on_response)
+    assert_equal(true, @user.remove_like_on('703826862_78463536862'))
+  end
+
   def test_can_send_email
     @user.expects(:send_email).with("subject", "body text")
     @user.send_email("subject", "body text")
@@ -709,6 +715,13 @@ class Facebooker::UserTest < Test::Unit::TestCase
         <<-eoxml
     <?xml version="1.0" encoding="UTF-8"?>
     <stream_addLike_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd">1</stream_addLike_response>
+        eoxml
+  end
+
+  def example_remove_like_on_response
+        <<-eoxml
+    <?xml version="1.0" encoding="UTF-8"?>
+    <stream_removeLike_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd">1</stream_removeLike_response>
         eoxml
   end
 

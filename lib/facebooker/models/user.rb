@@ -207,6 +207,16 @@ module Facebooker
       @session.post('facebook.stream.addLike', {:post_id=>post_id})
     end
 
+    ###
+    # Remove a like on a post
+    #
+    # See: http://wiki.developers.facebook.com/index.php/Stream.removeLike
+    #
+    # +post_id+ the post_id for the post that is being commented on
+    def remove_like_on(post_id)
+      @session.post('facebook.stream.removeLike', {:post_id=>post_id})
+    end
+
      def friend_lists
        @friend_lists ||= @session.post('facebook.friends.getLists').map do |hash|
          friend_list = FriendList.from_hash(hash)
