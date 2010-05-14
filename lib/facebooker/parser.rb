@@ -1,9 +1,9 @@
-require 'rexml/document'
 require 'facebooker/session'
 
 begin
-    require 'nokogiri'
+  require 'nokogiri'
 rescue Exception
+  require 'rexml/document'
 end
 
 module Facebooker
@@ -29,8 +29,10 @@ module Facebooker
       end
     end
 
-    ::REXML::Element.__send__(:include, REXMLElementExtensions)
-    ::REXML::Text.__send__(:include, REXMLTextExtensions)
+    if Object.const_defined?(:REXML) && REXML.const_defined?(:Element)
+      ::REXML::Element.__send__(:include, REXMLElementExtensions)
+      ::REXML::Text.__send__(:include, REXMLTextExtensions)
+    end
 
     def self.parse(method, data)
       Errors.process(data)
