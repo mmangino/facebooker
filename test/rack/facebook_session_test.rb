@@ -23,7 +23,7 @@ class Rack::FacebookSessionTest < Test::Unit::TestCase
   end
   
   def test_converts_session_key_on_get
-    response = app.get '/', :input => params(:fb_sig_session_key => 'foo')
+    response = app.get '/?' + params(:fb_sig_session_key => 'foo')
     assert_equal '_top_sekrit=foo', @env['HTTP_COOKIE']
   end
   
