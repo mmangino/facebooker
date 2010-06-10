@@ -17,10 +17,12 @@ if defined? Rails
   require 'facebooker/rails/facebook_request_fix' if Rails.version < '2.3'
   require 'facebooker/rails/facebook_request_fix_2-3' if Rails.version >= '2.3'
   require 'facebooker/rails/routing'
+  require 'facebooker/rails/helpers/stream_publish'
+  require 'facebooker/rails/helpers/fb_connect'
+  require 'facebooker/rails/helpers'
   require 'facebooker/rails/facebook_pretty_errors' rescue nil
   require 'facebooker/rails/facebook_url_helper'
   require 'facebooker/rails/extensions/rack_setup' if Rails.version > '2.3'
   require 'facebooker/rails/extensions/action_controller'
-  #require 'facebooker/rails/extensions/action_view'
   require 'facebooker/rails/extensions/routing'
 end
