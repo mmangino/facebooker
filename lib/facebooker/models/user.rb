@@ -76,7 +76,6 @@ module Facebooker
     #  # => Returns true if all went well
     def rsvp_event(eid, rsvp_status, options = {})
       result = @session.post('facebook.events.rsvp', options.merge(:eid => eid, :rsvp_status => rsvp_status))
-      result == '1' ? true : false
     end
 
     #
