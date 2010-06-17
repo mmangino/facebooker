@@ -213,6 +213,18 @@ class Facebooker::SessionTest < Test::Unit::TestCase
     mock_session.create_event('name' => 'foo', 'category' => 'bar', :start_time => start_time, :end_time => end_time)
   end
   
+  def test_can_edit_events
+    expect_http_posts_with_responses(example_event_edit_xml)
+    assert @session.edit_event("12345", :host => 'Me, Myself, & I')
+  end
+
+  def test_edit_event_name_after_others_rsvp_throws_exception
+    expect_http_posts_with_responses(example_event_edit_name_exception_xml)
+    assert_raises(Facebooker::Session::EventNameLocked) {
+      @session.edit_event("12345", :name => 'Please Raise an Exception')
+    }
+  end
+
   def test_can_cancel_events
     expect_http_posts_with_responses(example_event_cancel_xml)
     assert @session.cancel_event("12345", :cancel_message => "It's raining")
@@ -528,6 +540,59 @@ XML
     <events_create_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd">
       34444349712
     </events_create_response> 
+    XML
+  end
+
+  def example_event_edit_xml
+    <<-XML
+    <?xml version="1.0" encoding="UTF-8"?>
+    <events_edit_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd">
+      1
+    </events_edit_response>
+    XML
+  end
+
+  def example_event_edit_name_exception_xml
+    <<-XML
+    <?xml version="1.0" encoding="UTF-8"?>
+    <error_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd">
+      <error_code>1001</error_code>
+      <error_msg>You are no longer able to change the name of this event.</error_msg>
+      <request_args list="true">
+        <arg>
+          <key>v</key>
+          <value>1.0</value>
+        </arg>
+        <arg>
+          <key>session_key</key>
+          <value>xxxxxxxxxxxxxxxxxxxxxxxx-100000123443210</value>
+        </arg>
+        <arg>
+          <key>eid</key>
+          <value>123456776543210</value>
+        </arg>
+        <arg>
+          <key>api_key</key>
+          <value>xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</value>
+        </arg>
+        <arg>
+          <key>method</key>
+          <value>facebook.events.edit</value>
+        </arg>
+        <arg>
+          <key>sig</key>
+          <value>xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</value>
+        </arg>
+        <arg>
+          <key>event_info</key>
+          <value>{&quot;name&quot;:&quot;Please Raise an Exception&quot;}</value>
+        </arg>
+        <arg>
+          <key>call_id</key>
+          <value>1276801014.58273</value>
+        </arg>
+      </request_args>
+    </error_response>
     XML
   end
 
