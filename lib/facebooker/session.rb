@@ -343,7 +343,7 @@ module Facebooker
     # E.g:
     # @session.event_invite('1000321123', %w{1234 4567 1000123321}, :personal_message => "Please come!")
     def event_invite(eid, uids, options = {})
-      post('facebook.events.invite', options.merge(:eid => eid, :uids => uids))
+      post('facebook.events.invite', options.merge(:eid => eid, :uids => uids.to_json))
     end
 
     def event_members(eid)
