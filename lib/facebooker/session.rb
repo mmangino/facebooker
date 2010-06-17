@@ -323,6 +323,10 @@ module Facebooker
       
       post_file('facebook.events.create', :event_info => event_info.to_json, nil => multipart_post_file)
     end
+
+    def edit_event(eid, event_info, options = {})
+      post('facebook.events.edit', options.merge(:eid => eid, :event_info => event_info.to_json))
+    end
     
     # Cancel an event
     # http://wiki.developers.facebook.com/index.php/Events.cancel
