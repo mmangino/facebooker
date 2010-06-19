@@ -11,7 +11,7 @@ begin
   require 'multi_rails_init'
 rescue LoadError
   # multi rails not installed, test against newest supported version of Rails
-  gem 'rails', '2.3.8'
+  gem 'rails', (ENV['RAILS_VERSION'] || '2.3.8')
 end
 require 'active_support'
 require 'flexmock/test_unit'
