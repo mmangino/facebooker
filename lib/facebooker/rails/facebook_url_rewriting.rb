@@ -44,7 +44,11 @@ module ::ActionController
   
     def rewrite_url_with_facebooker(*args)
       options = args.first.is_a?(Hash) ? args.first : args.last
-      is_link_to_canvas = @request.env["REQUEST_METHOD"] == "POST" && link_to_canvas?(@request.request_parameters, options)
+      if Rails.version >= '2.3.8'
+        is_link_to_canvas = @request.env["REQUEST_METHOD"] == "POST" && link_to_canvas?(@request.request_parameters, options)
+      else
+        is_link_to_canvas = link_to_canvas?(@request.request_parameters, options)
+      end
       if is_link_to_canvas && !options.has_key?(:host)
         options[:host] = Facebooker.canvas_server_base
       end 
