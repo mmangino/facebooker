@@ -14,23 +14,26 @@ module Facebooker
     end
 
     def read_fixture(method, filename, original = nil)
-      path = fixture_path(method, filename)
-      File.read path
-    rescue Errno::ENAMETOOLONG
-      read_fixture(method, hash_fixture_name(filename), filename)
-    rescue Errno::ENOENT => e
-      if File.exists?(fixture_path(method, 'default'))
-        File.read fixture_path(method, 'default')
-      else
-        e.message << "\n(Non-hashed path is #{original})" if original
-        e.message << "\nFacebook API Reference: http://wiki.developers.facebook.com/index.php/#{method.sub(/^facebook\./, '')}#Example_Return_XML"
-        raise e
+      begin
+        path = fixture_path(method, filename)
+        File.read path
+      rescue Errno::ENAMETOOLONG
+        read_fixture(method, hash_fixture_name(filename), filename)
+      rescue Errno::ENOENT => e
+        if File.exists?(fixture_path(method, 'default'))
+          File.read fixture_path(method, 'default')
+        else
+          e.message << "\nPut the XML content in this file, or #{fixture_path(method,'default')}"
+          e.message << "\nFacebook API Reference: http://wiki.developers.facebook.com/index.php/#{method.sub(/^facebook\./, '')}#Example_Return_XML"
+          e.message << "\n(Non-hashed path is #{original})" if original
+          raise e
+        end
       end
     end
 
     def post(params)
       method = params.delete(:method)
-      params.delete_if {|k,_| [:v, :api_key, :call_id, :sig].include?(k) }
+      params.delete_if {|k,_| [:v, :api_key, :session_key, :call_id, :sig].include?(k) }
       Parser.parse(method, read_fixture(method, fixture_name(params)))
     end
 
