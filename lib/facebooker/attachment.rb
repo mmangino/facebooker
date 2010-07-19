@@ -42,6 +42,14 @@ class Facebooker::Attachment
     params[:expanded_height] = expanded_height unless expanded_height.nil?
     add_media(params)
   end
+
+  
+  def add_property(key, value)
+    @storage[:properties] ||= {}
+    @storage[:properties][key] = value
+  end
+
+
   
   def to_hash
     @storage
