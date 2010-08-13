@@ -20,6 +20,7 @@ module Facebooker
     class ServiceUnavailable < Error; end
     class MaxRequestsDepleted < Error; end
     class HostNotAllowed < Error; end
+    class AppPermissionError < Error; end
     class MissingOrInvalidParameter < Error; end
     class InvalidAPIKey < Error; end
     class SessionExpired < Error; end

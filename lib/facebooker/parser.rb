@@ -827,6 +827,7 @@ module Facebooker
       2 	=> Facebooker::Session::ServiceUnavailable,
       4 	=> Facebooker::Session::MaxRequestsDepleted,
       5 	=> Facebooker::Session::HostNotAllowed,
+      10  => Facebooker::Session::AppPermissionError,
       100 => Facebooker::Session::MissingOrInvalidParameter,
       101 => Facebooker::Session::InvalidAPIKey,
       102 => Facebooker::Session::SessionExpired,
