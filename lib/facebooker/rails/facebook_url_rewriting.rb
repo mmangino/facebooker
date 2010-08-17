@@ -31,7 +31,7 @@ module ::ActionController
       one_or_true @request.parameters["fb_sig_in_new_facebook"]
     end
 
-    def link_to_canvas?(params, options)
+    def link_to_canvas?(options)
       option_override = options[:canvas]
       return false if option_override == false # important to check for false. nil should use default behavior
       option_override || (can_safely_access_request_parameters? && (one_or_true(@request.parameters["fb_sig_in_canvas"]) || one_or_true(@request.parameters[:fb_sig_in_canvas]) || one_or_true(@request.parameters["fb_sig_is_ajax"]) ))
@@ -44,7 +44,7 @@ module ::ActionController
   
     def rewrite_url_with_facebooker(*args)
       options = args.first.is_a?(Hash) ? args.first : args.last
-      is_link_to_canvas = @request.env["REQUEST_METHOD"] == "POST" && link_to_canvas?(@request.request_parameters, options)
+      is_link_to_canvas = link_to_canvas?(options)
       if is_link_to_canvas && !options.has_key?(:host)
         options[:host] = Facebooker.canvas_server_base
       end 
