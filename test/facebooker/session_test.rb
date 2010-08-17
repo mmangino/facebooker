@@ -235,6 +235,11 @@ class Facebooker::SessionTest < Test::Unit::TestCase
     assert @session.event_invite("12345", %w{1234 4567 100043211234}, :personal_message => 'Please come!')
   end
 
+  def test_can_rsvp_to_events
+    expect_http_posts_with_responses(example_event_rsvp_xml)
+    assert @session.event_rsvp("12345", "attending")
+  end
+
   def test_can_query_for_events
     expect_http_posts_with_responses(example_events_get_xml)
     events = @session.events
@@ -606,6 +611,15 @@ XML
     <events_cancel_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd">
       1
     </events_cancel_response> 
+    XML
+  end
+
+  def example_event_rsvp_xml
+    <<-XML
+    <?xml version="1.0" encoding="UTF-8"?>
+    <events_rsvp_response xmlns="http://api.facebook.com/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.facebook.com/1.0/ http://api.facebook.com/1.0/facebook.xsd">
+      1
+    </events_rsvp_response>
     XML
   end
 

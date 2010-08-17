@@ -346,6 +346,14 @@ module Facebooker
       post('facebook.events.invite', options.merge(:eid => eid, :uids => uids.to_json))
     end
 
+    # RSVP to an event
+    # http://wiki.developers.facebook.com/index.php/Events.rsvp
+    # E.g:
+    # @session.event_rsvp('1000321123', 'attending')
+    def event_rsvp(eid,rsvp_status, options = {})
+      post('facebook.events.rsvp', options.merge(:eid => eid, :rsvp_status => rsvp_status))
+    end
+
     def event_members(eid)
       @members ||= {}
       @members[eid] ||= post('facebook.events.getMembers', :eid => eid) do |response|
