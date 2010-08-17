@@ -334,6 +334,22 @@ module Facebooker
       result == '1' ? true : false
     end
 
+    # Invite users to an event
+    # http://wiki.developers.facebook.com/index.php/Events.invite
+    # E.g:
+    # @session.event_invite('1000321123', %w{1234 4567 1000123321}, :personal_message => "Please come!")
+    def event_invite(eid, uids, options = {})
+      post('facebook.events.invite', options.merge(:eid => eid, :uids => uids.to_json))
+    end
+
+    # RSVP to an event
+    # http://wiki.developers.facebook.com/index.php/Events.rsvp
+    # E.g:
+    # @session.event_rsvp('1000321123', 'attending')
+    def event_rsvp(eid,rsvp_status, options = {})
+      post('facebook.events.rsvp', options.merge(:eid => eid, :rsvp_status => rsvp_status))
+    end
+
     def event_members(eid)
       @members ||= {}
       @members[eid] ||= post('facebook.events.getMembers', :eid => eid) do |response|
