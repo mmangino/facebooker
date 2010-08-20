@@ -1103,7 +1103,7 @@ class RailsHelperTest < Test::Unit::TestCase
   end
   
   def test_fb_logout_link
-    assert_equal @h.fb_logout_link("Logout","My URL"),"<a href=\"#\" onclick=\"FB.Connect.logoutAndRedirect(&quot;My URL&quot;);; return false;\">Logout</a>"
+    assert_equal @h.fb_logout_link("Logout","My URL"),"<a href=\"#\" onclick=\"FB.Connect.logoutAndRedirect(&quot;My URL&quot;);\nwindow.location.href = &quot;My URL&quot;;; return false;\">Logout</a>"
   end
 
   def test_fb_bookmark_link
