@@ -54,8 +54,8 @@ module Facebooker
     # By default the hash passed in is loaded from facebooker.yml, but it can also be passed in
     # manually every request to run multiple Facebook apps off one Rails app. 
     def apply_configuration(config)
-      ENV['FACEBOOK_API_KEY']             = config['api_key']
-      ENV['FACEBOOK_SECRET_KEY']          = config['secret_key']
+      ENV['FACEBOOK_API_KEY']             = config['api_key'].to_s
+      ENV['FACEBOOK_SECRET_KEY']          = config['secret_key'].to_s
       ENV['FACEBOOKER_RELATIVE_URL_ROOT'] = config['canvas_page_name']
       ENV['FACEBOOKER_API']               = config['api']
       if config.has_key?('set_asset_host_to_callback_url')
